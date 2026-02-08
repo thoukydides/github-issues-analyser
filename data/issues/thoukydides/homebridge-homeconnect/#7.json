@@ -1,0 +1,23 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 7,
+    "updated_at": "2026-02-08T19:47:08.518Z",
+    "faq": [
+        {
+            "question": "Why are the power switch and program switches for my appliance in a random order in HomeKit?",
+            "answer": "The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined way for plugins to enforce the display order of multiple services within a single accessory. While the plugin exposes several services (such as the power `Switch` and various program control `Switch` services), individual HomeKit apps determine how to order them. Attempts to use HAP features like **Primary** or **Linked** services have not consistently improved ordering across different applications; in some cases, these changes actually made the Apple **Home** app's ordering less predictable. Most third-party HomeKit apps, such as **Eve**, **Home+**, and **Hesperus**, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.",
+            "alternative_resolution": "The documentation could be updated to clarify that service ordering is determined by the HomeKit client application rather than the plugin, and list known third-party apps that support manual reordering.",
+            "tags": [
+                "HomeKit",
+                "Switch",
+                "UI",
+                "Apple Home",
+                "Eve",
+                "Home+"
+            ],
+            "confidence": "high",
+            "hash": "36fe2d1aec4e0d83d04d6460e80e0d050f5fb6e322e97673b41a0d82e549fb96"
+        }
+    ]
+}
