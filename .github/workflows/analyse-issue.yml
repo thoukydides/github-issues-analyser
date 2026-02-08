@@ -82,7 +82,7 @@ jobs:
         
       - name: Save the analysis
         env:
-          STATE:        ${{ steps.inference.outputs.state }}
+          STATE:        ${{ needs.select-issue.outputs.state }}
           ANALYSIS:     ${{ steps.inference.outputs.response }}
         run: npm exec tsx -- bin/issue-save-analysis.ts
 
