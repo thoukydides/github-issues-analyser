@@ -65,7 +65,7 @@ export function loadIssuesMap(): Map<string, Map<string, Map<number, IssueData>>
         const issueNumberMap = repoMap.get(repo) ?? new Map<number, IssueData>();
         issueNumberMap.set(issue_number, issue);
         repoMap.set(repo, issueNumberMap);
-        map.set(repo, repoMap);
+        map.set(owner, repoMap);
     }
     return map;
 }
