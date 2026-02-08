@@ -37,12 +37,12 @@ async function run(): Promise<void> {
     // Add to the workflow summary
     const issue_repository = `${issue.owner}/${issue.repo}`;
     await core.summary
-        .addRaw(`### [\`${issue_repository}\`] ${issue.title} [#${issue.id}](${issue.html_url})`, true)
+        .addRaw(`### [\`${issue_repository}\`] ${issue.title} [#${issue.number}](${issue.html_url})`, true)
         .write();
 
     // Set outputs
     core.setOutput('repository',    issue_repository);
-    core.setOutput('issue_number',  issue.id);
+    core.setOutput('issue_number',  issue.number);
     core.setOutput('state',         makeState(issue));
 }
 
@@ -62,9 +62,9 @@ async function selectNextIssue(octokit: InstanceType<typeof GitHub>): Promise<Is
         CONFIG.map(({ owner, repo }) => getIssues(octokit, owner, repo))
     )).flat();
 
-    // Filter out issues that have been processed since their last update
+    // Exclude issues that have already been processed since their last update
     issues = issues.filter(i => {
-        const saved = savedIssues.get(i.owner)?.get(i.repo)?.get(i.id);
+        const saved = savedIssues.get(i.owner)?.get(i.repo)?.get(i.number);
         return !saved || new Date(saved.updated_at) < new Date(i.updated_at);
     });
 
