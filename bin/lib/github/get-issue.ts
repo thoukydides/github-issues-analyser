@@ -35,7 +35,7 @@ export async function getIssues(
     repo:       string
 ): Promise<Issue[]> {
     const issuesAndPRs = await octokit.paginate(octokit.rest.issues.listForRepo, {
-        owner, repo, sort: 'created', direction: 'asc'
+        owner, repo, state: 'all', sort: 'created', direction: 'asc'
     });
     const issues = issuesAndPRs.filter(i => !i.pull_request);
     core.info(`Retrieved ${plural(issues.length, 'issue')}`);
