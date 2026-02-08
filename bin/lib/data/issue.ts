@@ -72,7 +72,6 @@ export function loadIssuesMap(): Map<string, Map<string, Map<number, IssueData>>
 
 // Save a single issue
 export function saveIssue(issue: IssueData): void {
-    const json = JSON.stringify(issue, null, 4);
     const { owner, repo, issue_number } = issue;
 
     // Ensure that the directory exists
@@ -81,7 +80,9 @@ export function saveIssue(issue: IssueData): void {
 
     // Save the file
     const issuePath = path.join(issueDir, `#${issue_number}.json`);
+    const json = JSON.stringify(issue, null, 4);
     fs.writeFileSync(issuePath, json);
+    core.info(`Wrote '${issuePath}'`);
 }
 
 // Read directory contents (recursively)
