@@ -5,13 +5,13 @@
     "updated_at": "2019-12-30T05:45:13Z",
     "faq": [
         {
-            "question": "Why is light control or status for my hood missing or not working?",
-            "answer": "Support for hood features, including light control and status, can be difficult to implement accurately because the official Home Connect API documentation is often incomplete or inconsistent. Furthermore, as there is no official simulator for hoods and the plugin maintainer does not have access to physical hardware for testing, some features are based on best-guess implementations. If your hood lights are not appearing or functioning correctly in HomeKit, please provide diagnostic logs and feedback to help refine the support.",
-            "alternative_resolution": "Update the plugin documentation (README) to clearly identify hood support as experimental or requiring user verification due to the lack of official simulators.",
+            "question": "Why is light control for hoods experimental or potentially non-functional?",
+            "answer": "Support for hood features, including light status and control, is often implemented based on technical assumptions because the maintainer does not own a Home Connect-enabled hood for physical testing. Furthermore, the official Home Connect simulator does not currently include a hood model, and the API documentation is frequently incomplete or inaccurate regarding these appliances. Users with these devices are encouraged to provide feedback and logs to help refine the implementation.",
+            "alternative_resolution": "Update the README to explicitly list appliances and features that are currently 'untested' or 'experimental' due to lack of hardware or simulator availability.",
             "tags": [
                 "hood",
-                "lighting",
-                "API",
+                "lights",
+                "limitations",
                 "testing"
             ],
             "confidence": "high"
