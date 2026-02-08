@@ -1,0 +1,21 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 4,
+    "updated_at": "2026-02-08T19:00:40.315Z",
+    "faq": [
+        {
+            "question": "Why are some features for my appliance, such as hood lights, missing or not working?",
+            "answer": "Support for many appliances is implemented based on the official Home Connect API documentation, which can be inaccurate or incomplete. As the maintainer does not own every type of appliance and official simulators are not always available, features for certain devices (such as hoods) may be experimental or untested. If you find that a feature is missing or not functioning as expected, providing debug logs can help the maintainer refine the implementation for hardware they cannot access directly.",
+            "alternative_resolution": "Clearly document the testing status of different appliance types in the README to manage user expectations regarding experimental features.",
+            "tags": [
+                "hood",
+                "lights",
+                "api-limitations",
+                "hardware-limitations"
+            ],
+            "confidence": "high",
+            "hash": "f13076dc6b9c0a651da3e9152769401fd54c8f7217f527440f3e6d0812f0ef3b"
+        }
+    ]
+}
