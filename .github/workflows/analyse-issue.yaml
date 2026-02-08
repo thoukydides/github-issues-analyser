@@ -47,6 +47,7 @@ jobs:
         env:
           REPOSITORY:   ${{ inputs.repository }}
           ISSUE_NUMBER: ${{ inputs.issue_number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm exec tsx -- bin/issue-select.ts
 
   analyse-issue:
