@@ -2,17 +2,17 @@
     "owner": "thoukydides",
     "repo": "homebridge-homeconnect",
     "issue_number": 4,
-    "updated_at": "2026-02-08T18:43:50.395Z",
+    "updated_at": "2026-02-08T18:44:41.695Z",
     "faq": [
         {
-            "question": "Why are some features for hoods, such as light control, not fully documented or supported?",
-            "answer": "Support for certain appliance types, particularly hoods, is often developed without access to the physical hardware or a functional simulator. Because the Home Connect API documentation can be inaccurate or incomplete, initial implementations for these devices are based on technical estimates. These features remain undocumented in the `README` and are considered experimental until users with the actual hardware provide feedback confirming that they work as expected. If you have a Home Connect enabled hood, providing logs and testing feedback is the primary way to help finalise support for these features.",
-            "alternative_resolution": "Update the documentation to include a section on 'Community Testing', explicitly listing appliance types that require user verification and providing instructions on how to submit debug logs to confirm functionality.",
+            "question": "Why are some appliance features, such as hood lights, listed as experimental or unconfirmed?",
+            "answer": "The plugin maintainer does not own every type of Home Connect appliance and relies on official API documentation and simulators for development. However, the Home Connect API documentation is frequently inaccurate or incomplete, and simulators are not provided for all device types (e.g. extractor hoods). 🔧 Features for appliances that cannot be physically tested by the maintainer are implemented based on 'best guesses' from the documentation. ✅ These features remain unconfirmed until users with the physical hardware provide feedback via the GitHub issue tracker to verify they work as expected.",
+            "alternative_resolution": "Update the README to include a support matrix clearly distinguishing between features verified on physical hardware versus those implemented based on documentation.",
             "tags": [
                 "hood",
-                "lighting",
-                "experimental",
-                "api-limitations"
+                "lights",
+                "testing",
+                "limitations"
             ],
             "confidence": "high"
         }
