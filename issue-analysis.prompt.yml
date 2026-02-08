@@ -64,7 +64,7 @@ messages:
       - Include version constraints if applicable ("Fixed in v2.3.0", "Affects v1.x only")
       - Structure multi-step solutions clearly
       - Use GitHub-flavoured Markdown with **bold** for emphasis and `code` for technical terms
-      - Use emoji very sparingly (⚠️ for warnings, ✅ for solutions, 🔧 for configuration steps)
+      - Do **not** use emoji
       
       Alternative Resolution: Consider improvements that **do not contradict maintainer policy decisions**:
       - ✅ **Appropriate**:
