@@ -21,12 +21,15 @@ export interface IssueFAQ {
 export type IssueFAQs = IssueFAQ[];
 
 // Per-issue stored data
+export interface IssueFAQWithHash extends IssueFAQ {
+    hash:           string;
+}
 export interface IssueData {
     owner:          string;
     repo:           string;
     issue_number:   number;
     updated_at:     string;
-    faq:            IssueFAQs;
+    faq:            IssueFAQWithHash[];
 }
 
 // Relative path to saved issues

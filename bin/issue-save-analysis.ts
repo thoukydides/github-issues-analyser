@@ -3,6 +3,7 @@
 
 import * as core from '@actions/core';
 import { IssueData, IssueFAQs, saveIssue } from './lib/data/issue.js';
+import { hash } from './lib/hash.js';
 
 try {
     await run();
@@ -17,7 +18,8 @@ async function run(): Promise<void> {
     const analysis = JSON.parse(process.env.ANALYSIS ?? '') as IssueFAQs;
 
     // Save the issue
-    const issue: IssueData = { ...state, faq: analysis };
+    const faq = analysis.map(e => ({ ...e, hash: hash(e) }));
+    const issue: IssueData = { ...state, faq };
     saveIssue(issue);
 
     // Add details of the analysis to the workflow summary
