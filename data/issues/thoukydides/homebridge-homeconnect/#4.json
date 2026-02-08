@@ -1,0 +1,19 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 4,
+    "updated_at": "2019-12-30T05:45:13Z",
+    "faq": [
+        {
+            "question": "Is light status and control supported for Home Connect hoods?",
+            "answer": "Support for hood lighting features has been implemented but is considered experimental. The developer does not have access to a physical hood for testing, and Home Connect does not provide a simulator for this appliance type. Additionally, the official API documentation is often inaccurate or incomplete regarding hood capabilities. Users are encouraged to test these features and provide feedback on GitHub to help refine the implementation. Official documentation will be updated once the community confirms the functionality works as expected.",
+            "alternative_resolution": "Update the plugin documentation to explicitly list Hood lighting as an experimental feature and include a request for user feedback in the 'Supported Appliances' section.",
+            "tags": [
+                "hood",
+                "lighting",
+                "experimental"
+            ],
+            "confidence": "high"
+        }
+    ]
+}
