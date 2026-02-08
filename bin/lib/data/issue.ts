@@ -30,7 +30,7 @@ export interface IssueData {
 }
 
 // Relative path to saved issues
-const ISSUES_PATH = '.data/issues'; // + /<owner>/<repo>/#<issue>.json
+const ISSUES_PATH = './data/issues'; // + /<owner>/<repo>/#<issue>.json
 
 // Load all saved issues
 export function loadIssues(): IssueData[] {
