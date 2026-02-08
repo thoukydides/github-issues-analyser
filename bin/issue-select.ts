@@ -37,7 +37,7 @@ async function run(): Promise<void> {
     // Add to the workflow summary
     const issue_repository = `${issue.owner}/${issue.repo}`;
     await core.summary
-        .addRaw(`### ${issue.title} [${issue_repository}#${issue.id}](${issue.html_url})`, true)
+        .addRaw(`### [\`${issue_repository}\`] ${issue.title} [#${issue.id}](${issue.html_url})`, true)
         .write();
 
     // Set outputs

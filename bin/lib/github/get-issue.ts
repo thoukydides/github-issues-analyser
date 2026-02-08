@@ -34,9 +34,10 @@ export async function getIssues(
     owner:      string,
     repo:       string
 ): Promise<Issue[]> {
-    const issues = await octokit.paginate(octokit.rest.issues.listForRepo, {
+    const issuesAndPRs = await octokit.paginate(octokit.rest.issues.listForRepo, {
         owner, repo, sort: 'created', direction: 'asc'
     });
+    const issues = issuesAndPRs.filter(i => !i.pull_request);
     core.info(`Retrieved ${plural(issues.length, 'issue')}`);
     core.debug(`REST API Issues:\n${JSON.stringify(issues, null, 4)}`);
     return issues.map(i => ({ owner, repo, ...i }));
