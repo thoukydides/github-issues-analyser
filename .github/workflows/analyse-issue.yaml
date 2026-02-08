@@ -1,0 +1,93 @@
+name: Analyse Issues
+permissions:
+  contents: write
+concurrency:
+  # Ensure only a single instance of this workflow runs at a time
+  group: ${{ github.workflow }}
+
+on:
+  schedule:
+  # Run 20 times/day (Gemini API rate limit)
+  - cron: '30 0-19 * * *'
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: The repository 'owner/repo'
+        required: false
+        type: string
+      issue_number:
+        description: Issue number
+        required: false
+        type: number
+
+jobs:
+  select-issue:
+    outputs:
+      repository:   ${{ steps.select.outputs.repository }}
+      issue_number: ${{ steps.select.outputs.issue_number }}
+      state:        ${{ steps.select.outputs.state }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout analyser repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Select an issue to analyse
+        id: select
+        env:
+          REPOSITORY:   ${{ inputs.repository }}
+          ISSUE_NUMBER: ${{ inputs.issue_number }}
+        run: npm exec tsx -- bin/issue-select.ts
+
+  analyse-issue:
+    needs: [select-issue]
+    if: ${{ needs.select-issue.outputs.issue_number }}
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout analyser repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Analyse the issue
+        id: inference
+        uses: thoukydides/action-issue-ai-summary@v1
+        with:
+          gemini_api_key:       ${{ secrets.gemini_api_key_issue }}
+          repository:           ${{ needs.select-issue.outputs.repository }}
+          issue_number:         ${{ needs.select-issue.outputs.issue_number }}
+          include_comments:     true
+          prompt_file:          ./issue-analysis.prompt.yml
+          input_prompt_tokens:  1500 # Measured using https://aistudio.google.com/prompts/new_chat
+        
+      - name: Save the analysis
+        env:
+          STATE:        ${{ steps.inference.outputs.state }}
+          ANALYSIS:     ${{ steps.inference.outputs.response }}
+        run: npm exec tsx -- bin/issue-save-analysis.ts
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add:              ./data
+          message:          'Updated issue #${{ needs.select-issue.outputs.issue_number }}'
+          default_author:   github_actions

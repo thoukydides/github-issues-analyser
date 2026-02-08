@@ -1,0 +1,70 @@
+{
+    "name": "github-issues-analyser",
+    "version": "1.0.0",
+    "description": "Extract potentially useful information from GitHub issues",
+    "license": "ISC",
+    "keywords": [
+        "GitHub",
+        "issues",
+        "comments",
+        "analyser",
+        "FAQ",
+        "AI",
+        "LLM"
+    ],
+    "author": {
+        "name": "Alexander Thoukydides",
+        "url": "https://www.thouky.co.uk/"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/thoukydides"
+        },
+        {
+            "type": "paypal",
+            "url": "https://paypal.me/thoukydides"
+        },
+        {
+            "type": "ko-fi",
+            "url": "https://ko-fi.com/thouky"
+        },
+        {
+            "type": "buymeacoffee",
+            "url": "https://www.buymeacoffee.com/thouky"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/thoukydides/github-issues-analyser.git"
+    },
+    "type": "module",
+    "engines": {
+        "node": "^24.12.0 || ^22.21.1 || ^20.19.6"
+    },
+    "dependencies": {
+        "@actions/core": "^2.0.3",
+        "@actions/github": "^9.0.0",
+        "@eslint/eslintrc": "^3.3.3",
+        "@eslint/js": "^9.30.1",
+        "@octokit/core": "^7.0.6",
+        "@octokit/plugin-rest-endpoint-methods": "^17.0.0",
+        "@tsconfig/node20": "^20.1.8",
+        "@types/eslint__js": "^8.42.3",
+        "@types/node": "^20.19.30",
+        "clusternova": "^1.5.5",
+        "eslint": "^9.39.2",
+        "globals": "^17.2.0",
+        "rimraf": "^6.1.2",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.54.0"
+    },
+    "scripts": {
+        "lint": "eslint eslint.config.mjs 'bin/**/*.ts' --max-warnings=0",
+        "type-check": "tsc --noEmit -p ./ && tsc --noEmit -p bin/"
+    },
+    "optionalDependencies": {
+        "fsevents": "^2.3.3"
+    }
+}
