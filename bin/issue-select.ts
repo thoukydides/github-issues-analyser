@@ -75,6 +75,6 @@ async function selectNextIssue(octokit: InstanceType<typeof GitHub>): Promise<Is
 
 // Prepare the state passed to the post-inference script
 function makeState(issue: Issue): Omit<IssueData, 'faq'> {
-    const { owner, repo, id, updated_at } = issue;
-    return { owner, repo, issue_number: id, updated_at };
+    const { owner, repo, number, updated_at } = issue;
+    return { owner, repo, issue_number: number, updated_at };
 }
