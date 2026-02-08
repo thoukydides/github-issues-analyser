@@ -1,0 +1,46 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 5,
+    "updated_at": "2026-02-08T19:02:46.319Z",
+    "faq": [
+        {
+            "question": "Why does the log show a program running or time remaining when my appliance is off?",
+            "answer": "The plugin logs and displays status information exactly as it is received from the **Home Connect API** server. If the logs indicate that a program is active or showing a countdown (e.g. `Program 1858 seconds remaining`) while the appliance is physically off, it means the Home Connect server is out of sync with the hardware. You can try to resolve this by starting and then stopping a manual program using the official Home Connect app to reset the server state. If the issue persists, it may require re-registering your **Client ID** or contacting Home Connect support, as the plugin cannot correct invalid data sent by the API.",
+            "alternative_resolution": "The plugin could potentially implement a check to ignore program status events if the appliance reports its power state as off, though this might hide genuine API behaviour.",
+            "tags": [
+                "oven",
+                "logs",
+                "Home Connect API",
+                "sync"
+            ],
+            "confidence": "high",
+            "hash": "4389694e353a209ff76e6b1f91f4d918d6f42a8732131b4fd812b9594a78b2dd"
+        },
+        {
+            "question": "Why do I receive an `insufficient_scope` error when trying to control my oven or hob?",
+            "answer": "The Home Connect API restricts the `Oven-Control` and `Hob-Control` scopes to approved business partners. According to the **Home Connect Developer Agreement**, these permissions are generally not granted to individual consumer accounts. Because of this architectural restriction, the plugin is unable to start or stop programs on these appliances. Functionality for ovens and hobs is limited to monitoring (read-only status), event notifications, and power on/off (where supported by the specific model's API implementation).",
+            "alternative_resolution": "Enhance the error message for `insufficient_scope` specifically for ovens and hobs to explain that this is a known API limitation for individual developer accounts.",
+            "tags": [
+                "oven",
+                "hob",
+                "insufficient_scope",
+                "API limitations"
+            ],
+            "confidence": "high",
+            "hash": "7189502419a8c632118d9d0c3a263952a216262c72d94bc8d74fe1f860fb4b4d"
+        },
+        {
+            "question": "How can I see the program remaining time or active status in HomeKit?",
+            "answer": "Apple's standard **Home app** often only displays a simple power switch for certain appliances. To view more detailed information provided by the plugin, such as **Active** status or **Program Remaining Time**, you must use a third-party HomeKit app that supports a wider range of characteristic types, such as **Eve for HomeKit**.",
+            "tags": [
+                "HomeKit",
+                "Home app",
+                "Eve",
+                "active status"
+            ],
+            "confidence": "high",
+            "hash": "1a7009d3361ea5413242f44f5acf396954f0ff9364069659fbe6ca1ed947560e"
+        }
+    ]
+}
