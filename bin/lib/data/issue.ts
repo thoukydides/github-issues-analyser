@@ -34,14 +34,12 @@ const ISSUES_PATH = '.data/issues'; // + /<owner>/<repo>/#<issue>.json
 
 // Load all saved issues
 export function loadIssues(): IssueData[] {
-    const dirContents = fs.readdirSync(ISSUES_PATH, { encoding: 'utf8', recursive: true });
     const issues: IssueData[] = [];
     let incompatible = 0;
-    for (const issueBasename of dirContents) {
-        if (!issueBasename.endsWith('.json')) continue;
+    for (const issuePath of listFiles(ISSUES_PATH)) {
+        if (!issuePath.endsWith('.json')) continue;
 
         // Read this issue's saved data
-        const issuePath = path.resolve(ISSUES_PATH, issueBasename);
         const json = fs.readFileSync(issuePath, { encoding: 'utf8' });
         const issue = JSON.parse(json) as IssueData;
 
@@ -84,4 +82,17 @@ export function saveIssue(issue: IssueData): void {
     // Save the file
     const issuePath = path.join(issueDir, `#${issue_number}.json`);
     fs.writeFileSync(issuePath, json);
+}
+
+// Read directory contents (recursively)
+function listFiles(dirPath: string, recursive = true): string[] {
+    try {
+        const entries = fs.readdirSync(dirPath, { encoding: 'utf8', withFileTypes: true, recursive });
+        const files = entries.filter(e => e.isFile());
+        return files.map(f => path.join(f.parentPath, f.name));
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        core.warning(`Error reading directory '${dirPath}': ${message}`);
+        return [];
+    }
 }
