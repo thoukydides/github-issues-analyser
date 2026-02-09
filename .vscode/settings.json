@@ -8,8 +8,12 @@
     ],
     "eslint.enable": true,
     "cSpell.words": [
+        "aeiou",
         "buymeacoffee",
         "clusternova",
+        "gemma",
+        "genai",
+        "HDBSCAN",
         "Homebridge",
         "homeconnect",
         "matterbridge",

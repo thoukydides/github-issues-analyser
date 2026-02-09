@@ -6,7 +6,7 @@ import * as core from '@actions/core';
 import { GitHub } from '@actions/github/lib/utils';
 import { getIssue, getIssues, Issue } from './lib/github/get-issue.js';
 import { CONFIG } from './config.js';
-import { IssueData, loadIssuesMap } from './lib/data/issue.js';
+import { IssueData, loadIssuesMap } from './lib/data/issues.js';
 import { plural } from './lib/utils.js';
 
 try {

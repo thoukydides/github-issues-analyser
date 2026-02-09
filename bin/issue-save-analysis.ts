@@ -2,7 +2,7 @@
 // Copyright © 2026 Alexander Thoukydides
 
 import * as core from '@actions/core';
-import { IssueData, IssueFAQs, saveIssue } from './lib/data/issue.js';
+import { IssueData, IssueFAQs, saveIssue } from './lib/data/issues.js';
 import { hash } from './lib/hash.js';
 
 try {

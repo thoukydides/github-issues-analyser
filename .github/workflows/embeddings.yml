@@ -1,0 +1,61 @@
+name: Generate Embeddings
+permissions:
+  contents: write
+concurrency:
+  # Ensure only a single instance of this workflow runs at a time
+  group: ${{ github.workflow }}
+
+on:
+  schedule:
+  - cron: '13 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate-embeddings:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout analyser repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate embeddings
+        env:
+          GEMINI_API_KEY:   ${{ secrets.gemini_api_key_issue }}
+        run: npm exec tsx -- bin/generate-embeddings.ts
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add:              ./data
+          message:          'Generated embeddings'
+          default_author:   github_actions
+
+  try-clustering:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout analyser repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Using HDBSCAN to cluster candidates
+        run: npm exec tsx -- bin/try-clustering.ts
