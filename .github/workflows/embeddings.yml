@@ -37,7 +37,7 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           add:              ./data
-          message:          'Generated embeddings'
+          message:          'Updated embeddings'
           default_author:   github_actions
 
   try-clustering:
