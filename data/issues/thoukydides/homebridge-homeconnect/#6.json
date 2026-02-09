@@ -1,0 +1,22 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 6,
+    "updated_at": "2026-02-09T03:27:33.876Z",
+    "faq": [
+        {
+            "question": "Why does the Elgato Eve app show my appliance as inactive or having an error?",
+            "answer": "The **Elgato Eve** app interprets HomeKit characteristics more strictly than the standard Apple Home app. Specifically, it uses the `Status Active` characteristic as a health indicator. When this value is `false`, Eve displays a red warning triangle or the message `The accessory is inactive. Please refer to its user manual.`, even if there is no actual fault.\n\nThe plugin maps Home Connect operation states to HomeKit to minimize these misleading warnings while still providing accurate status. Under the current mapping, the following states will trigger the **Inactive** warning in Eve:\n* `Pause`: The appliance program has been suspended.\n* `ActionRequired`: The appliance requires manual intervention (e.g. closing a door or refilling a consumable).\n* `Error`: The appliance has encountered a functional error.\n* `Aborting`: The appliance is currently cancelling the active program.\n\nIdle states like `Ready` or `Finished` are mapped to `Status Active = true` specifically to prevent Eve from showing an error state when the appliance is simply waiting to be used. Note that other HomeKit apps, such as **Home+**, may display these characteristics differently (e.g. as a boolean Yes/No for Status Active).",
+            "alternative_resolution": "Update the HomeKit Mapping documentation in the project wiki to include the definitive mapping table for `BSH.Common.Status.OperationState` to ensure users can verify expected behaviour in third-party apps.",
+            "tags": [
+                "Eve",
+                "HomeKit",
+                "Status Active",
+                "Operation State",
+                "UI"
+            ],
+            "confidence": "high",
+            "hash": "528783f110acd840acb45e51d74eef4ebca2d2287d5befde3fa00096d400711b"
+        }
+    ]
+}
