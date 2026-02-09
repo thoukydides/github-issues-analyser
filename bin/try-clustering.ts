@@ -10,14 +10,14 @@ import { plural } from './lib/utils.js';
 type CandidateVectorPoint = CandidateFAQ & VectorPoint;
 
 try {
-    run();
+    await run();
 } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     core.setFailed(message);
 }
 
 // Main entry point
-function run(): void {
+async function run(): Promise<void> {
     // Load all candidate entries
     const candidates = loadCandidates();
 
@@ -36,10 +36,11 @@ function run(): void {
     core.info(`${plural(clusters.length, 'cluster')} + ${plural(outliers.length, 'outlier')}`);
     clusters.forEach((cluster, index) => { listCandidates(`Cluster #${index}`, cluster); });
     listCandidates('Outliers', outliers);
+    await core.summary.write();
 }
 
-// List the members of a cluster
+// List the members of a cluster in the job summary
 function listCandidates(description: string, candidates: CandidateVectorPoint[]): void {
-    core.info(`#### ${description}`);
-    for (const c of candidates) core.info(`- ${c.question} (${c.repo}#${c.issue_number})`);
+    core.summary.addHeading(description, 4);
+    for (const c of candidates) core.summary.addRaw(`- ${c.question} (${c.repo}#${c.issue_number})`, true);
 }
