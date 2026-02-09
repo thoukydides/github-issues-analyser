@@ -41,6 +41,7 @@ async function run(): Promise<void> {
 
 // List the members of a cluster in the job summary
 function listCandidates(description: string, candidates: CandidateVectorPoint[]): void {
-    core.summary.addHeading(description, 4);
-    for (const c of candidates) core.summary.addRaw(`- ${c.question} (${c.repo}#${c.issue_number})`, true);
+    core.summary
+        .addHeading(description, 4)
+        .addList(candidates.map(c => `- ${c.question} (${c.repo}#${c.issue_number})`));
 }
