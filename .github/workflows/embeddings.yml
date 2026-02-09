@@ -41,6 +41,7 @@ jobs:
           default_author:   github_actions
 
   try-clustering:
+    needs: [generate-embeddings]
 
     runs-on: ubuntu-latest
 
