@@ -6,7 +6,7 @@ import * as core from '@actions/core';
 import { GitHub } from '@actions/github/lib/utils';
 import { getIssue, getIssues, Issue } from './lib/github/get-issue.js';
 import { CONFIG } from './config.js';
-import { IssueData, loadIssuesMap } from './lib/data/issues.js';
+import { ISSUE_DATE_PREFERRED, IssueData, loadIssuesMap } from './lib/data/issues.js';
 import { plural } from './lib/utils.js';
 
 try {
@@ -64,10 +64,23 @@ async function selectNextIssue(octokit: InstanceType<typeof GitHub>): Promise<Is
     )).flat();
 
     // Exclude issues that have already been processed since their last update
-    issues = issues.filter(i => {
-        const saved = savedIssues.get(i.owner)?.get(i.repo)?.get(i.number);
-        return !saved || new Date(saved.updated_at) < new Date(i.updated_at);
-    });
+    const filter = (issues: Issue[], predicate: (issue: Issue, saved?: IssueData) => boolean): Issue[] =>
+        issues.filter(i => predicate(i, savedIssues.get(i.owner)?.get(i.repo)?.get(i.number)));
+    issues = filter(issues, (i, saved) => !saved                        // (unprocessed)
+        || new Date(saved.updated_at) < new Date(i.updated_at)          // (issue updated)
+        || new Date(saved.updated_at) < new Date(ISSUE_DATE_PREFERRED));// (prompt updated)
+    core.info(`${plural(issues.length, 'issue')} require (re)analysis`);
+
+    // Select preferred issues to process first
+    const prefer = (description: string, predicate: (issue: Issue, saved?: IssueData) => boolean): void => {
+        const filtered = filter(issues, predicate);
+        if (filtered.length) {
+            core.info(`Prefer ${description}: Selected ${filtered.length} of ${plural(issues.length, 'issue')}`);
+            issues = filtered;
+        }
+    };
+    prefer('never analysed',    (_, saved) => !saved);
+    prefer('closed',            i => i.state === 'closed');
 
     // Select the least recently updated issue to process
     core.info(`Selected ${plural(issues.length, 'candidate issue')}`);

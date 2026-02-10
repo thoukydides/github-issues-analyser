@@ -8,6 +8,7 @@ import { plural } from '../utils.js';
 
 // Date of compatible and preferred prompts
 export const ISSUE_DATE_COMPATIBLE = '2026-02-08T00:00:00.000Z';
+export const ISSUE_DATE_PREFERRED  = '2026-02-10T13:46:41.150Z';
 
 // Result of inference using issue-analysis.prompt.yml
 export type IssueConfidence = 'high' | 'medium' | 'low';

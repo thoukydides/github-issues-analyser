@@ -78,7 +78,7 @@ jobs:
           issue_number:         ${{ needs.select-issue.outputs.issue_number }}
           include_comments:     true
           prompt_file:          ./issue-analysis.prompt.yml
-          input_prompt_tokens:  1500 # Measured using https://aistudio.google.com/prompts/new_chat
+          input_prompt_tokens:  2100 # Measured using https://aistudio.google.com/prompts/new_chat
         
       - name: Save the analysis
         env:
