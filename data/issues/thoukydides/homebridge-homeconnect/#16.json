@@ -1,0 +1,21 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 16,
+    "updated_at": "2026-02-10T11:28:51.411Z",
+    "faq": [
+        {
+            "question": "Why am I getting the error `BSH.Common.Error.LockedByLocalControl`?",
+            "answer": "The error `Request cannot be performed temporarily! due to local actuated user intervention [BSH.Common.Error.LockedByLocalControl]` is returned by the Home Connect servers when the appliance has recently been operated manually via its physical controls. According to the Home Connect API documentation, this state should normally only persist for a few seconds. However, some appliances (notably coffee makers) may implement a longer lockout period. This is an API-level restriction to ensure safety and prevent remote commands from conflicting with a user physically present at the machine. If this error persists long after manual intervention has ended, it may indicate an issue with the Home Connect servers or the specific appliance firmware.",
+            "alternative_resolution": "No code change possible as this is a server-side/hardware restriction. Documentation could be updated to list this as a known transient error state for coffee makers.",
+            "tags": [
+                "coffee maker",
+                "BSH.Common.Error.LockedByLocalControl",
+                "API error",
+                "remote start"
+            ],
+            "confidence": "high",
+            "hash": "bbcaf2e58294d559fc786b658c3ea3f582febed2a9cf9c41a73eb954237fca7d"
+        }
+    ]
+}
