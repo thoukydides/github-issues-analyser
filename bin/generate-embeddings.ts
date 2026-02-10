@@ -36,6 +36,6 @@ async function run(): Promise<void> {
 
 // Create issue content used for embeddings
 function makeContent(faq: IssueFAQ): string {
-    const { question, answer } = faq;
-    return `# ${question}\n\n${answer}`;
+    const { question, answer, semantic_abstract } = faq;
+    return semantic_abstract ?? `# ${question}\n\n${answer}`;
 }

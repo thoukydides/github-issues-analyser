@@ -64,6 +64,7 @@ messages:
         - Candidate is based on an older issue contradicting newer existing entry
         - Candidate suggests changes already rejected by maintainer
         - Existing entry is clear and complete; candidate adds no material value
+        - If no candidate entries add material value to this category, return the existing entries unchanged and explain briefly why
 
       Choose a concise, searchable heading that:
       - Encompasses the range of topics with the narrowest possible scope

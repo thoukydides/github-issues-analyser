@@ -15,8 +15,8 @@ export type IssueConfidence = 'high' | 'medium' | 'low';
 export interface IssueFAQ {
     question:                   string;
     answer:                     string;
+    semantic_abstract?:         string;
     alternative_resolution?:    string;
-    tags:                       string[];
     confidence:                 IssueConfidence;
 }
 export type IssueFAQs = IssueFAQ[];
