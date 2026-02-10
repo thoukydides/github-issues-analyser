@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 20,
+    "updated_at": "2026-02-10T17:08:22.176Z",
+    "faq": [
+        {
+            "question": "Why does my coffee machine or appliance turn on automatically when Homebridge starts?",
+            "answer": "To provide full functionality, the plugin must discover which programs your appliance supports and the specific options available for each (such as temperature or bean strength). On many Home Connect appliances, including most coffee machines, these details are only visible to the API when the device is powered on.\n\nDuring the initial setup (or after clearing the cache), the plugin will:\n1.  **Switch the appliance on**: This allows it to query the API for program metadata.\n2.  **Wait for a Ready state**: Appliances like coffee machines often perform a self-cleaning cycle when powered on. The plugin waits for this to finish (which can take 45–60 seconds) before proceeding.\n3.  **Iterate through programs**: It temporarily selects each program to read its supported options.\n4.  **Switch the appliance off**: Once discovery is finished, the appliance is returned to its previous state.\n\nThis information is saved to a cache file in the Homebridge `persist` directory. Once successfully cached, the appliance will **not** turn on during subsequent restarts. If your device turns on every time Homebridge restarts, it indicates the discovery process failed to complete (e.g. due to the device being manually operated or losing connection during the cycle) and is being retried.",
+            "semantic_abstract": "Home Connect appliances often require a power-on state to expose program-specific metadata and options via the API, necessitating a one-time discovery cycle where the plugin switches the device on. Coffee machines specifically introduce a delay due to mandatory self-cleaning cycles upon power-up, requiring the plugin to wait for the `OperationState.Ready` event before successfully caching appliance capabilities.",
+            "alternative_resolution": "Enhance the plugin's log output or configuration UI to explicitly warn users that a one-time power-on discovery cycle is required for their specific model, reducing confusion when the appliance unexpectedly activates.",
+            "confidence": "high",
+            "hash": "4547ff66a1af740a28d5226d4b6c403cc0f024c8b2d12ca3f7669345c1a7757d"
+        }
+    ]
+}
