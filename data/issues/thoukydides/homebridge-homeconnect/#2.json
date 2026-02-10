@@ -1,0 +1,66 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 2,
+    "updated_at": "2026-02-10T12:08:20.018Z",
+    "faq": [
+        {
+            "question": "Why cannot I see the remaining time or detailed status of my dishwasher or oven in the Apple Home app?",
+            "answer": "Apple's official Home app has limited support for specific appliance characteristics such as `Remaining Duration` or detailed program states. While the plugin provides this data, it is not displayed in the Home app. To view these details or use them as automation triggers, you should use a third-party HomeKit app such as **Eve** or **Home+**. Additionally, the plugin provides `Stateless Programmable Switch` services that function as automation triggers for events like **Program finished**, **Timer finished**, or **Preheat finished**, which are visible in any HomeKit app.",
+            "tags": [
+                "dishwasher",
+                "oven",
+                "Home app",
+                "Eve",
+                "Home+",
+                "remaining-duration"
+            ],
+            "confidence": "high",
+            "hash": "d759916748359761e110670a45f72be35c8d3e2f60f27ab8a76894afacc54b7a"
+        },
+        {
+            "question": "Why does my appliance stop responding to HomeKit after I use its physical buttons?",
+            "answer": "When an appliance is operated manually via its physical controls, the Home Connect system often locks out remote control via the API for a period of time. This is reported as `Request cannot be performed temporarily! due to local actuated user intervention [BSH.Common.Error.LockedByLocalControl]`. This is a hardware and API limitation of the Home Connect platform itself. Remote control usually resumes automatically once the manual operation is finished.",
+            "tags": [
+                "manual-control",
+                "BSH.Common.Error.LockedByLocalControl",
+                "lockout"
+            ],
+            "confidence": "high",
+            "hash": "206ad70f3e9cae702012657be584f196b5968b229808d55fa4721e825b0a3ea0"
+        },
+        {
+            "question": "How do I control my hood fan speed using Siri?",
+            "answer": "Siri maps fan speeds to specific percentages: **Low** is 25%, **Medium** is 50%, and **High** is 100%. The plugin maps these percentages to the closest available physical fan settings of your hood. You can use commands like `Hey Siri, set the hood fan to medium` or `Hey Siri, set the hood fan to 100%`. Note that numeric settings like `set fan to 1` are not supported by Siri for HomeKit fan services.",
+            "tags": [
+                "hood",
+                "fan",
+                "Siri"
+            ],
+            "confidence": "high",
+            "hash": "ee141225878815623c0eb81868a6090fcda8f08c76cc4d40fd152aeb078d5e0b"
+        },
+        {
+            "question": "Why does my multi-cavity oven show `BSH.Common.Error.InvalidUIDValue` in the logs?",
+            "answer": "This error typically occurs with multi-cavity appliances (such as the Thermador PRD486WDHU range) where only the main oven supports Home Connect functionality. If the Home Connect API continues to advertise the secondary oven despite it lacking remote capabilities, queries for its programs will fail with `BSH.Common.Error.InvalidUIDValue`. The plugin is designed to handle this gracefully by ignoring the error and disabling program control for the unsupported cavity. This is an issue with the Home Connect API's device enumeration which they have worked to address in their server-side updates.",
+            "tags": [
+                "oven",
+                "BSH.Common.Error.InvalidUIDValue",
+                "Thermador"
+            ],
+            "confidence": "high",
+            "hash": "c47023306cba5f39b0cbbc92a57518b49b01d2b7d15616e799a161a927644ca0"
+        },
+        {
+            "question": "Why is there a delay when controlling appliances via HomeKit?",
+            "answer": "The Home Connect API is inherently slow, typically taking 1 to 2 seconds to complete a single request. Furthermore, Home Connect imposes strict rate limits, such as a maximum of 10 error-inducing requests or 5 program starts per minute. To ensure reliability and avoid being blocked, the plugin serialises multiple characteristic changes (for example, simultaneously turning on a light and adjusting its brightness) into sequential API calls. This results in a noticeable but necessary lag between the HomeKit command and the appliance's physical response.",
+            "tags": [
+                "performance",
+                "latency",
+                "rate-limits"
+            ],
+            "confidence": "high",
+            "hash": "64ebc0663c40ec1a1055c09f52bc38e8a5b30abef78a934bb58ad3ad81e0b393"
+        }
+    ]
+}
