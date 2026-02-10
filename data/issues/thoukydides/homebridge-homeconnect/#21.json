@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 21,
+    "updated_at": "2026-02-10T17:35:03.295Z",
+    "faq": [
+        {
+            "question": "Why does the plugin crash with `SyntaxError: Unexpected end of JSON input`?",
+            "answer": "The Home Connect event stream can occasionally include spurious or garbage characters that cause the JSON parser to fail. This issue appears to be caused by debugging code left in the Home Connect API's event stream by the manufacturer. \n\nWhile this is a limitation of the Home Connect API itself, the plugin includes logic to detect these malformed event streams and automatically restart the connection to recover. \n\n- Ensure you are running version `0.17.0` or later, which includes enhanced trapping for these specific parsing failures.\n- If the error persists, it usually indicates a new pattern of garbage characters in the API stream that needs to be addressed in the plugin's error handling logic.",
+            "semantic_abstract": "Home Connect API event streams occasionally transmit spurious characters or malformed JSON, leading to parsing failures. The plugin implements defensive programming to trap these `SyntaxError` exceptions and trigger an event stream restart to maintain connectivity despite upstream API instability.",
+            "alternative_resolution": "The plugin's error handling for the event stream could be further hardened to ensure that any `SyntaxError` during JSON parsing of an event does not bubble up to the main Homebridge process, perhaps by logging the malformed payload for debugging and automatically re-initialising the stream.",
+            "confidence": "high",
+            "hash": "4a0ff1fdabedc77796097a86c3512b5992681b267d837c364181ac042183ecd9"
+        }
+    ]
+}
