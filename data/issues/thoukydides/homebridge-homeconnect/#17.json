@@ -1,0 +1,32 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 17,
+    "updated_at": "2026-02-10T15:43:16.405Z",
+    "faq": [
+        {
+            "question": "Why are some coffee programs missing options like bean amount or temperature in the Homebridge UI?",
+            "answer": "Some Home Connect appliances, particularly coffee makers, only provide program options to the API when that specific program is currently selected on the device. If the plugin hasn't seen a program selected, it might only show basic options like `FillQuantity`.\n\nThe plugin attempts to resolve this automatically by:\n1. Attempting to select and read each program's options when the plugin first starts (if the appliance is idle and remote control is enabled).\n2. Updating its cache whenever you manually select a program on the physical appliance.\n3. Performing a full scan of all programs when the **Identify** function is triggered in HomeKit (represented by the 'Identify' button in some Homebridge UI or 'Identify' in the Home app).\n\nIf you are still missing options, ensure the appliance is idle and use the **Identify** function to force a refresh. Note that programs currently 'unavailable' (e.g. coffee drinks when out of beans or the water tank is empty) cannot be scanned until the condition is resolved.",
+            "alternative_resolution": "The plugin could display a more descriptive warning in the log when programs return no options, suggesting the use of the 'Identify' feature to force a manual refresh of the program options cache.",
+            "tags": [
+                "coffee machine",
+                "program options",
+                "cache",
+                "identify"
+            ],
+            "confidence": "high",
+            "hash": "eee1299f72029d4e76c44bd1e54db364ff60207cfeb75d3294de40b630434b28"
+        },
+        {
+            "question": "Which coffee machine options are supported by the Home Connect API?",
+            "answer": "The public Home Connect API currently supports a limited set of options for coffee makers, even if the official Home Connect app shows more. The supported options typically include:\n\n* `ConsumerProducts.CoffeeMaker.Option.BeanAmount` (Strength)\n* `ConsumerProducts.CoffeeMaker.Option.FillQuantity` (Size/Volume)\n* `ConsumerProducts.CoffeeMaker.Option.CoffeeTemperature` (Temperature)\n\nOther proprietary options visible in the manufacturer's app may not be available via the API and therefore cannot be controlled via this plugin until BSH updates their public API.",
+            "alternative_resolution": "Add a link to the Home Connect API changelog in the documentation to help users check for newly supported features.",
+            "tags": [
+                "coffee machine",
+                "API limitations"
+            ],
+            "confidence": "high",
+            "hash": "929969da1a3ebd8dd1467563af1c01d2972af1f6ffb2ad244c19b80970b6e391"
+        }
+    ]
+}
