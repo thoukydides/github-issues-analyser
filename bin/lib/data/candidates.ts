@@ -6,13 +6,14 @@ import path from 'node:path';
 import * as core from '@actions/core';
 import { plural } from '../utils.js';
 import { IssueFAQWithHash } from './issues.js';
+import { Embeddings } from '../embeddings/google-ai-studio.js';
 
 // A candidate FAQ entry
 export interface CandidateFAQ extends IssueFAQWithHash {
     owner:          string;
     repo:           string;
     issue_number:   number;
-    vector?:        number[];
+    embeddings?:    Embeddings;
 }
 
 // File containing candidate FAQ entries with their embeddings

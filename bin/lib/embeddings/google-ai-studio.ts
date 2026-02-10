@@ -9,7 +9,8 @@ import { setTimeout } from 'node:timers/promises';
 
 // Embedding configuration
 const MODEL                 = 'gemini-embedding-001';
-const TASK_TYPE             = 'CLUSTERING';
+const TASK_TYPES            = ['SEMANTIC_SIMILARITY', 'CLUSTERING'] as const;
+type TaskType = typeof TASK_TYPES[number];
 const OUTPUT_DIMENSIONALITY = 768; // 128 - 3072 (recommended 768, 1536, 3072)
 const DECIMAL_PLACES        = 5;
 
@@ -22,9 +23,14 @@ const SLEEP_MS              = 1_000;    // (1 second)
 const LOCAL_TOKENS_MODEL    = 'gemini-2.5-flash';   // (uses 'gemma3')
 const LOCAL_TOKENS_SCALE    = 1.1;                  // (extra 10% margin)
 
+// Multiple embeddings
+export type EmbeddingType   = Lowercase<TaskType>;
+export type Embedding       = number[];
+export type Embeddings      = Record<EmbeddingType, Embedding>;
+
 // Calculate embeddings for a list of strings
 // (may return partial results if an API request fails)
-export async function geminiGenerateEmbeddings(contents: string[]): Promise<number[][]> {
+export async function geminiGenerateEmbeddings(contents: string[]): Promise<Embeddings[]> {
     // Create a client
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY not set');
@@ -42,7 +48,7 @@ export async function geminiGenerateEmbeddings(contents: string[]): Promise<numb
 
     // Generate the embeddings in batches
     let requests = 0;
-    const embeddings: number[][] = [];
+    const embeddings: Embeddings[] = [];
     try {
         while (embeddings.length < truncated.length) {
             // Batch as much content as possible into each request
@@ -52,11 +58,13 @@ export async function geminiGenerateEmbeddings(contents: string[]): Promise<numb
             while (endIndex < truncated.length && (tokenCounts[endIndex] ?? 0) <= availableTokens) {
                 availableTokens -= tokenCounts[endIndex++] ?? 0;
             }
-
-            // Generate the embeddings
             const batch = truncated.slice(startIndex, endIndex);
-            const result = await embeddingsRequest(ai, batch);
-            embeddings.push(...result);
+
+            // Generate the embeddings for each required task type
+            const results = await Promise.all(TASK_TYPES.map<Promise<[EmbeddingType, Embedding[]]>>(async taskType =>
+                [taskType.toLowerCase() as EmbeddingType, await embeddingsRequest(ai, taskType, batch)]));
+            const collated = batch.map((_, i) => Object.fromEntries(results.map(([k, v]) => [k, v[i]])) as Embeddings);
+            embeddings.push(...collated);
             ++requests;
 
             // Sleep between requests due to tokens/minute rate limit
@@ -93,14 +101,14 @@ async function getTokenCount(ai: GoogleGenAI, contents: string): Promise<number>
 }
 
 // A single embeddings request for multiple strings
-async function embeddingsRequest(ai: GoogleGenAI, contents: string[]): Promise<number[][]> {
+async function embeddingsRequest(ai: GoogleGenAI, taskType: TaskType, contents: string[]): Promise<Embedding[]> {
     // Generate the embeddings
     const response = await ai.models.embedContent({
         model:      MODEL,
         contents,
         config: {
             outputDimensionality:   OUTPUT_DIMENSIONALITY,
-            taskType:               TASK_TYPE
+            taskType
         }
     });
     let usage = '';
@@ -124,7 +132,7 @@ async function embeddingsRequest(ai: GoogleGenAI, contents: string[]): Promise<n
 }
 
 // Normalise an embedding and apply rounding
-function normaliseEmbedding(values: number[]): number[] {
+function normaliseEmbedding(values: Embedding): Embedding {
     const magnitude = Math.sqrt(values.reduce((acc, v) => acc + v * v, 0));
     if (magnitude === 0) return values;
     const normalised = values.map(v => v / magnitude);

@@ -5,26 +5,27 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as core from '@actions/core';
 import { plural } from '../utils.js';
+import { Embeddings } from '../embeddings/google-ai-studio.js';
 
 // Cache file
 const CACHE_FILE = './data/embeddings/cache.json';
 
 // Load the cache file
-export function loadEmbeddingsCache(): Map<string, number[]> {
+export function loadEmbeddingsCache(): Map<string, Embeddings> {
     try {
         const json = fs.readFileSync(CACHE_FILE, { encoding: 'utf8' });
-        const cache = JSON.parse(json) as [string, number[]][];
+        const cache = JSON.parse(json) as [string, Embeddings][];
         core.info(`Loaded ${plural(cache.length, 'cached embedding')}`);
         return new Map(cache);
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         core.warning(`Error reading cache file '${CACHE_FILE}': ${message}`);
-        return new Map<string, number[]>();
+        return new Map<string, Embeddings>();
     }
 }
 
 // Save the cache file
-export function saveEmbeddingsCache(cache: Map<string, number[]>): void {
+export function saveEmbeddingsCache(cache: Map<string, Embeddings>): void {
     // Ensure that the directory exists
     const cacheDir = path.dirname(CACHE_FILE);
     fs.mkdirSync(cacheDir, { recursive: true });

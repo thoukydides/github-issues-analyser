@@ -24,9 +24,10 @@ async function run(): Promise<void> {
     // HERE - Should do this separately per-repo
 
     // Prepare the candidates entries for clustering
-    const filtered = candidates.filter(c => c.vector);
+    const filtered = candidates.filter(c => c.embeddings);
     if (filtered.length < candidates.length) core.warning('Ignoring candidate FAQ entries without embeddings');
-    const data = filtered.map((v, i) => ({ ...v, id: i.toString() } as CandidateVectorPoint));
+    const data: CandidateVectorPoint[] = filtered.map((candidate, i) =>
+        ({ ...candidate, vector: candidate.embeddings?.clustering ?? [], id: i.toString() } satisfies CandidateVectorPoint));
 
     // Attempt to cluster the candidate entries
     const hdbscan = new HDBSCAN.default(data, 2, cosine);

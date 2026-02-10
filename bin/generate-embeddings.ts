@@ -26,8 +26,8 @@ async function run(): Promise<void> {
     // Generate the embeddings
     const contents = candidates.map(makeContent);
     const embeddings = await generateEmbeddings(contents);
-    embeddings.forEach((embedding, index) => candidates[index].vector = embedding);
-    const missingEmbeddings = candidates.filter(c => !c.vector).length;
+    embeddings.forEach((embedding, index) => candidates[index].embeddings = embedding);
+    const missingEmbeddings = candidates.filter(c => !c.embeddings).length;
     if (missingEmbeddings) core.warning(`${plural(missingEmbeddings, 'embedding')} missing`);
 
     // Save the candidate FAQ entries

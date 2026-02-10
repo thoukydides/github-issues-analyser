@@ -27,7 +27,7 @@ async function run(): Promise<void> {
         const emoji = { low: '🔴', medium: '🟡', high: '🟢' }[faq.confidence];
         core.summary
             .addRaw(`### ${emoji} ${faq.question}`, true)
-            .addRaw(faq.tags.map(t => `<kbd>${t}</kbd>`).join(' '), true)
+            .addRaw(` ${faq.semantic_abstract ?? '(No abstract)'}`, true)
             .addRaw(faq.answer, true);
         if (faq.alternative_resolution) core.summary.addRaw(`*[${faq.alternative_resolution}]*`, true);
     }
