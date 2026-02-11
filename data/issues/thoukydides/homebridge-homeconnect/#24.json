@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 24,
+    "updated_at": "2026-02-11T15:34:22.384Z",
+    "faq": [
+        {
+            "question": "Why are my hood or dishwasher ambient light settings (colour/brightness) missing in HomeKit?",
+            "answer": "Certain Home Connect appliances, particularly hoods and dishwashers, do not expose their full ambient light capabilities via the API unless the light is currently switched on. When the plugin first starts and discovers an appliance with no cache, it may only see basic on/off controls if the light is off.\n\nTo address this, the plugin (since v0.18.1) performs a discovery sequence during initial setup:\n1. It temporarily switches the light on.\n2. It reads the supported capabilities, such as `BSH.Common.Setting.AmbientLightBrightness` and `BSH.Common.Setting.AmbientLightCustomColor`.\n3. It switches the light back to its previous state.\n\n**Important technical notes on light control:**\n- **Brightness Handling**: The API documentation states that brightness cannot be set independently if the colour is set to `CustomColor`. In this mode, the brightness is embedded within the custom colour value itself.\n- **Discovery Constraints**: The `BSH.Common.Setting.AmbientLightCustomColor` setting is often only visible to the API if the `AmbientLightColor` is specifically set to `CustomColor`.\n- **Cache Dependancy**: These capabilities are cached once successfully discovered. If you notice missing controls after a plugin update or after clearing your cache, ensuring the appliance is reachable and allow the plugin to complete its startup sequence usually resolves the issue.",
+            "semantic_abstract": "Home Connect appliances like hoods and dishwashers may hide ambient light settings from the API when the light is powered off, preventing HomeKit from discovering brightness and colour characteristics. The plugin implements a discovery routine that briefly toggles the light state to cache these capabilities, managing the API's mutually exclusive relationship between standalone brightness settings and integrated brightness within custom colour values.",
+            "alternative_resolution": "The plugin could log a clearer warning during the initial discovery phase if it detects an ambient light but cannot query its extended capabilities because the appliance is offline or in a state that prevents temporary activation.",
+            "confidence": "high",
+            "hash": "3f2d2158c52a1e88b6f52c2d8cb5c2efca0384b7f5289a9cfc9a510771c8f5ff"
+        }
+    ]
+}
