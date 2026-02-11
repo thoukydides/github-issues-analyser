@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 14,
+    "updated_at": "2026-02-11T10:28:57.799Z",
+    "faq": [
+        {
+            "question": "Will there be a Home Assistant version of this plugin?",
+            "answer": "No. This plugin is specifically designed for Homebridge to provide HomeKit integration for Home Connect appliances. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.\n\nFor Home Assistant users, there are alternative community-maintained integrations available for Bosch, Siemens, and other Home Connect appliances.",
+            "semantic_abstract": "The homebridge-homeconnect project is strictly limited to Homebridge and HomeKit integration, with the maintainer explicitly declining support for Home Assistant due to personal platform preference and development scope.",
+            "alternative_resolution": "Ensure the project documentation clearly states its exclusive focus on Homebridge to manage user expectations regarding other automation platforms.",
+            "confidence": "high",
+            "hash": "2728c5ae66f6609228de097f8636cf78254bfdea1e0a048b4ed8a090d07ca4fc"
+        }
+    ]
+}
