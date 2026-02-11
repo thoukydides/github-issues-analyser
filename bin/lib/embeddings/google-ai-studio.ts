@@ -52,7 +52,8 @@ export async function geminiGenerateEmbeddings(contents: string[]): Promise<Embe
     try {
         while (embeddings.length < truncated.length) {
             // Batch as much content as possible into each request
-            let availableTokens = MAX_REQUEST_TOKENS;
+            // (rate limit divided by number of different embeddings)
+            let availableTokens = Math.floor(MAX_REQUEST_TOKENS / TASK_TYPES.length);
             const startIndex = embeddings.length;
             let endIndex = startIndex;
             while (endIndex < truncated.length && (tokenCounts[endIndex] ?? 0) <= availableTokens) {
