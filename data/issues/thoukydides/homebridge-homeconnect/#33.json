@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 33,
+    "updated_at": "2026-02-11T19:34:48.226Z",
+    "faq": [
+        {
+            "question": "Why are all my appliance power switches named the same when creating automations in the Home app?",
+            "answer": "This is a limitation of the Apple Home app user interface rather than an issue with the plugin. When configuring automations, the Home app often displays the service name (e.g., `Power`) instead of the accessory name (e.g., `Dishwasher`), making it difficult to distinguish between multiple appliances.\n\nTo resolve this, you can:\n1. **Rename the services**: In the Home app, go to the settings for each appliance and rename the specific switch or service to something unique (e.g., rename the power toggle from `Power` to `Dishwasher Power`).\n2. **Use a third-party HomeKit app**: Use an alternative app like **Eve for HomeKit** or **Controller for HomeKit** to set up your automations. These apps typically provide better context by showing which accessory a service belongs to.\n\nRefer to the [HomeKit Apps](https://github.com/thoukydides/homebridge-homeconnect/wiki/HomeKit-Apps) wiki page for more information on alternative controllers.",
+            "semantic_abstract": "The Apple Home app automation interface fails to provide accessory context when displaying identical service types across multiple devices, such as power switches. This platform-level UI limitation results in ambiguous device identification during automation setup, which must be addressed by manual service renaming or using third-party HomeKit controllers.",
+            "alternative_resolution": "Update the documentation to include a section on 'Managing Multiple Appliances in the Home App', specifically explaining how to rename services to improve the automation setup experience.",
+            "confidence": "high",
+            "hash": "f0df59ae74c784ffac340bdff8cdcd9fdc05c645092e73814daf499c3a77d5aa"
+        }
+    ]
+}
