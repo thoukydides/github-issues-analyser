@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 32,
+    "updated_at": "2026-02-11T17:34:13.241Z",
+    "faq": [
+        {
+            "question": "Why does my Home Connect coffee maker switch off automatically shortly after I turn it on manually?",
+            "answer": "This behaviour typically occurs when the plugin needs to read the supported options for a selected program but does not have them cached. To read these options, the plugin may explicitly switch the appliance `On` if it believes it is currently in `Standby`. After successfully reading the program details, the plugin attempts to restore the appliance to its previous known state.\n\nIf the Home Connect API fails to send a notification that the power state has changed to `On` (common with certain Siemens TI95xx models during initial self-cleaning cycles), the plugin will still believe the appliance is in `Standby`. Consequently, after reading the options, it will \"restore\" the appliance to `Standby`, effectively switching it off. \n\nKey points regarding this behaviour:\n- **Plugin Logic**: The plugin is designed to restore the original state after reading options so that background metadata updates do not permanently change your appliance's power state.\n- **API Limitation**: Some appliances do not proactively broadcast `PowerState` updates when manually toggled or when starting automatic maintenance cycles (like rinsing).\n- **Resolution**: A workaround was implemented in v0.18.2 which infers that the appliance is `On` whenever it reports an `OperationState` of `Ready`. Ensure you are running the latest version of the plugin to benefit from this logic.\n- **Verification**: If the issue persists, check the Home Connect app to ensure the appliance is correctly reporting its status and that remote start/control is enabled.",
+            "semantic_abstract": "Home Connect coffee makers may experience unintended power-off cycles due to the plugin's state-restoration logic following program option discovery. The issue stems from the Home Connect API failing to emit `PowerState` change events during manual activation or self-cleaning cycles, leading the plugin to restore an outdated `Standby` state after querying program metadata.",
+            "alternative_resolution": "The plugin's logging could be improved to explicitly state which event (e.g. `OperationState.Ready`) caused it to infer the `PowerState`, helping users distinguish between API-reported states and plugin-inferred states during troubleshooting.",
+            "confidence": "high",
+            "hash": "3eeb66d2e755fe660317656765c932ea7f02029efcf30d3bf3ebde9debf2e303"
+        }
+    ]
+}
