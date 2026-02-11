@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 27,
+    "updated_at": "2026-02-11T11:26:55.678Z",
+    "faq": [
+        {
+            "question": "Why does my appliance suddenly report it \"Does not support any programs\" or show `SDK.Error.UnsupportedSetting`?",
+            "answer": "These errors typically indicate that the Home Connect API servers are experiencing instability or an outage. The plugin relies on the API to report appliance capabilities and state; if the API fails to return mandatory settings (such as `BSH.Common.Setting.PowerState`), the plugin cannot correctly initialise the accessory and may incorrectly report that no programs are supported.\n\nTo resolve this issue, follow these steps:\n1. Check the logs for server-side error messages such as `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`.\n2. Wait for a few hours to allow the Home Connect service to stabilise.\n3. Stop Homebridge.\n4. Delete the plugin's persistent cache files (refer to the plugin wiki for the file locations).\n5. Restart Homebridge.\n\nIf the error `SDK.Error.UnsupportedSetting` persists for universal settings like `BSH.Common.Setting.PowerState` even after clearing the cache, the issue is likely a backend fault with the Home Connect service itself. In such cases, you should report the issue to Home Connect developer support.",
+            "semantic_abstract": "Home Connect API server instability or outages can cause mandatory appliance settings like `BSH.Common.Setting.PowerState` to become unavailable. This prevents the plugin from discovering appliance capabilities, leading to errors regarding unsupported programs or missing settings, which requires a cache clear and restart once the API stabilises.",
+            "alternative_resolution": "The plugin could potentially implement a more descriptive warning when mandatory settings like power state are missing, explicitly suggesting that the user check for API outages and clear the cache.",
+            "confidence": "high",
+            "hash": "2626ca48583b9c4165bce428385063bd6d7b7054b41051c6cb7b301e9c0d35f6"
+        }
+    ]
+}
