@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 28,
+    "updated_at": "2026-02-11T12:05:26.463Z",
+    "faq": [
+        {
+            "question": "Why is the Home Connect plugin not starting or showing an authorisation URL?",
+            "answer": "If the plugin is not providing an authorisation URL or does not appear to be loading, it is usually due to a configuration error in `config.json` that prevents Homebridge from identifying the platform.\n\n### Verify Initialization\nCheck your Homebridge logs for the following line:\n`[HomeConnect] Initializing HomeConnect platform...`\n\nIf this line is absent, Homebridge is not attempting to load the plugin. This typically occurs because:\n* **Incorrect Nesting**: The `HomeConnect` platform configuration block has been accidentally placed inside the configuration of another plugin (for example, inside an `accessories` or `inputs` list of a different platform).\n* **Missing Entry**: The platform is not listed within the `platforms` array of `config.json` at all.\n\n### Correct Configuration\nTo resolve this:\n1. Ensure the `HomeConnect` entry is a top-level item within the `platforms` array in your `config.json` file.\n2. Use the **Settings** button on the **Plugins** page of `homebridge-config-ui-x` rather than editing the JSON manually. This ensures the configuration is correctly formatted and positioned.\n3. Verify that the `clientid` property is set. If it is missing, the plugin will log: `Platform HomeConnect config.json is missing 'clientid' property` and stop.\n\n### Authorisation Process\nOnce correctly configured and initialized, the plugin will generate a specific URL in the logs:\n`[HomeConnect] Home Connect authorisation required. Please visit: https://verify.home-connect.com?user_code=XXXX-XXXX`\n\nYou must copy this URL into a web browser, sign in with your Home Connect account, and approve the request. While waiting for you to complete this, the plugin will log `Authorisation pending` every few seconds. If you receive an error regarding HTTP methods when clicking a link, ensure you are visiting the full `verify.home-connect.com` URL and not the API token endpoints directly.",
+            "semantic_abstract": "Manual configuration errors in `config.json`, such as improper nesting of the `HomeConnect` platform block or missing `clientid` properties, prevent the plugin from initializing or generating OAuth authorisation URLs. Successful initialization is indicated by specific log entries, followed by an authorisation flow requiring the user to visit a generated verification URL to grant API access.",
+            "alternative_resolution": "The plugin's documentation could be updated to include a 'Troubleshooting Startup' section that specifically warns against manual JSON nesting errors and provides an example of the expected log sequence for successful OAuth initialization.",
+            "confidence": "high",
+            "hash": "b9b5925e9eb5371721451d854dc3bdd0dd6819cf359b8228583b0461bb5dc617"
+        }
+    ]
+}
