@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 34,
+    "updated_at": "2026-02-12T03:27:52.864Z",
+    "faq": [
+        {
+            "question": "Why is my log flooded with `Service Temporarily Unavailable` errors every second during an outage?",
+            "answer": "When the Home Connect API experiences a service outage, you may see the plugin rapidly log attempts to restart the event stream. This behaviour is a deliberate design choice for several reasons:\n\n1.  **State Consistency**: Because of strict API rate limits, the plugin relies almost entirely on the event stream for real-time updates. When the stream is interrupted, the plugin loses sync with your appliances. Attempting to reconnect immediately ensures that the 'window' for missed events and stale data is kept as small as possible once the service resumes.\n2.  **Diagnostic Integrity**: Precise logs of every connection attempt and the specific error returned (e.g. `Service Temporarily Unavailable`) are vital for diagnosing complex or intermittent API failures. Reducing this detail or introducing delays would make it harder to identify specific failure mechanisms in the future.\n3.  **API Rate Limits**: The plugin is optimised to stay within rate limits. Adding manual delays or logic to 'wait out' an outage adds significant complexity that could interfere with the normal recovery process once the servers are back online.\n\nWhile this results in a high volume of logs during a service outage, it ensures the plugin recovers as quickly and reliably as possible without manual intervention.",
+            "semantic_abstract": "Home Connect API outages cause rapid log repetition because the plugin prioritises immediate event stream reconnection to maintain state consistency and avoid rate limit issues. The maintainer has opted against log deduplication or reconnection delays to preserve diagnostic detail and ensure the fastest possible recovery once service is restored.",
+            "alternative_resolution": "The plugin could potentially benefit from a brief, exponential back-off for specific HTTP 503 (Service Unavailable) errors to reduce log volume without sacrificing significant state synchronisation, or documentation could be updated to explicitly describe this 'fail-fast' reconnection behaviour as expected during API maintenance.",
+            "confidence": "high",
+            "hash": "01de917d3404e59eb1e10b1c329485affdfe16a06679df5ebe98603882a57764"
+        }
+    ]
+}
