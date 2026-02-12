@@ -2,36 +2,31 @@
 // Copyright © 2026 Alexander Thoukydides
 
 import fs from 'node:fs';
-import path from 'node:path';
 import * as core from '@actions/core';
 import { plural } from '../utils.js';
 import { Embeddings } from '../embeddings/google-ai-studio.js';
-
-// Cache file
-const CACHE_FILE = './data/embeddings/cache.json';
+import { ConfigRepository } from '../../config.js';
+import { getEmbeddingsCachePath } from './paths.js';
 
 // Load the cache file
-export function loadEmbeddingsCache(): Map<string, Embeddings> {
+export function loadEmbeddingsCache(repo: ConfigRepository): Map<string, Embeddings> {
+    const cacheFile = getEmbeddingsCachePath(repo);
     try {
-        const json = fs.readFileSync(CACHE_FILE, { encoding: 'utf8' });
+        const json = fs.readFileSync(cacheFile, { encoding: 'utf8' });
         const cache = JSON.parse(json) as [string, Embeddings][];
         core.info(`Loaded ${plural(cache.length, 'cached embedding')}`);
         return new Map(cache);
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        core.warning(`Error reading cache file '${CACHE_FILE}': ${message}`);
+        core.warning(`Error reading cache file '${cacheFile}': ${message}`);
         return new Map<string, Embeddings>();
     }
 }
 
 // Save the cache file
-export function saveEmbeddingsCache(cache: Map<string, Embeddings>): void {
-    // Ensure that the directory exists
-    const cacheDir = path.dirname(CACHE_FILE);
-    fs.mkdirSync(cacheDir, { recursive: true });
-
-    // Save the file
+export function saveEmbeddingsCache(repo: ConfigRepository, cache: Map<string, Embeddings>): void {
+    const cacheFile = getEmbeddingsCachePath(repo);
     const json = JSON.stringify([...cache]);
-    fs.writeFileSync(CACHE_FILE, json);
+    fs.writeFileSync(cacheFile, json);
     core.info(`Saved ${plural(cache.size, 'cached embedding')}`);
 }

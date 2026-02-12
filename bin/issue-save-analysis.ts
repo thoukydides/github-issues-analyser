@@ -4,6 +4,13 @@
 import * as core from '@actions/core';
 import { IssueData, IssueFAQs, saveIssue } from './lib/data/issues.js';
 import { makeStableHash } from './lib/hash.js';
+import { ConfigRepository } from './config.js';
+
+// State passed from the pre-inference script
+export interface IssueAnalysisState {
+    repo:   ConfigRepository;
+    issue:  Omit<IssueData, 'faq'>;
+}
 
 try {
     await run();
@@ -14,13 +21,13 @@ try {
 
 // Main entry point
 async function run(): Promise<void> {
-    const state    = JSON.parse(process.env.STATE    ?? '') as Omit<IssueData, 'faq'>;
+    const state    = JSON.parse(process.env.STATE    ?? '') as IssueAnalysisState;
     const analysis = JSON.parse(process.env.ANALYSIS ?? '') as IssueFAQs;
 
     // Save the issue
     const faq = analysis.map(e => ({ ...e, hash: makeStableHash(e) }));
-    const issue: IssueData = { ...state, faq };
-    saveIssue(issue);
+    const issue: IssueData = { ...state.issue, faq };
+    saveIssue(state.repo, issue);
 
     // Add details of the analysis to the workflow summary
     for (const faq of analysis) {
