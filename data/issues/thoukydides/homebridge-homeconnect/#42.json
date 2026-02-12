@@ -1,0 +1,24 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 42,
+    "updated_at": "2026-02-12T13:50:30.453Z",
+    "faq": [
+        {
+            "question": "Why does the Homebridge UI state \"This appliance does not support any programs\"?",
+            "answer": "This message is displayed when the plugin is unable to retrieve a list of supported programs from the Home Connect API. This is typically caused by transient instability or temporary outages of the Home Connect servers. If you encounter this error: 1. Verify the status of the Home Connect API. 2. Restart Homebridge to trigger a new request for the appliance configuration. 3. Ensure the appliance is connected to Wi-Fi and reachable in the official Home Connect app. In most instances, this issue resolves itself once the API servers are responding correctly.",
+            "semantic_abstract": "Transient Home Connect API server instability can prevent the retrieval of supported program lists, leading to a status message indicating that no programs are supported for the appliance.",
+            "alternative_resolution": "The plugin could provide a more descriptive error message in the configuration UI when program retrieval fails, explicitly suggesting a server-side issue rather than a lack of appliance features.",
+            "confidence": "high",
+            "hash": "91626b2c9445d81f9f5fccdf10b0405babb33cded4a66a6e49fa7b456e5e66cf"
+        },
+        {
+            "question": "Why is the ambient light on my dishwasher not supported by the plugin?",
+            "answer": "Although some dishwasher models feature physical ambient lighting, the Home Connect API currently only exposes control for ambient light on hood appliances. This is a limitation of the API provided by the manufacturer, not the plugin. Until Home Connect updates their API to include ambient light support for dishwashers, these features cannot be exposed to HomeKit.",
+            "semantic_abstract": "The Home Connect API limits ambient light control functionality to hood appliances, meaning that physical ambient lighting features on dishwashers cannot be controlled via the plugin due to API specification constraints.",
+            "alternative_resolution": "Update the plugin documentation or the \"Does not support Ambient Light\" log message to clarify that this is a specific API limitation for dishwashers to prevent repeated user queries.",
+            "confidence": "high",
+            "hash": "1683ac93ba52e19d8b6a37de86e624ae1c8e5d73ad0ac73aa67010c479523205"
+        }
+    ]
+}
