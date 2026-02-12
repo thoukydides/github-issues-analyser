@@ -1,0 +1,14 @@
+{
+    "issue_number": 46,
+    "updated_at": "2026-02-12T18:30:44.771Z",
+    "faq": [
+        {
+            "question": "Which settings are used when a program is started without specific options configured?",
+            "answer": "If no options (such as strength or volume for a coffee machine) are explicitly configured for a program button, the plugin does not send any option values to the Home Connect API. In this scenario, the Home Connect server or the appliance itself determines the values to use. This typically results in either the factory default for that program or the settings used during the last execution, mirroring the behaviour of selecting a program directly on the appliance's control panel without making adjustments.\n\nTo discover the default values supported by your appliance:\n1. Enable debug logging in Homebridge.\n2. Use the **Identify** function on the appliance within Homebridge.\n3. Review the logs, which will list the default values for each available program option as reported by the Home Connect API.",
+            "semantic_abstract": "Omission of specific program options in the plugin configuration causes the Home Connect API to fall back to appliance-defined defaults or last-used settings. The plugin's Identify feature retrieves these default values from the appliance API for use in manual configuration mapping.",
+            "alternative_resolution": "Enhance the configuration UI or documentation to explicitly state that empty option fields result in appliance-managed defaults, rather than plugin-defined ones.",
+            "confidence": "high",
+            "hash": "2122011e2832a6a0d6b87070bdd73220b7facf486bcd246b36497d36e4c79af7"
+        }
+    ]
+}
