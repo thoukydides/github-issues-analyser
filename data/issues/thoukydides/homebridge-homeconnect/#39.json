@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 39,
+    "updated_at": "2026-02-12T10:13:07.086Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Too Many Requests` and a long wait time before the next API request?",
+            "answer": "The Home Connect API enforces several rate limits, the most significant being a quota of **1000 requests per client and user account per day**. If this limit is exceeded, the API returns a `429 Too Many Requests` error and may block further activity for up to 24 hours.\n\nCommon reasons for hitting this limit include:\n- **Unstable internet connection**: Frequent disconnections and reconnections force the plugin to re-authenticate and re-sync appliance states, consuming the request quota rapidly.\n- **Initial Setup**: When the plugin first connects or adds new appliances, it must query for supported programmes, options, and settings, which involves many requests.\n- **Heavy HomeKit Usage**: Frequent manual control or complex automations that trigger many state changes.\n- **Home Connect Server Issues**: Transient problems on the manufacturer's side can occasionally cause retries that count against the quota.\n\nThe plugin is designed to handle this gracefully by identifying the lockout period and waiting for it to expire. Once the time has elapsed (e.g. `Waiting 86234 seconds`), the plugin will automatically re-establish the connection and resume normal operation. If the plugin does not recover after the wait period, restart Homebridge and check the logs with debug mode enabled (`-D` flag).",
+            "semantic_abstract": "The Home Connect API enforces a hard limit of 1000 requests per user account per 24-hour period. Exceeding this quota—often due to network instability, initial appliance discovery, or high-frequency HomeKit commands—triggers a 429 error and a subsequent 24-hour lockout which the plugin manages via a scheduled delay.",
+            "alternative_resolution": "The plugin's error logging could be enhanced to explicitly mention the 1000-request daily quota when a 429 error is encountered, directing users to check their internet stability or automation frequency.",
+            "confidence": "high",
+            "hash": "aa6b29776da30bf6904f64e69a0f74da96a57ef14b870a2908a1f9935c4aa9cd"
+        }
+    ]
+}
