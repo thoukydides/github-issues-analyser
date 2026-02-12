@@ -1,0 +1,14 @@
+{
+    "issue_number": 41,
+    "updated_at": "2026-02-12T15:31:42.433Z",
+    "faq": [
+        {
+            "question": "Why do Siri commands for my hood fan work intermittently or fail while the Home app works correctly?",
+            "answer": "Intermittent issues with Siri control, where the Home app continues to function correctly, are typically not caused by the plugin itself. These discrepancies usually stem from one of two sources:\n\n1.  **Siri semantic processing**: Siri requires specific combinations of characteristics to understand device types. If Apple updates Siri's logic, it may become \"confused\" by the non-standard service mappings required to bridge Home Connect appliances to HomeKit. This can result in Siri being unable to process commands like turning a fan off, even if the Home app interface works perfectly.\n2.  **Home Connect server instability**: Periodic unreliability of the Home Connect API servers can cause commands to fail or produce no logs within the plugin if the request never reaches the Homebridge instance.\n\nTo troubleshoot, you can enable HomeKit-level debug logging by setting the `DEBUG=*` environment variable before launching Homebridge. This will confirm whether the Siri request is actually reaching Homebridge or being dropped by the HomeKit framework.",
+            "semantic_abstract": "Discrepancies between Siri voice control and Home app manual control often result from changes in Siri semantic processing of HomeKit services or transient Home Connect API server instability. When Siri commands fail to trigger log entries in the plugin, the issue lies within the HomeKit framework or the voice command interpretation layer rather than the plugin implementation.",
+            "alternative_resolution": "Ensure that the troubleshooting documentation explicitly mentions that Siri and the Home app use different internal logic to interact with HomeKit devices, and that the lack of logs during a Siri command indicates the request never reached the plugin.",
+            "confidence": "high",
+            "hash": "6e02b21f1d8c390d82d2720eb3a6689602da10d3075a0711e62e4c4b7ed1ad0a"
+        }
+    ]
+}
