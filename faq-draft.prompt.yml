@@ -104,7 +104,7 @@ messages:
         - `code` for technical terms, settings, error messages
         - **bold** for emphasis (sparingly)
         - No emoji
-        - Horizontal rules (`---`) to separate historical context from current guidance if needed
+        - No sub-headings
 
       IDs tracking:
       - Include the `id` of **every** existing or candidate entry that each revised entry replaces or incorporates

@@ -62,7 +62,7 @@ messages:
         - `code` for technical terms, settings, error messages
         - **bold** for emphasis (sparingly)
         - No emoji
-        - Horizontal rules (`---`) to separate historical context from current guidance if needed
+        - No sub-headings
 
       Semantic abstract:
       - Write a 2-3 sentence abstract capturing the **core semantic concept** of this FAQ entry for clustering purposes
