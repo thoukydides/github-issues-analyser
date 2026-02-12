@@ -26,8 +26,8 @@ async function run(): Promise<void> {
     // Prepare the candidates entries for clustering
     const filtered = candidates.filter(c => c.embeddings);
     if (filtered.length < candidates.length) core.warning('Ignoring candidate FAQ entries without embeddings');
-    const data: CandidateVectorPoint[] = filtered.map((candidate, i) =>
-        ({ ...candidate, vector: candidate.embeddings?.clustering ?? [], id: i.toString() } satisfies CandidateVectorPoint));
+    const data: CandidateVectorPoint[] = filtered.map(candidate =>
+        ({ ...candidate, vector: candidate.embeddings?.clustering ?? [] } satisfies CandidateVectorPoint));
 
     // Attempt to cluster the candidate entries
     const hdbscan = new HDBSCAN.default(data, 2, cosine);
@@ -43,5 +43,5 @@ async function run(): Promise<void> {
 // List the members of a cluster in the job summary
 function listCandidates(description: string, candidates: CandidateVectorPoint[]): void {
     core.summary.addRaw(`#### ${description}`, true);
-    for (const c of candidates) core.summary.addRaw(`- [${c.repo}#${c.issue_number}] ${c.question}`, true);
+    for (const c of candidates) core.summary.addRaw(`- [${c.repo}#${c.id}] ${c.question}`, true);
 }

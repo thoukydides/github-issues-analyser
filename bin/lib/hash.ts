@@ -4,7 +4,7 @@
 import crypto from 'crypto';
 
 // Generate a stable hash of a value
-export function hash(value: unknown): string {
+export function makeStableHash(value: unknown): string {
     // Convert the value to a stable serialisation
     const stable = stableStringify(value);
 

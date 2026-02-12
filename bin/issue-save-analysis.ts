@@ -3,7 +3,7 @@
 
 import * as core from '@actions/core';
 import { IssueData, IssueFAQs, saveIssue } from './lib/data/issues.js';
-import { hash } from './lib/hash.js';
+import { makeStableHash } from './lib/hash.js';
 
 try {
     await run();
@@ -18,7 +18,7 @@ async function run(): Promise<void> {
     const analysis = JSON.parse(process.env.ANALYSIS ?? '') as IssueFAQs;
 
     // Save the issue
-    const faq = analysis.map(e => ({ ...e, hash: hash(e) }));
+    const faq = analysis.map(e => ({ ...e, hash: makeStableHash(e) }));
     const issue: IssueData = { ...state, faq };
     saveIssue(issue);
 
@@ -28,6 +28,7 @@ async function run(): Promise<void> {
         core.summary
             .addRaw(`### ${emoji} ${faq.question}`, true)
             .addRaw(`> ${faq.semantic_abstract ?? '(No abstract)'}`, true)
+            .addRaw('', true)
             .addRaw(faq.answer, true);
         if (faq.alternative_resolution) core.summary.addRaw(`*[${faq.alternative_resolution}]*`, true);
     }

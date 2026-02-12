@@ -5,15 +5,17 @@ import fs from 'node:fs';
 import path from 'node:path';
 import * as core from '@actions/core';
 import { plural } from '../utils.js';
-import { IssueFAQWithHash } from './issues.js';
 import { Embeddings } from '../embeddings/google-ai-studio.js';
 
 // A candidate FAQ entry
-export interface CandidateFAQ extends IssueFAQWithHash {
+export interface CandidateFAQ {
     owner:          string;
     repo:           string;
     issue_number:   number;
+    id:             string;
     embeddings?:    Embeddings;
+    question:       string;
+    answer:         string;
 }
 
 // File containing candidate FAQ entries with their embeddings
