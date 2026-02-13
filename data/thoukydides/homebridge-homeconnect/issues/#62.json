@@ -1,0 +1,14 @@
+{
+    "issue_number": 62,
+    "updated_at": "2026-02-13T19:24:53.330Z",
+    "faq": [
+        {
+            "question": "Why are some coffee machine programs missing options like temperature, quantity, or strength in the configuration?",
+            "answer": "The available programs and their associated options (such as `Temperature`, `Quantity`, or `Strength`) are dynamically populated based on the data returned by the Home Connect API for your specific appliance and its current firmware version. If certain options do not appear in the dropdown menus within the Homebridge configuration for a specific program, it is because the Home Connect API has not reported them as supported for that program on your hardware.\n\nTo verify what the API is reporting for your appliance, you can perform a HomeKit Identify operation and check the Homebridge logs. This will output the full list of supported programs and options as seen by the plugin. If a program or option is supported by the API but not appearing in the plugin, this log data is required for further investigation.",
+            "semantic_abstract": "Home Connect appliance program options are dynamically fetched from the API, meaning available settings like temperature or strength are subject to model-specific and firmware-specific API constraints. Discrepancies between expected and available configuration options typically stem from the API not exposing those specific parameters for the identified appliance hardware.",
+            "alternative_resolution": "Update the documentation to clarify that the configuration UI for programs is dynamically generated based on API responses, and provide instructions on how to use the 'Identify' feature to inspect the appliance's reported capabilities.",
+            "confidence": "high",
+            "hash": "1f79320eaa614eaa3aae959fc8e1e3c01d4aefcb8701d358debdf6177f68d574"
+        }
+    ]
+}
