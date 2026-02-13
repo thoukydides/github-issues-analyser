@@ -1,0 +1,14 @@
+{
+    "issue_number": 49,
+    "updated_at": "2026-02-13T05:10:29.940Z",
+    "faq": [
+        {
+            "question": "How can I reduce the number of switches created for appliance programs?",
+            "answer": "By default, the plugin creates individual switches for every supported program of an appliance. For devices with many cycles, such as washers or dryers, this can result in dozens of switches cluttering the HomeKit interface. \n\nTo hide these switches and simplify the interface:\n1. Access the plugin configuration via `homebridge-config-ui-x`.\n2. Locate the settings for the specific appliance or the global plugin settings.\n3. Enable the option **No individual program switches**.\n\nThis configuration suppresses the individual cycle switches while maintaining core functionality such as status monitoring, timers, and power controls. This is often preferred as program switches are typically only functional when the appliance is in a specific state (e.g. powered on but not yet running).",
+            "semantic_abstract": "Appliances with numerous supported cycles can generate excessive HomeKit `Switch` services, leading to interface clutter. The plugin includes a configuration toggle to suppress these individual program switches, restricting the exposed services to essential status and timer controls.",
+            "alternative_resolution": "Ensure the 'No individual program switches' option is prominently highlighted in the configuration documentation and the Homebridge Config UI X schema to improve discoverability for users with complex appliances.",
+            "confidence": "high",
+            "hash": "3c910253da6544cbc77be0a2c0cfee9d2abafbfd9fa497232b17492961ba2dfd"
+        }
+    ]
+}
