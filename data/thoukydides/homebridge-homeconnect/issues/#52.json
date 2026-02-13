@@ -1,0 +1,14 @@
+{
+    "issue_number": 52,
+    "updated_at": "2026-02-13T09:11:23.163Z",
+    "faq": [
+        {
+            "question": "Why do my Home Connect appliances remain visible in the Home app when they are turned off or offline?",
+            "answer": "It is normal for appliances to remain visible in the Home app even when they are powered off or disconnected from Wi-Fi. The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as the appliance is known to the Home Connect API, it will persist in HomeKit. \n\nThe plugin only adds or removes accessories if the Home Connect API indicates that the list of appliances associated with your account has changed. Being unreachable by the Home Connect servers does not trigger the removal of the accessory from HomeKit. If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing from the Favorites view, this may be due to a synchronisation issue within HomeKit or Homebridge. In such cases, the following steps can resolve the issue:\n\n1. Remove the Homebridge bridge from the Home app.\n2. Clear the Homebridge cache files.\n3. Re-add the bridge to HomeKit.",
+            "semantic_abstract": "Home Connect appliances are mapped to HomeKit accessories based on their registration in the Home Connect cloud account, ensuring they persist in the Home app even when offline or powered down. Accessory removal only occurs if the appliance is deleted from the user's account via the official API. Synchronisation issues or unexpected UI behaviour in the Home app can be corrected by clearing the Homebridge cache and re-pairing the bridge.",
+            "alternative_resolution": "The plugin documentation could be updated to explicitly state that accessory lifecycle is tied to account registration rather than real-time connectivity to manage user expectations regarding offline devices.",
+            "confidence": "high",
+            "hash": "2dc8b0b33cbf7490f6cc1241ccbcb4a438391a6126df07fc723651c6487303c6"
+        }
+    ]
+}
