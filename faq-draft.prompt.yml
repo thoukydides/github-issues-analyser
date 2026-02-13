@@ -1,4 +1,4 @@
-model: gemini-3-flash
+model: gemini-3-flash-preview
 
 messages:
 
