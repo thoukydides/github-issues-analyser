@@ -1,0 +1,22 @@
+{
+    "issue_number": 50,
+    "updated_at": "2026-02-13T06:35:54.329Z",
+    "faq": [
+        {
+            "question": "Why do I see `getaddrinfo EAI_AGAIN api.home-connect.com` in my logs?",
+            "answer": "This error signifies a temporary failure in DNS resolution. The system hosting Homebridge was unable to look up the IP address for the Home Connect API servers. This is usually caused by:\n\n1. A transient loss of internet connectivity.\n2. A local router or DNS server performing a scheduled reboot.\n3. General network congestion.\n\nThe plugin is designed to handle these interruptions and will automatically attempt to re-establish the event stream once the network connection is restored. If this happens at a consistent time every day, check for scheduled tasks or reboots in your local network infrastructure.",
+            "semantic_abstract": "DNS resolution failures represented by `EAI_AGAIN` occur when the host system cannot resolve the Home Connect API endpoint, often due to transient network interruptions or scheduled local network hardware reboots.",
+            "alternative_resolution": "Enhance the log message to explicitly suggest checking local network and DNS server stability when this specific error code is encountered.",
+            "confidence": "high",
+            "hash": "047568cca87c177a73be536000e597eff8d11032324ff8df5b624af2fbdfef06"
+        },
+        {
+            "question": "Why does the log say a selected program is not supported by the Home Connect API?",
+            "answer": "You may see a log message stating `Selected program ... is not supported by the Home Connect API` followed by `Active (Run)`. This occurs because of an inconsistency in how some appliances, particularly coffee machines, report their status through the Home Connect API:\n\n* The appliance reports via its event stream that it is currently running a specific program (for example, `ApplianceOffRinsing`).\n* However, when the plugin queries the API for a list of supported programs for that device, that specific program is missing from the list.\n\nIf the plugin were to attempt to fetch further details about this \"unsupported\" program, the API would return an error. To avoid consuming your API rate limit with requests that are guaranteed to fail, the plugin identifies the mismatch and logs this message instead. This behaviour is a characteristic of the appliance firmware or the API implementation and does not indicate a fault with the plugin.",
+            "semantic_abstract": "Home Connect appliances may report internal maintenance programs as active via event streams while omitting them from the API-provided supported program list, leading the plugin to log a mismatch to prevent invalid API requests and rate limit exhaustion.",
+            "alternative_resolution": "The log message could be adjusted to clarify that the \"unsupported\" status is an inconsistency reported by the Home Connect API itself, reducing user confusion regarding plugin functionality.",
+            "confidence": "high",
+            "hash": "fe745295526c8503ac794c6a962c452fbf577ca4aa2f948742c57b19d10a2b6a"
+        }
+    ]
+}
