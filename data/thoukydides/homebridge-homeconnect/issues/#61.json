@@ -1,0 +1,14 @@
+{
+    "issue_number": 61,
+    "updated_at": "2026-02-13T18:04:22.239Z",
+    "faq": [
+        {
+            "question": "Why does the plugin report 'The appliance is offline' when the Home Connect app still works?",
+            "answer": "If the plugin logs indicate `The appliance is offline`, it means the Home Connect cloud servers are reporting that they cannot communicate with your appliance. The official Home Connect mobile app can sometimes switch to direct local network communication when the cloud connection is unavailable, which is why it may appear to work while the plugin does not.\n\nTo troubleshoot this issue:\n1. Check the [Home Connect Service Status](https://www.thouky.co.uk/homeconnect.html) to see if there are known outages or performance issues with the Home Connect API.\n2. Test the official Home Connect app while your phone's Wi-Fi is turned off. This forces the app to connect via the cloud servers rather than your local network. If it fails to control the appliance over cellular data, the issue is with the appliance's cloud connection or the servers themselves.\n3. In the official Home Connect app, navigate to the appliance's settings and find the **Network** section. Verify that all three connection stages (appliance-app, appliance-cloud, and app-cloud) are reported as healthy.\n4. Power cycle the appliance or restart your router to refresh the connection to the Home Connect servers.\n\nIn many cases, these connection issues are transient and will resolve themselves without intervention once the Home Connect cloud stabilises.",
+            "semantic_abstract": "Home Connect appliances may appear offline in HomeKit while remaining functional in the official app due to the mobile app's ability to use local network communication versus the plugin's strict reliance on cloud API status reports. Connectivity discrepancies typically originate from Home Connect server outages or interrupted appliance-to-cloud communication paths rather than plugin software faults.",
+            "alternative_resolution": "Enhance the plugin's 'appliance is offline' log message to include a brief hint or link to a troubleshooting guide explaining the difference between local app control and cloud API status.",
+            "confidence": "high",
+            "hash": "1c74355f2f41aaa8eaaed9ba0b3cc245f4c3b8794729cb83fbb206b258015bb3"
+        }
+    ]
+}
