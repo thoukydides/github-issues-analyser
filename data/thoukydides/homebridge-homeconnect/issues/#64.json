@@ -1,0 +1,14 @@
+{
+    "issue_number": 64,
+    "updated_at": "2026-02-13T19:59:16.756Z",
+    "faq": [
+        {
+            "question": "Why is my Homebridge log filling up with `[Oven]` `Event STATUS` temperature messages?",
+            "answer": "These messages are generated whenever the Home Connect servers report a change in the appliance's internal temperature. Most ovens do not truly turn off; they remain in a standby state where they continue to monitor and report temperature data to the cloud. This is especially noticeable as an oven cools down after use.\n\nSeveral factors can increase the frequency of these logs:\n1. Temperature units: Settings using Fahrenheit (`°F`) will report changes almost twice as frequently as those using Celsius (`°C`) due to the higher sensitivity of the scale.\n2. Environmental factors: Fluctuations caused by the oven door being left open or unreliable hardware sensors.\n\nThe plugin is designed to log all information reported by the Home Connect API, and there is currently no configuration option to disable specific appliances or filter these status events. To prevent these messages from cluttering your logs, it is recommended to run the plugin in a separate Homebridge child bridge or a dedicated Homebridge instance. This isolates the plugin's output and ensures that high-volume events do not obscure logs from other accessories.",
+            "semantic_abstract": "Home Connect ovens in standby mode frequently report internal temperature fluctuations via the API event stream, which the plugin logs as `Event STATUS` messages. Log verbosity is increased when using Fahrenheit units due to higher reporting sensitivity compared to Celsius, and the plugin architecture does not provide a mechanism to filter events or exclude specific discovered appliances.",
+            "alternative_resolution": "Consider adding a configuration option to suppress specific event types (e.g., temperature status updates) or an 'ignore' list for discovered appliances to reduce log noise for users who do not require every device to be exposed to HomeKit.",
+            "confidence": "high",
+            "hash": "694f97358e4fb3873df4a1ddeffe535037c8eb89ca224bb451705b192529fb0a"
+        }
+    ]
+}
