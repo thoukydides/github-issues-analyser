@@ -1,0 +1,20 @@
+{
+    "issue_number": 72,
+    "updated_at": "2026-02-14T10:54:42.181Z",
+    "faq": [
+        {
+            "question": "Why does my Bosch washer or dryer always show as ON in the Home app even when it is finished?",
+            "answer": "Many Home Connect appliances, particularly washing machines and dryers, are designed as always-on devices from the perspective of the Home Connect API. On these models, the `BSH.Common.Setting.PowerState` only supports the value `On`. The plugin handles this by mapping the appliance's network connection status to the HomeKit Power switch:\n\n1.  **Connected state**: When the appliance is connected to the Home Connect servers, the HomeKit switch is shown as **On**.\n2.  **Disconnected state**: When the appliance is physically switched off or loses its Wi-Fi connection, the API reports a `DISCONNECTED` event. The plugin then sets the HomeKit switch to **Off**.\n\nIn some cases, if an appliance is already offline when Homebridge starts, the plugin may require a few moments to sync this status from the appliance discovery list. This behaviour was significantly improved in version `v0.23.6` to ensure the initial power state correctly reflects the connection status reported by the API during startup. If you are seeing persistent issues with the power state not updating, ensure you are running the latest version of the plugin.",
+            "semantic_abstract": "Certain Home Connect appliances like washers and dryers lack a software-definable 'Off' state in the API, forcing the plugin to use server connection status as a proxy for the HomeKit power characteristic. Plugin versions 0.23.6 and later synchronise the initial HomeKit state with the connection status returned during appliance discovery to prevent 'always on' symptoms when appliances are offline during Homebridge startup.",
+            "confidence": "high",
+            "hash": "52a3890681d5ebb69797e495ca2c1d7e4314ee005532fe5586cbd806649415bc"
+        },
+        {
+            "question": "Why does Homebridge startup seem to stall when my appliance is offline?",
+            "answer": "When the plugin starts, it must identify the capabilities and settings of each registered appliance to correctly initialise the corresponding HomeKit services. \n\n*   **Cahcing**: To avoid exceeding API rate limits, the plugin caches these capabilities. If the cache is valid and recent, the plugin will use it to restore the accessory even if the appliance is currently offline.\n*   **Cache Expiry**: If the cache has expired (due to being too old or a fresh installation), the plugin must query the appliance directly. If the appliance is offline, this specific part of the initialisation process will stall until the appliance connects to the Home Connect servers.\n*   **Impact**: While stalled waiting for capabilities, the Power switch might appear as read-only in HomeKit or use a generic state until the first successful communication with the appliance allows the plugin to determine exactly what features (like standby vs. off) the hardware supports.",
+            "semantic_abstract": "The plugin's initialisation sequence for HomeKit accessories depends on reading appliance-specific capabilities from the Home Connect API. While recent capabilities are cached to permit offline startup, an expired or missing cache requires a live connection to the appliance, causing service initialisation to stall until the device returns to a 'CONNECTED' state.",
+            "confidence": "high",
+            "hash": "9eb76066fe8402e0e4f4f99171622956addb2a360152ddd6be9372193ea5639d"
+        }
+    ]
+}
