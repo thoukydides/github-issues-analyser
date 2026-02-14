@@ -1,0 +1,22 @@
+{
+    "issue_number": 67,
+    "updated_at": "2026-02-14T07:54:53.805Z",
+    "faq": [
+        {
+            "question": "Is this plugin compatible with HOOBS?",
+            "answer": "This is a Homebridge plugin, not a native HOOBS plugin. While it generally works within a HOOBS environment, there are known limitations:\n\n1.  **Configuration**: HOOBS does not support `homebridge-ui-x` configuration schemas. This means the graphical configuration editor will not work, and you must edit the `config.json` file manually to configure the plugin.\n2.  **Stability**: Some users have reported issues such as all devices being stuck on `UPDATING` in the Apple Home app when running under HOOBS. If these issues are resolved by moving to a standard Homebridge installation, they are likely caused by incompatibilities within the HOOBS ecosystem.\n\nMaintainers do not officially support HOOBS-specific issues and recommend using a standard Homebridge installation for the best experience.",
+            "semantic_abstract": "Compatibility assessment between the Homebridge plugin and the HOOBS fork, highlighting the lack of support for graphical configuration schemas and potential communication failures resulting in the HomeKit 'UPDATING' status.",
+            "alternative_resolution": "Update the documentation to explicitly state that HOOBS graphical configuration is unsupported and that manual config.json editing is required.",
+            "confidence": "high",
+            "hash": "ea33967105953aeed86817b82e43b152725b8c199442e1248aeadd648df3b079"
+        },
+        {
+            "question": "Why are some features from the official Home Connect app missing in HomeKit?",
+            "answer": "The official Home Connect app uses a private API that often includes functionality not yet available in the public API used by this plugin. If a specific feature, such as **ironing reduction** or **anti-crease**, does not appear in the plugin, it is likely because Home Connect does not expose it to third-party developers.\n\nTo verify which options your specific appliance model supports through the public API:\n1.  **Check the logs**: Use a third-party HomeKit app (such as Eve) to trigger the `Identify` routine for the appliance. The plugin will log the full list of supported programs and options to the Homebridge console.\n2.  **Inspect the schema**: Look for a file named `.homebridge-homeconnect-v1.schema.json` in your Homebridge storage directory. This file contains the configuration options discovered by the plugin for your devices.\n\nIf a feature is missing from these sources, it cannot be added to the plugin until Home Connect updates their public API to include it.",
+            "semantic_abstract": "Discrepancy between private and public Home Connect APIs causing missing appliance features like ironing reduction, with instructions on using the HomeKit 'Identify' routine or inspecting schema files to verify API-supported options.",
+            "alternative_resolution": "Enhance the plugin's debug log output when the 'Identify' routine is triggered to clearly state that missing options are likely due to public API limitations.",
+            "confidence": "high",
+            "hash": "1639b90f4a6a80e24e2912f0cf4e7eae308ecc1cb134ad17c205375f6511fa28"
+        }
+    ]
+}
