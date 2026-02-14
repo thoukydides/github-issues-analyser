@@ -1,0 +1,14 @@
+{
+    "issue_number": 66,
+    "updated_at": "2026-02-14T09:54:08.756Z",
+    "faq": [
+        {
+            "question": "Why does my dishwasher trigger a Program Finished event when it reconnects?",
+            "answer": "The `homebridge-homeconnect` plugin maps events from the Home Connect API directly to HomeKit triggers. When the plugin logs `Event Program Finished`, it is because the appliance or the Home Connect cloud servers have sent a `BSH.Common.Event.ProgramFinished` event with the state `Present`.\n\nSome appliances, particularly certain Bosch dishwasher models, appear to re-broadcast this event when re-establishing a connection to the cloud after being disconnected. Since the plugin does not filter or state-check these events, they are passed through to HomeKit as a button press or notification. This is a quirk of the appliance firmware or the Home Connect API's event handling rather than a defect in the plugin itself.",
+            "semantic_abstract": "Home Connect appliances may re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a cloud connection after a disconnection. The plugin maps these API events directly to HomeKit `ProgrammableSwitchEvent` characteristics, leading to spurious \"Program finished\" notifications that originate from the appliance firmware or API server rather than the plugin's internal logic.",
+            "alternative_resolution": "Update the documentation to clarify that the plugin performs direct event mapping and that some hardware-specific re-announcement of events may occur during reconnection sequences, resulting in duplicate notifications in HomeKit.",
+            "confidence": "high",
+            "hash": "f64fb4f9f6eac2783f2d0fe84a835b568b6ca4b43eb510311449c8afc4e0446c"
+        }
+    ]
+}
