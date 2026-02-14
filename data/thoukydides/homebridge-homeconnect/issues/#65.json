@@ -1,0 +1,14 @@
+{
+    "issue_number": 65,
+    "updated_at": "2026-02-14T03:13:41.080Z",
+    "faq": [
+        {
+            "question": "Is the plugin compatible with Raspberry Pi OS Bullseye?",
+            "answer": "The `homebridge-homeconnect` plugin does not have any external dependencies beyond Homebridge and Node.js. It is therefore expected to function correctly on any operating system that supports these environments, including Raspberry Pi OS Bullseye. While a change in the version of Node.js provided by a new OS release could theoretically introduce issues, such occurrences are unlikely to affect this plugin's operation.",
+            "semantic_abstract": "The plugin's architecture relies exclusively on the Node.js runtime and Homebridge API without external binary dependencies. This design ensures broad compatibility across different operating systems and distributions, such as the transition from Raspbian Buster to Bullseye, as long as the underlying Node.js environment remains stable.",
+            "alternative_resolution": "Ensure the plugin's documentation explicitly mentions that it lacks native binary dependencies, which simplifies cross-platform compatibility and OS upgrades.",
+            "confidence": "high",
+            "hash": "324ab7f21dfeb729f4c765f47475af0a0eaefe7f6717c6a7394a3341214df3ac"
+        }
+    ]
+}
