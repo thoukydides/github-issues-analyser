@@ -1,0 +1,14 @@
+{
+    "issue_number": 73,
+    "updated_at": "2026-02-15T19:02:18.235Z",
+    "faq": [
+        {
+            "question": "Why am I seeing `Home Connect subsystem not available` or `503` errors in the logs?",
+            "answer": "The error `Home Connect API error: Home Connect subsystem not available. Please try it again. [503]` indicates a server-side issue with the Home Connect infrastructure. This is not a fault with the plugin or your local configuration.\n\nWhen this happens:\n* The official Home Connect mobile application may also fail to start or connect to appliances.\n* The issue is typically transient and usually resolved by the Home Connect team within a few hours or days.\n* Re-generating Client IDs or re-authenticating will not resolve the issue while the servers are down.\n\nYou can check the official Home Connect system status, although please note that it may occasionally report the system as functional even during localized outages. If the problem persists for an extended period, you may wish to contact Home Connect support directly.",
+            "semantic_abstract": "Home Connect API returns HTTP `503 Service Unavailable` errors with the message \"Home Connect subsystem not available\" when their backend infrastructure experiences outages. These transient server-side failures affect both the plugin and the official mobile application, requiring users to wait for service restoration by the manufacturer.",
+            "alternative_resolution": "The plugin could potentially catch 503 errors and provide a more user-friendly log message explicitly stating that this is a known Home Connect server issue and suggesting the user wait, rather than just logging the raw API error.",
+            "confidence": "high",
+            "hash": "03caf55da9ead8fbda4dea6bca18c673ff1eca6aad7f16c4bf2b9cc6ec5a4260"
+        }
+    ]
+}
