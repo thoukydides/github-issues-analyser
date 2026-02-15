@@ -36,7 +36,6 @@ flowchart TB
     m@{ shape: braces, label: "Manual review
     and update" }
 
-
     subgraph analyse [Analyse Issues]
     p1 -.-> wa[analyse-issue.yml]
     end
@@ -53,14 +52,7 @@ flowchart TB
     p2 -.-> wb[build-faq.yml]
     end
 
-    r --> wa --> i
-    i --> we --> c
-    c --> wc --> s
-    f --> wc
-    s <--> wb --> d
-
-    d --> m
-    m --> f
+    r --> wa --> i --> we --> c --> wc --> s <--> wb --> d --> m --> f --> wc
 ```
 
 1. **Analyse Issues**: Extract candidate FAQ entries from issue comments using AI
