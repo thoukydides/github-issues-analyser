@@ -1,0 +1,14 @@
+{
+    "issue_number": 93,
+    "updated_at": "2026-02-15T09:55:19.490Z",
+    "faq": [
+        {
+            "question": "Why does the plugin fail with `Home Connect API error: fetch failed` or `Cannot destructure property 'exports' of 'undefined'`?",
+            "answer": "This error, often accompanied by `TypeError: Cannot read properties of undefined (reading 'timeoutType')`, indicates a failure within the `undici` HTTP client library used by the plugin. This is typically caused by a corrupted Node.js environment or incompatible dependency versions within the `node_modules` directory.\n\nTo resolve this issue:\n1. Verify that your Node.js version meets the plugin's requirements (check the Homebridge log during startup; the plugin logs the current version and the required range).\n2. Attempt a clean reinstallation of the plugin. This can often be done by uninstalling it via the Homebridge UI and then installing it again.\n3. If the error persists, it may indicate a broader issue with the Homebridge installation. Users have reported that a complete reinstallation of Homebridge and all plugins resolved the underlying environment corruption.\n\nYou can check the version of the `undici` library currently in use by running `npm list undici` from the command line in the directory where the plugin is installed.",
+            "semantic_abstract": "Internal `undici` HTTP client failures, manifested as `fetch failed` or `timeoutType` property errors, indicate corrupted Node.js environments or dependency tree mismatches rather than plugin logic bugs. These technical errors require environment remediation through clean reinstallation of the plugin or the Homebridge platform to ensure library compatibility.",
+            "alternative_resolution": "The plugin already logs its dependencies and Node.js version compatibility at startup. Improving the error handling to specifically suggest a clean reinstall when `undici`-specific TypeErrors are caught during the fetch flow could reduce support overhead.",
+            "confidence": "high",
+            "hash": "7521aacb7e4e2caa3c723e5f9e3aaa8c76cc6bbd6c8e05c74b41817664a31051"
+        }
+    ]
+}
