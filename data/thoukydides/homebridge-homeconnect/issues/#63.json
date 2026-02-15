@@ -1,0 +1,14 @@
+{
+    "issue_number": 63,
+    "updated_at": "2026-02-15T13:27:32.220Z",
+    "faq": [
+        {
+            "question": "How can I receive notifications when a Home Connect appliance program finishes?",
+            "answer": "The Home app only supports native notifications for a limited set of service types, such as doors, windows, and security sensors. This plugin does not use these services to represent program status because they do not map accurately to appliance behaviour.\n\nTo receive notifications when a program (e.g. on a washing machine or dishwasher) completes, you can use the following methods:\n\n1.  **Official Home Connect App**: This is the most reliable method for receiving rich, text-based push notifications directly to your iOS device.\n2.  **HomeKit Automations**: For `Dryer`, `Washer`, and `WasherDryer` appliances, the plugin creates a `StatelessProgrammableSwitch` service. You can use these events to trigger HomeKit automations:\n    *   **Button 1 Single Press**: Triggered when a program finishes.\n    *   **Button 2 Single Press**: Triggered when a program is aborted.\n3.  **Third-party Notification Services**: You can create an automation in HomeKit triggered by the \"Program Finished\" button press that toggles a virtual switch (e.g. via `homebridge-dummy`). If that virtual switch is configured as a supported type (like a motion sensor or contact sensor), the Home app can then generate a notification based on its state change.",
+            "semantic_abstract": "HomeKit natively restricts status notifications to specific service categories like doors and sensors, excluding the programmable switches used for appliance event mapping. The plugin exposes program completion events via `StatelessProgrammableSwitch` button presses, requiring users to configure custom automations or third-party notification bridges to receive alerts.",
+            "alternative_resolution": "Update the plugin documentation to explicitly state that the Home app does not support native notifications for program completion events and provide examples of using the `StatelessProgrammableSwitch` events to trigger automations or third-party notification services.",
+            "confidence": "high",
+            "hash": "11e10c30986e4a4710a56d93b21a19d95863e595d9887a2b1054c388f0cf6ba0"
+        }
+    ]
+}
