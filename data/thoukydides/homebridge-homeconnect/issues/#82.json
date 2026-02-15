@@ -1,0 +1,22 @@
+{
+    "issue_number": 82,
+    "updated_at": "2026-02-15T15:49:46.853Z",
+    "faq": [
+        {
+            "question": "Why does the log show `request rejected by client authorization authority (developer portal)`?",
+            "answer": "This error is returned directly by the Home Connect servers when the provided `Client ID` is not recognised. This is typically caused by one of the following:\n\n1. **Incorrect ID type**: Ensure you have copied the 64-character hexadecimal string labelled `Client ID`. Do **not** use the `Client Secret` or the ID associated with the `API Web Client`.\n2. **Propagation delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take several minutes or even an hour for the new `Client ID` to propagate to the production authorisation servers. If the ID is definitely correct, wait a short while and restart Homebridge.\n3. **Truncated ID**: Double-check that the entire string was copied without missing characters at the beginning or end.",
+            "semantic_abstract": "The Home Connect API returns a client authorisation error when the provided Client ID is invalid, incorrectly typed, or hasn't yet propagated through the Home Connect infrastructure. This prevents the plugin from initiating the OAuth device flow.",
+            "alternative_resolution": "Improve the plugin's error message to specifically suggest checking for common mistakes like using the Client Secret or allowing for propagation time.",
+            "confidence": "high",
+            "hash": "05c85a93df8a0f4978e10e8b53da828714972d54f72c8c1c1c5360b4994558cb"
+        },
+        {
+            "question": "Why am I redirected to a SingleKey ID page during authorisation?",
+            "answer": "Home Connect has transitioned to using SingleKey ID for user authentication. Even if your Home Connect mobile app still uses a legacy login, the web-based authorisation flow used by this plugin may require a SingleKey ID.\n\nTo resolve this:\n* Create a SingleKey ID account at `singlekey-id.com` using the **same email address** as your existing Home Connect account.\n* Ensure the email address is written in **all lowercase letters**. The Home Connect backend performs case-sensitive comparisons against developer portal entries (which are forced to lowercase), and mismatched casing can result in `invalid_client` errors.\n* Avoid using 'plus' email addresses (e.g. `user+homebridge@example.com`) as these are inconsistently supported across the different Home Connect and SingleKey ID systems.",
+            "semantic_abstract": "Home Connect authentication has migrated to SingleKey ID, which introduces specific constraints regarding email formatting, including a requirement for all-lowercase addresses to match backend case-insensitive storage and potential issues with sub-addressing (plus tags).",
+            "alternative_resolution": "Update the plugin documentation to explicitly mention the SingleKey ID requirement and the necessity of using lowercase email addresses to avoid authentication failures.",
+            "confidence": "high",
+            "hash": "2ddccc3fa134ca6e0cb32972ed213aa67f18c257a5f9552f1c151b7ddce19d77"
+        }
+    ]
+}
