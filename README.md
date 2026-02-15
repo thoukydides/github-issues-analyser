@@ -1,94 +1,200 @@
 # GitHub Issues Analyser
 
-Valuable advice and insights are often buried in GitHub issue comments. This knowledge is difficult to search, particularly for new users, and becomes harder as context shifts and details go stale.This project incrementally processes issues and maintains a structured FAQ over time, rather than generating a one-off static summary. The system maintains provenance, semantic embeddings, and structural metadata to support reliable incremental updates.
+Valuable advice and insights are often buried in GitHub issue comments. This knowledge is difficult to search, particularly for new users, and becomes harder to find as context shifts and details go stale.
+
+**This project automatically extracts FAQ entries from GitHub issues**, using AI to identify patterns, cluster related topics, and maintain a living FAQ document that evolves with your project. Unlike one-off documentation generators, it maintains provenance, semantic embeddings, and structural metadata to support reliable incremental updates as new issues are raised and resolved.
+
+## Key Features
+
+- **Incremental Processing**: Processes one issue at a time via scheduled GitHub Actions, staying within free-tier API rate limits
+- **Semantic Clustering**: Uses embeddings to group related topics, even when they use different terminology
+- **Provenance Tracking**: Every FAQ entry links back to the source issues via HTML comments
+- **Smart Updates**: Only reprocesses issues when they are updated or when AI prompts are refined
+- **Manual Review**: Generates draft FAQs for human review before publication
+- **Multi-Repository**: Can process issues from multiple repositories, maintaining independent FAQs for each
+
+## How It Works
+
+The system operates as a multi-stage pipeline, with each stage triggered by scheduled GitHub Actions:
 
 ```mermaid
-flowchart LR
+flowchart TB
 
-    r@{ shape: docs, label: "Repository Issues" }
+    r@{ shape: db, label: "Repository Issues" }
 
     i@{ shape: docs, label: "issues/*N*.json" }
     c@{ shape: doc, label: "candidates.json" }
     e@{ shape: doc, label: "embeddings-cache.json" }
-    s@{ shape: doc, label: "structure.json" }
+    s@{ shape: doc, label: "faq-structure.json" }
     
     f@{ shape: doc, label: "faq.md" }
     d@{ shape: doc, label: "faq-draft.md" }
 
-    p1@{ shape: doc, label: "issue-analysis.prompt.yml" }
-    p2@{ shape: doc, label: "faq-draft.prompt.yml" }
+    p1@{ shape: lin-doc, label: "issue-analysis.prompt.yml" }
+    p2@{ shape: lin-doc, label: "faq-draft.prompt.yml" }
+
+    m@{ shape: braces, label: "Manual review
+    and update" }
+
 
     subgraph analyse [Analyse Issues]
-    direction TB
-    p1 -.-> analyse-issue.yml
+    p1 -.-> wa[analyse-issue.yml]
     end
 
     subgraph embeddings [Generate Embeddings]
-    direction TB
-    e --> embeddings.yml --> e
+    e <--> we[embeddings.yml]
     end
 
     subgraph cluster [Structure FAQ]
-    cluster.yml
+    wc[cluster.yml]
     end
 
     subgraph build [Build FAQ]
-    p2 -.-> build-faq.yml
+    p2 -.-> wb[build-faq.yml]
     end
 
-    r --> analyse --> i
-    i --> embeddings --> c
-    c --> cluster --> s
-    f --> cluster
-    s --> build --> s
-    build --> d
+    r --> wa --> i
+    i --> we --> c
+    c --> wc --> s
+    f --> wc
+    s <--> wb --> d
 
-    classDef textOnly fill:none,stroke:none;
+    d --> m
+    m --> f
 ```
+
+1. **Analyse Issues**: Extract candidate FAQ entries from issue comments using AI
+2. **Generate Embeddings**: Create semantic vectors for clustering related topics
+3. **Structure FAQ**: Group candidates into categories based on semantic similarity
+4. **Build FAQ**: Generate draft FAQ entries by merging related candidates
+5. **Manual Review**: Human review and refinement before publication
 
 Processing is performed by scheduled GitHub Actions workflows, with state checked back into the repo under the `data` directory, organised into subdirectories for each `owner/repo` being monitored. Each workflow run performs limited processing (e.g. a single AI inference step), continuing from the last state, to be robust and avoid exceeding API rate limits.
 
 Candidate FAQ entries are tracked via identifiers of the form `issue-42-de3d` comprising the source issue number and a unique hash. These identifiers are embedded in the final FAQ as HTML comments, identifying which candidate entries contributed to each final FAQ entry, and which candidates have been explicitly excluded (e.g. due to being obsolete, out of scope, or otherwise undesirable). They are used in subsequent updates to restrict processing to new candidate entries, and to organise those new entries into the most appropriate sections.
 
-> [!CAUTION]
-> This project was developed for my own use based on the characteristics of my own open source projects. If you are interested in trying it for yourself then follow the Usage instructions to customise and maintain your own copy. No support or stability guarantees are offered.
+## Quick Start
 
-> [!NOTE]
-> - This is **not** a general-purpose documentation generator.
-> - It is **not** guaranteed to produce correct answers without review.
-> - It is **not** a replacement for human editorial judgement.
+1. **Clone this repository** and delete the `data` folder
+2. **Configure** your repositories in `bin/config.ts`
+3. **Customise prompts** in `issue-analysis.prompt.yml` and `faq-draft.prompt.yml`
+4. **Add Gemini API key** as GitHub Actions secret `GEMINI_API_KEY_ISSUE`
+5. **Wait** for issues to be processed (can take weeks for large backlogs)
+6. **Review** `data/<owner>/<repo>/faq-draft.md` and commit as `faq.md`
+
+> [!IMPORTANT]
+> **This tool is designed for my specific use case.** It works well for technical open-source projects with detailed issue discussions, but may need significant customisation for other scenarios. Review the prompts carefully and adjust them to match your project's needs and tone.
+
+> [!CAUTION]
+> - This is **not** a general-purpose documentation generator
+> - It is **not** guaranteed to produce correct answers without review
+> - It is **not** a replacement for human editorial judgement
+> - **Review all generated content** before publishing
+> - **No support or stability guarantees are offered**
 
 ## Usage
 
+### Key Files
+
+```
+github-issues-analyser/
+├── .github/workflows/          # GitHub Actions workflows
+│   ├── analyse-issue.yml       # Extract candidates from issues
+│   ├── embeddings.yml          # Generate semantic embeddings
+│   ├── cluster.yml             # Group candidates by similarity
+│   └── build-faq.yml           # Generate draft FAQ
+├── bin/                        # TypeScript implementation
+│   └── config.ts               # Repository configuration
+├── data/<owner>/<repo>/        # Project-specific data
+│   ├── candidates.json         # All candidate FAQ entries with embeddings
+│   ├── embeddings-cache.json   # Cached embedding vectors
+│   ├── faq.md                  # Published FAQ (manually reviewed)
+│   ├── faq-draft.md            # Auto-generated FAQ draft
+│   ├── faq-structure.json      # Categorised candidates
+│   └── issues/#<n>.json        # Per-issue extraction results
+├── issue-analysis.prompt.yml   # AI prompt for candidate extraction
+└── faq-draft.prompt.yml        # AI prompt for FAQ generation
+```
+
+### Initial Setup
+
 To generate FAQs for your own projects:
-1. Checkout this project.
-2. Delete the existing `data` folder (which contains project-specific state for my own repositories).
-3. Customise the project:
-   - Edit `bin/config.ts` with a list of the repositories to process.
-   - Tailor the instructions in `issue-analysis.prompt.yml` and `faq-draft.prompt.yml` to suit your projects and preferences.
-4. Create a new GitHub repository for your copy of this project, and commit your version.
-5. Create a (free) Google AI Studio [Gemini API Key](https://aistudio.google.com/api-keys) and place it in a GitHub Actions Repository Secret named `GEMINI_API_KEY_ISSUE`.
-6. Wait for the backlog of existing issues to be processed.
-7. Review the generated `faq-draft.md`, edit as appropriate, and commit the revised version as `faq.md`. Ensure you retain the HTML comments with references to the source issues used to generate the FAQ entries; these are essential for incremental updates.
+
+1. **Create your copy**
+   ```bash
+   git clone https://github.com/thoukydides/github-issues-analyser.git
+   cd github-issues-analyser
+   rm -rf data/  # Remove project-specific data
+   ```
+
+2. **Configure repositories**
+   
+   Edit `bin/config.ts` to list the repositories you want to process:
+   ```typescript
+   export const CONFIG: ConfigRepository[] = [
+       { owner: 'your-username', repo: 'your-repo' }
+   ];
+   ```
+
+3. **Customise AI prompts**
+   
+   Tailor the instructions to match your project's characteristics:
+   - `issue-analysis.prompt.yml`: Controls how FAQ candidates are extracted from issues
+   - `faq-draft.prompt.yml`: Controls how candidates are merged into final FAQ entries
+   
+   Key areas to customise:
+   - Technical terminology specific to your project
+   - Tone and writing style preferences
+   - What types of issues to include/exclude
+   - How to handle maintainer policy decisions
+
+4. **Create GitHub repository**
+   
+   Create a **new repository** (not a fork) and push your customised version:
+   ```bash
+   git remote set-url origin git@github.com:your-username/your-faq-project.git
+   git push -u origin master
+   ```
+
+5. **Add API credentials**
+   
+   Create a [Gemini API Key](https://aistudio.google.com/api-keys) (free) and add it as a GitHub Actions repository secret named `GEMINI_API_KEY_ISSUE`.
+
+6. **Wait for processing**
+   
+   GitHub Actions will begin processing issues automatically. Monitor progress in the Actions tab. For repositories with many existing issues, initial processing can take several weeks due to API rate limits.
+
+7. **Review and publish**
+   
+   Once processing is complete:
+   - Review `data/<owner>/<repo>/faq-draft.md`
+   - Edit as needed (fix errors, improve wording, reorganise sections)
+   - **Preserve HTML comments** containing issue references (essential for incremental updates)
+   - If entries are deleted, list their issue references to prevent future inclusion:
+     ```html
+       <!-- EXCLUDED: issue-13-25e1 issue-18-f5e2 -->
+     ```
+     This prevents the system from re-adding candidates you have deliberately removed (e.g. obsolete workarounds or out-of-scope topics)
+   - Commit the reviewed version as `data/<owner>/<repo>/faq.md`
+
+### Ongoing Maintenance
+
+Once the initial FAQ is published:
+
+- **New issues** are automatically analysed as they are created or updated
+- **New candidates** are added to `faq-draft.md` in appropriate sections
+- **Review changes** regularly and merge approved updates into `faq.md`
+
+### Tips
 
 > [!TIP]
-> Create an independent repository rather than a fork of this project. Otherwise changes to the issue and FAQ data for my projects will appear as upstream commits.
+> **Create an independent repository** rather than forking. Otherwise, changes to my project's issue data will appear as upstream commits that you will need to manage.
 
 > [!TIP]
-> The GitHub Actions workflow scheduled triggers have been selected to remain within the Google AI Studio free tier rate limits, especially the limit of 20 requests/day for the `gemini-3-flash` model. When this project is first used against an established repository with lots of existing issues it will take a long time to churn through the backlog of old issues. After this has completed only updated issues will be processed.
+> **Rate limits**: The GitHub Actions schedules are configured to stay within Google AI Studio's free tier (20 requests/day for `gemini-3-flash`). A repository with 500 closed issues will take ~25 days to process initially. Ongoing maintenance only processes updated issues, so will typically generate an updated FAQ draft within 1-2 days.
 
-## Directory Structure
-
-The most important files in this project are:
-* `data/<owner>/<repo>/...`: Project-specific data:
-  * `.../candidates.json`: A flat list of candidate FAQ entries from all issues, with their associated embeddings vectors.
-  * `.../embeddings-cache.json`: Cache of all embeddings vectors generated for this project.
-  * `.../faq.md`: The manually reviewed and edited FAQ.
-  * `.../faq-draft.md`: The automatically generated or revised FAQ.
-  * `.../issues/#<n>.json`: A file per issue processed containing the results of the AI inference to extract candidate FAQ entries.
-  * `.../structure.json`: The parsed `faq.json` with all new `candidates.json` entries added into appropriate categories, updated as AI inference steps review and integrate the entries into each category.
-* `faq-draft.prompt.yml`: AI prompt to review a collection of related FAQ entries (existing and new candidates) and generate a revised list.
-* `issue-analysis-prompt.yml`: AI prompt to analyse a GitHub issue and generate candidate FAQ entries.
+> [!TIP]
+> **Prompt updates**: If you refine the `issue-analysis.prompt.yml` prompt, update the `ISSUE_DATE_PREFERRED` date in `bin/lib/data/issues.ts` to reprocess all issues using the new instructions. Only change `ISSUE_DATE_COMPATIBLE` if you make incompatible changes to the structured output format.
 
 ## ISC License (ISC)
 
