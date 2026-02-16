@@ -1,0 +1,14 @@
+{
+    "issue_number": 122,
+    "updated_at": "2026-02-16T13:46:25.953Z",
+    "faq": [
+        {
+            "question": "Why are some coffee machine programmes or beverages like `Caffe Grande` or `Hot Water` missing?",
+            "answer": "The plugin dynamically retrieves the list of supported programmes directly from the Home Connect API for each specific appliance; it does not maintain an internal list of supported programmes. If a programme available on your appliance's control panel is missing from Homebridge, it is typically because the Home Connect API does not expose it for your specific model or firmware version. \n\nTo discover newly added API programmes (such as `CaffeGrande`), you must restart Homebridge to trigger a re-read of the available programmes from the API. If a programme remains missing after a restart, it indicates a limitation of the Home Connect API itself or the appliance firmware. You can verify the list of standard programmes in the [Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options?#coffee-machine). Omissions must be addressed by the [Home Connect support team](https://developer.home-connect.com/support/contact).",
+            "semantic_abstract": "Home Connect coffee machine programme availability is determined dynamically via the API rather than a static internal list, meaning specific beverages only appear if exposed by the appliance firmware to the Home Connect servers. Discovery of newly supported API programmes requires a plugin restart to trigger a refresh of the cached appliance capabilities.",
+            "alternative_resolution": "Update the documentation to clarify that the available programmes are fetched dynamically from the API and that a restart is required to refresh this list following API or firmware updates.",
+            "confidence": "high",
+            "hash": "9466e4230d60f17a3f20eab0715af4af995d5096510799be82177416247c3082"
+        }
+    ]
+}
