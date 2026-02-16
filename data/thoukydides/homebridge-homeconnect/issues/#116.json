@@ -1,0 +1,21 @@
+{
+    "issue_number": 116,
+    "updated_at": "2026-02-16T06:40:38.865Z",
+    "faq": [
+        {
+            "question": "Why do my appliance program switches show up with generic names in the Apple Home app?",
+            "answer": "Starting with iOS 16, the Apple Home app changed how it handles service names, often ignoring the custom names provided by plugins and displaying the generic accessory name instead. \n\nTo address this, the plugin (from version 0.27.0 onwards) includes the `Configured Name` characteristic for `Switch`, `Stateless Programmable Switch`, and `Lightbulb` services. This characteristic allows the Home app to display the correct program names (e.g. `Cappuccino`, `Espresso`) for most tiles. \n\nIf you are still seeing generic names:\n1. Ensure the plugin is updated to at least v0.27.0.\n2. Note that `Stateless Programmable Switch` services (used for some button-like controls) may still appear as numeric buttons in the Apple Home app due to iOS-specific limitations. Third-party apps like **Eve** or **Home+** may display these more clearly.\n3. You can manually rename the switches within the Home app settings for that specific accessory to restore your preferred naming convention.",
+            "semantic_abstract": "iOS 16 changes to HomeKit service name resolution caused appliances with multiple programs to display generic names instead of specific program identifiers. The plugin implements the `Configured Name` characteristic for `Switch`, `Stateless Programmable Switch`, and `Lightbulb` services to restore proper naming visibility in the Home app.",
+            "confidence": "high",
+            "hash": "e2eca488d3245e076502fbb52456a261ae89b8c1110421db1f6cb4cbb45f2e43"
+        },
+        {
+            "question": "What does the error `BSH.Common.Error.WriteRequest.Busy` mean?",
+            "answer": "The `BSH.Common.Error.WriteRequest.Busy` error is returned by the Home Connect cloud servers when a command is sent to an appliance that is currently unable to process it. \n\nThis typically occurs when:\n* The appliance requires physical user interaction (e.g. a coffee machine needs its drip tray emptied or water tank filled).\n* The appliance is in a state where it cannot accept the specific command (e.g. attempting to start a program while a door is open or a cleaning cycle is active).\n* There is a transient issue with the Home Connect cloud service itself.\n\nIf you encounter this error, check the physical display of the appliance or the official Home Connect app to see if a manual action is required.",
+            "semantic_abstract": "The `BSH.Common.Error.WriteRequest.Busy` error indicates a Home Connect API constraint where an appliance is unable to execute a command due to its current physical state or required user intervention.",
+            "alternative_resolution": "The plugin could potentially catch this specific error and provide a more user-friendly message suggesting the user check the appliance for required manual interaction.",
+            "confidence": "high",
+            "hash": "1125e9089cb07905be2c7850c76284676df0042d1d1e41e720a5baef65836afd"
+        }
+    ]
+}
