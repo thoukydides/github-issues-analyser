@@ -1,0 +1,14 @@
+{
+    "issue_number": 115,
+    "updated_at": "2026-02-16T08:05:26.869Z",
+    "faq": [
+        {
+            "question": "Why am I getting the error `client has limited user list - user not assigned to client [invalid_client]`?",
+            "answer": "This error is returned by the Home Connect API servers and indicates that the account you are using to log in is not authorised to use the specific Developer Application you created. This is usually caused by a configuration mismatch in the Home Connect Developer Portal.\n\nTo resolve this, verify the following settings on the [Home Connect Developer Portal](https://developer.home-connect.com/):\n\n1. Check the **Home Connect User Account for Testing** field within your application settings. This must exactly match the email address used for your Home Connect mobile app.\n2. Verify the **Default Home Connect User Account for Testing** in your developer profile settings.\n3. If you have recently migrated your account to **SingleKey ID**, ensure that your developer profile and application settings have been updated to reflect the correct email address.\n\nIf the configuration is correct but the error persists or reappears after a short period of working, it may indicate a server-side issue with your specific account. In such cases, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) directly, as this cannot be resolved within the plugin.",
+            "semantic_abstract": "Home Connect API authorization failures with the `invalid_client` error code occur when the developer application's authorized user list does not include the account attempting to authenticate. This typically results from email address mismatches between the developer and appliance accounts or synchronization issues following a SingleKey ID migration.",
+            "alternative_resolution": "The plugin could be updated to catch this specific error string from the Home Connect API and provide a more descriptive log message that includes a link to the developer portal and instructions to verify the 'User Account for Testing' field.",
+            "confidence": "high",
+            "hash": "c7130b391d452042427ae9ee770d05fe32b34b39e63673d45cccf3f4ac95361a"
+        }
+    ]
+}
