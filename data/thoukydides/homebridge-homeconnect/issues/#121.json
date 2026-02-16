@@ -1,0 +1,14 @@
+{
+    "issue_number": 121,
+    "updated_at": "2026-02-16T10:30:49.026Z",
+    "faq": [
+        {
+            "question": "Why do I get a `Device authorization session has expired` error during setup?",
+            "answer": "This error typically occurs when the SingleKey ID account used for authorisation is not fully configured or verified in the official mobile app. To resolve this:\n\n1. Open the official Home Connect app on your mobile device.\n2. Ensure you are logged in with the same SingleKey ID used for the Homebridge plugin.\n3. Verify that your account profile is complete and any pending email verifications or terms of service acceptances have been processed.\n4. Once the account is fully active and functional within the mobile app, restart the plugin and attempt the authorisation process again.",
+            "semantic_abstract": "OAuth authentication flow failures during Device Flow occur when the SingleKey ID account used for authorisation has an incomplete setup or verification status within the official Home Connect mobile application. This prevents the API from successfully linking the developer application to the user account, resulting in session expiry errors during the redirect process.",
+            "alternative_resolution": "Update the plugin's authorisation instructions to explicitly remind users to ensure their SingleKey ID account is fully verified and active in the official Home Connect app before attempting the Device Flow link.",
+            "confidence": "medium",
+            "hash": "ccc6581ef6d0f20c2c23e934a6144c2c972031a8df0859c3564f4d55e8654d98"
+        }
+    ]
+}
