@@ -1,0 +1,29 @@
+{
+    "issue_number": 124,
+    "updated_at": "2026-02-16T11:59:45.115Z",
+    "faq": [
+        {
+            "question": "Can I disable the power or active program switches for my appliance?",
+            "answer": "You can control which individual program switches are provided by using the `addprograms` option in your `config.json` file. However, the `Switch` services for appliance power and the active program are fundamental to the plugin's architecture and cannot be disabled via configuration. If you wish to avoid accidental activation, consider moving these switches to a different room or a 'Technical' zone within the Home app.",
+            "semantic_abstract": "Plugin architectural constraints mandate the presence of core power and active program services, while the `addprograms` configuration property allows selective inclusion of optional program switches.",
+            "alternative_resolution": "The documentation for `config.json` could be updated to explicitly state that power and active program switches are mandatory and cannot be hidden, reducing user confusion regarding 'Notification only' setups.",
+            "confidence": "high",
+            "hash": "2e729bb4a4860d502a35e56225d9ecbacd704aebfb4a23360102836e25f3753c"
+        },
+        {
+            "question": "Why is the remaining program time or current stage not visible in the Home app?",
+            "answer": "There are two main reasons why this information may be missing:\n\n1.  **API Limitations**: Most Home Connect appliances (except for the Roxxter cleaning robot) do not report specific program stages like 'rinsing' or 'spinning'. They only provide elapsed time, remaining time, and percentage completion.\n2.  **HomeKit Display**: The plugin provides a `Remaining Program` characteristic, but the official Apple Home app does not support displaying it. To see the remaining duration, you must use a third-party HomeKit app that supports a wider range of characteristic types.",
+            "semantic_abstract": "Home Connect API constraints limit program stage granularity for most appliances, and the Apple Home app's lack of support for the `Remaining Program` characteristic necessitates third-party HomeKit clients for full telemetry visibility.",
+            "confidence": "high",
+            "hash": "9bb693ee3de5016c63b763d14c9fbce687827e0e936bbebcfaddf2d1ef556a17"
+        },
+        {
+            "question": "How can I get notifications for program completion or low detergent levels?",
+            "answer": "The Apple Home app only generates native notifications for a restricted set of characteristics, primarily those related to security (such as doors). It does not support native notifications for appliance program states or consumable levels.\n\nTo receive these alerts, you can use the `Stateless Programmable Switch` services provided by the plugin for events like `Program Finished` or `i-Dos Low`. These services allow you to create HomeKit automations that can trigger custom actions or notifications when the specific event occurs.",
+            "semantic_abstract": "Apple Home app notification policies for non-security characteristics require the use of `Stateless Programmable Switch` services to facilitate custom automation-based alerts for appliance events and refill notifications.",
+            "alternative_resolution": "Provide specific examples in the documentation for creating a HomeKit automation that sends a notification when a `Stateless Programmable Switch` event is triggered.",
+            "confidence": "high",
+            "hash": "8aeaa1a24ad06af8b8811373529e899b09c4a85a5bd7e4122eb12fb36f2fe688"
+        }
+    ]
+}
