@@ -1,0 +1,14 @@
+{
+    "issue_number": 145,
+    "updated_at": "2026-02-17T09:12:40.496Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Unexpected fields in Home Connect API response` or that a field like `displayvalue` is extraneous?",
+            "answer": "This warning message indicates that an appliance has returned data fields that are not defined in the plugin's internal schema or the official Home Connect API documentation. This typically occurs when a specific appliance model or firmware version provides additional metadata, such as a `displayvalue` field for program options. These warnings are generally informative and do not impact the functionality of the plugin or its ability to control the appliance. They represent a mismatch between the actual API implementation on the device and the plugin's data models.\n\nIf you encounter these messages:\n1. Ensure you are running the latest version of the plugin. Many specific instances of this warning, such as the `displayvalue` field found in some Bosch washing machines, were resolved in version `v0.29.3`.\n2. If the warning persists on the latest version, it indicates a new undocumented field has been discovered. Enable debug logging (specifically `Log API Bodies` and `Log Debug as Info` in the plugin configuration) and open a GitHub issue with the log output so the schema can be updated to include the new fields.",
+            "semantic_abstract": "Home Connect API responses for certain appliance models may contain undocumented metadata fields, such as `displayvalue` within program options, causing schema validation warnings. These implementation mismatches occur when appliance firmware provides information beyond the standard API specification, necessitating updates to the plugin's internal data models to suppress extraneous field warnings.",
+            "alternative_resolution": "Clarify in the log output that 'extraneous' fields are non-critical and provide a suggested path for reporting them to reduce user concern when new API fields are encountered.",
+            "confidence": "high",
+            "hash": "8923f2cf51dbd7374177d0edbcf6a9ed8b0e0aa68f8bcb78643e099e1c9883c7"
+        }
+    ]
+}
