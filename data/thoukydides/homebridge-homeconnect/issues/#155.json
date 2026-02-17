@@ -1,0 +1,14 @@
+{
+    "issue_number": 155,
+    "updated_at": "2026-02-17T15:26:23.623Z",
+    "faq": [
+        {
+            "question": "Why does my appliance show a `409 Conflict` error with `SDK.Error.HomeAppliance.Connection.Initialization.Failed`?",
+            "answer": "The `409 Conflict` error, specifically `SDK.Error.HomeAppliance.Connection.Initialization.Failed`, is returned by the Home Connect API when the cloud servers are unable to establish a connection with your appliance. This typically indicates that the appliance is offline or failed to respond to connection requests in time.\n\nTo troubleshoot this issue:\n1. Verify the appliance connectivity by disabling Wi-Fi on your mobile device and attempting to control the appliance via the official Home Connect app using a cellular data connection. This forces the app to communicate through the cloud servers rather than your local network.\n2. Check the network settings section within the official Home Connect app for the specific appliance to ensure it shows a stable connection (usually indicated by three green lines).\n3. Check the status of the Home Connect cloud services to ensure there are no ongoing outages.\n\nBecause this error originates from the Home Connect cloud services' inability to reach the hardware, it cannot be resolved within the plugin code.",
+            "semantic_abstract": "A `409 Conflict` API response indicates a failure in the connection between Home Connect cloud servers and the physical appliance, often due to the appliance being offline or unresponsive. This technical limitation prevents the plugin from retrieving status or sending commands until the appliance's cloud connectivity is restored.",
+            "alternative_resolution": "Enhance the plugin's error handling to provide a more descriptive log message for `409 Conflict` errors, explicitly suggesting that the user check the appliance's connection to the Home Connect cloud services.",
+            "confidence": "high",
+            "hash": "6e9f35ab4f281f1abe9af5b388ab644825a34dcd9830e82b6198da6bbe319009"
+        }
+    ]
+}
