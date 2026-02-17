@@ -1,0 +1,14 @@
+{
+    "issue_number": 157,
+    "updated_at": "2026-02-17T16:31:14.215Z",
+    "faq": [
+        {
+            "question": "Why can't I adjust the milk percentage for coffee drinks?",
+            "answer": "The ability to adjust the milk percentage for beverages like latte macchiatos or cappuccinos is currently not available because the Home Connect API does not expose this specific option to third-party integrations. \n\nThis plugin is designed to automatically support all program options that Home Connect provides through their official API. Currently, the only supported options for coffee makers are:\n* `BeanAmount`\n* `FillQuantity`\n* `CoffeeTemperature`\n* `BeanContainerSelection`\n* `FlowRate`\n* `MultipleBeverages`\n* `HotWaterTemperature` \n\nBecause the milk percentage feature is missing from the underlying API, it cannot be added to the plugin. If the Home Connect team updates their API to include this option, it will be supported by the plugin automatically without requiring any code changes.",
+            "semantic_abstract": "The Home Connect API lacks a specific program option for milk percentage adjustment on coffee machines, preventing its implementation in the plugin despite its availability in the official Home Connect mobile application. The plugin architecture dynamically reflects all API-exposed options, so any future additions to the Home Connect API specification for coffee machines will be integrated automatically.",
+            "alternative_resolution": "The documentation could be updated to clarify that features present in the official Home Connect app may be absent from the plugin if they are not included in the public Home Connect API specification.",
+            "confidence": "high",
+            "hash": "61a12e8d23c0ac2233237ccd66d2b05f7a415ff1f3d4ed046fefffc9d24bd24d"
+        }
+    ]
+}
