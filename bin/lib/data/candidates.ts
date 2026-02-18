@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import * as core from '@actions/core';
 import { plural } from '../utils.js';
-import { Embeddings } from '../embeddings/google-ai-studio.js';
+import { GeminiEmbeddings } from '../embeddings/google-ai-studio.js';
 import { ConfigRepository } from '../../config.js';
 import { getCandidatesPath } from './paths.js';
 
@@ -12,7 +12,7 @@ import { getCandidatesPath } from './paths.js';
 export interface CandidateFAQ {
     issue_number:   number;
     id:             string;
-    embeddings:     Embeddings;
+    embeddings:     GeminiEmbeddings;
     question:       string;
     answer:         string;
 }
@@ -24,6 +24,12 @@ export function loadCandidates(repo: ConfigRepository): CandidateFAQ[] {
     const candidates = JSON.parse(json) as CandidateFAQ[];
     core.info(`Loaded ${plural(candidates.length, 'candidate entry')}`);
     return candidates;
+}
+
+// Load the candidate FAQ entries indexed by ID
+export function loadCandidatesMap(repo: ConfigRepository): Map<string, CandidateFAQ> {
+    const candidates = loadCandidates(repo);
+    return new Map<string, CandidateFAQ>(candidates.map(c => [c.id, c]));
 }
 
 // Save the candidate FAQ entries

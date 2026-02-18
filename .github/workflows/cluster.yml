@@ -1,4 +1,4 @@
-name: Generate Embeddings
+name: Structure FAQ
 permissions:
   contents: write
 concurrency:
@@ -7,11 +7,11 @@ concurrency:
 
 on:
   schedule:
-  - cron: '13 20 * * *'
+  - cron: '13 21 * * *'
   workflow_dispatch:
 
 jobs:
-  generate-embeddings:
+  cluster:
 
     runs-on: ubuntu-latest
 
@@ -28,14 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate embeddings
-        env:
-          GEMINI_API_KEY: ${{ secrets.gemini_api_key_issue }}
-        run: npm exec tsx -- bin/generate-embeddings.ts
+      - name: Generate FAQ structure
+        run: npm exec tsx -- bin/structure-faq.ts
 
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v9
         with:
           add:              ./data
-          message:          'Updated embeddings'
+          message:          'Updated FAQ structure'
           default_author:   github_actions

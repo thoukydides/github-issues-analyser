@@ -6,6 +6,7 @@ import { LocalTokenizer } from '@google/genai/tokenizer/node';
 import * as core from '@actions/core';
 import { formatList, plural } from '../utils.js';
 import { setTimeout } from 'node:timers/promises';
+import { Embedding, normaliseEmbedding } from './clustering.js';
 
 // Embedding configuration
 const MODEL                 = 'gemini-embedding-001';
@@ -24,13 +25,12 @@ const LOCAL_TOKENS_MODEL    = 'gemini-2.5-flash';   // (uses 'gemma3')
 const LOCAL_TOKENS_SCALE    = 1.1;                  // (extra 10% margin)
 
 // Multiple embeddings
-export type EmbeddingType   = Lowercase<TaskType>;
-export type Embedding       = number[];
-export type Embeddings      = Record<EmbeddingType, Embedding>;
+export type GeminiEmbeddingType = Lowercase<TaskType>;
+export type GeminiEmbeddings    = Record<GeminiEmbeddingType, Embedding>;
 
 // Calculate embeddings for a list of strings
 // (may return partial results if an API request fails)
-export async function geminiGenerateEmbeddings(contents: string[]): Promise<Embeddings[]> {
+export async function geminiGenerateEmbeddings(contents: string[]): Promise<GeminiEmbeddings[]> {
     // Create a client
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY not set');
@@ -48,7 +48,7 @@ export async function geminiGenerateEmbeddings(contents: string[]): Promise<Embe
 
     // Generate the embeddings in batches
     let requests = 0;
-    const embeddings: Embeddings[] = [];
+    const embeddings: GeminiEmbeddings[] = [];
     try {
         while (embeddings.length < truncated.length) {
             // Batch as much content as possible into each request
@@ -62,9 +62,9 @@ export async function geminiGenerateEmbeddings(contents: string[]): Promise<Embe
             const batch = truncated.slice(startIndex, endIndex);
 
             // Generate the embeddings for each required task type
-            const results = await Promise.all(TASK_TYPES.map<Promise<[EmbeddingType, Embedding[]]>>(async taskType =>
-                [taskType.toLowerCase() as EmbeddingType, await embeddingsRequest(ai, taskType, batch)]));
-            const collated = batch.map((_, i) => Object.fromEntries(results.map(([k, v]) => [k, v[i]])) as Embeddings);
+            const results = await Promise.all(TASK_TYPES.map<Promise<[GeminiEmbeddingType, Embedding[]]>>(async taskType =>
+                [taskType.toLowerCase() as GeminiEmbeddingType, await embeddingsRequest(ai, taskType, batch)]));
+            const collated = batch.map((_, i) => Object.fromEntries(results.map(([k, v]) => [k, v[i]])) as GeminiEmbeddings);
             embeddings.push(...collated);
             ++requests;
 
@@ -129,14 +129,10 @@ async function embeddingsRequest(ai: GoogleGenAI, taskType: TaskType, contents: 
     core.info(`Generated ${plural(contents.length, 'embedding')}${usage}`);
 
     // Normalise the embeddings (only 3072 dimension is returned normalised)
-    return embeddings.map(normaliseEmbedding);
+    return embeddings.map(v => roundEmbedding(normaliseEmbedding(v)));
 }
 
-// Normalise an embedding and apply rounding
-function normaliseEmbedding(values: Embedding): Embedding {
-    const magnitude = Math.sqrt(values.reduce((acc, v) => acc + v * v, 0));
-    if (magnitude === 0) return values;
-    const normalised = values.map(v => v / magnitude);
-    const rounded = normalised.map(v => Number(v.toFixed(DECIMAL_PLACES)));
-    return rounded;
+// Round a vector to useful precision
+function roundEmbedding(values: Embedding): Embedding {
+    return values.map(v => Number(v.toFixed(DECIMAL_PLACES)));
 }

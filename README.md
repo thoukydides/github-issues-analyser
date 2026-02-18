@@ -70,7 +70,7 @@ Candidate FAQ entries are tracked via identifiers of the form `issue-42-de3d` co
 1. **Clone this repository** and delete the `data` folder
 2. **Configure** your repositories in `bin/config.ts`
 3. **Customise prompts** in `issue-analysis.prompt.yml` and `faq-draft.prompt.yml`
-4. **Add Gemini API key** as GitHub Actions secret `GEMINI_API_KEY_ISSUE`
+4. **Add Gemini API keys** as GitHub Actions secrets `GEMINI_API_KEY_ISSUE` and `GEMINI_API_KEY_FAQ`
 5. **Wait** for issues to be processed (can take weeks for large backlogs)
 6. **Review** `data/<owner>/<repo>/faq-draft.md` and commit as `faq.md`
 
@@ -150,7 +150,7 @@ To generate FAQs for your own projects:
 
 5. **Add API credentials**
    
-   Create a [Gemini API Key](https://aistudio.google.com/api-keys) (free) and add it as a GitHub Actions repository secret named `GEMINI_API_KEY_ISSUE`.
+   Create two [Gemini API Keys](https://aistudio.google.com/api-keys) (free) and add them as GitHub Actions repository secrets named `GEMINI_API_KEY_ISSUE` and  `GEMINI_API_KEY_FAQ`. These should be in separate Google Cloud projects to enable independent rate limits.
 
 6. **Wait for processing**
    

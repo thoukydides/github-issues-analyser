@@ -18,7 +18,9 @@
         "HDBSCAN",
         "Homebridge",
         "homeconnect",
+        "HOOBS",
         "matterbridge",
+        "stdev",
         "Thoukydides",
         "vars"
     ],

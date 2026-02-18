@@ -1,4 +1,4 @@
-name: Generate Embeddings
+name: Build FAQ
 permissions:
   contents: write
 concurrency:
@@ -7,11 +7,11 @@ concurrency:
 
 on:
   schedule:
-  - cron: '13 20 * * *'
+  - cron: '13 0-17,22-23 * * *'
   workflow_dispatch:
 
 jobs:
-  generate-embeddings:
+  build-faq:
 
     runs-on: ubuntu-latest
 
@@ -28,14 +28,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate embeddings
+      - name: Build FAQ
         env:
-          GEMINI_API_KEY: ${{ secrets.gemini_api_key_issue }}
-        run: npm exec tsx -- bin/generate-embeddings.ts
+          GEMINI_API_KEY: ${{ secrets.gemini_api_key_faq }}
+        run: npm exec tsx -- bin/build-faq.ts
 
       - name: Commit and push changes
         uses: EndBug/add-and-commit@v9
         with:
           add:              ./data
-          message:          'Updated embeddings'
+          message:          'Updated draft FAQ'
           default_author:   github_actions

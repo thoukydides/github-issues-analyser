@@ -24,3 +24,18 @@ export function getEmbeddingsCachePath(repo: ConfigRepository): string {
 export function getCandidatesPath(repo: ConfigRepository): string {
     return path.join(ROOT_PATH, repo.owner, repo.repo, 'candidates.json');
 }
+
+// Path to the structured FAQ for a repository
+export function getStructuredFAQPath(repo: ConfigRepository): string {
+    return path.join(ROOT_PATH, repo.owner, repo.repo, 'faq-structure.json');
+}
+
+// Path to the reviewed FAQ for a repository
+export function getInputFAQPath(repo: ConfigRepository): string {
+    return path.join(ROOT_PATH, repo.owner, repo.repo, 'faq.md');
+}
+
+// Path to the generated FAQ for a repository
+export function getOutputFAQPath(repo: ConfigRepository): string {
+    return path.join(ROOT_PATH, repo.owner, repo.repo, 'faq-draft.md');
+}

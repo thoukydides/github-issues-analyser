@@ -8,6 +8,9 @@ export function assertIsDefined<Type>(value: Type): asserts value is NonNullable
     assert.notStrictEqual(value, undefined);
     assert.notStrictEqual(value, null);
 }
+export function assertIsString(value: unknown): asserts value is string {
+    assert.strictEqual(typeof value, 'string');
+}
 
 // Format a counted noun (handling most regular cases automatically)
 export function plural(count: number, noun: string | [string, string], showCount = true): string {
