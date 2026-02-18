@@ -16,12 +16,13 @@ const PROMPT_FILE = './faq-draft.prompt.yml';
 // Model structured response (matches JSON schema in PROMPT_FILE)
 const ResponseSchema = z.object({
     category:   z.string()          .describe('Section heading for this collection of FAQ entries'),
-    reasoning:  z.string()          .describe('Brief and concise explanation of major changes made:'
-                                              + ' entries merged, split, updated, or excluded, and why'),
     entries:    z.array(
         z.object({
             question:   z.string()  .describe('A concise, searchable question'),
-            answer:     z.string()  .describe('The FAQ entry body in GitHub-flavoured Markdown'),
+            answer:     z.string()  .describe('The FAQ entry body in GitHub-flavoured Markdown;'
+                                        + ' represent paragraph breaks and list items using standard JSON newline escapes (`\n`);'
+                                        + ' do not emit literal backslash characters before `n` unless they are intended to'
+                                        + ' appear in the final Markdown'),
             ids:        z.array(
                 z.string()          .describe("The 'id' field from an existing or candidate entry")
             )                       .describe('IDs of all existing and candidate entries that this entry replaces or incorporates')
