@@ -6,7 +6,7 @@ import * as core from '@actions/core';
 import { ConfigRepository } from '../../config.js';
 import { getInputFAQPath, getOutputFAQPath } from './paths.js';
 import { describeStructuredFAQ, StructuredFAQ, StructuredFAQCategory, StructuredFAQPartition } from './structure.js';
-import { plural } from '../utils.js';
+import { assertIsDefined, plural } from '../utils.js';
 
 // A Markdown section (not nested)
 interface MarkdownSection {
@@ -117,7 +117,22 @@ function extractIds(markdown: string, prefix: string): { markdown: string, ids: 
 // Generate an HTML comment listing candidate identifiers
 function makeIdsComment(prefix: string, ids: string[]): string {
     if (!ids.length) return '';
-    const uniqueIds = [...new Set(ids)].sort().join(' ');
+    const compareIds = (a: string, b: string): number => {
+        const aParts = a.split('-'), bParts = b.split('-');
+        for (let i = 0; i < Math.min(aParts.length, bParts.length); i++) {
+            const aPart = aParts[i], bPart = bParts[i];
+            assertIsDefined(aPart); assertIsDefined(bPart);
+            if (/^\d+$/.test(aPart) && /^\d+$/.test(bPart)) {
+                const aNum = Number(aPart), bNum = Number(bPart);
+                if (aNum !== bNum) return aNum - bNum;
+            } else {
+                const cmp = aPart.localeCompare(bPart);
+                if (cmp !== 0) return cmp;
+            }
+        }
+        return aParts.length - bParts.length;
+    };
+    const uniqueIds = [...new Set(ids)].sort(compareIds).join(' ');
     return `<!-- ${prefix}: ${uniqueIds} -->\n`;
 }
 
