@@ -1,0 +1,14 @@
+{
+    "issue_number": 175,
+    "updated_at": "2026-02-18T06:39:23.469Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Unexpected fields in Home Connect API response` or `extraneous` fields?",
+            "answer": "This log message indicates that the plugin has received data from the Home Connect API that is not currently defined in its internal schema. The plugin performs strict validation on all API responses to ensure data integrity.\n\nThese warnings typically appear when the Home Connect API is updated with new, undocumented fields or appliance-specific features that the plugin does not yet recognise. Although they appear as warnings in the logs, they are generally **non-critical** and do not affect the basic functionality or control of your appliances.\n\nTo resolve these warnings:\n1. Update to the latest version of the plugin, as support for new API fields is added regularly.\n2. If the warnings persist on the latest version, you can report them as a GitHub issue. This information is used by the maintainer to update the plugin's schema and potentially add support for new features provided by those fields.",
+            "semantic_abstract": "The plugin enforces strict schema validation on Home Connect API responses, resulting in warnings when undocumented or 'extraneous' fields are encountered. This design choice identifies discrepancies between the API's current implementation and the plugin's schema, though such mismatches typically do not interfere with appliance operation.",
+            "alternative_resolution": "The log message for extraneous fields could be clarified to explicitly state that the condition is non-critical and diagnostic, reducing user concern when the plugin remains fully functional.",
+            "confidence": "high",
+            "hash": "e94162471bd80bfaae57d700bb43736e3839b189b8f5fb18bd6072b497f9c720"
+        }
+    ]
+}
