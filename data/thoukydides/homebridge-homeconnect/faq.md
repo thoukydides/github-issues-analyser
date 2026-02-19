@@ -160,4 +160,4 @@ IFTTT exposes some functionality that is not available via the official Home Con
 
 For users who require IFTTT-specific functionality, such as triggering automations from Hood Favourite button presses, it is recommended to use a dedicated plugin such as `homebridge-ifttt` alongside this one. This approach keeps the logic for different services separate and more manageable.
 
-<!-- EXCLUDED: issue-3-e25e issue-3-b11b issue-5-7189 issue-10-f54e issue-13-d6c6 issue-17-9299 issue-21-4a0f issue-32-3eeb issue-36-116c issue-43-3166 issue-65-324a issue-77-ea0e issue-78-26c0 issue-97-c838 issue-93-7521 issue-91-e7db issue-89-ea9b issue-85-0a95 issue-84-bee9 issue-80-1fb6 issue-47-127f issue-67-1639 issue-77-48d3 -->
+<!-- EXCLUDED: issue-3-e25e issue-3-b11b issue-5-7189 issue-10-f54e issue-13-d6c6 issue-17-9299 issue-21-4a0f issue-32-3eeb issue-36-116c issue-43-3166 issue-65-324a issue-77-ea0e issue-78-26c0 issue-97-c838 issue-93-7521 issue-91-e7db issue-89-ea9b issue-85-0a95 issue-84-bee9 issue-80-1fb6 issue-47-127f issue-67-1639 issue-77-48d3 issue-144-f92c issue-145-8923 issue-72-52a3 issue-35-2eee -->
