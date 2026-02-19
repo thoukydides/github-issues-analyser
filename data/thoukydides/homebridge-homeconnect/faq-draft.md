@@ -806,205 +806,102 @@ If an appliance or program shows `Not Responding`, the cached metadata may be st
 
 If you find that `Program Switches` are still visible after disabling them, ensure the `haId` in your `config.json` exactly matches the identifier in the logs, including case and punctuation. If multiple unrelated plugins show `No Response`, this indicates a Homebridge process-level issue; consider using child bridges to isolate the Home Connect plugin from other services.
 
-### New partition 3
+### Plugin Configuration and Troubleshooting
 
-<!-- PARTITION: New partition 3 -->
+<!-- PARTITION -->
 
-#### 🚧 How can I see the program remaining time or active status in HomeKit? 🚧
+#### How do I correctly configure the Home Connect application and complete the authorisation process?
 
-<!-- INCLUDES: issue-5-1a70 -->
-Apple's standard **Home app** often only displays a simple power switch for certain appliances. To view more detailed information provided by the plugin, such as **Active** status or **Program Remaining Time**, you must use a third-party HomeKit app that supports a wider range of characteristic types, such as **Eve for HomeKit**.
+<!-- INCLUDES: issue-51-db9a issue-60-3cca issue-60-6eaf issue-82-2ddc issue-97-1958 -->
+When registering your application on the [Home Connect Developer Portal](https://developer.home-connect.com/applications), you **must** set the **OAuth Flow** to `Device Flow`. This setting cannot be changed after creation; if it is incorrect, you must create a new application. The **Application ID** is for your reference (e.g., `Homebridge`), and the **Redirect URI** must be a valid URL (e.g. `https://localhost`), though it is not used by the `Device Flow`. Do not use the default `API Web Client ID` provided by Home Connect.
 
-#### 🚧 Why do I see `getaddrinfo EAI_AGAIN api.home-connect.com` in my logs? 🚧
+To complete authorisation, copy the unique URL from the Homebridge log (e.g. `.../device_verify?user_code=...`) into your browser. You must log in using the same credentials as your Home Connect mobile app, which now requires a **SingleKey ID**. Ensure the email address is in all lowercase to avoid `invalid_client` errors. If you receive an `expired_token` or `session not found` error, the 10-minute window has likely expired or the link was reused; wait for the plugin to log a fresh URL and try again.
 
-<!-- INCLUDES: issue-50-0475 -->
-This error signifies a temporary failure in DNS resolution. The system hosting Homebridge was unable to look up the IP address for the Home Connect API servers. This is usually caused by:
+#### Why can't I see program remaining time, active status, or pause/resume controls in the Home app?
 
-1. A transient loss of internet connectivity.
-2. A local router or DNS server performing a scheduled reboot.
-3. General network congestion.
+<!-- INCLUDES: issue-5-1a70 issue-8-226b -->
+Apple's standard **Home app** has limited support for many appliance characteristics. While the plugin provides detailed information such as **Active** status, **Program Remaining Time**, and experimental **Pause/Resume** controls (via the `Active` characteristic), these are often not displayed in the native Home app. To access these features, you must use a third-party HomeKit app that supports a wider range of service and characteristic types, such as **Eve for HomeKit**, **Home+**, or **Controller for HomeKit**.
 
-The plugin is designed to handle these interruptions and will automatically attempt to re-establish the event stream once the network connection is restored. If this happens at a consistent time every day, check for scheduled tasks or reboots in your local network infrastructure.
-
-#### 🚧 What values should I use for Application ID and Redirect URI when registering the Home Connect application? 🚧
-
-<!-- INCLUDES: issue-51-db9a -->
-When registering your application on the Home Connect developer portal, ensure you configure the following settings:
-
-1. **OAuth Flow**: This **must** be set to `Device Flow`. This setting cannot be changed after the application is created. If you have an existing application set to a different flow, you must create a new one.
-2. **Application ID**: This is a friendly name for your reference only. You can enter anything here, such as `Homebridge`.
-3. **Redirect URI** (or Success Redirect): This field is mandatory in the form but is not used by the `Device Flow`. You can enter any valid URL, such as `https://localhost` or `https://google.com`.
-
-Note that the default `API Web Client ID` often visible in new accounts is reserved for the official Home Connect web-based API client and will not work with this plugin. You must create your own application to obtain a compatible Client ID.
-
-#### 🚧 Why do my Home Connect appliances remain visible in the Home app when they are turned off or offline? 🚧
-
-<!-- INCLUDES: issue-52-2dc8 -->
-It is normal for appliances to remain visible in the Home app even when they are powered off or disconnected from Wi-Fi. The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as the appliance is known to the Home Connect API, it will persist in HomeKit. 
-
-The plugin only adds or removes accessories if the Home Connect API indicates that the list of appliances associated with your account has changed. Being unreachable by the Home Connect servers does not trigger the removal of the accessory from HomeKit. If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing from the Favorites view, this may be due to a synchronisation issue within HomeKit or Homebridge. In such cases, the following steps can resolve the issue:
-
-1. Remove the Homebridge bridge from the Home app.
-2. Clear the Homebridge cache files.
-3. Re-add the bridge to HomeKit.
-
-#### 🚧 Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin? 🚧
-
-<!-- INCLUDES: issue-53-9275 -->
-This is an error produced by the `npm` package manager rather than a fault within the plugin code. It typically occurs when `npm` attempts to rename or remove a directory during an update but fails because the target directory is not empty or a file is being held open by another process.
-
-To resolve this issue:
-1. Stop the Homebridge service to ensure no processes are actively using the plugin files.
-2. Locate the temporary directory identified in the error log (for example, `/usr/local/lib/node_modules/.homebridge-homeconnect-XXXXXXXX`).
-3. Manually delete that temporary directory and the existing `homebridge-homeconnect` directory if necessary.
-4. Attempt to install the plugin again.
-
-This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI X interface.
-
-#### 🚧 Why does my appliance not show ambient light colour controls in HomeKit? 🚧
-
-<!-- INCLUDES: issue-54-f83f -->
-This typically occurs when the Home Connect API fails to report colour support during the plugin's initial discovery process. Many Home Connect appliances only expose the `BSH.Common.Setting.AmbientLightColor` setting when the ambient light is actively switched on. 
-
-While the plugin attempts to briefly enable the light during discovery to detect these capabilities, this process can fail if the appliance was recently controlled manually (which temporarily blocks remote API commands) or if there were transient network delays. To resolve this and force a re-detection of your appliance's features:
-
-1. Ensure you are running the latest version of the plugin (a race condition affecting this was fixed in `v0.23.2`).
-2. Stop Homebridge.
-3. Navigate to the plugin's persistent storage directory, typically `~/.homebridge/homebridge-homeconnect/persist`.
-4. Delete the cache file corresponding to your appliance. The filename is an MD5 hash of the appliance name/ID (e.g., `a7ea3482...`).
-5. Ensure the appliance is not being used manually and is in standby.
-6. Restart Homebridge. The plugin will perform a fresh discovery of all appliance capabilities.
-
-#### 🚧 Can I hide the event switches or mode switches to reduce clutter in the Home app? 🚧
-
-<!-- INCLUDES: issue-56-ce35 -->
-Yes. From version `v0.32.0` onwards, the plugin provides per-appliance configuration options to selectively remove specific services. This is particularly useful for reducing the number of `Stateless Programmable Switch` services, which often appear with confusing numeric labels in the Home app due to platform limitations.
-
-You can selectively enable or disable the following services for each appliance:
-- **Events**: `Stateless Programmable Switch` services triggered by appliance events.
-- **Modes**: `Switch` services for specific appliance settings (e.g. Sabbath Mode or Eco Mode).
-- **Door**: The `Door` service used for monitoring door status.
-
-To adjust these settings, navigate to the plugin configuration in the Homebridge UI, find the settings section for your specific appliance, and toggle the visibility of these services. A restart of Homebridge is required to update the HomeKit accessory cache and remove the hidden services.
-
-#### 🚧 Why is the `HeaterCooler` service not used for fridge or freezer temperature control? 🚧
-
-<!-- INCLUDES: issue-58-06c5 -->
-The `HeaterCooler` service in HomeKit is designed specifically for environmental climate control, such as room thermostats or air conditioning units. Using this service for appliances like fridges, freezers, or ovens introduces several issues with Siri and HomeKit semantics:
-
-1. Siri conflates the appliance's internal temperature with the ambient room temperature. Asking "What is the temperature in the kitchen?" would include the fridge temperature in the calculation of the room's temperature range.
-2. Commands to adjust climate control could affect the appliance. For example, asking Siri to set the room to a specific temperature might inadvertently attempt to set the fridge or freezer to that same temperature if they are assigned to the same HomeKit room.
-3. The "mode dial" functionality used in some climate services does not have a documented or consistent mapping for appliance-specific modes (like Sabbath or Super-Cooling) that ensures sensible voice control behaviour.
-
-To maintain the integrity of voice control via Siri, this plugin exposes fridge and freezer modes (such as Super, Eco, Vacation, and Fresh modes) as individual `Switch` services rather than a combined climate control interface. This ensures that these features can be controlled independently without breaking the semantic model of the home's environmental settings.
-
-#### 🚧 Why does the Elgato Eve app show my appliance as inactive or having an error? 🚧
-
-<!-- INCLUDES: issue-6-5287 -->
-The **Elgato Eve** app interprets HomeKit characteristics more strictly than the standard Apple Home app. Specifically, it uses the `Status Active` characteristic as a health indicator. When this value is `false`, Eve displays a red warning triangle or the message `The accessory is inactive. Please refer to its user manual.`, even if there is no actual fault.
-
-The plugin maps Home Connect operation states to HomeKit to minimize these misleading warnings while still providing accurate status. Under the current mapping, the following states will trigger the **Inactive** warning in Eve:
-* `Pause`: The appliance program has been suspended.
-* `ActionRequired`: The appliance requires manual intervention (e.g. closing a door or refilling a consumable).
-* `Error`: The appliance has encountered a functional error.
-* `Aborting`: The appliance is currently cancelling the active program.
-
-Idle states like `Ready` or `Finished` are mapped to `Status Active = true` specifically to prevent Eve from showing an error state when the appliance is simply waiting to be used. Note that other HomeKit apps, such as **Home+**, may display these characteristics differently (e.g. as a boolean Yes/No for Status Active).
-
-#### 🚧 Why does the log show `Unauthorized client: grant_type is invalid`? 🚧
-
-<!-- INCLUDES: issue-60-3cca -->
-This error indicates a configuration mismatch between the Home Connect Developer Portal and the plugin settings. To resolve this, verify the following in the [Home Connect Developer Portal](https://developer.home-connect.com/applications):
-
-1. Ensure that **OAuth Flow** is set to **Device Flow** for your application. It defaults to *Authorization Code Grant Flow*, which is not supported by this plugin.
-2. Verify that the `clientid` in your Homebridge configuration matches the **Client ID** assigned to the specific application you created. Do not use the ID for the automatically created *API Web Client*.
-3. Ensure the `simulator` option in your configuration is set to `false` (or omitted entirely) unless you are specifically testing against the Home Connect appliance simulators.
-
-#### 🚧 How do I complete the Home Connect authorisation process if the link fails or prompts for a code? 🚧
-
-<!-- INCLUDES: issue-60-6eaf -->
-When the plugin starts or requires re-authorisation, it generates a unique URL in the Homebridge log. To complete the process:
-
-1. Copy the entire URL from the log (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=1234-5678`) into your web browser.
-2. When prompted to log in, you **must** use the same email address and password that you use for the official Home Connect mobile app where your appliances are registered. Do not use your Developer Portal credentials if they are different.
-3. Approve the request to access your appliances. You will then be redirected to the `Redirect URI` specified in your developer application settings.
-4. The plugin will automatically detect the completion, retrieve the tokens, and save them to your configuration. 
-
-If you see errors like `HTTP method not allowed`, ensure you are using the full URL provided in the logs and not attempting to manually visit API endpoints.
-
-#### 🚧 Why doesn't the plugin use a Valve service to show the remaining time for dishwashers or washing machines? 🚧
-
-<!-- INCLUDES: issue-68-c945 -->
-The HomeKit `Valve` service (including its sub-types like `Irrigation` or `Shower Head`) is not used for displaying remaining time because it is semantically inappropriate for many Home Connect appliances, such as ovens, hoods, or dryers. To maintain a consistent experience across all supported hardware, the plugin instead adds the `RemainingDuration` characteristic to the **Active Program Switch**.
-
-While the native Apple Home app does not always display this timer prominently, it is fully accessible for both viewing and automation in third-party HomeKit applications (e.g. Eve, Home+, or Controller for HomeKit). Using a `Valve` service for only specific appliance types would create an inconsistent architectural model and would break existing automations that rely on the current service structure.
-
-#### 🚧 Why is my Home Connect appliance unresponsive in Homebridge but working in the Home Connect app? 🚧
+#### Why is my appliance unresponsive in Homebridge but working in the Home Connect app?
 
 <!-- INCLUDES: issue-71-a9f3 -->
-The Home Connect mobile app primarily communicates with appliances via the local Wi-Fi network when your phone is connected to the same network. In contrast, this plugin (and all third-party integrations) must use the public Home Connect cloud API. It is possible for an appliance to have a working local connection but a broken or stalled cloud connection.
+The Home Connect mobile app primarily communicates with appliances via the local Wi-Fi network when your phone is on the same network. In contrast, this plugin (and all third-party integrations) must use the public Home Connect cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection.
 
-To diagnose this, disable Wi-Fi on your mobile device to force the Home Connect app to use a cellular (remote) connection. If the appliance becomes unresponsive in the app while on cellular data, the issue lies with the appliance's connection to the Home Connect servers rather than the plugin.
+To diagnose this, disable Wi-Fi on your mobile device to force the Home Connect app to use a cellular (remote) connection. If the appliance becomes unresponsive in the app while on cellular data, the issue lies with the appliance's connection to the Home Connect servers. You can often resolve this by checking the **Network** section in the appliance settings within the Home Connect app and toggling the **Connection to server** setting off and then back on.
 
-You can often resolve this by: 
-1.  Opening the **Home Connect app**.
-2.  Navigating to the **Settings** for the specific appliance.
-3.  Checking the **Network** section to ensure all three connection lines (appliance to cloud, cloud to phone) are green.
-4.  Toggling the **Connection to server** setting off and then back on again to force a reconnection to the cloud API.
-
-#### 🚧 Why do appliance status updates stop appearing in HomeKit while the plugin is still connected? 🚧
+#### Why do status updates stop appearing in HomeKit even though the plugin is connected?
 
 <!-- INCLUDES: issue-74-d6d6 -->
-The `homebridge-homeconnect` plugin relies on a long-lived HTTP event stream from the Home Connect API to receive real-time updates. The API sends a `KEEP-ALIVE` event approximately every 55 seconds to maintain the connection. If the plugin does not receive any activity for 120 seconds, it will automatically tear down and re-establish the stream, which is often logged as `ESOCKETTIMEDOUT`.
+The plugin relies on a long-lived HTTP event stream from the Home Connect API. While the plugin automatically reconnects if the stream times out (e.g. `ESOCKETTIMEDOUT`), the connection can sometimes remain technically active (receiving `KEEP-ALIVE` heartbeats) while the backend stops sending actual state change events. This is typically a failure in the Home Connect backend distribution service.
 
-In some cases, the connection may remain technically active (with `KEEP-ALIVE` heartbeats still arriving) while the Home Connect backend stops sending actual state change events (such as power on/off or program status). This is typically a result of a failure in the Home Connect backend distribution service rather than a fault in the plugin or your local network. A major instance of this behaviour was resolved by a Home Connect backend update in April 2022.
-
-If you experience a stall where updates stop but no errors appear in the logs:
-1. Check if the official Home Connect app is still receiving real-time updates. The app often establishes a fresh connection upon opening, which may mask an underlying stream failure affecting the plugin.
+If updates stall:
+1. Check if the official Home Connect app is still receiving real-time updates (the app may mask failures by establishing a fresh connection on open).
 2. Restart Homebridge to force the plugin to subscribe to a new event stream.
-3. Verify your network configuration. Ensure that your router or firewall is not prematurely terminating long-lived TCP connections (the default TCP idle timeout is typically 300 seconds).
+3. Verify that your router or firewall is not prematurely terminating long-lived TCP connections (ensure a TCP idle timeout greater than 300 seconds).
 
-#### 🚧 Why can't I set the alarm timer or `AlarmClock` setting on my appliance? 🚧
+#### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
-<!-- INCLUDES: issue-77-7f97 -->
-HomeKit does not currently define services or characteristics with the correct semantics for a general-purpose appliance alarm timer. Mapping this functionality to existing, unrelated HomeKit services would result in incorrect behaviour and cause issues when using Siri. To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer.
+<!-- INCLUDES: issue-52-2dc8 -->
+The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as the appliance is known to the Home Connect API, it will persist in HomeKit even if it is powered off or disconnected from Wi-Fi. Accessories are only removed if the API indicates they are no longer associated with your account. If you see inconsistent behaviour, removing the Homebridge bridge from the Home app, clearing the cache files, and re-adding the bridge can resolve synchronisation issues.
 
-#### 🚧 What does the log message `Selected program ... is not supported by the Home Connect API` mean? 🚧
+#### Why is the `HeaterCooler` service not used for fridge or freezer temperature control?
 
-<!-- INCLUDES: issue-78-c9c7 -->
-This message is a cosmetic warning that occurs when an appliance reports a program selection event before the plugin has finished fetching or loading the list of supported programs from the Home Connect API. This most commonly happens during the initial plugin startup or after the local cache has been cleared.
+<!-- INCLUDES: issue-58-06c5 -->
+The `HeaterCooler` service in HomeKit is designed for environmental climate control. Using it for kitchen appliances would cause Siri to conflate the appliance's internal temperature with the ambient room temperature. For example, asking "What is the temperature in the kitchen?" would include the fridge's internal temperature in the average. Furthermore, commands to adjust the room temperature might inadvertently change the fridge or freezer settings. To maintain semantic integrity, this plugin instead exposes fridge and freezer modes (like Super-Cooling or Eco) as individual `Switch` services.
 
-The plugin avoids requesting specific options for a program until it has confirmed the program's existence in the supported list. Once the full list of programs is retrieved from the API, the plugin will automatically fetch the necessary details. This message does not indicate a functional failure and can be safely ignored if it only appears briefly during startup or cache refresh operations.
+#### Why does the Eve app show my appliance as inactive or having an error?
 
-#### 🚧 Why can't I see the Pause or Resume options in the Apple Home app? 🚧
+<!-- INCLUDES: issue-6-5287 -->
+The **Eve for HomeKit** app uses the `Status Active` characteristic as a health indicator. When this value is `false`, Eve displays a warning triangle or an "inactive" message. The plugin maps specific Home Connect states to this characteristic to provide accurate status. The following states will trigger the **Inactive** warning in Eve:
+* `Pause`: The program has been suspended.
+* `ActionRequired`: Manual intervention is needed (e.g. closing a door or refilling consumables).
+* `Error`: A functional error has occurred.
+* `Aborting`: The program is being cancelled.
 
-<!-- INCLUDES: issue-8-226b -->
-Experimental support for pausing and resuming appliance programs is implemented via the HomeKit `Active` characteristic. Apple's native Home app does not display this specific characteristic for most appliance types. To access these controls, you must use a third-party HomeKit app that supports a wider range of characteristics, such as Eve for HomeKit or Home+.
+Idle states like `Ready` or `Finished` are mapped to `Status Active = true` to prevent misleading error warnings when the appliance is simply waiting to be used.
 
-#### 🚧 Why is the Pause/Resume support inconsistent between my Home Connect appliances? 🚧
+#### Why doesn't the plugin use a `Valve` service to show the remaining time for dishwashers or washing machines?
+
+<!-- INCLUDES: issue-68-c945 -->
+The HomeKit `Valve` service is semantically intended for irrigation or plumbing and is inappropriate for appliances like ovens or dryers. To maintain a consistent experience across all supported hardware, the plugin adds the `RemainingDuration` characteristic to the **Active Program Switch**. While not always displayed prominently in the native Apple Home app, this timer is fully accessible for viewing and automation in third-party HomeKit applications like Eve or Home+.
+
+#### Why is Pause/Resume support inconsistent between different Home Connect appliances?
 
 <!-- INCLUDES: issue-8-5b9e -->
-Support for the `PauseProgram` and `ResumeProgram` commands varies significantly between different appliance types and firmware versions, often deviating from the official Home Connect API documentation. While the API documentation suggests broad support, the plugin has found that:
+Support for the `PauseProgram` and `ResumeProgram` commands varies significantly between appliance types and firmware versions, often deviating from the official Home Connect API documentation. Many appliances (including certain dishwashers, ovens, and washers) do not support these commands via the public API despite documentation claims. The plugin dynamically detects available commands for each appliance; if the options are missing, your specific hardware likely does not support the feature via the API.
 
-1. Many appliances (including some Dishwashers and Ovens) do not support these commands via the public API despite documentation claims.
-2. Some appliances, such as certain Siemens Washers, may support `PauseProgram` but not `ResumeProgram`.
-3. The plugin (v0.19.0 and later) dynamically detects available commands for each appliance and only exposes supported functions. If the options are missing, your specific hardware or firmware likely does not support the feature via the Home Connect API.
+#### Why does my appliance not show ambient light colour controls in HomeKit?
 
-#### 🚧 Why am I redirected to a SingleKey ID page during authorisation? 🚧
+<!-- INCLUDES: issue-54-f83f -->
+Many Home Connect appliances only expose the `BSH.Common.Setting.AmbientLightColor` setting when the light is actively switched on. While the plugin attempts to briefly enable the light during discovery to detect these capabilities, this can fail due to manual control blocks or network delays. To force a re-detection:
+1. Ensure you are on the latest plugin version (a fix for this was included in `v0.23.2`).
+2. Stop Homebridge and delete the appliance cache file in `~/.homebridge/homebridge-homeconnect/persist` (named with an MD5 hash).
+3. Ensure the appliance is in standby and not in manual use.
+4. Restart Homebridge to trigger a fresh discovery.
 
-<!-- INCLUDES: issue-82-2ddc -->
-Home Connect has transitioned to using SingleKey ID for user authentication. Even if your Home Connect mobile app still uses a legacy login, the web-based authorisation flow used by this plugin may require a SingleKey ID.
+#### Can I hide the event switches or mode switches to reduce clutter in the Home app?
 
-To resolve this:
-* Create a SingleKey ID account at `singlekey-id.com` using the **same email address** as your existing Home Connect account.
-* Ensure the email address is written in **all lowercase letters**. The Home Connect backend performs case-sensitive comparisons against developer portal entries (which are forced to lowercase), and mismatched casing can result in `invalid_client` errors.
-* Avoid using 'plus' email addresses (e.g. `user+homebridge@example.com`) as these are inconsistently supported across the different Home Connect and SingleKey ID systems.
+<!-- INCLUDES: issue-56-ce35 -->
+Yes. Per-appliance configuration options allow you to selectively remove specific services to reduce clutter. This is particularly useful for hiding `Stateless Programmable Switch` services (Events) or `Switch` services for specific modes (e.g. Sabbath or Eco Mode). Navigate to the plugin configuration in the Homebridge UI, find the settings for your appliance, and toggle the visibility of these services. A restart is required to update the HomeKit accessory cache.
 
-#### 🚧 Why do I see `Home Connect API error: Device authorization session not found, expired or blocked [expired_token]` during setup? 🚧
+#### Why do I see `getaddrinfo EAI_AGAIN api.home-connect.com` in my logs?
 
-<!-- INCLUDES: issue-97-1958 -->
-This error occurs during the initial authorisation process if the device code expires or is used more than once. The Home Connect API provides a limited window, typically 10 minutes, for you to visit the authorisation URL provided in the Homebridge logs and complete the login process. If this time limit is exceeded, or if the URL is accessed multiple times, the session becomes invalid.
+<!-- INCLUDES: issue-50-0475 -->
+This error signifies a temporary failure in DNS resolution, meaning your Homebridge host could not look up the IP address for the Home Connect API. This is usually caused by transient internet loss, local router reboots, or network congestion. The plugin is designed to handle these interruptions and will automatically attempt to re-establish connection once the network is restored. If it occurs at a consistent time, check for scheduled tasks in your local network infrastructure.
 
-The plugin handles this error gracefully by waiting 60 seconds before automatically starting a new authorisation attempt. To resolve the issue, check the Homebridge logs for a fresh authorisation URL and complete the verification process promptly within the 10-minute window.
+#### Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?
+
+<!-- INCLUDES: issue-53-9275 -->
+This is an `npm` package manager error that occurs when a directory cannot be renamed or removed because it is not empty or a file is being held open. To resolve this: stop the Homebridge service, manually delete the temporary directory identified in the error log (e.g. `/usr/local/lib/node_modules/.homebridge-homeconnect-XXXXXXXX`), and then retry the installation. Restarting the host system often clears any remaining file locks.
+
+#### Why can't I set the alarm timer or `AlarmClock` setting on my appliance?
+
+<!-- INCLUDES: issue-77-7f97 -->
+HomeKit does not currently define services or characteristics that match the semantics of a general-purpose appliance alarm timer. Mapping this to unrelated HomeKit services would cause incorrect behaviour and unreliable voice control via Siri. To maintain consistency with the HomeKit model, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer.
+
+#### What does the log message `Selected program ... is not supported by the Home Connect API` mean?
+
+<!-- INCLUDES: issue-78-c9c7 -->
+This is a cosmetic warning that occurs if an appliance reports a program selection before the plugin has finished loading the list of supported programs from the API. This typically happens during startup or after the cache is cleared. The plugin will automatically fetch the necessary details once the full program list is retrieved. This message does not indicate a failure and can be ignored if it only appears briefly during startup.
 
 <!-- EXCLUDED: issue-3-b11b issue-3-e25e issue-5-7189 issue-10-f54e issue-13-d6c6 issue-17-9299 issue-21-4a0f issue-32-3eeb issue-36-116c issue-43-3166 issue-47-127f issue-65-324a issue-67-1639 issue-77-48d3 issue-77-ea0e issue-78-26c0 issue-80-1fb6 issue-84-bee9 issue-85-0a95 issue-89-ea9b issue-91-e7db issue-93-7521 issue-97-c838 -->
