@@ -47,7 +47,7 @@ export function loadStructuredFAQ(repo: ConfigRepository): StructuredFAQ {
 // Save the structured FAQ
 export function saveStructuredFAQ(repo: ConfigRepository, faq: StructuredFAQ): void {
     const faqFile = getStructuredFAQPath(repo);
-    const json = JSON.stringify(faq);
+    const json = JSON.stringify(faq, null, 4);
     fs.writeFileSync(faqFile, json);
     core.info(`Saved structured: ${describeStructuredFAQ(faq)}`);
 }
