@@ -1,0 +1,14 @@
+{
+    "issue_number": 195,
+    "updated_at": "2026-02-19T10:12:10.392Z",
+    "faq": [
+        {
+            "question": "Why does the error `ReadableStream is not defined` occur when loading the plugin?",
+            "answer": "This error occurs when the plugin is run on an unsupported version of Node.js, such as Node.js 16 or earlier. The `homebridge-homeconnect` plugin requires a minimum of Node.js 18 to function correctly, which is consistent with the requirements for Homebridge verified plugins.\n\nTo resolve this, ensure that your environment is updated to Node.js 18 or later. If you are using a platform such as HOOBS, you must ensure that its underlying Node.js runtime meets this minimum version requirement. Please note that this plugin is designed for vanilla Homebridge; while it may function on other platforms, they are not officially supported by the maintainer.",
+            "semantic_abstract": "Node.js runtime versions prior to 18 do not include `ReadableStream` in the global scope, causing plugin initialization failures. The plugin enforces a minimum Node.js 18 requirement to align with Homebridge verified plugin standards and ensure availability of modern platform APIs.",
+            "alternative_resolution": "The plugin could implement a pre-flight check during the initialization phase to provide a more descriptive error message if the Node.js version is below 18, rather than allowing it to fail with a reference error.",
+            "confidence": "high",
+            "hash": "84f2f1ffc8817df1573fbfa84598b588a0acc5b5025ae0752e20d7a63785ac26"
+        }
+    ]
+}
