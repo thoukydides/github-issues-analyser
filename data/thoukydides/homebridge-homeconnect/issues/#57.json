@@ -1,0 +1,14 @@
+{
+    "issue_number": 57,
+    "updated_at": "2026-02-19T16:27:58.402Z",
+    "faq": [
+        {
+            "question": "How can I hide or disable specific Home Connect appliances in HomeKit?",
+            "answer": "Starting from version `v0.37.0`, the plugin supports the ability to exclude specific appliances from being exposed to HomeKit. This is particularly useful for users who may have multiple Home Connect devices but only wish to control a subset of them (for example, exposing only a hood to automate based on air quality while hiding a washing machine or dryer). Configuration options are available within the plugin settings to manage which devices are discovered and registered as HomeKit accessories.",
+            "semantic_abstract": "The plugin configuration allows for selective appliance exclusion from HomeKit discovery. This feature manages HomeKit accessory clutter by preventing the registration of specific Home Connect devices as services based on user preference.",
+            "alternative_resolution": "Ensure the plugin configuration UI provides a clear list or input method for identifying appliances to be excluded, such as by nickname or Home Connect Appliance ID (HaId), to simplify the setup for users with many devices.",
+            "confidence": "high",
+            "hash": "6cdceeec547a7602725f68a7815e4cb11430642e9297f1ff869e989b4ab17cd7"
+        }
+    ]
+}
