@@ -133,7 +133,7 @@ To resolve this:
 2. Wait a few hours for the service to stabilise.
 3. Stop Homebridge, delete the plugin's persistent cache files, and restart. If the error persists for universal settings, it is likely a fault with the Home Connect service itself and should be reported to their support.
 
-<!-- PARTITION -->
+<!-- PARTITION: Appliance Operation and API Behaviour -->
 
 #### Why does my appliance turn on automatically or Homebridge startup stall?
 
@@ -470,113 +470,62 @@ This is a limitation of the API implementation for specific hardware. Control fu
 
 ## HomeKit Services
 
-### Notifications & Events
+### Notifications and Events
 
 <!-- PARTITION -->
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons?
 
-<!-- INCLUDES: issue-1-38d2 issue-3-c53c issue-43-caee issue-45-fb59 -->
-Home Connect communicates many appliance states as **transient events** (e.g. "Drip tray full" or "iDos fill level poor") rather than persistent, queryable states. It is not possible for the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears.
+<!-- INCLUDES: issue-1-38d2 issue-3-c53c issue-31-241e issue-43-caee issue-45-fb59 issue-153-91f4 -->
+Home Connect communicates many appliance states as **transient events** (such as "Drip tray full", "Cooktop timer ended", or "iDos fill level poor") rather than persistent, queryable states. It is not possible for the plugin to poll the current state (for example, after a reboot), and many appliances do not reliably generate events when a condition clears.
 
-These events map to `Stateless Programmable Switch` services, allowing them to be used as automation triggers. Other types like `Contact Sensor` are not used because they require a persistent state that cannot be determined reliably, leading to a poor user experience.
-
-The Apple Home app only displays numeric labels (Button 1, Button 2). To see what these represent, check your **Homebridge logs** during startup or use a third-party app like **Eve** or **Home+** which displays the descriptive labels.
-
-#### Why does the Home app show two (or more) tiles for one appliance?
-
-<!-- INCLUDES: issue-59-593e -->
-This is standard Apple Home behaviour. To keep the interface organized, Apple separates different service types into distinct tiles. Specifically, a separate tile is created for the `Stateless Programmable Switch` services used for event triggers.
-
-While you can toggle **Show as Separate Tiles**, Apple does not currently allow these buttons to be merged into the primary appliance tile. If you do not use these events for automations, you can disable them in the plugin configuration to prevent them from appearing in the Home app.
-
-#### How do I get appliance notifications?
-
-<!-- INCLUDES: issue-38-9780 issue-63-11e1 -->
-Apple Home only supports native push notifications for specific security-related sensors (Doors, Locks, Smoke, etc.). Most Home Connect events do not fit these categories; forcing them to do so would result in misleading notification text.
-
-To receive notifications for other events, you have two main options:
-
-* **The Official Home Connect App:** The most reliable way to get detailed, text-based push notifications.
-* **HomeKit Automations:** Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.
-
-#### 🚧 How can I disable HomeKit notifications for fridge or freezer door events? 🚧
-
-<!-- INCLUDES: issue-132-791b -->
-Door open and close notifications are managed by the Apple Home app on a per-device basis, rather than by the plugin itself. To disable them:
-
-1. Open the Apple **Home** app.
-2. Tap the **...** (More) icon at the top of the screen and select **Home Settings**.
-3. Navigate to the **Doors** section.
-4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
-
-Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, since v0.32.0 of the plugin, you can use the per-appliance configuration options to remove the `Door` service entirely if you do not require its state information in HomeKit.
-
-#### 🚧 Why do dishwasher events like `Salt low` or `Program Finished` appear as numbered buttons in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-153-91f4 -->
-Appliance events such as `Salt low`, `Rinse aid low`, and `Program Finished` are exposed to HomeKit as `Stateless Programmable Switch` services. The Apple Home app represents these services as a series of numbered buttons rather than descriptive text labels or sensors. Automations can be triggered using the **Single Press** action for each button.
-
-For dishwasher appliances, the buttons are mapped as follows:
+These events map to `Stateless Programmable Switch` services, allowing them to be used as automation triggers. The Apple Home app only displays numeric labels (Button 1, Button 2, etc.). For dishwashers, these typically represent:
 1. **Program Finished**
 2. **Program Aborted**
 3. **Salt Low**
 4. **Rinse Aid Low**
 
-While some third-party HomeKit applications may display the descriptive labels for these events, the Apple Home app requires users to identify the event by its button index.
+To identify what these buttons represent for other appliances, check your **Homebridge logs** during startup or use a third-party app like **Eve** or **Home+** which displays the descriptive labels. If you do not require these triggers, you can disable them globally or per-appliance in the plugin configuration.
 
-#### 🚧 Why are there extra buttons with numeric labels for my Home Connect appliances in the Home app? 🚧
+#### Why does the Home app show separate tiles for one appliance?
 
-<!-- INCLUDES: issue-31-241e -->
-These buttons represent `Stateless Programmable Switch` services that the plugin creates to enable HomeKit automation triggers for specific appliance events. Examples include a dishwasher finishing its cycle, a cooktop timer ending, or a hood program completing.
+<!-- INCLUDES: issue-59-593e -->
+This is standard Apple Home behaviour. To keep the interface organised, Apple separates different service types into distinct tiles. Specifically, a separate tile is created for the `Stateless Programmable Switch` services used for event triggers.
 
-Due to a limitation in Apple's Home app, these services are often displayed with generic numeric labels (e.g., 1, 2, 3) rather than the descriptive names provided by the plugin. This makes them appear as unconfigured or mysterious buttons.
+While you can toggle **Show as Separate Tiles** in the accessory settings, Apple does not currently allow these buttons to be merged into the primary appliance tile. If you do not use these events for automations, you can disable them in the plugin configuration to prevent them from appearing in the Home app.
 
-You have several options for managing these:
-1. Use a more advanced HomeKit app (such as Home+) which correctly displays the service names, making it easier to set up automations.
-2. Disable these services globally or per appliance within the plugin configuration. Options are available to remove `Stateless Programmable Switch` services if you do not require automation triggers.
-3. Customise other exposed services, such as `Switch` for appliance mode settings or `Door` for door status, via the same per-appliance configuration settings.
+#### How can I manage or receive appliance notifications?
 
-#### 🚧 Why does my Siemens coffee maker still show as On in HomeKit after it enters auto-standby? 🚧
+<!-- INCLUDES: issue-38-9780 issue-63-11e1 issue-132-791b -->
+Apple Home only supports native push notifications for specific security-related sensors (Doors, Locks, Smoke, etc.). Most Home Connect events do not fit these categories; forcing them to do so would result in misleading notification text.
+
+To receive notifications for other events, you have two main options:
+* **The Official Home Connect App:** The most reliable way to get detailed, text-based push notifications.
+* **HomeKit Automations:** Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.
+
+To **disable** door notifications specifically, you can adjust the **Activity Notifications** settings for the door accessory within the Apple **Home** app. Alternatively, since `v0.32.0`, you can use per-appliance configuration options to remove the `Door` service entirely if you do not require its state in HomeKit.
+
+#### Why does my Siemens coffee maker stay On in HomeKit after entering auto-standby?
 
 <!-- INCLUDES: issue-35-2eee -->
-Some coffee makers, particularly certain Siemens models like the TI95 series, do not reliably emit a `PowerState` change event through the Home Connect API when they automatically transition to standby mode after a period of inactivity. This results in the HomeKit power switch remaining in the **On** position even though the appliance is inactive.
+Certain coffee makers, particularly Siemens TI95 series models, do not reliably emit a `PowerState` change event through the Home Connect API when transitioning to standby mode automatically. This results in the HomeKit power switch remaining **On** even though the appliance is inactive.
 
-The plugin includes a workaround for this behaviour by monitoring the `BSH.Common.Status.OperationState`. When the appliance reports that it has become `Inactive`, the plugin infers that the power has been switched off or moved to standby. 
+The plugin includes a workaround (implemented in `v0.18.3`) that monitors `BSH.Common.Status.OperationState`. When the appliance reports it has become `Inactive`, the plugin infers the power has been switched off or moved to standby. If you encounter this, ensure you are running the latest version of the plugin and have not disabled status updates in your configuration. Note that the plugin treats both `Off` and `Standby` as **Off** in HomeKit.
 
-This logic was implemented in version `v0.18.3`. If you are encountering this issue, please ensure:
-1. You are running the latest version of the plugin.
-2. You have not disabled status updates in your configuration.
-
-Note that the plugin does not distinguish between the `Off` and `Standby` states for the purposes of the HomeKit power switch; both are treated as **Off**.
-
-#### 🚧 Can I see the remaining time of an appliance programme in HomeKit? 🚧
+#### Why can't I see the remaining programme time in the Home app?
 
 <!-- INCLUDES: issue-48-237c -->
-Yes, the remaining duration is available, but there are limitations on how it is displayed within HomeKit apps:
+The remaining duration is exposed via the `RemainingTime` characteristic on the main `Active Program` switch service, but there are limitations on visibility:
 
-1. The remaining time is exposed via the `RemainingTime` characteristic on the main `Active Program` switch service.
-2. Apple's Home app generally only displays the `Remaining Duration` characteristic for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` accessories. As appliances do not fall into these categories, the value will not be visible in the native Home app.
-3. To view the remaining time or use it to trigger automations, you must use a third-party HomeKit app (such as Controller for HomeKit or Eve) that supports displaying non-standard characteristics for appliance services.
+1. Apple's Home app generally only displays the `Remaining Duration` characteristic for specific accessory types defined in the HomeKit Accessory Protocol (HAP), such as `Irrigation System` and `Valve`. As appliances do not fall into these categories, the value is hidden in the native Home app.
+2. To view the remaining time or use it for automations, you must use a third-party HomeKit app such as **Controller for HomeKit** or **Eve** which supports displaying non-standard characteristics for appliance services.
 
-For more details on which characteristics are mapped to HomeKit, refer to the plugin's documentation on HomeKit mapping and recommended third-party apps.
+#### How can I simplify the list of program switches or change their order?
 
-#### 🚧 How can I reduce the number of switches created for appliance programs? 🚧
+<!-- INCLUDES: issue-7-36fe issue-49-3c91 -->
+By default, the plugin creates individual switches for every supported programme. For devices like washers or dryers, this can clutter the HomeKit interface. To hide these, enable the **No individual program switches** option in the plugin configuration; this maintains core functionality while removing the extra cycle switches.
 
-<!-- INCLUDES: issue-49-3c91 -->
-By default, the plugin creates individual switches for every supported program of an appliance. For devices with many cycles, such as washers or dryers, this can result in dozens of switches cluttering the HomeKit interface. 
-
-To hide these switches and simplify the interface:
-1. Access the plugin configuration via `homebridge-config-ui-x`.
-2. Locate the settings for the specific appliance or the global plugin settings.
-3. Enable the option **No individual program switches**.
-
-This configuration suppresses the individual cycle switches while maintaining core functionality such as status monitoring, timers, and power controls. This is often preferred as program switches are typically only functional when the appliance is in a specific state (e.g. powered on but not yet running).
-
-#### 🚧 Why are the power switch and program switches for my appliance in a random order in HomeKit? 🚧
-
-<!-- INCLUDES: issue-7-36fe -->
-The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined way for plugins to enforce the display order of multiple services within a single accessory. While the plugin exposes several services (such as the power `Switch` and various program control `Switch` services), individual HomeKit apps determine how to order them. Attempts to use HAP features like **Primary** or **Linked** services have not consistently improved ordering across different applications; in some cases, these changes actually made the Apple **Home** app's ordering less predictable. Most third-party HomeKit apps, such as **Eve**, **Home+**, and **Hesperus**, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.
+Regarding the display order, the HomeKit Accessory Protocol (HAP) does not provide a robust way for plugins to enforce the order of services. Individual HomeKit apps determine how to order tiles and switches. Most third-party apps, such as **Eve** or **Home+**, allow users to manually reorder services or characteristics within their own interfaces if you require a specific layout.
 
 ## Third-party Platforms
 
