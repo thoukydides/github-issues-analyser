@@ -65,16 +65,20 @@
                     "subcategories": []
                 },
                 {
-                    "heading": "Programs and Options",
+                    "heading": "Appliance Programs and Options",
                     "preamble": "",
                     "partitions": [
                         {
                             "entries": [
                                 {
-                                    "question": "Why does the log show `Unexpected fields in Home Connect API response` or `extraneous` fields?",
-                                    "answer": "This log message indicates that the plugin has received data from the Home Connect API that is not currently defined in its internal schema. The plugin performs strict validation on all API responses to ensure data integrity and to help with discovery of undocumented API capabilities.\n\nThese warnings typically appear when the Home Connect API is updated with new, undocumented fields or appliance-specific features that the plugin does not yet recognise. Although they appear as warnings in the logs, they are generally **non-critical** and do not usually affect the basic functionality or control of your appliances.\n\nIn most cases the plugin will write a message to the Homebridge log similar to:\n> Home Connect API returned keys/values that are unrecognised by this plugin\n> Please report these by creating a new GitHub issue using this link:\n\nIf you see this message, please use the provided link to report it on GitHub. This enables discovery and implementation of undocumented API features.",
+                                    "question": "Why does the log show `Unrecognised`, `Unexpected`, or `Mismatched` fields and types?",
+                                    "answer": "These log messages indicate that the plugin has received data from the Home Connect API that is not defined in its internal schema or conflicts with official documentation. This typically occurs with newer appliance models, regional variations, or firmware updates.\n\nCommon examples include:\n* **Type Mismatches**: Some refrigeration models report door states (e.g. `Refrigeration.Common.Status.Door.Freezer`) using identifiers that do not match the standard API specification.\n* **Unrecognised Settings or Options**: Features like internal lighting (`Refrigeration.Common.Setting.Light.Internal.Power`), specific microwave power levels (`Cooking.Oven.Program.Microwave.600Watt`), or options like `ProcessPhase` and `VarioSpeed`.\n* **Naming Inconsistencies**: Minor differences such as `LaundryCare.Washer.Option.IDos1.Active` (with an extra period) vs the documented `LaundryCare.Washer.Option.IDos1Active`.\n\nWhile these warnings are generally non-critical and do not affect basic functionality, reporting them helps improve the plugin for everyone:\n1. Ensure you are running the latest version of the plugin.\n2. Look for a log entry stating **Home Connect API returned keys/values that are unrecognised by this plugin**.\n3. Click the provided GitHub link in the log; it generates a pre-filled issue containing the technical data needed for the maintainer to map the feature.\n4. If requested for troubleshooting, enable `Log API Bodies` and `Log Debug as Info` in the plugin configuration and restart to capture detailed initialisation logs.",
                                     "included_ids": [
-                                        "issue-175-e941"
+                                        "issue-175-e941",
+                                        "issue-189-35bc",
+                                        "issue-190-235a",
+                                        "issue-198-658c",
+                                        "issue-199-2e94"
                                     ]
                                 },
                                 {
@@ -142,45 +146,15 @@
                                     ]
                                 },
                                 {
-                                    "question": "How can I reduce the number of switches created for appliance programs?",
-                                    "answer": "By default, the plugin creates individual switches for every supported program. For appliances with many cycles, such as washing machines or dryers, this can result in dozens of switches cluttering the HomeKit interface.\n\nTo hide these switches and simplify the interface open the Homebridge UI plugin settings, select the specific appliance, and choose the **No individual program switches** option. This suppresses the individual program switches while maintaining core functionality such as status monitoring, timers, and power controls.\n\nAlternatively, use the **Custom list of programs and options** option and specify the list of programs that you want to be visible in HomeKit. This option also enables configuration of the settings to use for each program.",
+                                    "question": "How can I hide specific appliances or reduce the number of switches in HomeKit?",
+                                    "answer": "By default, the plugin creates individual switches for every supported program, which can clutter the HomeKit interface for appliances with many cycles (like washing machines).\n\nTo manage visibility:\n* **Hide all program switches**: In the Homebridge UI plugin settings, select the specific appliance and enable the **No individual program switches** option. This maintains core functionality like power and status monitoring while hiding the cycle switches.\n* **Select specific programs**: Use the **Custom list of programs and options** to specify only the cycles you want visible in HomeKit.\n* **Exclude entire appliances**: If you have multiple Home Connect devices but only wish to control a subset, you can exclude specific appliances from being registered as HomeKit accessories via the plugin configuration (supported since `v0.37.0`).",
                                     "included_ids": [
-                                        "issue-49-3c91"
+                                        "issue-49-3c91",
+                                        "issue-57-6cdc"
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "question": "Why does the log show Unrecognised Setting or Mismatched type for my appliance?",
-                                    "answer": "These log messages indicate that your appliance is sending data that the plugin does not yet recognise or that conflicts with the official Home Connect API documentation. This is common with newer or manufacturer-specific features that haven't been previously mapped in the plugin.\n\nSpecific examples include:\n*   **Type Mismatches**: Some refrigeration models report door states (such as `Refrigeration.Common.Status.Door.Freezer`) using string identifiers that do not match the standard API specification.\n*   **Unrecognised Settings**: Features like internal or external fridge lighting (`Refrigeration.Common.Setting.Light.Internal.Power`) or dishwasher modes like `VarioSpeed` may be flagged as unrecognised if they haven't been added to the plugin's internal registry.\n\nTo resolve these:\n1. Ensure you are running the latest version of the plugin, as many of these mappings are added in regular updates.\n2. If the errors persist, enable the `Log API Bodies` and `Log Debug as Info` debug options in the plugin configuration.\n3. Restart the plugin and capture the logs during appliance initialisation. These logs provide the technical details required to add support for the specific settings or data types used by your appliance model.",
-                                    "issue_number": 189,
-                                    "id": "issue-189-35bc"
-                                },
-                                {
-                                    "question": "Why does my log show Mismatched type for NOTIFY Event.data.items[0] or none of ProgramKey errors?",
-                                    "answer": "These warnings occur when a Home Connect appliance reports a program that is not currently listed in the official Home Connect API documentation. The plugin performs strict validation on data received from the API, and if an appliance uses an undocumented program key (for example, specific microwave power levels or automatic cooking programs), it triggers an informational `Mismatched type` warning.\n\nThese warnings are for information only and do not affect the operation of the plugin or the control of your appliance. Many common undocumented values have been added in subsequent updates (such as `v0.37.0`). If you continue to see these messages:\n\n1. Ensure you are running the latest version of the plugin.\n2. Note the specific program string mentioned in the log, such as `Cooking.Oven.Program.Microwave.600Watt` or `Cooking.Oven.Program.Dish.Automatic.Microwave.Haehnchenteile`.\n3. Report any missing values by opening a new issue so they can be added to the plugin's internal definitions.",
-                                    "issue_number": 190,
-                                    "id": "issue-190-235a"
-                                },
-                                {
-                                    "question": "Why does the log show Unrecognised Option or unrecognised keys/values?",
-                                    "answer": "This message indicates that your appliance is reporting features, programs, or settings that are not yet documented in the official Home Connect API or have not been previously encountered by the plugin. This is common with newer appliance models or regional variations.\n\nTo resolve this:\n1. Update to the latest version of the plugin, as support for new keys is added frequently.\n2. If the message persists, look for a log entry stating **Home Connect API returned keys/values that are unrecognised by this plugin**.\n3. Follow the instructions provided in the log to open a new GitHub issue. The plugin generates a specific URL that pre-fills the required information; you only need to paste the code block provided in the log into the issue description.\n\nProviding this information allows the maintainer to map these undocumented features and include them in a future release.",
-                                    "issue_number": 198,
-                                    "id": "issue-198-658c"
-                                },
-                                {
-                                    "question": "Why are some appliance programs or options logged as `(unrecognised)`?",
-                                    "answer": "The Home Connect API frequently reports values that differ from its official documentation or are not documented at all. This results in the plugin logging these values as `(unrecognised)`. Common causes include:\n\n* **API Mismatches**: An appliance may use slightly different keys than documented. For example, some washers use `LaundryCare.Washer.Option.IDos1.Active` (with an extra period) instead of the documented `LaundryCare.Washer.Option.IDos1Active`.\n* **Undocumented Options**: Appliances often report internal state or new features via options like `LaundryCare.Common.Option.ProcessPhase` which are not listed in public API references.\n* **Firmware Updates**: New programs or settings may be introduced by the manufacturer that have not yet been mapped in the plugin.\n\nThese warnings indicate that the specific feature cannot be fully controlled or displayed by the plugin. If you encounter these after updating to the latest version of the plugin, please provide the relevant log snippet in a new GitHub issue so that support for the missing values can be added.",
-                                    "issue_number": 199,
-                                    "id": "issue-199-2e94"
-                                },
-                                {
-                                    "question": "How can I hide or disable specific Home Connect appliances in HomeKit?",
-                                    "answer": "Starting from version `v0.37.0`, the plugin supports the ability to exclude specific appliances from being exposed to HomeKit. This is particularly useful for users who may have multiple Home Connect devices but only wish to control a subset of them (for example, exposing only a hood to automate based on air quality while hiding a washing machine or dryer). Configuration options are available within the plugin settings to manage which devices are discovered and registered as HomeKit accessories.",
-                                    "issue_number": 57,
-                                    "id": "issue-57-6cdc"
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
