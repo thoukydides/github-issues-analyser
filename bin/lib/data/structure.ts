@@ -32,7 +32,7 @@ export interface StructuredFAQCategory {
 }
 export interface StructuredFAQ extends StructuredFAQCategory {
     excluded_ids:   string[];
-    // HERE - Need to add hashes of input files
+    source_hashes:  Record<string, string>;
 }
 
 // Load the structured FAQ

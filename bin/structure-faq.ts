@@ -7,10 +7,11 @@ import { CandidateFAQ, loadCandidatesMap } from './lib/data/candidates.js';
 import { assertIsDefined, formatList, plural } from './lib/utils.js';
 import { CONFIG, ConfigRepository } from './config.js';
 import { loadMarkdownFAQ, saveMarkdownFAQ } from './lib/data/faq.js';
-import { saveStructuredFAQ, StructuredFAQ, StructuredFAQCandidate,
+import { loadStructuredFAQ, saveStructuredFAQ, StructuredFAQ, StructuredFAQCandidate,
          StructuredFAQCategory, StructuredFAQExisting, StructuredFAQPartition } from './lib/data/structure.js';
 import { Embedding, embeddingsStats, euclideanDistance, minEuclideanDistance } from './lib/embeddings/clustering.js';
 import { GeminiEmbeddingType } from './lib/embeddings/google-ai-studio.js';
+import { makeStableHash } from './lib/hash.js';
 
 // Embedding type to use
 const EMBEDDING_TYPE: GeminiEmbeddingType = 'clustering';
@@ -42,6 +43,13 @@ function structureFAQ(repo: ConfigRepository): void {
     // Load the current FAQ and all candidate entries
     const faq = loadMarkdownFAQ(repo);
     const allCandidates = loadCandidatesMap(repo);
+
+    // Check whether any source files have changed
+    const oldFaq = loadStructuredFAQ(repo);
+    if (!sourcesHaveChanged(oldFaq, faq, allCandidates)) {
+        core.info('No changes to source files, skipping structuring');
+        return;
+    }
 
     // Assign new candidates to clusters
     const newCandidates = filterIdentifiers(allCandidates, faq);
@@ -232,4 +240,15 @@ function getEmbeddingsForIds(candidates: Map<string, CandidateFAQ>, ids: string[
         assertIsDefined(candidate);
         return candidate.embeddings[EMBEDDING_TYPE];
     });
+}
+
+// Check whether any source files have changed by comparing hashes (mutate in place)
+function sourcesHaveChanged(oldFaq: StructuredFAQ, faq: StructuredFAQ, candidates: Map<string, CandidateFAQ>): boolean {
+    const newHashes = {
+        faq:        makeStableHash(faq),
+        candidates: makeStableHash(Object.values(candidates))
+    };
+    faq.source_hashes = newHashes;
+    return oldFaq.source_hashes.faq        !== newHashes.faq
+        || oldFaq.source_hashes.candidates !== newHashes.candidates;
 }
