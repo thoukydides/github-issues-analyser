@@ -58,6 +58,10 @@ async function run(): Promise<void> {
 async function buildFAQ(repo: ConfigRepository): Promise<boolean> {
     // Load the current version of the structured FAQ
     const faq = loadStructuredFAQ(repo);
+    if (!faq) {
+        core.warning(`No structured FAQ for ${repo.owner}/${repo.repo}; skipping`);
+        return false;
+    }
 
     // Select a single partition with candidate entries requiring processing
     const selectedPartition = selectPartition(faq);

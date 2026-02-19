@@ -243,12 +243,12 @@ function getEmbeddingsForIds(candidates: Map<string, CandidateFAQ>, ids: string[
 }
 
 // Check whether any source files have changed by comparing hashes (mutate in place)
-function sourcesHaveChanged(oldFaq: StructuredFAQ, faq: StructuredFAQ, candidates: Map<string, CandidateFAQ>): boolean {
+function sourcesHaveChanged(oldFaq: StructuredFAQ | undefined, faq: StructuredFAQ, candidates: Map<string, CandidateFAQ>): boolean {
     const newHashes = {
         faq:        makeStableHash(faq),
         candidates: makeStableHash(Object.values(candidates))
     };
     faq.source_hashes = newHashes;
-    return oldFaq.source_hashes.faq        !== newHashes.faq
+    return oldFaq?.source_hashes?.faq      !== newHashes.faq
         || oldFaq.source_hashes.candidates !== newHashes.candidates;
 }

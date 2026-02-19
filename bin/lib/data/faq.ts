@@ -26,7 +26,7 @@ export function loadMarkdownFAQ(repo: ConfigRepository): StructuredFAQ {
         return parseMarkdownFAQ(markdown);
     } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
-        core.warning(`Error reading structured FAQ '${faqFile}': ${message}`);
+        core.warning(`Error reading FAQ '${faqFile}': ${message}`);
         return {
             excluded_ids:   [],
             heading:        'Frequently Asked Questions (FAQ)',
@@ -101,7 +101,7 @@ function parseMarkdownFAQ(markdown: string): StructuredFAQ {
     // Return the top-level category as the structured FAQ
     const faqCategory = categories[0];
     if (!faqCategory) throw new Error('No FAQ loaded');
-    const faq: StructuredFAQ = {...faqCategory, excluded_ids };
+    const faq: StructuredFAQ = { ...faqCategory, excluded_ids };
     core.info(`Loaded FAQ: ${describeStructuredFAQ(faq)}`);
     return faq;
 }

@@ -32,16 +32,21 @@ export interface StructuredFAQCategory {
 }
 export interface StructuredFAQ extends StructuredFAQCategory {
     excluded_ids:   string[];
-    source_hashes:  Record<string, string>;
+    source_hashes?: Record<string, string>;
 }
 
 // Load the structured FAQ
-export function loadStructuredFAQ(repo: ConfigRepository): StructuredFAQ {
+export function loadStructuredFAQ(repo: ConfigRepository): StructuredFAQ | undefined {
     const faqFile = getStructuredFAQPath(repo);
-    const json = fs.readFileSync(faqFile, { encoding: 'utf8' });
-    const faq = JSON.parse(json) as StructuredFAQ;
-    core.info(`Loaded structured: ${describeStructuredFAQ(faq)}`);
-    return faq;
+    try {
+        const json = fs.readFileSync(faqFile, { encoding: 'utf8' });
+        const faq = JSON.parse(json) as StructuredFAQ;
+        core.info(`Loaded structured: ${describeStructuredFAQ(faq)}`);
+        return faq;
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        core.warning(`Error reading structured FAQ '${faqFile}': ${message}`);
+    }
 }
 
 // Save the structured FAQ
