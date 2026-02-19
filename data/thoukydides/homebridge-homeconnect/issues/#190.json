@@ -1,0 +1,14 @@
+{
+    "issue_number": 190,
+    "updated_at": "2026-02-19T12:02:17.741Z",
+    "faq": [
+        {
+            "question": "Why does my log show Mismatched type for NOTIFY Event.data.items[0] or none of ProgramKey errors?",
+            "answer": "These warnings occur when a Home Connect appliance reports a program that is not currently listed in the official Home Connect API documentation. The plugin performs strict validation on data received from the API, and if an appliance uses an undocumented program key (for example, specific microwave power levels or automatic cooking programs), it triggers an informational `Mismatched type` warning.\n\nThese warnings are for information only and do not affect the operation of the plugin or the control of your appliance. Many common undocumented values have been added in subsequent updates (such as `v0.37.0`). If you continue to see these messages:\n\n1. Ensure you are running the latest version of the plugin.\n2. Note the specific program string mentioned in the log, such as `Cooking.Oven.Program.Microwave.600Watt` or `Cooking.Oven.Program.Dish.Automatic.Microwave.Haehnchenteile`.\n3. Report any missing values by opening a new issue so they can be added to the plugin's internal definitions.",
+            "semantic_abstract": "Home Connect appliances occasionally report program identifiers via the event stream that are absent from the official API documentation. This causes the plugin's schema validation to trigger a `Mismatched type` warning for the `BSH.Common.Root.ActiveProgram` field, although device functionality remains unaffected.",
+            "alternative_resolution": "The error message could be updated to explicitly state that the reported program is undocumented and provide a direct link to report the specific missing string to the repository.",
+            "confidence": "high",
+            "hash": "235a9bc1e80dbe69b59313d14e90c307ec6674a7a7041ad010ae5c560c66334c"
+        }
+    ]
+}
