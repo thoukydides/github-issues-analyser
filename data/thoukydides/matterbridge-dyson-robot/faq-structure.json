@@ -1,1 +1,11 @@
-{"excluded_ids":[],"heading":"Frequently Asked Questions (FAQ)","preamble":"","partitions":[],"subcategories":[]}
+{
+    "excluded_ids": [],
+    "heading": "Frequently Asked Questions (FAQ)",
+    "preamble": "",
+    "partitions": [],
+    "subcategories": [],
+    "source_hashes": {
+        "faq": "6a562ae564d85d7d1565ab58cc59f274a6dbe7b131e9aa270093da76c45b8e29",
+        "candidates": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+}
