@@ -294,12 +294,14 @@ This error typically occurs when the SingleKey ID account used for authorisation
 
 <!-- PARTITION -->
 
-#### Why does the Apple Home app not show the remaining time for my appliance?
+#### Why does the Apple Home app not show the remaining time or detailed status?
 
-<!-- INCLUDES: issue-48-237c issue-114-0f03 issue-124-9bb6 -->
+<!-- INCLUDES: issue-2-d759 issue-48-237c issue-68-c945 issue-114-0f03 issue-124-9bb6 -->
 The plugin exposes the `Remaining Duration` characteristic to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services, which are not appropriate for Home Connect appliances.
 
-To view the remaining time or use it for automations, you must use a third-party HomeKit application (such as Eve, Home+, or Controller for HomeKit). These applications support displaying a wider range of standard HomeKit characteristics that Apple's own app hides.
+The plugin does not use the `Valve` service because it is semantically incorrect for devices like ovens, hoods, or dryers. Using it only for specific types would create an inconsistent architectural model and break existing automations. To maintain consistency, the `Remaining Duration` is provided on the program switch.
+
+To view the remaining time or use it for automations, you must use a third-party HomeKit application (such as Eve, Home+, or Controller for HomeKit). Additionally, the plugin provides `Stateless Programmable Switch` services that function as automation triggers for events like **Program finished**, **Timer finished**, or **Preheat finished**, which are visible in any HomeKit app.
 
 #### Why are the power and program switches for my appliance in a random order in HomeKit?
 
@@ -313,61 +315,41 @@ Attempts to use HAP features like **Primary** or **Linked** services have not co
 <!-- INCLUDES: issue-124-2e72 -->
 The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled (other than by disabling the whole appliance). The `Switch` services for individual programs can be disabled by selecting **No individual program switches**, or individually enabled with **Custom list of programs and options**. All other services can be individually enabled or disabled for each appliance.
 
-#### 🚧 Why cannot I see the remaining time or detailed status of my dishwasher or oven in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-2-d759 -->
-Apple's official Home app has limited support for specific appliance characteristics such as `Remaining Duration` or detailed program states. While the plugin provides this data, it is not displayed in the Home app. To view these details or use them as automation triggers, you should use a third-party HomeKit app such as **Eve** or **Home+**. Additionally, the plugin provides `Stateless Programmable Switch` services that function as automation triggers for events like **Program finished**, **Timer finished**, or **Preheat finished**, which are visible in any HomeKit app.
-
-#### 🚧 Why is a specific appliance program or feature showing as `Not Responding` while others work? 🚧
+#### Why is a specific appliance program or feature showing as `Not Responding`?
 
 <!-- INCLUDES: issue-26-a87b -->
-This behaviour often indicates that the plugin's cached list of supported programs or features for that specific appliance has become stale or no longer matches what the Home Connect API expects. This can occur after an appliance firmware update or a change in the Home Connect server-side configuration.
+This behaviour often indicates that the plugin's cached list of supported programs or features for that specific appliance has become stale, often following an appliance firmware update or Home Connect server-side configuration change.
 
-### Recommended Resolution: Refresh via Identify
-The simplest way to force the plugin to refresh the list of supported programs and rebuild its internal configuration schema is to use the **Identify** function within HomeKit (found in the accessory settings for the appliance). Triggering this will: 
-1. Re-read all supported programs and options from the Home Connect API.
-2. Output the current appliance configuration to the Homebridge logs.
-3. Update the cached metadata used by the plugin.
+To resolve this, use the **Identify** function within HomeKit (found in the accessory settings). This forces the plugin to re-read all supported programs and options from the Home Connect API and update its cached metadata.
 
-### Alternative Resolution: Clearing Persistent Cache
-If the `Identify` method does not resolve the issue, you can manually clear the plugin's cache. The plugin stores appliance-specific metadata in a `persist` directory, usually located at `~/.homebridge/homebridge-homeconnect/persist`.
-
-To safely clear the cache:
+If the issue persists, you can manually clear the plugin cache located in the `persist` directory (usually `~/.homebridge/homebridge-homeconnect/persist`):
 1. Stop Homebridge.
-2. Navigate to the `persist` directory mentioned above.
-3. Identify the file starting with `94a08da1fecbb6e8b46990538c7b50b2` (this is your account authorisation). **Do not delete this file**, or you will need to re-authorise your account.
-4. Delete all other files in that directory. These files are appliance-specific caches and will be automatically regenerated upon restart.
+2. Navigate to the `persist` directory.
+3. Identify the file starting with `94a08da1fecbb6e8b46990538c7b50b2` (account authorisation). **Do not delete this file**.
+4. Delete all other files in that directory.
 5. Restart Homebridge.
 
-If you see the error `[SDK.Error.HomeAppliance.Connection.Initialization.Failed]` in your logs, this indicates the Home Connect servers are having trouble reaching your appliance, which may also cause individual programs to fail even if the appliance appears online.
+Note: If the logs show `[SDK.Error.HomeAppliance.Connection.Initialization.Failed]`, the Home Connect servers are having trouble reaching your appliance, which may cause features to fail even if the device appears online.
 
-#### 🚧 How can I trigger the Identify function for an appliance using the Eve app? 🚧
+#### How can I trigger the Identify function using the Eve app?
 
 <!-- INCLUDES: issue-37-b6a0 -->
-To trigger the `Identify` mechanism within the Eve app, follow these steps:
-
+To trigger the `Identify` mechanism within the Eve app:
 1. Navigate to the **Rooms** tab and find the appliance.
-2. Tap on the name of the appliance (ensure you do not tap an active control like a toggle or slider) to open the detailed device view.
-3. At the top of the screen, tap the appliance name/arrow located just below the **Edit** button.
-4. Two icons will appear: a settings cog and an **ID** button.
-5. Tap the **ID** button to trigger the identification sequence on the physical appliance.
+2. Tap the name of the appliance (avoiding toggles or sliders) to open the detailed view.
+3. Tap the appliance name/arrow located just below the **Edit** button at the top.
+4. Tap the **ID** button that appears next to the settings cog.
 
-#### 🚧 Why do Siri commands for my hood fan work intermittently or fail while the Home app works correctly? 🚧
+This will trigger the identification sequence on the physical appliance and refresh the plugin's cached configuration.
+
+#### Why do Siri commands fail or work intermittently when the Home app works correctly?
 
 <!-- INCLUDES: issue-41-6e02 -->
-Intermittent issues with Siri control, where the Home app continues to function correctly, are typically not caused by the plugin itself. These discrepancies usually stem from one of two sources:
+Intermittent Siri failures, where the Home app continues to function correctly, are typically not caused by the plugin. These discrepancies usually stem from two sources:
+1. **Siri semantic processing**: Siri requires specific combinations of characteristics to understand device types. Apple updates to Siri's logic can cause it to become "confused" by the non-standard service mappings required to bridge Home Connect appliances to HomeKit.
+2. **Home Connect server instability**: Periodic unreliability of the Home Connect API can cause commands to fail or produce no logs if the request never reaches the plugin.
 
-1.  **Siri semantic processing**: Siri requires specific combinations of characteristics to understand device types. If Apple updates Siri's logic, it may become "confused" by the non-standard service mappings required to bridge Home Connect appliances to HomeKit. This can result in Siri being unable to process commands like turning a fan off, even if the Home app interface works perfectly.
-2.  **Home Connect server instability**: Periodic unreliability of the Home Connect API servers can cause commands to fail or produce no logs within the plugin if the request never reaches the Homebridge instance.
-
-To troubleshoot, you can enable HomeKit-level debug logging by setting the `DEBUG=*` environment variable before launching Homebridge. This will confirm whether the Siri request is actually reaching Homebridge or being dropped by the HomeKit framework.
-
-#### 🚧 Why doesn't the plugin use a Valve service to show the remaining time for dishwashers or washing machines? 🚧
-
-<!-- INCLUDES: issue-68-c945 -->
-The HomeKit `Valve` service (including its sub-types like `Irrigation` or `Shower Head`) is not used for displaying remaining time because it is semantically inappropriate for many Home Connect appliances, such as ovens, hoods, or dryers. To maintain a consistent experience across all supported hardware, the plugin instead adds the `RemainingDuration` characteristic to the **Active Program Switch**.
-
-While the native Apple Home app does not always display this timer prominently, it is fully accessible for both viewing and automation in third-party HomeKit applications (e.g. Eve, Home+, or Controller for HomeKit). Using a `Valve` service for only specific appliance types would create an inconsistent architectural model and would break existing automations that rely on the current service structure.
+To troubleshoot, you can enable HomeKit-level debug logging by setting the `DEBUG=*` environment variable before launching Homebridge. This confirms whether the Siri request is reaching Homebridge or being dropped by the HomeKit framework.
 
 ### Notifications & Events
 
