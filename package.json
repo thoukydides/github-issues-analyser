@@ -66,7 +66,9 @@
     },
     "scripts": {
         "lint": "eslint eslint.config.mjs 'bin/**/*.ts' --max-warnings=0",
-        "type-check": "tsc --noEmit -p ./ && tsc --noEmit -p bin/"
+        "type-check": "tsc --noEmit -p ./ && tsc --noEmit -p bin/",
+        "structure-faq": "tsx bin/structure-faq.ts",
+        "build-faq": "tsx bin/build-faq.ts"
     },
     "optionalDependencies": {
         "fsevents": "^2.3.3"
