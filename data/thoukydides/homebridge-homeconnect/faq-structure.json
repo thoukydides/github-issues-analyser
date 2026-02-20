@@ -280,34 +280,30 @@
                                 },
                                 {
                                     "question": "Why does authorisation fail with `invalid_client` or `unauthorized_client`?",
-                                    "answer": "These errors are returned by the Home Connect API and indicate a configuration mismatch in the [Home Connect Developer Portal](https://developer.home-connect.com/):\n\nEnsure the `Client ID` in your Homebridge configuration exactly matches the one in the portal, and that the application is configured as follows:\n* **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app.\n* **OAuth Flow**: Device Flow.\n* **Success Redirect**: Leave blank (or set to a valid URL).\n* **One Time Token Mode**: Disabled.\n* **Proof Key for Code Exchange**: Disabled.\n* **Sync to China**: Disabled, unless you are using the Home Connect servers in China.\n\nIf the configuration is correct but errors persist, try deleting and recreating the application in the developer portal to reset its state.",
+                                    "answer": "These errors are returned by the Home Connect API and indicate a configuration mismatch in the [Home Connect Developer Portal](https://developer.home-connect.com/):\n\nEnsure the `Client ID` in your Homebridge configuration matches the one in the portal exactly, and that the application is configured as follows:\n* **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app. When prompted to log in during authorisation, you **must** use these mobile app credentials, not your Developer Portal credentials.\n* **OAuth Flow**: Device Flow.\n* **Success Redirect**: Leave blank (or set to a valid URL).\n* **One Time Token Mode**: Disabled.\n* **Proof Key for Code Exchange**: Disabled.\n* **Sync to China**: Disabled, unless you are using the Home Connect servers in China.\n\nIf you encounter `HTTP method not allowed` when clicking the authorisation link, ensure you are using the full URL provided in the logs and not attempting to access API endpoints manually. If configuration is correct but errors persist, try deleting and recreating the application in the developer portal.",
                                     "included_ids": [
                                         "issue-115-c713",
-                                        "issue-117-1a0f"
+                                        "issue-117-1a0f",
+                                        "issue-60-6eaf"
                                     ]
                                 },
                                 {
-                                    "question": "Why does authorisation fail with `expired_token` or `the code entered is invalid or has expired`?",
-                                    "answer": "This error typically occurs during the initial OAuth authorisation process due to one of the following reasons:\n\n* **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.\n* **Stale Authorisation Links**: The `device_code` in the authorisation URL is typically only valid for 5 minutes. If you use an older link, it will have expired. Check the Homebridge UI plugin configuration editor or log file for a more recent URL.",
+                                    "question": "Why does the authorisation link expire or fail with `expired_token` or an invalid code?",
+                                    "answer": "This typically occurs during the initial OAuth authorisation process due to technical constraints or display issues:\n\n* **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.\n* **Link Expiration**: The authorisation link and associated `device_code` are only valid for a short period (typically 5 to 30 minutes). If you use an older link from the logs or the settings page, it will have expired. Refresh the plugin configuration page or restart Homebridge to generate a new URI.\n* **Display Issues**: If the link is displayed as `[object Promise]` or contains that text, ensure you have updated the plugin to at least `v0.29.5`. This was a display issue in earlier versions where the link generation was not correctly awaited in the user interface.",
                                     "included_ids": [
-                                        "issue-125-9208"
+                                        "issue-125-9208",
+                                        "issue-151-9c3a"
+                                    ]
+                                },
+                                {
+                                    "question": "How do I complete the Home Connect authorisation process?",
+                                    "answer": "When the plugin starts or requires re-authorisation, it generates a unique URL in the Homebridge log and the plugin settings. To complete the process:\n\n1. Copy the entire URL (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=1234-5678`) into your web browser.\n2. When prompted to log in, you **must** use the same email address and password used for the official Home Connect mobile app where your appliances are registered. Do not use your Developer Portal credentials if they are different.\n3. Approve the request to access your appliances. You will then be redirected to the `Redirect URI` specified in your developer application settings.\n4. The plugin will automatically detect the completion, retrieve the tokens, and save them to your configuration.\n\nIf the browser prompts for a code manually, enter the 8-character `user_code` found at the end of the provided authorisation URL.",
+                                    "included_ids": [
+                                        "issue-60-6eaf"
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "question": "Why does the Home Connect authorisation link in the settings expire or fail?",
-                                    "answer": "The authorisation URI generated by the plugin for linking your account is subject to technical constraints from the Home Connect servers.\n\n*   The authorisation link is only valid for **30 minutes**. You must complete the process within this window; otherwise, the link will become invalid.\n*   If the link fails or has expired, refresh the plugin configuration page or restart Homebridge to generate a new URI.\n*   If the link is displayed as `[object Promise]` or `https://.../[object%20Promise]`, ensure you have updated the plugin to at least `v0.29.5`. This was a display issue in earlier versions where the link generation was not correctly awaited in the user interface.",
-                                    "issue_number": 151,
-                                    "id": "issue-151-9c3a"
-                                },
-                                {
-                                    "question": "How do I complete the Home Connect authorisation process if the link fails or prompts for a code?",
-                                    "answer": "When the plugin starts or requires re-authorisation, it generates a unique URL in the Homebridge log. To complete the process:\n\n1. Copy the entire URL from the log (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=1234-5678`) into your web browser.\n2. When prompted to log in, you **must** use the same email address and password that you use for the official Home Connect mobile app where your appliances are registered. Do not use your Developer Portal credentials if they are different.\n3. Approve the request to access your appliances. You will then be redirected to the `Redirect URI` specified in your developer application settings.\n4. The plugin will automatically detect the completion, retrieve the tokens, and save them to your configuration. \n\nIf you see errors like `HTTP method not allowed`, ensure you are using the full URL provided in the logs and not attempting to manually visit API endpoints.",
-                                    "issue_number": 60,
-                                    "id": "issue-60-6eaf"
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
