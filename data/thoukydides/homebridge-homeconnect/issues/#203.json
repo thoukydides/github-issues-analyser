@@ -1,0 +1,14 @@
+{
+    "issue_number": 203,
+    "updated_at": "2026-02-20T07:31:13.935Z",
+    "faq": [
+        {
+            "question": "Why are there `(unrecognised)` items in the logs for my coffee machine or other appliance?",
+            "answer": "Home Connect appliances frequently receive firmware updates or include new features that are not yet officially documented in the Home Connect API. This is particularly common with high-end coffee machines (such as the Siemens EQ.900/TQ907 series), which often introduce new beverage types (like `CoffeeWorld` recipes), custom programs (`Favorite.001`), and granular settings (such as `Coarsness` or `CoffeeStrength`).\n\nThe plugin includes a discovery mechanism that identifies these undocumented items and prints them to the log in a specific code-like format. If you see these entries:\n*   **Check for updates**: Ensure you are using the latest version of the plugin. Support for many unrecognised items is added regularly (for example, support for many Siemens coffee maker options was added in `v0.37.4`).\n*   **Report new values**: If they persist on the latest version, copy the complete log block (including the `===` separator lines) and post it to a new GitHub issue.\n*   **Provide context**: Include the model of your appliance and describe which program or setting you were using when the log entry appeared.\n\nThis information allows the maintainer to map these undocumented values to HomeKit services or configuration options in future updates. Note that some options, like `BSH.Common.Option.ProgramName`, may contain user-defined text which the plugin handles generically once identified.",
+            "semantic_abstract": "The Home Connect API frequently contains undocumented program keys and options, especially for advanced appliances like coffee machines with custom beverage recipes. The plugin implements a detection system that surfaces these unknown values in the logs, enabling users to provide the necessary metadata for the maintainer to implement formal support.",
+            "alternative_resolution": "The plugin's log output for unrecognised values could be prefixed with a clear instructional message explaining that the block should be reported on GitHub if it persists after a plugin update, reducing user confusion about whether the log represents a failure.",
+            "confidence": "high",
+            "hash": "2ddc6c9d04c6336a35797fbf4c7536bbb2be10a8c8bc568a355bb034ab3e6d76"
+        }
+    ]
+}
