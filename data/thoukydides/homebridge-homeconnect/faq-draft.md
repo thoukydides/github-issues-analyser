@@ -357,17 +357,23 @@ To troubleshoot, you can enable HomeKit-level debug logging by setting the `DEBU
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
 
-<!-- INCLUDES: issue-1-38d2 issue-3-c53c issue-31-241e issue-43-caee issue-45-fb59 issue-153-91f4 -->
+<!-- INCLUDES: issue-1-38d2 issue-3-c53c issue-31-241e issue-43-caee issue-45-fb59 issue-56-ce35 issue-153-91f4 -->
 Home Connect communicates many appliance states as **transient events** (e.g. "Drip tray full" or "iDos fill level poor") rather than persistent, queryable states. It is not possible for the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears. These are mapped to `Stateless Programmable Switch` services, allowing them to be used as automation triggers.
 
-The Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To see what these represent for your specific appliance, check your **Homebridge logs** during startup or use a third-party app like **Eve** or **Home+** which displays descriptive labels. If you do not require these events for automations, you can disable them per-appliance in the plugin configuration to prevent them from appearing in the Home app.
+The Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To see what these represent for your specific appliance, check your **Homebridge logs** during startup or use a third-party app like **Eve** or **Home+** which displays descriptive labels. If you do not require these events for automations, you can selectively disable them in the per-appliance configuration to prevent them from appearing in the Home app.
 
 #### Why does the Home app show two (or more) tiles for one appliance?
 
-<!-- INCLUDES: issue-59-593e -->
+<!-- INCLUDES: issue-56-ce35 issue-59-593e -->
 This is standard Apple Home behaviour. To keep the interface organised, Apple separates different service types into distinct tiles. Specifically, a separate tile is created for the `Stateless Programmable Switch` services used for event triggers.
 
-While you can toggle **Show as Separate Tiles** in the accessory settings, Apple does not currently allow these buttons to be merged into the primary appliance tile. If you do not use these events for automations, you can disable them in the plugin configuration to prevent them from appearing in the Home app.
+While you can toggle **Show as Separate Tiles** in the accessory settings, Apple does not currently allow these buttons to be merged into the primary appliance tile. To reduce clutter, you can use the per-appliance configuration (introduced in `v0.32.0`) to selectively disable the following services:
+
+* **Events**: `Stateless Programmable Switch` services triggered by appliance events.
+* **Modes**: `Switch` services for specific settings like Sabbath Mode or Eco Mode.
+* **Door**: The `Door` service used for monitoring door status.
+
+Note that a restart of Homebridge is required to update the HomeKit accessory cache and remove any hidden services.
 
 #### How do I get appliance notifications?
 
@@ -381,7 +387,7 @@ To receive notifications for other events, you have two main options:
 
 #### How can I disable HomeKit notifications for door events?
 
-<!-- INCLUDES: issue-132-67f7 issue-132-791b -->
+<!-- INCLUDES: issue-56-ce35 issue-132-67f7 issue-132-791b -->
 Door notifications for appliances like fridges or freezers are managed by the Apple Home app on a per-device basis. To disable them:
 
 1. Open the Apple **Home** app.
@@ -389,30 +395,18 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 3. Navigate to the **Doors** section.
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
-Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
+Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit. A restart of Homebridge is required to apply this change.
 
-#### 🚧 Why do my Home Connect appliances remain visible in the Home app when they are turned off or offline? 🚧
+#### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
 <!-- INCLUDES: issue-52-2dc8 -->
-It is normal for appliances to remain visible in the Home app even when they are powered off or disconnected from Wi-Fi. The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as the appliance is known to the Home Connect API, it will persist in HomeKit. 
+The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as an appliance remains associated with your account in the Home Connect API, it will persist in HomeKit even if it is powered off or disconnected from Wi-Fi. The plugin only removes accessories if the API indicates they have been removed from your account.
 
-The plugin only adds or removes accessories if the Home Connect API indicates that the list of appliances associated with your account has changed. Being unreachable by the Home Connect servers does not trigger the removal of the accessory from HomeKit. If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing from the Favorites view, this may be due to a synchronisation issue within HomeKit or Homebridge. In such cases, the following steps can resolve the issue:
+If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing from the Favorites view, this is typically due to synchronisation issues within HomeKit or Homebridge. To resolve such issues:
 
 1. Remove the Homebridge bridge from the Home app.
-2. Clear the Homebridge cache files.
+2. Clear the Homebridge accessory cache.
 3. Re-add the bridge to HomeKit.
-
-#### 🚧 Can I hide the event switches or mode switches to reduce clutter in the Home app? 🚧
-
-<!-- INCLUDES: issue-56-ce35 -->
-Yes. From version `v0.32.0` onwards, the plugin provides per-appliance configuration options to selectively remove specific services. This is particularly useful for reducing the number of `Stateless Programmable Switch` services, which often appear with confusing numeric labels in the Home app due to platform limitations.
-
-You can selectively enable or disable the following services for each appliance:
-- **Events**: `Stateless Programmable Switch` services triggered by appliance events.
-- **Modes**: `Switch` services for specific appliance settings (e.g. Sabbath Mode or Eco Mode).
-- **Door**: The `Door` service used for monitoring door status.
-
-To adjust these settings, navigate to the plugin configuration in the Homebridge UI, find the settings section for your specific appliance, and toggle the visibility of these services. A restart of Homebridge is required to update the HomeKit accessory cache and remove the hidden services.
 
 ## Third-party Platforms
 
