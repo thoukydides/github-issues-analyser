@@ -1,0 +1,13 @@
+{
+    "issue_number": 209,
+    "updated_at": "2026-02-20T15:09:14.801Z",
+    "faq": [
+        {
+            "question": "Why do the logs show `unrecognised` programs or settings?",
+            "answer": "The plugin is designed to detect and report Home Connect API keys or values that have not yet been formally defined in its internal schema. When your appliance returns a value the plugin does not know how to handle, it outputs a diagnostic block to the logs containing TypeScript-style definitions and the label `// (unrecognised)`. This often happens when a new appliance model is released or a firmware update adds functionality, such as increasing the number of available coffee favourite slots (e.g. `BSH.Common.Program.Favorite.013` up to `.020`). To resolve this: 1. Ensure you are running the latest version of the plugin, as support for new values is added frequently. 2. If the latest version still shows these messages, copy the entire block from the logs (including the `====` separator lines) and open a new GitHub issue. This allows the maintainer to add the missing definitions to the plugin.",
+            "semantic_abstract": "Home Connect appliances may report undocumented API identifiers or program values that the plugin captures and identifies in logs as unrecognised union types. This diagnostic feature allows for the discovery of hardware-specific extensions or firmware-driven changes, such as additional coffee maker favourite slots, which must be manually added to the plugin's internal schema to be correctly supported and exposed to HomeKit.",
+            "confidence": "high",
+            "hash": "d7db7268eec151cb5f8ec32b1d6d51766418fe9af4b8e14d4332c936b25abb6e"
+        }
+    ]
+}
