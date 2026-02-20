@@ -1,0 +1,13 @@
+{
+    "issue_number": 210,
+    "updated_at": "2026-02-20T19:13:39.591Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs show unrecognised options or an `export interface` block?",
+            "answer": "When the plugin encounters appliance options, settings, or states that are not yet supported or that return unexpected data types, it generates a diagnostic log block formatted as a TypeScript interface (e.g. `export interface OptionValues` or `export interface StateValues`). This usually indicates that the appliance is providing data that does not match the plugin's current understanding of the Home Connect API.\n\nTo help resolve this, please:\n1. Ensure you are using the latest version of the plugin, as support for new features is added regularly.\n2. If the block remains, copy the entire section between the `====` separators.\n3. Open a new issue on GitHub, including the appliance manufacturer, model, and the copied log block.\n\nThis information allows the maintainer to update the plugin to correctly handle these values. For example, some Bosch washers were found to use both numeric and string identifiers for the same `LaundryCare.Common.Option.ReferToProgram` option, which required a specific update to the plugin's type definitions to accommodate both formats.",
+            "semantic_abstract": "The plugin implements a diagnostic logging mechanism that generates TypeScript interface definitions when it encounters undocumented or incorrectly typed Home Connect API entities. This metadata facilitates the manual mapping of new appliance features and the resolution of implementation mismatches within the plugin's internal definitions.",
+            "confidence": "high",
+            "hash": "cc8eb12e03aeb1b8748e0d0f3ccf7168568ba9fd7784bac759374d6158316cfa"
+        }
+    ]
+}
