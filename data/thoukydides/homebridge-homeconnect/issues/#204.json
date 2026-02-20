@@ -1,0 +1,13 @@
+{
+    "issue_number": 204,
+    "updated_at": "2026-02-20T09:08:11.752Z",
+    "faq": [
+        {
+            "question": "Why does the log show code blocks with `(unrecognised)` comments?",
+            "answer": "When the plugin encounters programs, options, or settings from the Home Connect API that are not yet in its internal database, it generates a structured log block delimited by `=======` lines. These entries are marked with `// (unrecognised)`. This typically occurs with recently released appliance models or after a firmware update adds new functionality that was previously undocumented.\n\nTo resolve this and help improve the plugin:\n1. Ensure you are running the latest version of the plugin, as the keys may have already been added in a recent release.\n2. If the `unrecognised` entries persist on the latest version, copy the complete block from the logs.\n3. Open a GitHub issue providing the log block and the model identifier of your appliance.\n\nThe maintainer uses these snippets to update the plugin's definitions and expose the new functionality to HomeKit.",
+            "semantic_abstract": "The plugin identifies undocumented Home Connect API keys and values, such as programs or settings, by outputting a structured code block in the logs with `unrecognised` annotations. This diagnostic mechanism enables users to report new appliance features or firmware changes for formal integration into the plugin's supported schema.",
+            "confidence": "high",
+            "hash": "2f619320f492e45a6d4e3bc91f29812906be3cef5a58eedd1567b84bb2dc39e0"
+        }
+    ]
+}
