@@ -95,10 +95,19 @@ function selectPartition(faq: StructuredFAQ): Partition | undefined {
 
 // Convert FAQ partition to model's input context
 function partitionToModel(repo: ConfigRepository, selected: Partition): Map<string, string> {
+    const identifiersToIssueNumbers = (ids: string[]): number[] => {
+        const issueNumbers: number[] = [];
+        for (const id of ids) {
+            const match = /^issue-(\d+)-/.exec(id);
+            if (match) issueNumbers.push(Number(match[1]));
+        }
+        return issueNumbers;
+    };
     const { category, partition } = selected;
     const contextExisting = {
         category:   partition.partition ?? category.heading,
-        entries:    partition.entries.map(({ included_ids, ...entry }, index) => ({ ...entry, id: `faq-${index}` }))
+        entries:    partition.entries.map(({ included_ids, ...entry }, index) =>
+            ({ ...entry, id: `faq-${index}`, issue_numbers: identifiersToIssueNumbers(included_ids) }))
     };
     const vars = new Map<string, string>([
         ['owner',       repo.owner],

@@ -17,7 +17,7 @@ import { makeStableHash } from './lib/hash.js';
 const EMBEDDING_TYPE: GeminiEmbeddingType = 'clustering';
 
 // Cluster size relative to all-members centroid distance statistics
-const CLUSTER_RADIUS_SD = 1; // mean + 1 * stdev
+const CLUSTER_RADIUS_SD = 2; // mean + 2 * stdev
 
 // Partition size to attempt splitting into sub-clusters
 const MIN_PARTITION_SIZE = 10; // Minimum size to attempt sub-clustering

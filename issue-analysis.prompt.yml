@@ -90,30 +90,15 @@ messages:
       - This abstract is for internal clustering and classification only, not end-user documentation
       - Write in a neutral, documentation-style voice; avoid temporal language
       
-      Alternative Resolution: Consider improvements that **do not contradict maintainer policy decisions**:
-      - ✅ **Appropriate**:
-        - Improved error messages or warnings
-        - Documentation clarifications or examples  
-        - Configuration UI/UX improvements
-        - Validation or helpful defaults
-      - ❌ **Inappropriate**:
-        - Suggesting features already rejected by maintainer
-        - Proposing workarounds that undermine stated design decisions
-        - Questioning architectural choices after maintainer explanation
-      - If an issue is marked `wontfix` or similar, focus on whether the **documentation** adequately explains the design rationale and how users can work within the constraints
-      
       Maintainer authority:
       - Prioritise information from comments by a `Maintainer`; these represent authoritative project guidance
       - When a `Maintainer` has stated a clear policy decision or technical rationale:
         - **Treat it as definitive** - this represents the project's official position
-        - **Do not suggest alternatives** that contradict the maintainer's stated approach
         - **Focus the FAQ answer** on explaining the maintainer's rationale clearly
         - **Include the resolution** in the answer (e.g. how to disable the feature, configure around it)
       - Issues marked with `wontfix` or similar labels indicate deliberate design decisions. The FAQ should:
         1. Explain **why** the maintainer made this choice (technical constraints, consistency, API limitations)
         2. Provide **workarounds** if the maintainer suggested any
-        3. **Not** propose alternative implementations in the `alternative_resolution` field
-      - The `alternative_resolution` field is for identifying gaps in **error messages**, **documentation**, or **configuration UX**; not for revisiting settled design decisions
 
       Redact all personally identifiable information and secrets:
       - Email addresses, IP addresses, hostnames, MAC addresses
@@ -161,10 +146,6 @@ jsonSchema: |- # json
           "semantic_abstract": {
             "type": "string",
             "description": "2-3 sentence abstract capturing core technical concepts for clustering, avoiding generic troubleshooting terminology"
-          },
-          "alternative_resolution": {
-            "type": "string",
-            "description": "Description of documentation or UX improvements (not feature changes contradicting maintainer decisions)"
           },
           "confidence": {
             "type": "string",

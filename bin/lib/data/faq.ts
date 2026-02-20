@@ -181,10 +181,11 @@ function renderMarkdownFAQCategory(category: StructuredFAQCategory, level: numbe
     if (category.preamble) markdown += `${category.preamble}\n\n`;
 
     // FAQ entries directly under this category (all partitions)
-    for (const partition of partitions) {
-        markdown += partition.partition
-            ? `<!-- PARTITION: ${partition.partition} -->\n\n`
-            : '<!-- PARTITION -->\n\n';
+    partitions.forEach((partition, index) =>{
+        if (0 < index || partition.partition) {
+            const heading = partition.partition;
+            markdown += `<!-- PARTITION${heading ? `: ${heading}` : ''} -->\n\n`;
+        }
         const questionHeading = '#'.repeat(QUESTION_HEADING_LEVEL);
         for (const entry of partition.entries) {
             markdown += `${questionHeading} ${entry.question}\n\n`;
@@ -196,7 +197,7 @@ function renderMarkdownFAQCategory(category: StructuredFAQCategory, level: numbe
             markdown += makeIdsComment('INCLUDES', [candidate.id]);
             markdown += `${candidate.answer}\n\n`;
         }
-    }
+    });
 
     // Subcategories
     for (const subcategory of category.subcategories) {
