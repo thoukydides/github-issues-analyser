@@ -1,0 +1,14 @@
+{
+    "issue_number": 196,
+    "updated_at": "2026-02-20T03:18:13.900Z",
+    "faq": [
+        {
+            "question": "Why can I not rename appliance services such as door sensors or switches in the Home app?",
+            "answer": "Prior to version 0.37.0, the plugin implemented the `ConfiguredName` characteristic as read-only. From v0.37.0 onwards, this has been changed to writable, allowing individual services (e.g. `Refrigerator Door`, `Eco Mode`, or specific power switches) to be renamed within HomeKit.\n\nIf you have updated to the latest version but find that custom names revert immediately, HomeKit is likely caching the previous read-only metadata. To resolve this:\n\n1. Force-quit the Home app on your iOS or macOS device.\n2. Restart your HomeKit hub (Apple TV or HomePod).\n3. If names still revert, reboot the device you are using to access the Home app.\n\nNote that by default, services include the appliance name as a prefix (as configured in the official Home Connect app). You can use the `Remove prefix from service names` option in the plugin configuration if you prefer shorter names, or simply rename the service to your preference once the cache is cleared.",
+            "semantic_abstract": "The `ConfiguredName` characteristic for Home Connect services was transitioned from read-only to writable in v0.37.0 to permit custom naming in HomeKit. Persistent naming reverts post-update are attributed to HomeKit's caching of service permissions, which necessitates a restart of the Home app or HomeKit hubs to synchronise the updated metadata.",
+            "alternative_resolution": "Include a troubleshooting note in the README or a one-time log warning upon updating to v0.37.0+ advising users to restart their Home app/hubs if service renaming fails due to HomeKit metadata caching.",
+            "confidence": "high",
+            "hash": "85112cbb65c1b225237fc03b33f088615409ddfc2db8eeb017f2778beab692f4"
+        }
+    ]
+}
