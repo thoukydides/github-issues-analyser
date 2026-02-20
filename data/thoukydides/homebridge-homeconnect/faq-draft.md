@@ -187,18 +187,19 @@ The plugin logs all status information reported by the API. To prevent these mes
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-e985 issue-40-f8f5 issue-61-1c74 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f -->
+<!-- INCLUDES: issue-1-e985 issue-40-f8f5 issue-61-1c74 issue-71-a9f3 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd -->
 The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details of the specific reason. Some of the more common cases are:
 
 * `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
   1. In the official app, navigate to the appliance's **Settings** > **Network** and ensure all three connection stages (appliance-app, appliance-cloud, and app-cloud) are green.
   2. Test the official app while your phone's Wi-Fi is disabled; if it fails to control the appliance over cellular data, the issue is with the appliance's cloud connection.
-  3. Power cycle the appliance or restart your router to refresh the connection to the Home Connect servers.
-  4. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages.
+  3. Toggle the **Connection to server** setting off and then back on within the appliance settings in the official app to force a reconnection.
+  4. Power cycle the appliance or restart your router to refresh the connection to the Home Connect servers.
+  5. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages.
 
 * `SDK.Error.InvalidSettingState`: This behaviour is usually caused by inconsistencies in the Home Connect API regarding an appliance's power state capabilities. The API may incorrectly report that an appliance (common with fridges, freezers, and hobs) supports being switched to `Off` or `Standby` when it is actually read-only. Control functionality typically resumes once the manufacturer corrects the device constraints for your specific model.
 
-* `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program that the API considers unavailable for remote execution. This may be due to appliance settings (e.g. requiring consumables or enabling a specific mode like Sabbath) or firmware bugs advertising programs that cannot be started remotely.
+* `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program that the API considers unavailable for remote execution. This may be due to appliance settings (e.g. requiring consumables or enabling Sabbath mode) or the appliance being in a state that prevents remote start. To verify which programs the API currently permits, enable the `Log API Bodies` debug option and examine the response to the `GET /api/homeappliances/.../programs/available` request in the logs.
 
 For details of other `409` errors refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
 
@@ -207,12 +208,12 @@ For details of other `409` errors refer to the [Home Connect API Errors](https:/
 <!-- INCLUDES: issue-112-6c3a issue-116-1125 -->
 The `Busy` error is returned by the Home Connect cloud when an appliance cannot process a command, often because it requires physical interaction (e.g. filling a water tank or closing a door). If you encounter this error, check the physical display of the appliance or the official Home Connect app to see if a manual action is required. This issue may also be caused by a transient issue with the Home Connect cloud service itself; check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.
 
-Failure to power certain ovens on or off is a known bug in the Home Connect API affecting specific models. If the appliance physically ready but the power command is rejected, this is an external platform limitation. You should report such issues to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance's E-Nr (part number).
+Failure to power certain ovens on or off is a known bug in the Home Connect API affecting specific models. If the appliance is physically ready but the power command is rejected, this is an external platform limitation. You should report such issues to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance's E-Nr (part number).
 
 #### What does an `SDK.Error.504.GatewayTimeout` error mean?
 
-<!-- INCLUDES: issue-11-d4f5 -->
-An `SDK.Error.504.GatewayTimeout` error indicates that the Home Connect cloud servers are experiencing internal issues or high latency. This is a server-side problem with the Home Connect infrastructure and cannot be resolved by the plugin. During these periods, appliances may appear as `No Response` in HomeKit. These errors are usually transient and resolve once the Home Connect service stabilises. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.
+<!-- INCLUDES: issue-11-d4f5 issue-19-6154 -->
+An `SDK.Error.504.GatewayTimeout` error indicates that the Home Connect cloud servers are experiencing internal issues or high latency. This is a server-side problem with the Home Connect infrastructure and cannot be resolved by the plugin. During these periods, appliances may appear as `No Response` in HomeKit. Note that the public API used by third-party integrations often experiences issues independently of the official Home Connect mobile app. These errors are usually transient and resolve once the Home Connect service stabilises. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.
 
 #### Why does the log show `Home Connect subsystem not available` or a `503` error?
 
@@ -221,8 +222,8 @@ The error `Home Connect API error: Home Connect subsystem not available [503]` i
 
 #### What does a `Proxy Error` in the logs mean?
 
-<!-- INCLUDES: issue-13-daa9 -->
-A `Proxy Error` indicates that the Home Connect API servers unexpectedly terminated the event stream. This is a server-side issue within the Home Connect infrastructure and is not caused by the plugin. The plugin is designed to handle these interruptions by automatically attempting to re-establish the connection. If these errors occur frequently, it usually indicates transient instability in the Home Connect cloud service. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.
+<!-- INCLUDES: issue-13-daa9 issue-19-6154 -->
+A `Proxy Error` indicates that the Home Connect API servers unexpectedly terminated the event stream. This is a server-side issue within the Home Connect infrastructure and is not caused by the plugin. The public API used by third-party integrations may experience such instability even while the official Home Connect app remains functional. The plugin is designed to handle these interruptions by automatically attempting to re-establish the connection. If these errors occur frequently, it usually indicates transient instability in the Home Connect cloud service. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.
 
 #### Why am I seeing `getaddrinfo EAI_AGAIN` in my logs?
 
@@ -232,40 +233,6 @@ The error `getaddrinfo EAI_AGAIN` is a standard networking error indicating a te
 1. Check your local network's DNS settings and ensure your Homebridge server has a stable internet connection.
 2. Verify that your DNS provider is not experiencing outages or blocking requests to `api.home-connect.com`.
 3. If you are using a specific environment like a Docker container, ensure that the networking stack is correctly configured, as this error originates from the host system rather than the plugin itself.
-
-#### 🚧 Why do I get a 409 Conflict error [SDK.Error.ProgramNotAvailable] when starting a program? 🚧
-
-<!-- INCLUDES: issue-186-6cfd -->
-A `409 Conflict` error with the code `SDK.Error.ProgramNotAvailable` occurs when you attempt to start a program that the Home Connect API currently considers unavailable for remote execution.
-
-This typically happens because:
-- The program is not supported for remote start on your specific appliance model.
-- The appliance is in a state that prevents that specific program from starting (e.g. local control is active, or a required precondition is not met).
-- The Home Connect API response for `available` programs does not include the program you are trying to trigger.
-
-If the program is visible in HomeKit but fails with this error, it indicates that while the plugin knows the program exists, the API is rejecting the request to execute it. You can verify which programs are truly available by enabling the `Log API Bodies` debug option and checking the response to the `GET /api/homeappliances/.../programs/available` request in the logs.
-
-#### 🚧 Why does the log show `Gateway Timeout` or `Proxy Error` even though the official app works? 🚧
-
-<!-- INCLUDES: issue-19-6154 -->
-These errors (`SDK.Error.504.GatewayTimeout` or `Proxy Error`) are returned directly by the Home Connect API servers and indicate instability or maintenance in their backend infrastructure. 
-
-The public API used by third-party integrations often experiences issues independently of the official Home Connect mobile app. This is a known limitation of the service's reliability that the plugin cannot fix. The plugin is designed to automatically attempt to reconnect and resume the event stream once the Home Connect servers are responsive again. 
-
-If you see frequent `Gateway Timeout` messages, it usually signifies that the Home Connect subsystem is timing out internally before responding to the plugin's requests.
-
-#### 🚧 Why is my Home Connect appliance unresponsive in Homebridge but working in the Home Connect app? 🚧
-
-<!-- INCLUDES: issue-71-a9f3 -->
-The Home Connect mobile app primarily communicates with appliances via the local Wi-Fi network when your phone is connected to the same network. In contrast, this plugin (and all third-party integrations) must use the public Home Connect cloud API. It is possible for an appliance to have a working local connection but a broken or stalled cloud connection.
-
-To diagnose this, disable Wi-Fi on your mobile device to force the Home Connect app to use a cellular (remote) connection. If the appliance becomes unresponsive in the app while on cellular data, the issue lies with the appliance's connection to the Home Connect servers rather than the plugin.
-
-You can often resolve this by: 
-1.  Opening the **Home Connect app**.
-2.  Navigating to the **Settings** for the specific appliance.
-3.  Checking the **Network** section to ensure all three connection lines (appliance to cloud, cloud to phone) are green.
-4.  Toggling the **Connection to server** setting off and then back on again to force a reconnection to the cloud API.
 
 ### Authorisation Issues
 
