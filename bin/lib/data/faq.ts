@@ -178,7 +178,14 @@ function renderMarkdownFAQCategory(category: StructuredFAQCategory, level: numbe
 
     // Category heading and preamble
     let markdown = `${'#'.repeat(level)} ${category.heading}\n\n`;
-    if (category.preamble) markdown += `${category.preamble}\n\n`;
+    if (category.preamble) {
+        const preamble = category.preamble.replace(/^<!-- TOC-START -->(?:[\s\S]*<!-- TOC-END -->)?/gm, () =>
+            '<!-- TOC-START -->\n'
+            + renderMarkdownFAQContents(category, level)
+            + '<!-- TOC-END -->'
+        );
+        markdown += `${preamble}\n\n`;
+    }
 
     // FAQ entries directly under this category (all partitions)
     partitions.forEach((partition, index) =>{
@@ -202,6 +209,35 @@ function renderMarkdownFAQCategory(category: StructuredFAQCategory, level: numbe
     // Subcategories
     for (const subcategory of category.subcategories) {
         markdown += renderMarkdownFAQCategory(subcategory, level + 1);
+    }
+    return markdown;
+}
+
+// Construct a table of contents for a FAQ category and its subcategories
+function renderMarkdownFAQContents(category: StructuredFAQCategory, level: number, prefix = ''): string {
+    const makeAnchor = (heading: string): string =>
+        heading.toLowerCase().replace(/\s+/g, '-').replace(/[^-\w]/g, '').trim();
+
+    // Add any FAQ entries directly under this category
+    let markdown = '';
+    for (const partition of category.partitions) {
+        for (const entry of partition.entries) {
+            const { question } = entry;
+            markdown += `${prefix}- [${question}](#${makeAnchor(question)})\n`;
+        }
+    }
+
+    // Add any subcategories at the current level
+    for (const subcategory of category.subcategories) {
+        if (level < QUESTION_HEADING_LEVEL - 1) {
+            // Nested subcategory with its own heading
+            const { heading } = subcategory;
+            markdown += `${prefix}- **[${heading}](#${makeAnchor(heading)})**\n`;
+            markdown += renderMarkdownFAQContents(subcategory, level + 1, `${prefix}  `);
+        } else {
+            // Treat subcategories as partitions at the current level
+            markdown += renderMarkdownFAQContents(subcategory, level, prefix);
+        }
     }
     return markdown;
 }
