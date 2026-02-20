@@ -1,0 +1,13 @@
+{
+    "issue_number": 207,
+    "updated_at": "2026-02-20T13:40:58.850Z",
+    "faq": [
+        {
+            "question": "Why are some appliance options or values marked as `(unrecognised)` in the logs?",
+            "answer": "During the initialisation of an appliance, the plugin retrieves a list of all supported programs, options, and settings from the Home Connect API. If the appliance reports a feature that has not yet been explicitly defined within the plugin's codebase—often a result of newer hardware models or firmware revisions—the plugin will mark that entry as `(unrecognised)` in the logs.\n\nThese markers are diagnostic and do not typically indicate a critical failure, but the associated feature may not appear or function correctly within HomeKit. To improve support for your specific appliance, please open a GitHub issue and include the log section containing the unrecognised values so they can be added to the plugin's definitions in a future update.",
+            "semantic_abstract": "Home Connect appliances can return manufacturer-specific or undocumented API options that the plugin identifies as `(unrecognised)` during its device discovery phase. These diagnostic logs signify features requiring manual mapping in the plugin's codebase to ensure proper exposure and functionality within the HomeKit ecosystem.",
+            "confidence": "high",
+            "hash": "4f2c676293eeacb9e58d5091e508f3fd8abcc707b854144713d7a256814dae50"
+        }
+    ]
+}
