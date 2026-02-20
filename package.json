@@ -67,6 +67,7 @@
     "scripts": {
         "lint": "eslint eslint.config.mjs 'bin/**/*.ts' --max-warnings=0",
         "type-check": "tsc --noEmit -p ./ && tsc --noEmit -p bin/",
+        "generate-embeddings": "tsx bin/generate-embeddings.ts",
         "structure-faq": "tsx bin/structure-faq.ts",
         "build-faq": "tsx bin/build-faq.ts"
     },

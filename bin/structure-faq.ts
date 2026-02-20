@@ -28,6 +28,7 @@ try {
 } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     core.setFailed(message);
+    core.debug(`Stack trace: ${err instanceof Error ? err.stack : 'N/A'}`);
 }
 
 // Main entry point

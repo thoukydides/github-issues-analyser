@@ -419,7 +419,7 @@ Note that this setting must be configured separately on each iPhone or iPad wher
 
 #### How do I control my hood fan speed using Siri?
 
-<!-- INCLUDES: "issue-2-ee14 -->
+<!-- INCLUDES: issue-2-ee14 -->
 Siri maps fan speeds to specific percentages:
 - **Low** is 25%
 - **Medium** is 50%
