@@ -1,0 +1,13 @@
+{
+    "issue_number": 212,
+    "updated_at": "2026-02-21T03:09:03.915Z",
+    "faq": [
+        {
+            "question": "How should I report unrecognised API values or programs found in the logs?",
+            "answer": "The plugin identifies values from the Home Connect API that it does not currently recognise, such as new wash programs or dryer settings. These are displayed in the logs within a block of TypeScript-style code, with specific lines marked as `// (unrecognised)`. This often happens with newer hardware or after firmware updates. To have these features supported, please open a GitHub issue and provide the entire log block. This information allows the maintainer to add the missing definitions and support the new functionality in a future release.",
+            "semantic_abstract": "Home Connect appliances occasionally return new program keys or event values that the plugin has not yet mapped to its internal definitions, resulting in `(unrecognised)` markers in log files. These occurrences are typical for new appliance models or firmware updates and require the maintainer to manually update the plugin schema to expose the new functionality.",
+            "confidence": "high",
+            "hash": "38c3b9518fc796f3ce7acf047b43f8376d9c2a0a68f3062bc16b6effa56cfe45"
+        }
+    ]
+}
