@@ -1,0 +1,20 @@
+{
+    "issue_number": 202,
+    "updated_at": "2026-02-21T07:08:26.315Z",
+    "faq": [
+        {
+            "question": "Why does the log show 'Mismatched type for Option value' or 'unrecognised' for certain appliance options?",
+            "answer": "These warnings occur when the Home Connect API returns keys or values that are not currently defined in the plugin's internal mapping, often because they are not yet documented in the official Home Connect API specification. This is common with newer appliance models that introduce features like `FlexSpray`. To help resolve this, you can:\n\n1.  **Perform an Identify operation**: In the Eve app, use the `ID` button for the appliance to force the plugin to query for full details.\n2.  **Clear the cache**: Stop Homebridge and delete the files in `~/.homebridge/homebridge-homeconnect/persist` (except for the file containing your OAuth credentials, typically a long alphanumeric string). Restart Homebridge to force a fresh retrieval of all appliance options.\n\nOnce the plugin identifies these new values, it will log a formatted snippet that you can provide to the maintainer for inclusion in a future update.",
+            "semantic_abstract": "Home Connect appliances may return undocumented API options and enumerated values, such as `FlexSprayIntensity`, which cause type mismatch warnings in the logs. These can be resolved by forcing a full metadata refresh via the HomeKit Identify operation or by clearing the plugin's persistent cache to bypass rate-limited data retrieval.",
+            "confidence": "high",
+            "hash": "99638ca90b06098c06ba1828e6cd86e9749d83ada762bdc8240dc74d0cbc0cca"
+        },
+        {
+            "question": "Why are many of my appliance programs listed as 'currently unavailable' in the logs?",
+            "answer": "It is normal for the Home Connect API to report that certain programs are supported but currently unavailable. Common reasons include:\n\n*   A program is already running, making others unavailable.\n*   The appliance is busy with a background task (e.g. a cleaning cycle).\n*   Required resources are missing (e.g. no water, no detergent, or an open door).\n*   The program must be manually enabled in the appliance's own physical settings (e.g. Sabbath mode).\n\nThe plugin logs this as a warning because it cannot read the specific options for an unavailable program if they haven't been cached previously. This is generally not an error and does not require troubleshooting unless a program you expect to use is persistently missing.",
+            "semantic_abstract": "The Home Connect API distinguishes between supported and available programs, where environmental factors or active operations can temporarily restrict access to specific program metadata. This availability status limits the plugin's ability to discover and cache program-specific options until the appliance state allows that program to be selected.",
+            "confidence": "high",
+            "hash": "4160be9ba807d3375877b9a656f939a1d54d029c173d767bf8e7ba81fce4e09b"
+        }
+    ]
+}
