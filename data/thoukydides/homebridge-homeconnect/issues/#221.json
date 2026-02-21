@@ -1,0 +1,13 @@
+{
+    "issue_number": 221,
+    "updated_at": "2026-02-21T11:47:20.429Z",
+    "faq": [
+        {
+            "question": "Why does the log show `(unrecognised)` next to some Home Connect API values?",
+            "answer": "The plugin includes a diagnostic feature that identifies appliance features, options, or settings that have not yet been formally mapped in the plugin's code. This is common when using newer appliance models or firmware versions that introduce new functionality, such as the `FlexSpray` settings found on certain Bosch dishwashers. These entries are logged as a TypeScript-compatible block to make it easy for users to identify and report them. If you see these in your logs, you can provide the log content in a GitHub issue to help the maintainer add support for those specific features in a future release.",
+            "semantic_abstract": "Appliance firmware updates or new hardware models often introduce specific API keys (e.g., `FlexSpray` options) that are not yet defined in the plugin's schema. The plugin identifies these unknown keys via a diagnostic log block, allowing users to report them for inclusion in future updates to improve device-specific feature support.",
+            "confidence": "high",
+            "hash": "f53a6fec3765936c1befbe2b65655fa48ac46e79af2ac6eb532c892bb7b590f4"
+        }
+    ]
+}
