@@ -1,0 +1,13 @@
+{
+    "issue_number": 235,
+    "updated_at": "2026-02-21T19:01:26.282Z",
+    "faq": [
+        {
+            "question": "How should I handle log messages showing `(unrecognised)` Home Connect API values?",
+            "answer": "The plugin includes a diagnostic mechanism to identify and report data from the Home Connect API that it does not yet recognise. This typically occurs when a manufacturer introduces new features, settings, or values via firmware updates or when a new appliance model is released.\n\nWhen this happens, the plugin generates a block of TypeScript-like definitions in the logs, bounded by lines of `=` characters and marked with `// (unrecognised)`. For example:\n\n```shell\n[HomeConnect] ========================================================================================\n[HomeConnect] // Union types\n[HomeConnect] export type AromaSelect =\n[HomeConnect]     'ConsumerProducts.CoffeeMaker.EnumType.AromaSelect.distinctive'; // (unrecognised)\n...\n[HomeConnect] ========================================================================================\n```\n\nIf you observe these messages in your logs:\n\n1. Verify that you are running the latest version of the plugin, as support for new API values is added frequently. For instance, the `AromaSelect.distinctive` value for coffee makers was added in `v0.39.1` following such a report.\n2. If the messages persist on the latest version, copy the entire block between the separators and open a new issue on GitHub. This information allows the maintainer to update the plugin's internal schema and ensure all features of your appliance are correctly supported and exposed to HomeKit.",
+            "semantic_abstract": "The plugin monitors the Home Connect API for unrecognised enum values or options and generates formatted diagnostic logs to assist with their integration. This mechanism identifies new appliance capabilities or firmware-driven API changes that require updates to the plugin's internal schema to correctly map functionality to HomeKit.",
+            "confidence": "high",
+            "hash": "b0616a63319e9aec5520437123e485135c6f334e16f4787aaeb2a97b316cc0dd"
+        }
+    ]
+}
