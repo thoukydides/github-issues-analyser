@@ -1,0 +1,13 @@
+{
+    "issue_number": 220,
+    "updated_at": "2026-02-21T13:25:51.153Z",
+    "faq": [
+        {
+            "question": "Why does the log show `(unrecognised)` for certain Home Connect API values?",
+            "answer": "The Home Connect API frequently contains settings, states, and options that are not documented in the official API specification. To help improve the plugin, an API checking and logging mechanism identifies these unfamiliar values and marks them as `(unrecognised)` in the logs.\n\nThese log entries are useful for several reasons:\n\n* **Feature Discovery**: They allow the identification of new appliance capabilities that can be exposed to HomeKit, such as fridge lighting or specific dishwasher options.\n* **Improved Configuration**: While the plugin attempts to list program options automatically in the Homebridge UI, having specific definitions for these values ensures they are displayed correctly.\n* **Future Compatibility**: As smart home standards like Matter evolve to support more appliance types, these undocumented values help in mapping API features to new HomeKit services and characteristics.\n\nThese messages are informational and do not indicate a failure in the plugin. The identified values are typically incorporated into the plugin's internal definitions in future updates.",
+            "semantic_abstract": "The Home Connect API frequently returns undocumented settings and enum values which the plugin identifies as `(unrecognised)` in debug logs. This diagnostic process facilitates the discovery of new appliance features and ensures that internal type definitions can be updated to support future HomeKit or Matter service mappings.",
+            "confidence": "high",
+            "hash": "c9a6233181ba9670fe5719e9ee86801df66d03286afbfe16ace910185f713590"
+        }
+    ]
+}
