@@ -1,0 +1,13 @@
+{
+    "issue_number": 213,
+    "updated_at": "2026-02-21T04:52:22.891Z",
+    "faq": [
+        {
+            "question": "Why does my log contain blocks of code marked as unrecognised?",
+            "answer": "When the plugin identifies values from the Home Connect API that are not yet in its internal database, it prints a diagnostic block of code to the log marked with `(unrecognised)`. This often occurs following an appliance firmware update or when using a newer model with features not previously seen by the plugin. These log entries are not errors that you can fix through configuration; instead, they provide the necessary technical details to update the plugin. If you see these blocks, please copy the entire section and open a new issue on GitHub so that these values can be added to the plugin, ensuring that appliance states and options are correctly displayed in HomeKit.",
+            "semantic_abstract": "The plugin produces diagnostic log output when it encounters Home Connect API enumeration values—such as those for appliance phases or options—that are not defined in its internal schema. These entries identify new or undocumented appliance behaviours, often resulting from firmware updates, and require updates to the plugin code to ensure complete feature support.",
+            "confidence": "high",
+            "hash": "c06c06bc507b53948c5e65c3c8189a7385adfe5f4db6c4d6fadc533ccca34b45"
+        }
+    ]
+}
