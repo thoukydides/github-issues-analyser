@@ -1,0 +1,13 @@
+{
+    "issue_number": 233,
+    "updated_at": "2026-02-22T05:05:44.991Z",
+    "faq": [
+        {
+            "question": "Why do some Home Connect API values appear as `(unrecognised)` in the logs?",
+            "answer": "The plugin includes a diagnostic feature that identifies and logs appliance states or options not yet defined in its internal schema. These appear in a structured block of text, formatted like TypeScript code, with the label `// (unrecognised)`. This usually occurs when a new appliance model is used or a firmware update introduces new features.\n\nTo resolve these:\n1. Update the plugin to the latest version, as new API values are frequently added.\n2. If the values persist on the latest version, create a new GitHub issue.\n3. Provide the full diagnostic log block, including the `===` separator lines. This allows the maintainer to add formal support for those specific features or appliance states in a future release.",
+            "semantic_abstract": "The plugin generates diagnostic logs for undocumented Home Connect API values using a TypeScript-style syntax to flag unrecognised enums and options. This process facilitates the identification of appliance-specific features and firmware updates, allowing them to be formally integrated into the plugin service mapping.",
+            "confidence": "high",
+            "hash": "f1a21769fbc54e94b3f7e48758a19d87fd6ec00baed965a0efd556ad005eb9c6"
+        }
+    ]
+}
