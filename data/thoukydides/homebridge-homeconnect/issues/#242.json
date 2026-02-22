@@ -1,0 +1,13 @@
+{
+    "issue_number": 242,
+    "updated_at": "2026-02-22T14:53:37.415Z",
+    "faq": [
+        {
+            "question": "Why doesn't the plugin automatically turn on my coffee machine when I start a beverage program?",
+            "answer": "The plugin does not implement automated sequencing of operations, such as powering on an appliance and waiting for it to be ready before starting a program. There are several technical reasons for this design choice:\n\n1. **HomeKit Response Timeouts**: When a characteristic is updated in HomeKit, the plugin must respond quickly to confirm success or failure. Waiting for a coffee machine to complete a power-on sequence or a rinse cycle would exceed the time allowed by HomeKit, potentially stalling other HomeKit activities or causing the app to report a timeout error.\n2. **State Reporting Inconsistency**: Different Home Connect CoffeeMaker models report their power state and operational readiness inconsistently. Some models may not reliably indicate when they are ready to receive a program command, making a robust universal implementation difficult.\n3. **User Feedback**: To avoid HomeKit timeouts, the plugin would have to report success immediately and then continue the sequence in the background. If the sequence later fails (e.g. the water tank is empty), the user would receive no feedback in HomeKit or via Siri that their request actually failed.\n4. **Device Behaviour**: Many appliances already power on automatically when a program command is received via the API, making additional sequencing unnecessary for those models.\n\nIf your specific model requires a manual power-on before a beverage can be requested, you should use the Apple **Shortcuts** app or HomeKit automations to create a sequence (e.g. Turn On -> Wait -> Start Drink).",
+            "semantic_abstract": "Home Connect CoffeeMaker appliances require individual power-on and program-start commands, but the plugin avoids automated sequencing to prevent HomeKit response timeouts and handle inconsistent device state reporting across different models. Sequential operations are instead delegated to HomeKit automations or Shortcuts to ensure reliable user feedback and avoid stalling the HomeKit accessory communication flow.",
+            "confidence": "high",
+            "hash": "dd7162b7a9f8fb8354085eb9201233177799d6309b3f84627fca8950e0913926"
+        }
+    ]
+}
