@@ -1,0 +1,13 @@
+{
+    "issue_number": 236,
+    "updated_at": "2026-02-22T13:27:00.225Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log unrecognised API values like `LearningDishwasher`?",
+            "answer": "Newer Home Connect appliances often introduce features and program options that are not yet documented in the official API specification. A common example is the `LearningDishwasher` program and its associated options, such as `CleaningLevel`, `DryingLevel`, and `DurationLevel`. \n\nThe plugin is designed to identify these unknown attributes and provide the necessary technical details for the maintainer to add support. If you see a block in your logs delimited by `====================` containing `// (unrecognised)` comments, it indicates that your appliance has capabilities the plugin does not yet fully understand. \n\nTo resolve this and help improve the plugin:\n1. Copy the entire block of code from your logs, including the lines of equals signs.\n2. Open an issue on GitHub providing these logs and your appliance model number.\n\nWhile basic support for features like `LearningDishwasher` was introduced in `v0.40.0`, the API may still return specific enumeration values (like `Level1` or `Level2`) that have not yet been mapped. Providing your logs allows these missing definitions to be added in a future release.",
+            "semantic_abstract": "Newer Home Connect appliances often implement undocumented API programs and options, such as the `LearningDishwasher` suite, which are not present in official specifications. The plugin identifies these unknown attributes and generates diagnostic TypeScript-style logs to facilitate their inclusion in updates, as hardware capabilities frequently lead API documentation.",
+            "confidence": "high",
+            "hash": "11a685393b1f33b6a86cca2096dd63fab71c85751e2c8aa60acf0b414b8af8ed"
+        }
+    ]
+}
