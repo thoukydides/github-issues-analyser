@@ -1,42 +1,24 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 13,
-    "updated_at": "2026-02-10T03:39:36.199Z",
+    "updated_at": "2026-03-07T14:41:09.196Z",
     "faq": [
         {
-            "question": "Why are there no log entries for several hours even though the plugin is running?",
-            "answer": "If no appliances are being used and no status changes are occurring, it is normal for the plugin to remain silent in the logs. By default, log entries are only generated when an appliance is controlled via HomeKit, the Home Connect event stream reports a change in appliance state, or a connection error occurs. When running with debug logging (`-D`) enabled, the plugin polls the appliance list approximately once per hour, but otherwise remains quiet unless there is activity. The absence of log updates does not indicate that the plugin or Homebridge has frozen.",
-            "alternative_resolution": "The documentation could be updated to clarify expected log frequency during idle periods to prevent users from mistaking inactivity for a process freeze.",
-            "tags": [
-                "logs",
-                "troubleshooting",
-                "status"
-            ],
-            "confidence": "high",
-            "hash": "159fba48ea726ae3569611aece746a6343edc4904e32c29cee9287679a0c868f"
+            "question": "Why are there no log entries for the Home Connect plugin for several hours?",
+            "answer": "The plugin is designed to minimise log output during normal operation. After the initial start-up, log messages are only generated when an appliance is controlled through HomeKit, the event stream reports a change in an appliance's state, or an error occurs. \n\nIf your appliances are idle and no communication errors are encountered, it is normal to see no activity in the logs for extended periods. This silence is expected behaviour and does not indicate that the plugin has frozen. If you enable debug logging, you will see entries approximately once per hour when the plugin polls the list of appliances, but otherwise, the plugin remains quiet when there is nothing to report.",
+            "semantic_abstract": "Home Connect plugin logging architecture prioritises minimal output, only generating logs during active appliance interaction or event stream changes. The absence of log entries during idle periods is expected behaviour rather than an indication of a plugin or process failure.",
+            "hash": "9879fc38dea6df1b3b3504441fd129f865b845068eee3efed31a6327d7edbb46"
         },
         {
             "question": "What does a `Proxy Error` in the logs mean?",
-            "answer": "A `Proxy Error` indicates that the Home Connect API servers unexpectedly terminated the event stream. This is a server-side issue within the Home Connect infrastructure and is not caused by the plugin. The plugin is designed to handle these interruptions by automatically attempting to re-establish the connection. If these errors occur frequently, it usually indicates transient instability in the Home Connect cloud service.",
-            "tags": [
-                "error",
-                "Home Connect API",
-                "events"
-            ],
-            "confidence": "high",
-            "hash": "daa9b7bb4cb7d82041c99ea4e7c9f4b5a34e157fd857b4738fc5ff4c7740b470"
+            "answer": "A `Proxy Error` is a message returned by the Home Connect API servers indicating that the event stream connection was unexpectedly terminated. This is a transient issue caused by instability in the third-party Home Connect cloud infrastructure and is not a fault within the plugin itself.\n\nThe plugin is designed to handle these events by automatically attempting to re-establish the connection. While these errors are recorded in the log, they typically resolve themselves once the Home Connect servers return to a stable state. No user action is normally required unless the error persists for an unusually long period.",
+            "semantic_abstract": "Home Connect API server-side instability can manifest as a `Proxy Error`, resulting in the abrupt termination of the event stream. The plugin manages these third-party service interruptions by automatically attempting to reconnect when the API becomes responsive again.",
+            "hash": "549a0ae49bc7ca4038374c9ad01b8eeeca082b653e573354149c459b0bbd4a93"
         },
         {
-            "question": "Why does Homebridge shut down with a `SIGTERM` error in the logs?",
-            "answer": "A `SIGTERM` signal indicates that the Homebridge process was explicitly instructed to stop by the operating system or an external command (such as `systemctl stop` or a `kill` signal). This is a system-level event and cannot be triggered by the Homebridge Home Connect plugin itself. If Homebridge terminates with this message, you should investigate your system's service manager (e.g. `systemd`) or other process management tools to determine why the shutdown was requested.",
-            "tags": [
-                "Homebridge",
-                "error",
-                "troubleshooting"
-            ],
-            "confidence": "high",
-            "hash": "d6c69e39fe0a703db2675bbd18f676d189d8cf40738aebf582219a18ffc65d1d"
+            "question": "Why did my Homebridge instance stop with a `SIGTERM` signal?",
+            "answer": "A `SIGTERM` signal is a request for a program to terminate, which is typically sent by the operating system or a process manager (such as `systemd` or `pm2`) when a service is being stopped or restarted. \n\nThis plugin does not initiate `SIGTERM` signals. If you see this in your logs, it indicates that an external process or a manual command (like `systemctl stop`) instructed Homebridge to shut down. If this coincides with a lack of log activity from the plugin, it is important to note that the plugin is naturally silent when idle, which should not be confused with the process being frozen or crashed.",
+            "semantic_abstract": "Process termination via `SIGTERM` is an external signal typically triggered by system management tools or manual user intervention and is not a behaviour initiated by the plugin. Inactivity in logs during idle periods is a design feature and does not correlate with service termination signals.",
+            "hash": "3c36f079feb02aa6e5ad3a5671d964806a5f529eb975ffd7c1dc572b5b213ac1"
         }
     ]
 }
