@@ -1,80 +1,36 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 1,
-    "updated_at": "2026-02-09T09:33:31.273Z",
+    "updated_at": "2026-03-07T11:33:01.232Z",
     "faq": [
         {
-            "question": "How can I find the `haID` (Home Appliance ID) for my appliance?",
-            "answer": "The `haID` is a unique identifier required for customising appliance configurations in `config.json`. You can find this value in several ways: 1. In HomeKit apps, it is displayed as the appliance's **Serial Number**. 2. By using the **Identify** function on the accessory within your HomeKit app, which will write the full appliance details (including the `haID`) to the Homebridge log. 3. When debug mode is enabled (`DEBUG=*`), the `haID` is included in almost all log entries and Home Connect request URLs. The format typically follows a pattern like `MANUFACTURER-MODEL-HEXADECIMAL_ID`.",
-            "alternative_resolution": "The plugin's documentation could be updated to include a dedicated troubleshooting section specifically for locating the `haID` to reduce confusion for new users.",
-            "tags": [
-                "configuration",
-                "haID",
-                "serial-number"
-            ],
-            "confidence": "high",
-            "hash": "27792394277f8b1a60d0538eef1b28595b4d2d34233ddd9279ab28ac2e3d8640"
+            "question": "How can I trigger an automation when my coffee maker's drip tray is full?",
+            "answer": "The Home Connect API reports certain status updates, such as the `drip tray full` event, as transient events rather than persistent, queryable states. This means the plugin cannot determine the status of the tray when it first starts or if a connection is lost.\n\nTo accommodate this, the plugin maps these events to a `Stateless Programmable Switch` in HomeKit. You can use this switch as a trigger for HomeKit automations, though it will not show a continuous 'full' or 'empty' state in the Home app.",
+            "semantic_abstract": "Home Connect API reports certain status updates like drip tray full as transient events rather than persistent queryable states, necessitating a HomeKit `Stateless Programmable Switch` mapping for automation triggers.",
+            "hash": "c1c9b89aadf24a1c980d6ac5e0a355904c7398fc08b593b963b2c8ca79a902c7"
         },
         {
-            "question": "Why is 'double dispensing' or 'two-cup mode' not available for my coffee maker?",
-            "answer": "The 'double dispensing' (or 'Doppelbezug') feature is not currently supported because it is not exposed through the public **Home Connect API**. While the official Home Connect mobile application may offer this functionality, it often utilizes private APIs that are not available to third-party developers. Until Bosch/Siemens updates their public API to include this as a selectable program option or value, it cannot be implemented in this plugin.",
-            "alternative_resolution": "No code change possible until the API supports it. The documentation could list known unsupported API features for specific appliance types to manage user expectations.",
-            "tags": [
-                "coffee-maker",
-                "API-limitation",
-                "feature-request"
-            ],
-            "confidence": "high",
-            "hash": "3c2cd7d992ade8d58ac80c4817270e35a61748a1621d22a36954d9cfbd4b2de1"
+            "question": "Why does my coffee maker show as Inactive in the Eve app?",
+            "answer": "When a Home Connect appliance is switched on but not currently running a program, it is reported as being in an idle state. The plugin maps this idle state to the HomeKit `Inactive` status.\n\nWhile this is a standard mapping for idle devices, some third-party HomeKit applications like the Eve app highlight this state prominently, which may appear as a warning. This behaviour is a characteristic of how the specific HomeKit app displays the data and does not indicate a functional error with the appliance or the plugin.",
+            "semantic_abstract": "Idle appliances are mapped to the HomeKit `Inactive` state, which is interpreted visually by some third-party apps like Eve as a status warning despite the device being powered on and ready.",
+            "hash": "6c1093eabef8086cb2caba6400dd5e2d36c0023ebbfeb79542fac065ffbdf8b1"
         },
         {
-            "question": "Why does the Eve app show my appliance as 'Inactive' when it is idle?",
-            "answer": "When an appliance is switched on but not currently running a program, its state is logically **Inactive**. The Eve app specifically chooses to highlight this status in a way that can appear like a warning or an error. This is a user interface decision made by the Eve app developers; other HomeKit applications do not typically treat the idle state as a negative status.",
-            "alternative_resolution": "Consider investigating if there is a more appropriate HomeKit characteristic that reflects an 'Idle' or 'Ready' state without triggering the 'Inactive' warning in third-party apps like Eve.",
-            "tags": [
-                "HomeKit",
-                "Eve-app",
-                "status"
-            ],
-            "confidence": "medium",
-            "hash": "96fa6b7d70a8578b1687e07699ac1814e5bb938f68b098caada330b33e404d23"
+            "question": "Why am I getting a `HomeAppliance did not respond to connection initialization requests` error?",
+            "answer": "The error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` indicates that the Home Connect cloud servers were unable to establish a connection with your physical appliance within the expected timeframe.\n\nThis is typically caused by issues between the appliance and the Home Connect servers rather than the plugin itself. To troubleshoot:\n1. Open the official Home Connect app.\n2. Navigate to the appliance's settings and check the Network section for reported errors.\n3. Ensure the appliance has a stable Wi-Fi connection and that the Home Connect service is not experiencing a regional outage.",
+            "semantic_abstract": "Timeouts during connection initialization indicated by `SDK.Error.HomeAppliance.Connection.Initialization.Failed` typically stem from connectivity issues between the physical appliance and Home Connect cloud infrastructure.",
+            "hash": "2d19b4bd95fd02fb298caa3cb0f237c439c9e0fb307c8f475dc99ea088bc46ab"
         },
         {
-            "question": "Why is the coffee maker 'drip tray full' notification a button instead of a persistent status?",
-            "answer": "The Home Connect API provides notifications like 'drip tray full' only as **Events**. Because there is no way for the plugin to query the persistent state of the tray (e.g., when Homebridge first starts or after a reconnection), it is implemented as a `Stateless Programmable Switch`. This allows you to trigger HomeKit automations when the event occurs, even though the 'status' cannot be monitored as a continuous state.",
-            "alternative_resolution": "Update the documentation to clarify how to use these stateless events in HomeKit automations for notifications.",
-            "tags": [
-                "coffee-maker",
-                "events",
-                "HomeKit"
-            ],
-            "confidence": "high",
-            "hash": "38d23b0fd3113a2258afd6659fdc5b4a01ae7fe24518cc1a2dc965562b929beb"
+            "question": "How do I find my appliance `haID` for configuration?",
+            "answer": "The `haID` (Home Appliance ID) is required for certain configuration patterns and is comprised of the manufacturer name, model number (E-Nr), and a hexadecimal string (e.g., `BOSCH-CTL636ES6-12A34B4567C8`). You can find this value using several methods:\n* **Identify Log**: In your HomeKit app, select the appliance and use the **Identify** function. This will trigger the plugin to write a complete JSON structure of the appliance's capabilities and its `haID` to the Homebridge log.\n* **Serial Number**: In most HomeKit apps, the `haID` is displayed in the appliance's settings as the **Serial Number**.\n* **Debug Logs**: If Homebridge is started with debug mode enabled (`-D`), the `haID` will appear as part of the Home Connect request URLs.",
+            "semantic_abstract": "The unique Home Appliance ID (`haID`) required for advanced configuration is exposed via the HomeKit `Identify` mechanism and the `Serial Number` characteristic in accessory information services.",
+            "hash": "3b47df50b40b73daf74a9f6199cfd10766a72f9eef3746bd2c29a5e80f3b2780"
         },
         {
-            "question": "What does the error `BSH.Common.Error.LockedByLocalControl` mean?",
-            "answer": "This error occurs when the appliance is being operated physically (locally) by a user. For safety and consistency, the Home Connect API blocks remote commands while local interaction is detected. You must wait for the local intervention to finish before the plugin can successfully send commands to the appliance.",
-            "alternative_resolution": "Improve the plugin's error handling to provide a more user-friendly message when this specific API error is encountered.",
-            "tags": [
-                "error-code",
-                "BSH.Common.Error.LockedByLocalControl",
-                "troubleshooting"
-            ],
-            "confidence": "high",
-            "hash": "9917e6c732c1cd742569431c97ab883d69057139c20bb6042a0703fc553315bf"
-        },
-        {
-            "question": "Why am I seeing `SDK.Error.HomeAppliance.Connection.Initialization.Failed` in my logs?",
-            "answer": "This error typically indicates a communication failure between your physical appliance and the **Home Connect cloud servers**. It is not caused by the plugin itself. If you encounter this, check the network status section in the official Home Connect app on your mobile device to ensure the appliance has a stable internet connection.",
-            "alternative_resolution": "The plugin could potentially catch this error and suggest checking the appliance's Wi-Fi or cloud connection status in the logs.",
-            "tags": [
-                "error-code",
-                "connectivity",
-                "SDK.Error.HomeAppliance.Connection.Initialization.Failed"
-            ],
-            "confidence": "high",
-            "hash": "e9850619720b6fa1b45f86f99ec8357532359ff652ec8cdf621c964071c09b73"
+            "question": "Can I start Double dispensing coffee programs through Homebridge?",
+            "answer": "No, features like double dispensing (Doppelbezug) are not currently available via the public Home Connect API. \n\nWhile these options may be visible and functional within the official Home Connect mobile application, the official app often utilises private API endpoints that are not accessible to third-party developers. Until Home Connect updates their public API to include these specific program options, they cannot be supported by the plugin. You can check the official Home Connect developer changelog for updates on available program options.",
+            "semantic_abstract": "Advanced appliance features such as double dispensing for coffee makers are restricted to official Home Connect applications and are not exposed via the public API, preventing implementation in third-party plugins.",
+            "hash": "d662c0672864e641bc2a4d7c1131e9cfbd694830afb2f1ff9e96a94b13b2d11f"
         }
     ]
 }
