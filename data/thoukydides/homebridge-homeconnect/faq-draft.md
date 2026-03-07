@@ -62,7 +62,7 @@
     - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
-    - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
+    - [Why does the Apple Home app not show the remaining time, or why is it displayed in seconds?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-why-is-it-displayed-in-seconds)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
     - [Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?](#why-can-i-not-hide-certain-switches-or-why-do-they-remain-visible-or-unresponsive-after-being-disabled)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
@@ -75,6 +75,7 @@
     - [Why can I only control power and fan speed for my Home Connect air conditioner?](#why-can-i-only-control-power-and-fan-speed-for-my-home-connect-air-conditioner)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
+    - [Why does the Eve app show a red warning triangle or an 'Inactive' status for my appliance?](#why-does-the-eve-app-show-a-red-warning-triangle-or-an-inactive-status-for-my-appliance)
   - **[Notifications & Events](#notifications--events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
@@ -624,15 +625,22 @@ No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk
 
 ### HomeKit Accessories, Services, and Characteristics
 
-#### Why does the Apple Home app not show the remaining time or detailed status for my appliance?
+#### Why does the Apple Home app not show the remaining time, or why is it displayed in seconds?
 
-<!-- INCLUDES: issue-2-d759 issue-48-237c issue-68-c945 issue-114-0f03 issue-124-9bb6 issue-225-731f issue-230-03a5 -->
+<!-- INCLUDES: issue-2-d759 issue-3-a6f3 issue-48-237c issue-68-c945 issue-114-0f03 issue-124-9bb6 issue-225-731f issue-230-03a5 -->
 The plugin exposes the `Remaining Duration` characteristic to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. These services are semantically inappropriate for most Home Connect appliances, and using them would create an inconsistent architectural model and break existing automations.
 
-To view the remaining time or use it for automations, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support displaying a wider range of standard HomeKit characteristics that Apple's own app hides.
+Furthermore, the HAP specification defines the `Remaining Duration` characteristic as an integer value representing time in seconds. While the plugin follows this official standard, the way the value is displayed depends on the specific HomeKit app:
+
+- **Apple Home**: Usually hides the characteristic entirely for appliances.
+- **Eve** and **Home+**: Typically format this value into human-readable minutes and seconds.
+- **Other apps**: May display the raw value in seconds.
+
+To view the remaining time or use it for automations, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). These applications support displaying and formatting a wider range of standard HomeKit characteristics that Apple's own app hides.
 
 #### Why are the power and program switches for my appliance in a random order in HomeKit?
 
+<!-- INCLUDES: issue-7-871f -->
 The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined way for plugins to enforce the display order of multiple services within a single accessory. While the plugin exposes several services, such as the power `Switch`, various program control `Switch` services, and event `Stateless Programmable Switch` services, individual HomeKit apps determine how to order them.
 
 Although HAP includes a `Service Label Index` characteristic, it is specifically intended for ordering `Stateless Programmable Switch` services and is not officially supported or respected by apps for other service types. Technical attempts to influence the order—such as marking the power switch as a `Primary` service or using `Linked` services to group controls—have proven inconsistent across different applications. In some cases, these changes actually made the Apple Home app's ordering less predictable. Most third-party HomeKit apps, such as *Eve*, *Home+*, and *Hesperus*, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.
@@ -742,48 +750,19 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
-#### 🚧 Why does my coffee maker show as Inactive in the Eve app? 🚧
+#### Why does the Eve app show a red warning triangle or an 'Inactive' status for my appliance?
 
-<!-- INCLUDES: issue-1-6c10 -->
-When a Home Connect appliance is switched on but not currently running a program, it is reported as being in an idle state. The plugin maps this idle state to the HomeKit `Inactive` status.
+<!-- INCLUDES: issue-1-6c10 issue-6-a773 -->
+This behaviour occurs because some third-party HomeKit apps, such as Elgato Eve, interpret the standard `Status Active` characteristic as a health or readiness indicator. If this characteristic is set to `false`, Eve may display a red warning triangle or label the accessory as 'Inactive'.
 
-While this is a standard mapping for idle devices, some third-party HomeKit applications like the Eve app highlight this state prominently, which may appear as a warning. This behaviour is a characteristic of how the specific HomeKit app displays the data and does not indicate a functional error with the appliance or the plugin.
+To prevent misleading error displays while staying consistent with the appliance state, the plugin maps the Home Connect `BSH.Common.Status.OperationState` to the HomeKit `Status Active` characteristic. It remains `true` during all normal operating conditions (including `Inactive`, `Ready`, `DelayedStart`, `Run`, or `Finished`). It only switches to `false` when the appliance requires user intervention or has encountered a fault, specifically in the following states:
 
-#### 🚧 Why is the remaining program time displayed in seconds instead of minutes? 🚧
-
-<!-- INCLUDES: issue-3-a6f3 -->
-The plugin uses the standard Apple HomeKit `Remaining Duration` characteristic to report the time until a program completes. Apple's specification defines this characteristic as an integer value representing time in seconds. 
-
-The way this value is displayed (e.g. converting seconds into minutes and seconds) is entirely dependent on the specific HomeKit app you are using:
-* The **Eve** app and **Home+** typically format this value into a human-readable minutes and seconds format.
-* Other apps, including some versions of **HomeDash** or the default Apple **Home** app, may display the raw seconds or may not show the characteristic at all.
-
-Because defining a custom characteristic for minutes would make the data unreadable to most HomeKit apps, the plugin adheres to the official Apple standard of seconds.
-
-#### 🚧 Why does the Eve app show a red warning triangle or an inactive status for my Home Connect appliance? 🚧
-
-<!-- INCLUDES: issue-6-a773 -->
-This behaviour occurs because some third-party HomeKit apps, such as Elgato Eve, interpret the `Status Active` characteristic as an indication of whether the accessory is functioning correctly. If this characteristic is set to `false`, Eve displays a red warning triangle and the message: "The accessory is inactive. Please refer to its user manual."
-
-To prevent misleading error displays, the plugin maps the Home Connect `BSH.Common.Status.OperationState` to the HomeKit `Status Active` characteristic so that it remains `true` during normal operation, including when the appliance is idle or has finished its program. It only switches to `false` when the appliance requires user intervention or has encountered a fault:
-
-*   **Active (Status Active = true)**: The appliance is in the `Inactive`, `Ready`, `DelayedStart`, `Run`, or `Finished` state. These are considered normal operating conditions where no immediate action is required to maintain functionality.
-*   **Inactive (Status Active = false)**: The appliance is in the `Pause`, `ActionRequired`, `Error`, or `Aborting` state. These states typically require user intervention (such as closing a door or refilling a tank) or indicate a genuine hardware fault.
+- **Pause**: The program is paused.
+- **ActionRequired**: For example, a door is open or a tank needs refilling.
+- **Error**: A hardware or software fault has occurred.
+- **Aborting**: The appliance is in the process of cancelling a program.
 
 Note that the standard Apple Home app does not display the `Status Active` characteristic, so this visual quirk is only observed in more advanced HomeKit browsers or third-party apps.
-
-#### 🚧 Why are the services for my Home Connect appliance displayed in a random or awkward order? 🚧
-
-<!-- INCLUDES: issue-7-871f -->
-The `homebridge-homeconnect` plugin creates multiple services for each appliance, such as a power `Switch` and various program `Switch` services. HomeKit does not provide a robust, universal mechanism for plugins to define the display order of these services within an accessory.
-
-The plugin uses the `Service Label Index` to order `Stateless Programmable Switch` services (used for event triggers), but this characteristic is not officially supported or respected by most HomeKit apps for other service types like standard switches.
-
-Internal testing of different HomeKit attributes yielded the following results:
-- **Primary Service**: Marking the power switch as the primary service did not consistently place it first and, in some apps like Apple Home, occasionally made the ordering worse.
-- **Linked Services**: Creating logical links between program switches did not improve grouping or ordering in popular HomeKit applications.
-
-If the default order is unsatisfactory, consider using a third-party HomeKit app that supports manual reordering of services within an accessory, such as **Eve**, **Home+**, or **Hesperus**. The official Apple Home app does not currently allow users to manually reorder the individual services of a single accessory.
 
 ### Notifications & Events
 
