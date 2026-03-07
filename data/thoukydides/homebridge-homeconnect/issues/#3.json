@@ -1,75 +1,30 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 3,
-    "updated_at": "2026-02-09T18:29:48.528Z",
+    "updated_at": "2026-03-07T13:49:32.598Z",
     "faq": [
         {
-            "question": "Why can't I turn off my washing machine or dryer using the plugin?",
-            "answer": "The **Home Connect API** for specific appliances, including washers, dryers, and washer-dryers, only supports the `On` power state. These devices cannot be switched to `Off` or `Standby` via the public API. The plugin queries each appliance for its supported power states; if the logs indicate `Cannot be switched off`, it is a limitation of the hardware and the Home Connect platform itself rather than the plugin.",
-            "alternative_resolution": "Improve documentation to list which appliance types have API-imposed limitations on power state control, and ensure the plugin logs a clear message when a user attempts to switch off an unsupported device.",
-            "tags": [
-                "washer",
-                "dryer",
-                "washerdryer",
-                "power",
-                "API-limitation"
-            ],
-            "confidence": "high",
-            "hash": "988396e2b0ce05e5042ce1b7ccf442ca57a60fdc3c33825e35c6fa0d88ad91fe"
+            "question": "Why can I not turn my washing machine or dryer off via HomeKit?",
+            "answer": "The ability to turn an appliance off is determined by the Home Connect API and the specific hardware, rather than the plugin itself. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state. They do not support being switched to `Off` or `Standby` remotely.\n\nYou can verify the capabilities of your specific appliance by checking the Homebridge logs. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.",
+            "semantic_abstract": "Home Connect API constraints for laundry appliances (washers, dryers, washer-dryers) omit support for \"Off\" or \"Standby\" power states, restricting the plugin's power control interface to an \"On\" status only.",
+            "hash": "99701261e59e657e61baa2f36c918b3786f9c63032ecd23d075724f0167280bc"
         },
         {
-            "question": "Can I enable Remote Start for my appliance through HomeKit?",
-            "answer": "No. For safety reasons, **Remote Start** must be physically enabled on the appliance itself. The Home Connect API treats the remote start status as read-only (`remotecontrolactivationstate` and `remotestartallowancestate`). While the plugin can monitor this state to trigger automations, it cannot activate it remotely. Note that Remote Start typically expires after 24 hours or if the appliance door is opened.",
-            "alternative_resolution": "Ensure the documentation clearly explains that Remote Start is a read-only status and cannot be toggled via HomeKit due to safety constraints in the Home Connect API.",
-            "tags": [
-                "remote-start",
-                "safety",
-                "API-limitation"
-            ],
-            "confidence": "high",
-            "hash": "09c6c4c9455a905bd037b4e1e48ec1172bad7808e363cc3ed3db590462cb8b9b"
+            "question": "Why can I not enable remote start from HomeKit?",
+            "answer": "The `RemoteStart` and `RemoteControl` states are read-only via the Home Connect API for safety and security reasons. To use remote control features, you must physically interact with the appliance to enable remote start (usually via a button on the machine). This activation typically remains valid for a 24-hour window or until the door is opened. Because this is a security-related hardware restriction, it cannot be overridden or activated by third-party plugins.",
+            "semantic_abstract": "Security-governed API restrictions render the remote start and remote control activation states read-only, requiring manual physical interaction with the appliance to enable remote operation.",
+            "hash": "e7f1817598a8af652a708f06eab7a9c7731c23f7b18fd84794f8fd44c39ded87"
         },
         {
-            "question": "Why does the remaining time show in seconds (e.g. `4500`) instead of minutes?",
-            "answer": "The `Remaining Duration` characteristic is a standard HomeKit definition that requires the value to be an integer in **seconds**. The plugin follows this official specification to ensure compatibility. How this value is displayed depends on the specific HomeKit app you are using. Apps like **Eve** or **Home+** typically format this value into minutes and seconds for the user, whereas Apple's Home app or other dashboards may display the raw seconds.",
-            "alternative_resolution": "Update the documentation to recommend specific HomeKit apps (like Eve or Home+) that correctly format duration characteristics into a human-readable format.",
-            "tags": [
-                "HomeKit",
-                "UI",
-                "duration",
-                "remaining-time"
-            ],
-            "confidence": "high",
-            "hash": "e25ed873d8aa536147e3f4f87054ee409012b1bd684f74bcd971d88af4480d9c"
+            "question": "Why is the remaining program time displayed in seconds instead of minutes?",
+            "answer": "The plugin uses the standard Apple HomeKit `Remaining Duration` characteristic to report the time until a program completes. Apple's specification defines this characteristic as an integer value representing time in seconds. \n\nThe way this value is displayed (e.g. converting seconds into minutes and seconds) is entirely dependent on the specific HomeKit app you are using:\n* The **Eve** app and **Home+** typically format this value into a human-readable minutes and seconds format.\n* Other apps, including some versions of **HomeDash** or the default Apple **Home** app, may display the raw seconds or may not show the characteristic at all.\n\nBecause defining a custom characteristic for minutes would make the data unreadable to most HomeKit apps, the plugin adheres to the official Apple standard of seconds.",
+            "semantic_abstract": "The HomeKit `Remaining Duration` characteristic is defined as an integer in seconds by the platform specification, leaving the conversion to minutes/hours as a client-side display responsibility of the specific HomeKit application.",
+            "hash": "a6f3a12d9d37c23ef739521c1ae882c74391a4e7643827a1d265ce1ff565c0aa"
         },
         {
-            "question": "What are the Programmable Switch services shown for my appliance?",
-            "answer": "These are `Stateless Programmable Switch` services used to trigger HomeKit automations based on appliance events. Since HomeKit does not have a native notification type for 'Program Finished' or 'Program Aborted', the plugin uses these switches as triggers. You can configure HomeKit automations to perform actions (such as flashing a light) when these 'switches' are activated by the appliance completing its cycle.",
-            "alternative_resolution": "Add examples to the Wiki or documentation showing how to set up a HomeKit automation using these event switches.",
-            "tags": [
-                "events",
-                "automation",
-                "notifications",
-                "dishwasher",
-                "washer"
-            ],
-            "confidence": "high",
-            "hash": "c53c7e3147191d10ca11028e19ce600bda08fe92de4c031286e52e15d32f6998"
-        },
-        {
-            "question": "Why can't I control my oven or hob through the plugin?",
-            "answer": "Control of ovens and hobs is restricted by Home Connect and requires a special agreement with them that is generally not available to individual developers or open-source projects. Furthermore, even if control were permitted, safety features such as the 24-hour Remote Start timeout would prevent most remote operations from working reliably. For these devices, the plugin is limited to monitoring state and program progress.",
-            "alternative_resolution": "Clarify in the documentation that oven and hob control is currently prohibited by the Home Connect API terms and hardware safety restrictions.",
-            "tags": [
-                "oven",
-                "hob",
-                "safety",
-                "API-limitation",
-                "policy"
-            ],
-            "confidence": "high",
-            "hash": "b11b4f00111393a7ccb5faee9309de25454108f5d345975b77bbd12ac79da64e"
+            "question": "Why does my washing machine door show as Open in HomeKit when the machine is running?",
+            "answer": "This behaviour typically occurs when the appliance is in a `Locked` state rather than just a `Closed` state. The Home Connect API reports three distinct door states: `Open`, `Closed`, and `Locked` (standard for washing machines during a cycle). \n\nIf the plugin is not correctly interpreting the `Locked` state, it may default to showing the door as open. Current versions of the plugin map both `Closed` and `Locked` to the HomeKit `Closed` state to ensure accurate reporting during active programs. If you encounter this, ensure you are on the latest version of the plugin. Note that some discrepancy can also occur if the Home Connect event stream is briefly disconnected due to server-side timeouts (HTTP `502` errors), which prevents the plugin from receiving the state change event.",
+            "semantic_abstract": "Washing machine door sensors utilise an additional `Locked` state during active cycles, which must be mapped to the HomeKit `Closed` status to prevent false \"Open\" reports while the appliance is running.",
+            "hash": "5aacf35d150114605e2d2131a890026683f59854991b02c274801c5d55f2c721"
         }
     ]
 }
