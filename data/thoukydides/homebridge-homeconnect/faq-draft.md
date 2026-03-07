@@ -54,6 +54,7 @@
     - [Why is my appliance unresponsive in Homebridge but working in the Home Connect app?](#why-is-my-appliance-unresponsive-in-homebridge-but-working-in-the-home-connect-app)
     - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
+    - [Why does my washing machine door show as open in HomeKit during a cycle?](#why-does-my-washing-machine-door-show-as-open-in-homekit-during-a-cycle)
     - [Why does my dishwasher trigger a Program Finished event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
     - [Why is my Homebridge log filling up with oven `Event STATUS` temperature messages?](#why-is-my-homebridge-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
@@ -545,14 +546,14 @@ You can verify the capabilities of your specific appliance by checking the Homeb
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
 
-<!-- INCLUDES: issue-74-d6d6 issue-170-3230 -->
-The plugin relies on a real-time Server Sent Events (SSE) stream from the Home Connect API to receive status updates. If this stream is interrupted or the backend stops sending events, the plugin cannot update HomeKit.
+<!-- INCLUDES: issue-15-1a1d issue-74-d6d6 issue-170-3230 -->
+The plugin relies on a real-time Server Sent Events (SSE) stream from the Home Connect API to receive status updates. This connectivity is independent of the appliance's local Wi-Fi status. If this stream is interrupted or the backend stops sending events, the appliance is marked as offline in the logs and will appear as **No Response** in HomeKit.
 
-The API sends a `KEEP-ALIVE` event approximately every 55 seconds; if the plugin detects no activity for 120 seconds, it will automatically re-establish the stream. In some cases, the connection may remain technically active while the Home Connect backend stops distributing actual state change events, either due to events not being received from the appliance or internal errors within the cloud infrastructure.
+The API sends a `KEEP-ALIVE` event approximately every 55 seconds; if the plugin detects no activity for 120 seconds, it will automatically re-establish the stream. A connection might fail to stabilise if the plugin takes longer than three seconds to re-establish the stream or if an error occurs during state synchronisation immediately after reconnection.
 
 To troubleshoot:
 
-1. Enable the **Log Debug as Info** plugin option to see all raw events received from the API. If no events are logged when you interact with the appliance, the issue resides with the Home Connect platform or appliance.
+1. Enable the **Log Debug as Info** plugin option to see all raw events. If no events are logged when you interact with the appliance, the issue resides with the Home Connect platform.
 2. Restart Homebridge to force the plugin to subscribe to a fresh event stream.
 3. Ensure your network configuration does not prematurely terminate long-lived TCP connections.
 
@@ -572,15 +573,23 @@ If you observe inconsistent behaviour, such as devices unexpectedly appearing or
 
 #### Why does the log show a program running or time remaining when my appliance is off?
 
-The plugin reflects the real-time status and events reported by the Home Connect API servers. If the logs indicate that a program is active or shows a countdown while the appliance is idle, it means the plugin is receiving these specific events from the Home Connect cloud service.
+<!-- INCLUDES: issue-5-af4b -->
+The plugin reflects the real-time status and events reported by the Home Connect API servers. If the logs indicate that a program is active or shows a countdown while the appliance is idle, it means the plugin is receiving these specific events from the Home Connect cloud service. This is typically caused by a server-side state mismatch or a delay in the event stream where old status updates are delivered late.
 
-This behaviour is typically caused by:
+To resolve this, try the following:
 
-1. A server-side state mismatch or backlog within the Home Connect infrastructure.
-2. A delay in the event stream where old status updates are delivered late.
-3. A bug in the appliance firmware or the cloud API representation of that specific model.
+1. Start and then manually stop a program using the official Home Connect app or the physical appliance interface to reset the server state.
+2. Power cycle the appliance at the mains to force a reconnection and state refresh.
+3. Use a third-party HomeKit app such as Eve to inspect technical characteristics like `Active` and `Remaining Time` for more detail than the standard Apple Home app.
 
-To resolve this, try starting and then stopping a manual program using the official Home Connect app or the physical appliance interface to reset the server state. This is a transient server-side or firmware issue that cannot be corrected by the plugin itself.
+This is a transient server-side or firmware issue that cannot be corrected by the plugin itself.
+
+#### Why does my washing machine door show as open in HomeKit during a cycle?
+
+<!-- INCLUDES: issue-3-5aac -->
+The Home Connect API reports three distinct door states: `Open`, `Closed`, and `Locked`. For appliances like washing machines that lock during a cycle, the plugin maps both the `Closed` and `Locked` states to the HomeKit `Closed` state to ensure accurate reporting.
+
+If the door incorrectly appears as open, it may be because the plugin missed the state change event. This can happen if the Home Connect event stream was briefly disconnected (for example, due to HTTP `502` server errors) at the moment the appliance transitioned to the locked state. Ensure you are using the latest version of the plugin, as mapping logic is periodically refined to handle these API nuances.
 
 #### Why does my dishwasher trigger a Program Finished event when it reconnects?
 
@@ -610,37 +619,6 @@ The Home Connect API currently restricts door functionality for dishwasher appli
 
 <!-- INCLUDES: issue-306-65ff -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
-
-#### 🚧 Why does the log show `The appliance is offline` and HomeKit show "No Response" when the device is connected to Wi-Fi? 🚧
-
-<!-- INCLUDES: issue-15-1a1d -->
-The plugin determines if an appliance is online based on the status of a real-time event stream from the Home Connect servers. This status is independent of the appliance's local network connectivity or its appearance in the official Home Connect app. If this stream is interrupted, the appliance is marked as offline in the logs and will appear as "No Response" in HomeKit.
-
-This can happen if:
-* The event stream is terminated (e.g. due to API server maintenance or transient network errors).
-* The plugin takes longer than three seconds to re-establish the connection to the stream.
-* An error occurs while the plugin is synchronising the appliance's state immediately after a reconnection.
-
-This behaviour prevents the plugin from sending commands to a device when its current state is unknown. Typically, this is a transient condition that resolves itself once the connection to the Home Connect API is stabilised.
-
-#### 🚧 Why does my washing machine door show as Open in HomeKit when the machine is running? 🚧
-
-<!-- INCLUDES: issue-3-5aac -->
-This behaviour typically occurs when the appliance is in a `Locked` state rather than just a `Closed` state. The Home Connect API reports three distinct door states: `Open`, `Closed`, and `Locked` (standard for washing machines during a cycle). 
-
-If the plugin is not correctly interpreting the `Locked` state, it may default to showing the door as open. Current versions of the plugin map both `Closed` and `Locked` to the HomeKit `Closed` state to ensure accurate reporting during active programs. If you encounter this, ensure you are on the latest version of the plugin. Note that some discrepancy can also occur if the Home Connect event stream is briefly disconnected due to server-side timeouts (HTTP `502` errors), which prevents the plugin from receiving the state change event.
-
-#### 🚧 Why does my appliance show as running in HomeKit when it is physically off? 🚧
-
-<!-- INCLUDES: issue-5-af4b -->
-The plugin displays the status and events exactly as they are reported by the Home Connect API servers. Occasionally, the cloud server's state can become desynchronised from the physical appliance, causing the API to continue broadcasting an `Active` status and program countdowns even after the appliance is powered down.
-
-Because the plugin simply reflects the data provided by the API, you must force a state update on the Home Connect side to resolve the mismatch:
-1. Start and then manually stop a real program using the official Home Connect app or the physical controls on the appliance.
-2. Power cycle the appliance at the mains.
-3. Use a third-party HomeKit app such as Eve to inspect the `Active` and `Remaining Time` characteristics, which can provide more technical detail than the standard Apple Home app.
-
-If the Home Connect API consistently provides incorrect data, you may need to register a new Client ID in the Home Connect Developer Portal or contact their developer support.
 
 ## Apple HomeKit
 
