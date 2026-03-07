@@ -337,7 +337,7 @@
                                 },
                                 {
                                     "question": "Why are some appliance features, programs, or options missing or unavailable?",
-                                    "answer": "There are several reasons why features may be missing from the plugin or appear as `currently unavailable` or `advertised by appliance currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options (like temperature or spin speed) via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
+                                    "answer": "There are several reasons why features may be missing from the plugin or appear as `currently unavailable` or `advertised by appliance currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. This includes features like **double dispensing** (Doppelbezug) for coffee machines. If a program or other feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options (like temperature or spin speed) via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
                                     "included_ids": [
                                         "issue-42-1683",
                                         "issue-44-70cc",
@@ -353,7 +353,8 @@
                                         "issue-303-9e0f",
                                         "issue-316-e6c5",
                                         "issue-368-b5fa",
-                                        "issue-380-03ac"
+                                        "issue-380-03ac",
+                                        "issue-1-d662"
                                     ]
                                 },
                                 {
@@ -501,22 +502,16 @@
                                         "issue-310-e840",
                                         "issue-353-8bec"
                                     ]
-                                }
-                            ],
-                            "candidates": [
-                                {
-                                    "issue_number": 1,
-                                    "id": "issue-1-d662",
-                                    "question": "Can I start Double dispensing coffee programs through Homebridge?",
-                                    "answer": "No, features like double dispensing (Doppelbezug) are not currently available via the public Home Connect API. \n\nWhile these options may be visible and functional within the official Home Connect mobile application, the official app often utilises private API endpoints that are not accessible to third-party developers. Until Home Connect updates their public API to include these specific program options, they cannot be supported by the plugin. You can check the official Home Connect developer changelog for updates on available program options."
                                 },
                                 {
-                                    "issue_number": 3,
-                                    "id": "issue-3-9970",
-                                    "question": "Why can I not turn my washing machine or dryer off via HomeKit?",
-                                    "answer": "The ability to turn an appliance off is determined by the Home Connect API and the specific hardware, rather than the plugin itself. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state. They do not support being switched to `Off` or `Standby` remotely.\n\nYou can verify the capabilities of your specific appliance by checking the Homebridge logs. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API."
+                                    "question": "Why is the power off function unavailable for my washing machine or dryer?",
+                                    "answer": "The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is a restriction of the Home Connect platform itself rather than the plugin.\n\nYou can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.",
+                                    "included_ids": [
+                                        "issue-3-9970"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
