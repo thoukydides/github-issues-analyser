@@ -92,6 +92,8 @@
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
     - [How do I find the `haID` for an appliance?](#how-do-i-find-the-haid-for-an-appliance)
     - [Where can I find the list of changes for each plugin version?](#where-can-i-find-the-list-of-changes-for-each-plugin-version)
+    - [Why are there no log entries for the Home Connect plugin for several hours?](#why-are-there-no-log-entries-for-the-home-connect-plugin-for-several-hours)
+    - [Why did my Homebridge instance stop with a `SIGTERM` signal?](#why-did-my-homebridge-instance-stop-with-a-sigterm-signal)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -891,19 +893,19 @@ A `CHANGELOG.md` file is maintained in the root directory of the plugin reposito
 * **Homebridge UI**: For users of `homebridge-config-ui-x`, the changelog is automatically displayed within the dashboard when an update is available.
 * **GitHub History**: More detailed information about ongoing development and specific code changes can be found by reviewing the repository commit history on GitHub.
 
-<!-- PARTITION: Plugin Logging and Runtime Behaviour -->
+<!-- PARTITION -->
 
-#### 🚧 Why are there no log entries for the Home Connect plugin for several hours? 🚧
+#### Why are there no log entries for the Home Connect plugin for several hours?
 
 <!-- INCLUDES: issue-13-9879 -->
-The plugin is designed to minimise log output during normal operation. After the initial start-up, log messages are only generated when an appliance is controlled through HomeKit, the event stream reports a change in an appliance's state, or an error occurs. 
+The plugin is designed to minimise log output during normal operation. After the initial start-up, log messages are only generated when an appliance is controlled through HomeKit, the event stream reports a change in an appliance's state, or an error occurs.
 
 If your appliances are idle and no communication errors are encountered, it is normal to see no activity in the logs for extended periods. This silence is expected behaviour and does not indicate that the plugin has frozen. If you enable debug logging, you will see entries approximately once per hour when the plugin polls the list of appliances, but otherwise, the plugin remains quiet when there is nothing to report.
 
-#### 🚧 Why did my Homebridge instance stop with a `SIGTERM` signal? 🚧
+#### Why did my Homebridge instance stop with a `SIGTERM` signal?
 
 <!-- INCLUDES: issue-13-3c36 -->
-A `SIGTERM` signal is a request for a program to terminate, which is typically sent by the operating system or a process manager (such as `systemd` or `pm2`) when a service is being stopped or restarted. 
+A `SIGTERM` signal is a request for a program to terminate, which is typically sent by the operating system or a process manager (such as `systemd` or `pm2`) when a service is being stopped or restarted.
 
 This plugin does not initiate `SIGTERM` signals. If you see this in your logs, it indicates that an external process or a manual command (like `systemctl stop`) instructed Homebridge to shut down. If this coincides with a lack of log activity from the plugin, it is important to note that the plugin is naturally silent when idle, which should not be confused with the process being frozen or crashed.
 
