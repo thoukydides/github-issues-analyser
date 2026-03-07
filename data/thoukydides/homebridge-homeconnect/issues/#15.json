@@ -1,21 +1,12 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 15,
-    "updated_at": "2026-02-10T09:33:21.851Z",
+    "updated_at": "2026-03-07T14:58:20.062Z",
     "faq": [
         {
-            "question": "Why does the log show `The appliance is offline` when the device is connected in the Home Connect app?",
-            "answer": "The `The appliance is offline` message indicates that the plugin has lost its connection to the Home Connect **Event Stream** or failed to synchronise the appliance's state. The plugin relies on this persistent stream for real-time updates; if it is interrupted, the appliance is flagged as offline to prevent operations based on outdated information. This status specifically refers to the API's event-based connection rather than the appliance's local Wi-Fi status. It is possible for an appliance to appear functional in the official Home Connect app (which can use alternative communication methods) while being reported as offline in Homebridge if the event stream is unavailable. Ensure your network allows persistent outgoing connections and check for any Home Connect service interruptions.",
-            "alternative_resolution": "Enhance the log message to provide more context when an appliance is considered offline, such as distinguishing between a disconnected event stream, a failed state request, or a specific API error code.",
-            "tags": [
-                "offline",
-                "connectivity",
-                "event-stream",
-                "logs"
-            ],
-            "confidence": "high",
-            "hash": "25d900e66c39bd13e99cd5072be63b8830c318fb2b104baf1b67bf91ad43c30e"
+            "question": "Why does the log show `The appliance is offline` and HomeKit show \"No Response\" when the device is connected to Wi-Fi?",
+            "answer": "The plugin determines if an appliance is online based on the status of a real-time event stream from the Home Connect servers. This status is independent of the appliance's local network connectivity or its appearance in the official Home Connect app. If this stream is interrupted, the appliance is marked as offline in the logs and will appear as \"No Response\" in HomeKit.\n\nThis can happen if:\n* The event stream is terminated (e.g. due to API server maintenance or transient network errors).\n* The plugin takes longer than three seconds to re-establish the connection to the stream.\n* An error occurs while the plugin is synchronising the appliance's state immediately after a reconnection.\n\nThis behaviour prevents the plugin from sending commands to a device when its current state is unknown. Typically, this is a transient condition that resolves itself once the connection to the Home Connect API is stabilised.",
+            "semantic_abstract": "Home Connect appliance connectivity status is derived from the health of the API event stream rather than local Wi-Fi status. Interruptions, timeouts, or synchronisation failures on this stream cause the appliance to be marked as offline and appear as \"No Response\" in HomeKit to maintain state consistency.",
+            "hash": "1a1df1ad18a0a216e103d46def1699212ae1ff5ae321e70dd479f62520d46ce4"
         }
     ]
 }
