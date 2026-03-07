@@ -893,7 +893,7 @@ A `CHANGELOG.md` file is maintained in the root directory of the plugin reposito
 * **Homebridge UI**: For users of `homebridge-config-ui-x`, the changelog is automatically displayed within the dashboard when an update is available.
 * **GitHub History**: More detailed information about ongoing development and specific code changes can be found by reviewing the repository commit history on GitHub.
 
-<!-- PARTITION -->
+<!-- PARTITION: Plugin Logging and Runtime Behaviour -->
 
 #### Why are there no log entries for the Home Connect plugin for several hours?
 
