@@ -1,13 +1,12 @@
 {
     "issue_number": 9,
-    "updated_at": "2026-03-04T07:06:11.356Z",
+    "updated_at": "2026-03-07T10:58:29.986Z",
     "faq": [
         {
-            "question": "Why are some minor changes or bug fixes not listed in the `CHANGELOG.md`?",
-            "answer": "The plugin's `CHANGELOG.md` is curated to highlight significant functional changes and features that impact the majority of users. To maintain clarity and avoid cluttering the documentation with minor technical details or internal code refactorings that do not change the user experience, less significant updates may be omitted from the primary changelog. For a complete and exhaustive record of every change made to the plugin, users should consult the GitHub commit history. Technical context for specific updates is also frequently documented within the associated GitHub issues and pull requests.",
-            "semantic_abstract": "Maintainer documentation policy prioritises user-relevant functional updates in the `CHANGELOG.md` to ensure clarity and relevance. Granular technical changes and minor refactorings are recorded in the GitHub commit history rather than the primary changelog to prevent information overload for the average user while maintaining transparency.",
-            "confidence": "high",
-            "hash": "a04dc8f877d50ea1374f93a655e22d4c55556fe27eae3042188414e4a9df9671"
+            "question": "Where can I find a summary of changes for each version of the plugin?",
+            "answer": "A `CHANGELOG.md` file is maintained in the root directory of the plugin repository. This provides a chronological record of features, bug fixes, and technical changes for each version.\n\n* **Homebridge UI Integration**: For users of `homebridge-config-ui-x`, the contents of the changelog are automatically displayed within the dashboard when an update is available.\n* **Development Progress**: More detailed or granular information about ongoing development and specific code changes can be found by reviewing the GitHub commit history.",
+            "semantic_abstract": "Release notes and version history are documented in a standard `CHANGELOG.md` file, enabling automated display of updates within Homebridge management interfaces. For technical details of specific code changes, the GitHub repository commit history serves as the primary record.",
+            "hash": "87907e672635835531678076868bc84b4cb12771337d9aa43a4d65b5cbe0d77c"
         }
     ]
 }
