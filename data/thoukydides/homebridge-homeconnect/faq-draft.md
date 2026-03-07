@@ -289,14 +289,10 @@ This plugin supports configuration of program options to be used when starting a
 
 #### Why does my appliance show `No Response` when I try to start a program?
 
-<!-- INCLUDES: issue-79-56b4 -->
-To protect your safety and prevent your appliance from starting unexpectedly:
+<!-- INCLUDES: issue-3-e7f1 issue-79-56b4 -->
+To protect your safety and prevent your appliance from starting unexpectedly, **Remote Start must be physically enabled** on the appliance itself before remote control is permitted. This is a security-related hardware restriction that cannot be activated or overridden via the Home Connect API or this plugin.
 
-- **Remote Start must be physically enabled** on the appliance itself before remote control is allowed
-- This cannot be set via the API
-- Some appliances automatically expire Remote Start after a period of time or when you open the appliance door
-
-If you attempt to start a program via HomeKit when Remote Start is disabled, the plugin intentionally reports an error to HomeKit, which the Apple Home app displays as `No Response`. Reporting "Success" instead would be misleading, as the appliance would not actually start.
+Most appliances require you to press a physical button to enable this mode. The activation typically remains valid for a 24-hour period or until the appliance door is opened. If you attempt to start a program via HomeKit when Remote Start is disabled, the plugin intentionally reports an error to HomeKit, which the Apple Home app displays as `No Response`. Reporting "Success" instead would be misleading, as the appliance would not actually start.
 
 This plugin exposes the appliance's Remote Start status via the `Program Mode` characteristic on the power `Switch` service. It is not shown in the Home app, but can be viewed or used to gate automations in third-party apps like *Eve*.
 
@@ -311,15 +307,15 @@ This plugin exposes the appliance's Local Control status via the `Program Mode` 
 
 #### Why does my appliance report `Control scope has not been authorised` or `insufficient_scope`?
 
-<!-- INCLUDES: issue-30-450a -->
-This error occurs because the Home Connect API requires specific authorisation scopes to control **Oven** or **Hob** programs. While these were previously restricted, they were made available to independent developers in March 2021. If you authorised the plugin's connection to Home Connect prior to this then force a re-authorisation:
+<!-- INCLUDES: issue-5-3245 issue-30-450a -->
+This error occurs because the Home Connect API requires specific authorisation scopes to control **Oven** or **Hob** programs. While these were previously restricted for individual accounts, they were made available to independent developers in March 2021. If you authorised the plugin's connection to Home Connect prior to this, you must force a re-authorisation:
 
 1. Stop Homebridge.
 2. Delete the cached token file in the plugin's persistent storage directory (usually `~/.homebridge/homebridge-homeconnect/persist/94a08da1fecbb6e8b46990538c7b50b2`).
 3. Restart Homebridge.
 4. Follow the authorisation link provided in the logs or Homebridge UI to sign in again.
 
-Note that `FridgeFreezer-Images` scope remains restricted and hence is not supported by this plugin. The Home Connect API documentation describes it as requiring an "Additional Partner Agreement".
+Note that some functionality, such as the `FridgeFreezer-Images` scope, remains restricted to approved business partners and is not supported by this plugin. The Home Connect API documentation describes these as requiring an "Additional Partner Agreement".
 
 #### Why is there a delay when controlling appliances via HomeKit?
 
@@ -351,23 +347,6 @@ Frequent transitions between `Connected` and `Disconnected` states usually indic
 - **Local Network**: Weak Wi-Fi signals or intermittent internet drops can cause the appliance to lose its cloud heartbeat.
 
 When these disconnections occur, the plugin logs the event and updates the HomeKit status to reflect that the device is unreachable. This is a reporting of the appliance's actual cloud state and cannot be resolved via plugin code changes.
-
-#### 🚧 Why can I not enable remote start from HomeKit? 🚧
-
-<!-- INCLUDES: issue-3-e7f1 -->
-The `RemoteStart` and `RemoteControl` states are read-only via the Home Connect API for safety and security reasons. To use remote control features, you must physically interact with the appliance to enable remote start (usually via a button on the machine). This activation typically remains valid for a 24-hour window or until the door is opened. Because this is a security-related hardware restriction, it cannot be overridden or activated by third-party plugins.
-
-#### 🚧 Why do I see an `insufficient_scope` error when trying to control my oven, hob, or fridge-freezer? 🚧
-
-<!-- INCLUDES: issue-5-3245 -->
-The Home Connect API restricts specific functionalities, notably the `Hob-Control`, `Oven-Control`, and `FridgeFreezer-Images` scopes, to approved business partners under separate agreements. These permissions are generally not granted to individual developer accounts or consumers.
-
-Because of these API constraints, this plugin's support for these device categories is limited to:
-* Power on/off control, where supported by both the appliance hardware and the Home Connect API.
-* Read-only status monitoring.
-* Receiving notification events.
-
-Attempting to start or stop programs on these appliances via HomeKit will result in a `Home Connect API error: Insufficient scope for this resource [insufficient_scope]`. This is an external platform limitation rather than a defect in the plugin.
 
 ### Programs and Options
 
