@@ -112,7 +112,8 @@
                                         "issue-208-c4fd",
                                         "issue-325-3294",
                                         "issue-374-e780",
-                                        "issue-378-832c"
+                                        "issue-378-832c",
+                                        "issue-1-2d19"
                                     ]
                                 },
                                 {
@@ -131,10 +132,12 @@
                                     ]
                                 },
                                 {
-                                    "question": "What do `Gateway Timeout` or `Proxy Error` messages in the log mean?",
-                                    "answer": "Errors such as `SDK.Error.504.GatewayTimeout` or `Proxy Error` indicate that the Home Connect cloud servers are experiencing internal issues, high latency, or have unexpectedly terminated the event stream. \n\nThese are server-side problems within the Home Connect infrastructure and cannot be resolved by the plugin. The public API used by third-party integrations often experiences these issues independently of the official Home Connect mobile app. The plugin is designed to handle these interruptions by automatically attempting to re-establish the connection once the servers are responsive again.\n\n**What you can do**:\n- Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for known outages\n- Wait for automatic recovery (typically 5-30 minutes)\n- If the issue persists for hours, restart Homebridge to force a fresh connection",
+                                    "question": "What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?",
+                                    "answer": "Errors such as `SDK.Error.504.GatewayTimeout` (often logged as `Timeout on Home Connect subsystem`) or `Proxy Error` indicate that the Home Connect cloud servers are experiencing internal issues, high latency, or have unexpectedly terminated the event stream. \n\nBecause the Home Connect infrastructure acts as a bridge between the plugin and the physical appliance, the plugin is dependent on their cloud services being responsive. These are server-side problems within the Home Connect infrastructure and cannot be resolved by the plugin. You may observe the appliance appearing connected in the official Home Connect app but failing when controlled via HomeKit, as the official app can sometimes communicate directly over your local network while the API is restricted to cloud communication. The device may also briefly switch to `Not Available` immediately after a command is sent during these periods.\n\n**What you can do**:\n- Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for known outages\n- Wait for automatic recovery (typically 5-30 minutes)\n- If the issue persists for hours, restart Homebridge to force a fresh connection",
                                     "included_ids": [
-                                        "issue-19-6154"
+                                        "issue-19-6154",
+                                        "issue-11-73ec",
+                                        "issue-13-549a"
                                     ]
                                 },
                                 {
@@ -176,26 +179,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 1,
-                                    "id": "issue-1-2d19",
-                                    "question": "Why am I getting a `HomeAppliance did not respond to connection initialization requests` error?",
-                                    "answer": "The error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` indicates that the Home Connect cloud servers were unable to establish a connection with your physical appliance within the expected timeframe.\n\nThis is typically caused by issues between the appliance and the Home Connect servers rather than the plugin itself. To troubleshoot:\n1. Open the official Home Connect app.\n2. Navigate to the appliance's settings and check the Network section for reported errors.\n3. Ensure the appliance has a stable Wi-Fi connection and that the Home Connect service is not experiencing a regional outage."
-                                },
-                                {
-                                    "issue_number": 11,
-                                    "id": "issue-11-73ec",
-                                    "question": "Why does my Home Connect appliance frequently show as Not Available or return a `504 Gateway Timeout` error?",
-                                    "answer": "The error `SDK.Error.504.GatewayTimeout` (often logged as `Timeout on Home Connect subsystem`) indicates that the Home Connect API servers were unable to communicate with the appliance within the required timeframe. This is a server-side issue on the Home Connect platform and does not indicate a fault within the plugin, Homebridge, or your local network configuration.\n\nBecause the Home Connect infrastructure acts as a bridge between the plugin and the physical appliance, the plugin is dependent on their cloud services being responsive. You may observe the following behaviour:\n\n* The appliance appears connected in the official Home Connect app but fails when controlled via HomeKit.\n* The device briefly switches to Not Available immediately after a command is sent.\n* Intermittent reliability where the system works perfectly one moment and fails the next.\n\nThere are no settings within the plugin to resolve these timeouts. If you experience persistent issues of this nature, you may wish to contact Home Connect developer support directly, as the problem resides within their infrastructure."
-                                },
-                                {
-                                    "issue_number": 13,
-                                    "id": "issue-13-549a",
-                                    "question": "What does a `Proxy Error` in the logs mean?",
-                                    "answer": "A `Proxy Error` is a message returned by the Home Connect API servers indicating that the event stream connection was unexpectedly terminated. This is a transient issue caused by instability in the third-party Home Connect cloud infrastructure and is not a fault within the plugin itself.\n\nThe plugin is designed to handle these events by automatically attempting to re-establish the connection. While these errors are recorded in the log, they typically resolve themselves once the Home Connect servers return to a stable state. No user action is normally required unless the error persists for an unusually long period."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

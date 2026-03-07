@@ -15,7 +15,7 @@
     - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
     - [Why does my appliance show as `Not Responding` in the Home app when turned off?](#why-does-my-appliance-show-as-not-responding-in-the-home-app-when-turned-off)
     - [Why does the power button not work or return a `BSH.Common.Error.WriteRequest.Busy` error?](#why-does-the-power-button-not-work-or-return-a-bshcommonerrorwriterequestbusy-error)
-    - [What do `Gateway Timeout` or `Proxy Error` messages in the log mean?](#what-do-gateway-timeout-or-proxy-error-messages-in-the-log-mean)
+    - [What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?](#what-do-gateway-timeout-proxy-error-or-timeout-on-home-connect-subsystem-messages-mean)
     - [Why does the log show `Home Connect subsystem not available` or a `503` error?](#why-does-the-log-show-home-connect-subsystem-not-available-or-a-503-error)
     - [Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?](#why-am-i-seeing-network-errors-like-eai_again-enotfound-etimedout-or-enetunreach)
     - [Why is the log flooded with errors during a Home Connect outage?](#why-is-the-log-flooded-with-errors-during-a-home-connect-outage)
@@ -181,7 +181,7 @@ Most of the limits reset after either 1 or 10 minutes, but there is also a daily
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-22-3aca issue-40-f8f5 issue-61-1c74 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
+<!-- INCLUDES: issue-1-2d19 issue-22-3aca issue-40-f8f5 issue-61-1c74 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
 The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details of the specific reason. Some of the more common cases are:
 
 - `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
@@ -216,12 +216,12 @@ The `Busy` error is returned by the Home Connect cloud when an appliance cannot 
 
 Failure to power certain ovens on or off is a known bug in the Home Connect API affecting specific models. If the appliance is physically ready but the power command is rejected, this is an external platform limitation. You should report such issues to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance's E-Nr (part number).
 
-#### What do `Gateway Timeout` or `Proxy Error` messages in the log mean?
+#### What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?
 
-<!-- INCLUDES: issue-19-6154 -->
-Errors such as `SDK.Error.504.GatewayTimeout` or `Proxy Error` indicate that the Home Connect cloud servers are experiencing internal issues, high latency, or have unexpectedly terminated the event stream. 
+<!-- INCLUDES: issue-11-73ec issue-13-549a issue-19-6154 -->
+Errors such as `SDK.Error.504.GatewayTimeout` (often logged as `Timeout on Home Connect subsystem`) or `Proxy Error` indicate that the Home Connect cloud servers are experiencing internal issues, high latency, or have unexpectedly terminated the event stream. 
 
-These are server-side problems within the Home Connect infrastructure and cannot be resolved by the plugin. The public API used by third-party integrations often experiences these issues independently of the official Home Connect mobile app. The plugin is designed to handle these interruptions by automatically attempting to re-establish the connection once the servers are responsive again.
+Because the Home Connect infrastructure acts as a bridge between the plugin and the physical appliance, the plugin is dependent on their cloud services being responsive. These are server-side problems within the Home Connect infrastructure and cannot be resolved by the plugin. You may observe the appliance appearing connected in the official Home Connect app but failing when controlled via HomeKit, as the official app can sometimes communicate directly over your local network while the API is restricted to cloud communication. The device may also briefly switch to `Not Available` immediately after a command is sent during these periods.
 
 **What you can do**:
 - Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for known outages
@@ -284,36 +284,6 @@ Some dishwasher appliances offer two ways to reduce noise: a dedicated **Silence
 The Home Connect API restricts appliances to one active program at a time. If you attempt to start the `NightWash` program while another program is already running, the API returns a `409 Conflict` error with `SDK.Error.WrongOperationState`.
 
 This plugin supports configuration of program options to be used when starting a new program, including the `SilenceOnDemand` option for programs that support it. However, it does not implement mapping of program options to dedicated HomeKit services to enable changing them for a program that is already running. This is a deliberate design choice because the API does not clearly signal which options are valid to modify dynamically, and there is no appropriate way to map these temporary, time-limited behaviours to the standard HomeKit service model.
-
-#### 🚧 Why am I getting a `HomeAppliance did not respond to connection initialization requests` error? 🚧
-
-<!-- INCLUDES: issue-1-2d19 -->
-The error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` indicates that the Home Connect cloud servers were unable to establish a connection with your physical appliance within the expected timeframe.
-
-This is typically caused by issues between the appliance and the Home Connect servers rather than the plugin itself. To troubleshoot:
-1. Open the official Home Connect app.
-2. Navigate to the appliance's settings and check the Network section for reported errors.
-3. Ensure the appliance has a stable Wi-Fi connection and that the Home Connect service is not experiencing a regional outage.
-
-#### 🚧 Why does my Home Connect appliance frequently show as Not Available or return a `504 Gateway Timeout` error? 🚧
-
-<!-- INCLUDES: issue-11-73ec -->
-The error `SDK.Error.504.GatewayTimeout` (often logged as `Timeout on Home Connect subsystem`) indicates that the Home Connect API servers were unable to communicate with the appliance within the required timeframe. This is a server-side issue on the Home Connect platform and does not indicate a fault within the plugin, Homebridge, or your local network configuration.
-
-Because the Home Connect infrastructure acts as a bridge between the plugin and the physical appliance, the plugin is dependent on their cloud services being responsive. You may observe the following behaviour:
-
-* The appliance appears connected in the official Home Connect app but fails when controlled via HomeKit.
-* The device briefly switches to Not Available immediately after a command is sent.
-* Intermittent reliability where the system works perfectly one moment and fails the next.
-
-There are no settings within the plugin to resolve these timeouts. If you experience persistent issues of this nature, you may wish to contact Home Connect developer support directly, as the problem resides within their infrastructure.
-
-#### 🚧 What does a `Proxy Error` in the logs mean? 🚧
-
-<!-- INCLUDES: issue-13-549a -->
-A `Proxy Error` is a message returned by the Home Connect API servers indicating that the event stream connection was unexpectedly terminated. This is a transient issue caused by instability in the third-party Home Connect cloud infrastructure and is not a fault within the plugin itself.
-
-The plugin is designed to handle these events by automatically attempting to re-establish the connection. While these errors are recorded in the log, they typically resolve themselves once the Home Connect servers return to a stable state. No user action is normally required unless the error persists for an unusually long period.
 
 ### Local/Remote Control
 
