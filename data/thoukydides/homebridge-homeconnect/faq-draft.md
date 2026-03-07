@@ -768,10 +768,10 @@ Note that the standard Apple Home app does not display the `Status Active` chara
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
 
-<!-- INCLUDES: issue-31-241e issue-43-caee issue-45-fb59 issue-153-91f4 issue-323-9301 -->
-Home Connect communicates many appliance states as **transient events** (e.g. "Drip tray full" or "iDos fill level poor") rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so that they can be used as automation triggers. It is not possible for the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears.
+<!-- INCLUDES: issue-1-c1c9 issue-31-241e issue-43-caee issue-45-fb59 issue-153-91f4 issue-323-9301 -->
+Home Connect communicates many appliance states—such as a coffee maker's `Drip tray full` or a dishwasher's `iDos fill level poor`—as **transient events** rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so they can be used as automation triggers. This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears. Consequently, these services do not show a continuous 'full' or 'empty' state in the Home app.
 
-The Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To see what these represent for your specific appliance, check your **Homebridge logs** during startup or use a third-party app like *Eve* or *Home+* which displays descriptive labels. If you do not require these events for automations, you can disable them per-appliance in the plugin configuration to prevent them from appearing in the Home app.
+The Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup or use a third-party app like *Eve* or *Home+* which can display descriptive labels. If you do not require these events for automations, you can disable them per-appliance in the plugin configuration to prevent them from appearing in the Home app.
 
 #### Why does the Home app show two (or more) tiles for one appliance?
 
@@ -801,13 +801,6 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
 Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
-
-#### 🚧 How can I trigger an automation when my coffee maker's drip tray is full? 🚧
-
-<!-- INCLUDES: issue-1-c1c9 -->
-The Home Connect API reports certain status updates, such as the `drip tray full` event, as transient events rather than persistent, queryable states. This means the plugin cannot determine the status of the tray when it first starts or if a connection is lost.
-
-To accommodate this, the plugin maps these events to a `Stateless Programmable Switch` in HomeKit. You can use this switch as a trigger for HomeKit automations, though it will not show a continuous 'full' or 'empty' state in the Home app.
 
 ### Siri
 
