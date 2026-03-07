@@ -1,0 +1,13 @@
+{
+    "issue_number": 364,
+    "updated_at": "2026-03-05T13:36:47.517Z",
+    "faq": [
+        {
+            "question": "Why do disabled features still appear in the Home app as unresponsive?",
+            "answer": "This is typically caused by HomeKit's internal caching and synchronisation mechanisms rather than the plugin itself. When a feature is disabled in the configuration, the plugin removes the corresponding service from the accessory definition. However, HomeKit (especially across multiple hubs or iCloud-synced devices) may retain a stale cached version of the accessory.\n\nYou may observe the following:\n- Features reappearing after a HomeKit hub (e.g. Apple TV) restarts.\n- Features appearing briefly during Homebridge startup if they were recently disabled (this is Homebridge restoring its own cache before the plugin can apply your new configuration).\n\nTo resolve persistent stale entries, try these steps in order:\n1. Restart Homebridge to trigger a fresh configuration update to HomeKit.\n2. Wait several hours for iCloud synchronisation to reconcile the state across all devices.\n3. Reboot your primary HomeKit home hub.\n4. If the issue persists, sign out of iCloud on the home hub and sign back in.\n\nNote that the plugin will log a message such as `Removing obsolete service \"Internal Light\"` if it is actively removing a service restored from the Homebridge cache. If this log is not present, the plugin is not advertising those services to HomeKit.",
+            "semantic_abstract": "HomeKit accessory service caching and iCloud synchronisation inconsistencies can cause previously disabled appliance features to reappear as unresponsive. While the plugin correctly removes services from the accessory definition, HomeKit hubs may fail to immediately reflect these changes, necessitating manual hub restarts or iCloud re-authentication. Homebridge's dynamic platform architecture also briefly restores cached services at startup before the plugin can apply configuration-based removals.",
+            "confidence": "high",
+            "hash": "a64bbf794ffc13aeff15f763f463b7e13ad492e32248a3180b999517a3d0db52"
+        }
+    ]
+}

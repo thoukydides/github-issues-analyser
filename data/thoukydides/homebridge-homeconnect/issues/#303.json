@@ -1,0 +1,27 @@
+{
+    "issue_number": 303,
+    "updated_at": "2026-02-27T09:04:46.088Z",
+    "faq": [
+        {
+            "question": "Why is the `LearningDishwasher` program not available or showing a `409 Conflict` error?",
+            "answer": "The Home Connect API only exposes specific programs for each appliance. If a program like `Dishcare.Dishwasher.Program.LearningDishwasher` is available in the official Home Connect app but fails with a `409 Conflict` or `SDK.Error.UnsupportedProgram` error in the plugin, it is because the Home Connect team has not yet made that specific program available via their public API. The plugin can only expose what the API advertises as supported for your specific model. You may wish to contact Home Connect support to request that this program be added to their API.",
+            "semantic_abstract": "Home Connect API limitations prevent certain proprietary programs like `LearningDishwasher` from being controlled via third-party integrations, resulting in `409 Conflict` errors during appliance initialisation when the plugin attempts to read or restore program state.",
+            "confidence": "high",
+            "hash": "9e0f35ef859ebdae5a629a0cf0cd746eeaa94eaa1718bd480b8f010cab14dc3d"
+        },
+        {
+            "question": "How do I use Smart Start or delayed start for dishwasher programs?",
+            "answer": "The plugin supports the `BSH.Common.Option.StartInRelative` option, which corresponds to Smart Start or delayed start functionality. If your appliance supports this via the Home Connect API, it is automatically supported by the plugin. This option allows a program to be scheduled by specifying either a number of seconds in the future or a specific time of day for the program to begin.",
+            "semantic_abstract": "Dishwasher delayed start functionality is implemented via the `BSH.Common.Option.StartInRelative` API option, which the plugin exposes for compatible appliances as a time-based configuration to allow scheduling program execution.",
+            "confidence": "high",
+            "hash": "3b352e52bf9236b346876ee279dec87414e15cc063b4611836edc02be46d4fbb"
+        },
+        {
+            "question": "Why is the dishwasher door exposed as a Door service instead of a Contact Sensor?",
+            "answer": "The plugin uses the `Door` service to represent appliance doors by design, as this is the most semantically accurate HomeKit service for the hardware. If you find the default iOS notifications for the `Door` service annoying (e.g. receiving a notification every time the dishwasher is opened), you can disable them in the Apple Home app:\n\n1. Open the **Home** app.\n2. Go to **Home Settings**.\n3. Select **Doors**.\n4. Toggle off notifications for the dishwasher door.\n\nThe maintainer has indicated that this service mapping will not be changed to a `Contact Sensor` as the current implementation is the preferred design and notifications are manageable via standard HomeKit settings.",
+            "semantic_abstract": "Appliance doors are mapped to the HomeKit `Door` service rather than `Contact Sensor` as a deliberate design choice to maintain technical accuracy; notification frequency is managed through standard iOS Home app configuration rather than plugin-level changes.",
+            "confidence": "high",
+            "hash": "3c06abf7e720fbb17f9fead82fd75483628873b8bd785bfe9ae20987a63faf69"
+        }
+    ]
+}

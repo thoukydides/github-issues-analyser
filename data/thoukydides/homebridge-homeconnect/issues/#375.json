@@ -1,0 +1,12 @@
+{
+    "issue_number": 375,
+    "updated_at": "2026-03-07T06:58:48.921Z",
+    "faq": [
+        {
+            "question": "Why do configuration settings like name prefixes fail to save or behave unexpectedly in the Homebridge UI?",
+            "answer": "Erratic behaviour in the configuration web interface—such as settings resetting to defaults, options disappearing, or values appearing blank—is typically caused by regressions in the Homebridge Config UI's form engine (`ng-formworks`).\n\nThese issues arise when the UI's interpretation of the plugin's configuration schema changes, particularly affecting:\n\n*   **Conditional controls**: Settings that change based on other selections (like name prefixes) may fail to persist because the UI incorrectly reapplies default values during the form-rendering process.\n*   **Boolean menus**: Drop-down menus for true/false values may appear blank even if a valid configuration already exists.\n*   **Complex strings**: Logic conditions containing specific characters (such as periods) within the schema may prevent appliance-specific options from being displayed correctly.\n*   **UI stability**: Browser console errors or duplicate menu items appearing after saving changes.\n\nWhile version `v1.7.0` of the plugin introduced several workarounds for these Homebridge UI behaviours (such as using `enumNames` for booleans and unicode escapes for condition strings), users encountering similar UI instability should ensure they are running the latest versions of both the plugin and Homebridge UI. If the graphical interface continues to behave unexpectedly, configuration changes can be applied manually by editing the `config.json` file directly.",
+            "semantic_abstract": "Regressions in the Homebridge Config UI X form engine (`ng-formworks`) create technical mismatches with the plugin's JSON configuration schema, specifically impacting conditional logic and data model mutations. This leads to configuration settings like service prefixes and program options failing to persist, resetting to defaults, or rendering incorrectly within the web-based management interface.",
+            "hash": "b67d7c9533650bbd0887b8d4a6ef6ef319978471dfb1d6138f9e3fe244b3b4ea"
+        }
+    ]
+}

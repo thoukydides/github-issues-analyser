@@ -1,0 +1,13 @@
+{
+    "issue_number": 283,
+    "updated_at": "2026-02-26T05:08:25.485Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log `(unrecognised)` for certain Home Connect API options?",
+            "answer": "The Home Connect API is extensive and frequently updated with new features and options tailored to specific appliance models. When the plugin encounters a key or value that is not yet in its internal definitions—for example, the `ConsumerProducts.CoffeeMaker.Option.BeveragesRemaining` option on newer Siemens coffee makers—it logs the entry as `(unrecognised)`. This diagnostic output is designed to help you provide the necessary technical details to the maintainer. If you see these messages, please copy the formatted section from the logs and open an issue on GitHub so that support for the new features can be added in a future update.",
+            "semantic_abstract": "Evolution of the Home Connect API across different appliance models and firmware versions leads to the appearance of unsupported keys and values in the event stream. The plugin identifies these unrecognised elements and generates technical metadata snippets to ensure the internal characteristic definitions can be updated to support new appliance functionality.",
+            "confidence": "high",
+            "hash": "981b4df316fb3aa01c878eb55fbfbb939f6688058dafa7a2636b7f59b8960c05"
+        }
+    ]
+}

@@ -1,0 +1,49 @@
+{
+    "files.eol": "\n",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    "editor.rulers": [
+        80
+    ],
+    "eslint.enable": true,
+    "cSpell.words": [
+        "aeiou",
+        "appapi",
+        "buymeacoffee",
+        "clusternova",
+        "Color",
+        "deprioritise",
+        "ENETUNREACH",
+        "ENOTEMPTY",
+        "ENOTFOUND",
+        "ETIMEDOUT",
+        "gemma",
+        "genai",
+        "getaddrinfo",
+        "HDBSCAN",
+        "Homebridge",
+        "homeconnect",
+        "HOOBS",
+        "idxs",
+        "kmpp",
+        "libdyson",
+        "matterbridge",
+        "nslookup",
+        "opendyson",
+        "Proxyman",
+        "proxymanlogv",
+        "SERIALNUMBER",
+        "Siri",
+        "skmeans",
+        "Solarcycle",
+        "stdev",
+        "Thoukydides",
+        "vars",
+        "wifi"
+    ],
+    "files.exclude": {
+        "node_modules/": true
+    },
+    "typescript.tsdk": "node_modules/typescript/lib"
+}

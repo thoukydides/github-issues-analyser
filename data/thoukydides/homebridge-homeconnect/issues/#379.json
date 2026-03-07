@@ -1,0 +1,12 @@
+{
+    "issue_number": 379,
+    "updated_at": "2026-03-07T08:51:04.624Z",
+    "faq": [
+        {
+            "question": "What does it mean when the log shows a block of code with `(unrecognised)` labels?",
+            "answer": "The plugin includes a mechanism to identify and report data from the Home Connect API that does not match the known specification. When your appliance sends a value, option, or setting that is undocumented, the plugin generates a block of code in the logs highlighting these items as `(unrecognised)`. This often occurs with newer appliance models or features that the manufacturer has not yet added to the official developer documentation.\n\nA common example is multi-cavity ovens, which may report a `Cooking.Oven.Option.CavitySelector` with values such as `Top`, `Bottom`, or `Main` to indicate which oven cavity a status or command refers to. While many of these have been integrated, manufacturers occasionally introduce new identifiers. If you see these messages in your logs, it indicates that your appliance is using functionality not yet explicitly defined in the plugin. Providing these log snippets in a GitHub issue allows for the undocumented values to be correctly mapped and supported.",
+            "semantic_abstract": "Mismatches between the Home Connect API's observed behaviour and its official documentation result in the plugin logging `(unrecognised)` data structures. This diagnostic output identifies undocumented enum values or options, such as `CavitySelector` identifiers for multi-cavity ovens, which require manual updates to the plugin's internal definitions for full support.",
+            "hash": "2e76fb9e27133c8681baff5515d027b553ebb145d28883386c7960ef39b0f9d2"
+        }
+    ]
+}

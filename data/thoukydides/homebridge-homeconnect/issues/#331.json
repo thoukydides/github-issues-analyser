@@ -1,0 +1,13 @@
+{
+    "issue_number": 331,
+    "updated_at": "2026-03-01T03:26:22.230Z",
+    "faq": [
+        {
+            "question": "Why does the log show blocks of code with `(unrecognised)` comments?",
+            "answer": "These log entries are a diagnostic feature of the plugin. When the plugin communicates with your appliances via the Home Connect API, it may encounter programs, options, or settings that have not yet been added to its internal definitions. To assist with development, the plugin automatically generates a block of code representing these new values. If you see these messages, first check if a newer version of the plugin is available as the values may have already been added. If the logs persist on the latest version, please open a GitHub issue and provide the complete block of code, including the `=======` separator lines. This information allows the maintainer to add formal support for the features of your specific appliance model. These messages do not indicate a failure; they simply mean the plugin has identified features that require explicit mapping to be fully supported and correctly labelled within HomeKit.",
+            "semantic_abstract": "Diagnostic log output containing code blocks occurs when Home Connect API identifiers for programs or options are missing from the plugin's internal schema. This mechanism facilitates the collection of technical metadata required to extend support for specific appliance features and firmware variations.",
+            "confidence": "high",
+            "hash": "ce23884d07f9c97426d370403f76e89bd7f7949f24a26123341f23ceaa5ebdeb"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "issue_number": 365,
+    "updated_at": "2026-03-06T07:07:43.219Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Unknown` for `ProgramKey` or mark status values as unrecognised?",
+            "answer": "Reports of `unrecognised` or `Unknown` values in the logs typically occur for two reasons:\n\n1. **Appliance Firmware Quirks**: Certain appliances, particularly coffee makers (such as the Siemens CT636LES6/00), may report an undocumented `Unknown` value for the `ProgramKey`. This is a known firmware issue where the appliance fails to provide a valid identifier via the Home Connect API. The plugin (v1.6.3 and later) explicitly allows this value to prevent unnecessary error reports, though the specific active program cannot be identified when this occurs.\n2. **Stale Cache Entries**: If a status value like `InteriorIlluminationActive` is flagged as unrecognised despite being supported by the current plugin version, it is likely due to data cached by a previous version. The plugin maintains a local cache of appliance capabilities to optimise performance. If a feature was unsupported when the cache was first created, the unrecognised flag might persist. This logic was improved in v1.6.3 to ensure these flags are correctly updated when the plugin is versioned.\n\nUpdating to the latest version of the plugin will resolve these issues by accommodating the firmware quirks and correctly managing the capability cache.",
+            "semantic_abstract": "Home Connect coffee makers may return an undocumented `Unknown` value for the `ProgramKey` due to appliance firmware limitations, while legacy cache entries can cause valid status values to be incorrectly flagged as unrecognised in logs following a plugin update.",
+            "confidence": "high",
+            "hash": "e16b406f10bb02748f2738e885f64edb9b12dfc0f7cf55e41ab38cf5a7049259"
+        }
+    ]
+}

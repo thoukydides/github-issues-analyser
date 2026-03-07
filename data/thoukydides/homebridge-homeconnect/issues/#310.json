@@ -1,0 +1,13 @@
+{
+    "issue_number": 310,
+    "updated_at": "2026-02-28T09:45:35.159Z",
+    "faq": [
+        {
+            "question": "Why does my log show `BSH.Common.Setting.PowerState` as `Undefined` or unrecognised?",
+            "answer": "The Home Connect API occasionally returns `BSH.Common.EnumType.PowerState.Undefined` for certain appliances. This is regarded as a transient error or a bug within the Home Connect API servers, as it is not a documented valid power state. \n\nTo maintain plugin stability and prevent internal logic errors, this value is intentionally not supported as a valid state. If this appears in your logs, it can safely be ignored as it represents a temporary reporting issue from the manufacturer's cloud service.",
+            "semantic_abstract": "Home Connect API servers occasionally return an `Undefined` power state enumeration that deviates from the official specification. This transient API error is treated as an unrecognised value by the plugin to avoid internal logic conflicts, rather than being mapped to a valid HomeKit state.",
+            "confidence": "high",
+            "hash": "e840060859999cdb25c1fcd8b273a02f0e4e1d19d802a297b0a5a54c9aa350e3"
+        }
+    ]
+}

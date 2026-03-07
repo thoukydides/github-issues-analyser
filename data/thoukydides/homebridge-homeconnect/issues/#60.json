@@ -1,0 +1,22 @@
+{
+    "issue_number": 60,
+    "updated_at": "2026-02-15T17:52:31.901Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Unauthorized client: grant_type is invalid`?",
+            "answer": "This error indicates a configuration mismatch between the Home Connect Developer Portal and the plugin settings. To resolve this, verify the following in the [Home Connect Developer Portal](https://developer.home-connect.com/applications):\n\n1. Ensure that **OAuth Flow** is set to **Device Flow** for your application. It defaults to *Authorization Code Grant Flow*, which is not supported by this plugin.\n2. Verify that the `clientid` in your Homebridge configuration matches the **Client ID** assigned to the specific application you created. Do not use the ID for the automatically created *API Web Client*.\n3. Ensure the `simulator` option in your configuration is set to `false` (or omitted entirely) unless you are specifically testing against the Home Connect appliance simulators.",
+            "semantic_abstract": "Incorrect OAuth configuration on the Home Connect Developer Portal, specifically selecting 'Authorization Code Grant Flow' instead of 'Device Flow', causes `grant_type` validation errors during the authentication process. This often involves using the default 'API Web Client' ID instead of a user-created application ID.",
+            "alternative_resolution": "The plugin configuration UI could include a validation check or a prominent tooltip next to the Client ID field reminding users to select 'Device Flow' in the Developer Portal.",
+            "confidence": "high",
+            "hash": "3cca0d59b27e94865318ed91654b9644c53811a1850e787cf60fd2eee294c4fe"
+        },
+        {
+            "question": "How do I complete the Home Connect authorisation process if the link fails or prompts for a code?",
+            "answer": "When the plugin starts or requires re-authorisation, it generates a unique URL in the Homebridge log. To complete the process:\n\n1. Copy the entire URL from the log (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=1234-5678`) into your web browser.\n2. When prompted to log in, you **must** use the same email address and password that you use for the official Home Connect mobile app where your appliances are registered. Do not use your Developer Portal credentials if they are different.\n3. Approve the request to access your appliances. You will then be redirected to the `Redirect URI` specified in your developer application settings.\n4. The plugin will automatically detect the completion, retrieve the tokens, and save them to your configuration. \n\nIf you see errors like `HTTP method not allowed`, ensure you are using the full URL provided in the logs and not attempting to manually visit API endpoints.",
+            "semantic_abstract": "Home Connect API authorisation via the Device Flow requires the use of the full uniquely generated URL from the plugin logs to link the Homebridge instance with the specific appliance-registered user account. Authentication failures occur if users attempt to use Developer Portal credentials instead of mobile app credentials during the grant process.",
+            "alternative_resolution": "Clarify in the plugin logs that the login credentials required are those of the Home Connect mobile app, not the Developer Portal.",
+            "confidence": "high",
+            "hash": "6eafe61885898aa94faaff00e4ca9b4e952926dc71ebbf8f8461ba4e178bdb09"
+        }
+    ]
+}

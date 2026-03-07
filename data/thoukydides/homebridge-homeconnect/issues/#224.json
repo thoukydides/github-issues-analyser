@@ -1,0 +1,13 @@
+{
+    "issue_number": 224,
+    "updated_at": "2026-02-22T15:50:07.168Z",
+    "faq": [
+        {
+            "question": "Why is the Active Program switch not selectable in HomeKit scenes or failing to start my appliance?",
+            "answer": "This issue typically occurs when the Home Connect API fails to report which program is currently selected on the appliance. The plugin relies on the `BSH.Common.Root.SelectedProgram` event to identify which program to initiate when the generic `Active Program` switch is toggled.\n\nKey details regarding this behaviour:\n\n1.  **API Event Dependency**: Some appliances (frequently washers and dryers) do not consistently generate events for program selection. Without this information, the plugin cannot determine which program to start, resulting in an `Error: No program selected` in the logs.\n2.  **Appliance Variation**: This limitation is device-specific. For example, many dishwashers correctly report the selected program, allowing the `Active Program` switch to function as expected, whereas other laundry appliances may not.\n3.  **HomeKit UI Effects**: If the plugin cannot reliably set the state of a switch due to these API limitations, HomeKit (via the Home or Eve apps) may prevent that switch from being used in scenes or automations to avoid inconsistent states.\n\nTo ensure reliable automation, it is recommended to use the **specific named program switches** (e.g., `Cotton`, `Towels`, `Eco 50`) instead of the generic `Active Program` switch. These named switches explicitly define the program to be started and do not depend on the appliance's current selection state.",
+            "semantic_abstract": "The absence of `BSH.Common.Root.SelectedProgram` events in the Home Connect API stream for specific appliance categories prevents the plugin from identifying the intended program for the generic `Active Program` switch. This technical limitation results in the switch becoming effectively read-only or failing to execute 'start' commands, particularly on affected washers and dryers, while specific named program switches remain functional.",
+            "confidence": "high",
+            "hash": "e8e4859112c1049f272d1c83e8031783ce9101a2d54f8465eda9972e679d3e05"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "issue_number": 194,
+    "updated_at": "2026-02-19T15:24:01.035Z",
+    "faq": [
+        {
+            "question": "Why does adding a `name` parameter to the plugin configuration cause an error?",
+            "answer": "The plugin uses strict schema validation for its configuration. Prior to v0.37.0, the standard Homebridge `name` property was not included in this schema, causing a validation error such as `<PLATFORM_CONFIG>.name is not a ApplianceConfig` when users attempted to rename the plugin for logging or UI purposes.\n\nFrom v0.37.0 onwards, the `name` property is accepted and preserved by the plugin. This allows you to customise the prefix used in Homebridge logs and how the bridge appears in some interfaces. Please note:\n\n*   This property is not exposed in the Homebridge Config UI editor.\n*   To use it, you must manually edit your `config.json` file to add the `\"name\": \"YourCustomName\"` field within the `HomeConnect` platform block.\n*   The plugin simply ignores this value internally, but its presence allows Homebridge to apply your preferred display name without triggering a configuration error.",
+            "semantic_abstract": "Strict configuration schema validation initially prevented the use of the standard Homebridge `name` property, resulting in startup errors. The plugin was updated to explicitly permit this optional property to support custom log prefixes and bridge naming without failing validation.",
+            "alternative_resolution": "Ensure that the plugin's configuration schema documentation or tooltip mentions that while the `name` property is supported for Homebridge logging purposes, it does not affect the plugin's internal operation or appliance naming.",
+            "confidence": "high",
+            "hash": "f6eeb9c2f85bdec480222ae8d3b9a18719b7e5998f9dab75312f39b931b8b59b"
+        }
+    ]
+}

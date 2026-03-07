@@ -1,0 +1,13 @@
+{
+    "issue_number": 244,
+    "updated_at": "2026-02-23T06:42:29.824Z",
+    "faq": [
+        {
+            "question": "Why do the logs show `(unrecognised)` tags next to certain program options?",
+            "answer": "The Home Connect API occasionally returns undocumented or model-specific options and values that are not yet included in the plugin's internal definitions. When this occurs, the plugin logs the detected interface structure and marks unknown items with a `// (unrecognised)` comment. This typically happens with newer appliance features, such as `LaundryCare.Common.Option.LowTemperatureHygiene`. While these values are unrecognised, the plugin can still identify their types but may not have specific logic associated with them. To resolve these messages, users should ensure they are running the latest version of the plugin. If the entries persist, the log output should be reported on the GitHub repository so that official support for the new definitions can be added in a future update.",
+            "semantic_abstract": "The Home Connect API frequently exposes undocumented program options and status values that deviate from the public specification. The plugin detects these discrepancies during runtime and logs them as unrecognised entries to facilitate the identification of missing metadata for integration into the plugin's type definitions.",
+            "confidence": "high",
+            "hash": "beeb0071f43f65d9f9474741d35227fefedfd1b263a20fddf7470f680e9c027f"
+        }
+    ]
+}

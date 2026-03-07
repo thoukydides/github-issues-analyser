@@ -1,0 +1,12 @@
+{
+    "issue_number": 272,
+    "updated_at": "2026-02-25T09:28:22.545Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Found X appliances (0 added, 0 removed)` periodically?",
+            "answer": "This message appears because the plugin currently performs periodic polling of the Home Connect API to discover any new or removed appliances. This ensures that changes to your Home Connect account are reflected in Homebridge without requiring a manual restart.\n\nThe maintainer plans to replace this polling mechanism with a more efficient event-based approach using `PAIRED` and `DEPAIRED` events from the Home Connect event stream. Once this enhancement is implemented, these log messages will only be generated when an appliance is actually added or removed from the account.",
+            "semantic_abstract": "The plugin's periodic polling of the Home Connect API for appliance discovery results in recurring log messages showing the count of found appliances. A planned transition to event-based discovery using PAIRED and DEPAIRED notifications will eliminate these periodic status updates in favour of activity-based logging.",
+            "hash": "e11d5f3f8af9ea9c301cae9b1122cf09a60eab50682d1f6dcd61aa31a5757ca7"
+        }
+    ]
+}

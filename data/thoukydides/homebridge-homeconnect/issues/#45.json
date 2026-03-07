@@ -1,0 +1,14 @@
+{
+    "issue_number": 45,
+    "updated_at": "2026-02-12T19:35:48.123Z",
+    "faq": [
+        {
+            "question": "Why are coffee maker maintenance events like `drip tray full` mapped to a stateless switch instead of a contact sensor?",
+            "answer": "Coffee makers using the Home Connect API only report events for changes to the state of maintenance components, such as the bean container, water tank, or drip tray. These are instantaneous events rather than queryable states; the plugin cannot determine the current status of these components when it starts or when a connection is first established.\n\nTo align with the HomeKit Accessory Protocol (HAP) specification, these transient events are mapped to a `Stateless Programmable Switch`. A `Contact Sensor` would be inappropriate because it is designed to represent a continuous state (e.g. open or closed), which the plugin cannot reliably maintain without the ability to poll the appliance for the current status. Users wishing to receive notifications for these events can use the switch presses to trigger HomeKit automations or use third-party HomeKit apps that support notifications for stateless switches.",
+            "semantic_abstract": "Home Connect coffee makers broadcast asynchronous events for maintenance conditions rather than providing a queryable state, leading to the mapping of these events to HomeKit `StatelessProgrammableSwitch` services. This design choice adheres to HAP specifications for transient events and accounts for the inability to determine the current state of the appliance components during plugin initialization.",
+            "alternative_resolution": "The plugin documentation could be updated to include a guide or examples on how to configure HomeKit automations to generate notifications from stateless switch events, addressing the limitation of the native Apple Home app's notification system for switches.",
+            "confidence": "high",
+            "hash": "fb59e91d4a16cb9d82b4fe10a65187f22752a3edec5a9ab3f3f8dbb2de78aeb4"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "issue_number": 273,
+    "updated_at": "2026-02-25T05:11:18.915Z",
+    "faq": [
+        {
+            "question": "Why have some program options or specific programs disappeared for my appliance?",
+            "answer": "The plugin dynamically retrieves the list of available programs and their configurable options (such as temperature or spin speed) directly from the Home Connect API. If the API reports that a program has no options or is currently unavailable, the plugin will update its state to reflect this, which may result in missing controls in HomeKit.\n\nThis behaviour is typically caused by transient issues with the Home Connect cloud services or the appliance firmware failing to provide full details to the API. To resolve this, you can force the plugin to re-read the supported program details:\n\n1.  Ensure the appliance is on and connected to your Wi-Fi.\n2.  Open a HomeKit app that supports the `Identify` routine (such as the Eve app) and trigger the **ID** or **Identify** button for the affected appliance.\n3.  Check the Homebridge logs; the plugin will log the raw API response and re-initialise the available services.\n\nIf options remain missing, it is likely a server-side limitation or outage at Home Connect. You can monitor the API status at the [Home Connect status page](https://homeconnect.thouky.co.uk/).",
+            "semantic_abstract": "Home Connect API server-side instability or transient outages can cause appliance programs and options to be reported as missing or unavailable. This results in the plugin removing the corresponding HomeKit characteristics, which can be recovered by triggering the HomeKit Identify routine to force a metadata refresh from the API.",
+            "maintainer_authority": "The maintainer confirmed that the plugin accurately reflects the API response and that missing options are usually a result of the Home Connect cloud service failing to provide valid data for specific programs.",
+            "hash": "c05ece2c5ee6df49443ee0da21ced64268c0464596094562f475737b9f12e3da"
+        }
+    ]
+}

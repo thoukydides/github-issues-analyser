@@ -1,0 +1,12 @@
+{
+    "issue_number": 277,
+    "updated_at": "2026-02-25T12:00:51.704Z",
+    "faq": [
+        {
+            "question": "Why do my logs show `(unrecognised)` next to some appliance options?",
+            "answer": "The plugin logs appliance capabilities that are not currently supported or are undocumented in the Home Connect API specification. These items are marked with `(unrecognised)` within a log block formatted as a TypeScript `interface` (such as `OptionValues` or `SettingValues`). If these appear in your logs, please report them by opening a GitHub issue and including the relevant log snippet. This information allows the maintainer to update the plugin to support these additional features and settings.",
+            "semantic_abstract": "Home Connect appliances may expose undocumented API options or settings that the plugin does not natively recognise. The plugin identifies these unknown keys during the appliance discovery process and logs them with an `(unrecognised)` annotation, facilitating the technical expansion of the plugin's supported feature set via user-provided log data.",
+            "hash": "728a20ef8e5f7769d21413c3923ddc5d898101b83cb97d6f5742433f3e5f9f7d"
+        }
+    ]
+}

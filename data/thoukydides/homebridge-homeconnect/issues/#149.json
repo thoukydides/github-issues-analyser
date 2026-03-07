@@ -1,0 +1,14 @@
+{
+    "issue_number": 149,
+    "updated_at": "2026-02-17T10:12:58.621Z",
+    "faq": [
+        {
+            "question": "Why does my coffee machine fail to start or show Not responding when using the switch in the Home app?",
+            "answer": "Coffee machine appliances often expose multiple `Switch` services to HomeKit, including: \n\n* **Power**: Controls the standby state of the machine.\n* **Active Program**: Starts or stops the currently selected program.\n* **Custom Program**: Specifically triggers a user-defined program (e.g. Ristretto).\n* **Cup Warmer**: (If supported) Controls the warming plate.\n\nBy default, the Apple Home app may group these separate services into a single tile. Toggling this combined tile attempts to activate all switches simultaneously. Because coffee machines require time to power on and initialise, attempting to start a program at the same time as the power switch will typically result in a failure or a `Not responding` status in the Home app.\n\nTo resolve this, you should configure the Home app to display these services individually:\n\n1. Open the **Home** app and find the coffee machine accessory tile.\n2. Long-press the tile and select **Accessory Details**.\n3. Scroll down and select **Show as Separate Tiles**.\n\nThis allows you to power on the machine first, wait for it to reach a ready state, and then trigger the specific program switch.",
+            "semantic_abstract": "HomeKit default grouping of multiple `Switch` services (Power, Active Program, Custom Programs) into a single tile causes simultaneous command execution that conflicts with the sequential operational requirements of coffee machines. This hardware-specific timing constraint often results in `Not responding` errors or API 409 Conflict errors when the power-on and program-start commands are sent concurrently.",
+            "alternative_resolution": "The plugin documentation could be updated to explicitly recommend the Show as Separate Tiles setting for coffee machines to prevent simultaneous command conflicts.",
+            "confidence": "high",
+            "hash": "a6ae07efdd052c1b52a10ec0f4ff3f0739695054ba80eda6a9f6cac1ef8e998e"
+        }
+    ]
+}

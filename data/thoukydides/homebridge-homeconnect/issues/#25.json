@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 25,
+    "updated_at": "2026-02-11T09:28:05.963Z",
+    "faq": [
+        {
+            "question": "Why are program switches still visible even after disabling them in the configuration?",
+            "answer": "If you have configured specific appliances to hide their program switches (e.g. by setting `Program Switches` to `No individual program switches`) but they still appear, this is typically caused by a mismatch in the appliance identifier (`haId`) within your `config.json`.\n\nThe plugin applies per-appliance settings by matching the `haId` exactly. To ensure your configuration is applied correctly, check the following:\n\n* **Exact Match**: The `haId` must have matching case and punctuation.\n* **No Hidden Characters**: Ensure there are no leading or trailing spaces in the identifier string.\n* **Consistency**: The logic for hiding program switches is shared across all appliance types (except Hoods). If the setting works for one appliance but not another, the issue is almost certainly the identifier used in the configuration.\n\nYou can find the correct `haId` for your appliances in the Homebridge logs during plugin startup or through the Homebridge UI settings.",
+            "semantic_abstract": "Configuration overrides for specific appliances fail when the `haId` (Home Appliance ID) string does not match the device identifier exactly due to case sensitivity, punctuation, or trailing spaces. This prevents the plugin from applying settings such as program switch visibility to the intended hardware instance.",
+            "alternative_resolution": "The configuration UI could be improved by providing a dropdown list of discovered `haId` values instead of requiring manual text entry, reducing the risk of typographical errors. Additionally, the plugin could log a confirmation message when a configuration block is successfully matched to a detected appliance.",
+            "confidence": "high",
+            "hash": "83975dbb40f0dca58c0d7eca867fd5d8edf30eefc87ed4357ddcaeb45752d06b"
+        }
+    ]
+}

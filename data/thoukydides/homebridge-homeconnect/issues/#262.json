@@ -1,0 +1,13 @@
+{
+    "issue_number": 262,
+    "updated_at": "2026-02-24T12:03:12.395Z",
+    "faq": [
+        {
+            "question": "Why does the log show unrecognised `ProgramKey` or other API values?",
+            "answer": "The Home Connect API frequently uses identifiers for programs, options, and statuses that are not included in the official developer documentation. When the plugin encounters a value it does not recognise, it logs a snippet of TypeScript code (for example, marking a `ProgramKey` as `unrecognised`). This is expected behaviour when using appliances with newer firmware or regional specialisations, such as identifying cycle-specific identifiers like `LaundryCare.Washer.Program.Spin.SpinDrain` or `LaundryCare.Washer.Program.Rinse`. Users should first ensure they are running the latest version of the plugin; if the logs persist, providing these snippets in a GitHub issue allows the maintainer to map these undocumented features for all users.",
+            "semantic_abstract": "Home Connect API implementations often include appliance-specific or region-specific identifiers that are absent from official documentation. The plugin identifies these mismatches and logs them as unrecognised values to facilitate manual mapping of undocumented firmware features into the plugin's service definitions.",
+            "confidence": "high",
+            "hash": "4486d2fdab245e91ae6b17b329af82e6200eedec8ada4aadac327fe77c1b2e1a"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "issue_number": 199,
+    "updated_at": "2026-02-19T19:58:35.970Z",
+    "faq": [
+        {
+            "question": "Why are some appliance programs or options logged as `(unrecognised)`?",
+            "answer": "The Home Connect API frequently reports values that differ from its official documentation or are not documented at all. This results in the plugin logging these values as `(unrecognised)`. Common causes include:\n\n* **API Mismatches**: An appliance may use slightly different keys than documented. For example, some washers use `LaundryCare.Washer.Option.IDos1.Active` (with an extra period) instead of the documented `LaundryCare.Washer.Option.IDos1Active`.\n* **Undocumented Options**: Appliances often report internal state or new features via options like `LaundryCare.Common.Option.ProcessPhase` which are not listed in public API references.\n* **Firmware Updates**: New programs or settings may be introduced by the manufacturer that have not yet been mapped in the plugin.\n\nThese warnings indicate that the specific feature cannot be fully controlled or displayed by the plugin. If you encounter these after updating to the latest version of the plugin, please provide the relevant log snippet in a new GitHub issue so that support for the missing values can be added.",
+            "semantic_abstract": "Home Connect appliances often utilise program keys and option identifiers that deviate from the official API specification or are entirely undocumented, such as variations in i-Dos activation keys or internal process phase trackers. These discrepancies result in `(unrecognised)` warnings in the logs and require manual updates to the plugin's metadata to ensure correct mapping and functionality.",
+            "alternative_resolution": "The plugin could enhance the log message accompanying the `(unrecognised)` label to explicitly suggest reporting the specific key to the project repository if the user is already on the latest version.",
+            "confidence": "high",
+            "hash": "2e941b98c28ae685b4d7f99590c9ee6a518c707ed0c03b2d2253f149fce45c0d"
+        }
+    ]
+}

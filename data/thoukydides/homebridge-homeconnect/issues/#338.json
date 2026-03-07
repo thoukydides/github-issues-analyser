@@ -1,0 +1,13 @@
+{
+    "issue_number": 338,
+    "updated_at": "2026-03-01T13:13:14.508Z",
+    "faq": [
+        {
+            "question": "Why is the hood boost mode a separate switch instead of a fan speed?",
+            "answer": "The plugin represents Home Connect hood functionality using a combination of a `Fan` service for speed control and a `Switch` service for the boost mode. This design reflects the different behaviours of these features in the appliance firmware:\n\n1. **Standard Speeds and Intensive Levels**: These are mapped to the HomeKit fan speed percentage (e.g. 20%, 40%, 60%, 80%, and 100%). Intensive levels (typically the 80% and 100% settings) are designed to run for a fixed period—often 6 minutes—before automatically reverting to a specific lower speed, usually level 3 (60%).\n2. **Boost Mode**: On supported models (such as the Siemens LC91BUR50), the `Boost` option provides a higher fan speed for a very short duration, such as 20 seconds. Unlike intensive levels, when the boost period ends, the hood returns to the **previous** speed setting.\n\nBecause HomeKit fan speed controls represent a linear progression, incorporating a mode that reverts to an arbitrary previous state is not natively supported by the speed slider. Exposing `Boost` as a separate switch preserves this hardware behaviour and allows it to be activated independently of the current speed. This switch can be hidden in the plugin configuration if it is not required.",
+            "semantic_abstract": "Home Connect hoods distinguish between intensive levels, which revert to a fixed venting stage, and boost modes, which revert to the previously active speed. This discrepancy in state transitions necessitates mapping intensive levels to HomeKit fan speed percentages while exposing boost functionality as a standalone switch to maintain correct device behaviour.",
+            "confidence": "high",
+            "hash": "61ead4079b2ad2c940dcf960d272f05ff069e2dcdb6c9a410620f950205fc760"
+        }
+    ]
+}

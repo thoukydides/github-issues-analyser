@@ -1,0 +1,12 @@
+{
+    "issue_number": 378,
+    "updated_at": "2026-03-07T07:58:46.010Z",
+    "faq": [
+        {
+            "question": "Why does my dishwasher become unresponsive after receiving `409 Conflict` errors in the log?",
+            "answer": "If you see multiple `409 Conflict` errors with the detail `BSH.Common.Error.400.BadRequest` in your logs, it usually indicates that the plugin is attempting to stop a program that has already been stopped. This frequently happens when multiple HomeKit commands are sent to the appliance simultaneously.\n\nThe most common cause for this behaviour is **grouping the dishwasher's switches into a single tile** in the Apple Home app. When services of the same type are grouped, tapping the tile can send a blanket command to all grouped switches at once. If several program switches are set to off simultaneously, the plugin attempts to issue a `DELETE /programs/active` request for each, but only the first can succeed; subsequent requests fail because no program is active to be stopped.\n\nRepeated errors and rapid requests can trigger the **Home Connect API rate limits**:\n* A maximum of 5 program stops per minute is permitted.\n* A maximum of 10 errors is allowed within a rolling 10-minute window.\n\nOnce these limits are reached, the Home Connect API will queue or reject further requests, making the appliance appear unresponsive or \"Not Reachable\" in HomeKit until the rate limit window resets (which can take up to 10 minutes).\n\nTo resolve this:\n1. **Ungroup the switches** in the Home app so that they are treated as independent controls.\n2. Ensure you are running **v1.8.0 or newer** of the plugin, which includes logic to coalesce simultaneous program switch commands into a single API request.\n3. Avoid using Siri commands that might be interpreted as a blanket turn-off (e.g., prefer \"Turn off dishwasher power\" over a generic \"Turn off the dishwasher\").",
+            "semantic_abstract": "Grouping multiple HomeKit program switch services into a single tile causes simultaneous HAP characteristic changes, leading to redundant `DELETE` requests to the Home Connect API. This trigger-heavy behaviour results in `409 Conflict` errors and appliance unresponsiveness due to the API's strict rate limits on program stops and cumulative error counts.",
+            "hash": "832c3c48494a2fc793c01d90923eafd70e86d5e15f7f363df82b4a4118f2e381"
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+name: Publish FAQs
+permissions:
+  contents: write
+concurrency:
+  # Ensure only a single instance of this workflow runs at a time
+  group: ${{ github.workflow }}
+
+on:
+  push:
+    paths:
+      - 'data/**/faq.md'
+  workflow_dispatch:
+
+jobs:
+
+  publish-faq:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: ['thoukydides/homebridge-homeconnect', 'thoukydides/matterbridge-dyson-robot']
+
+    steps:
+      - name: Checkout analyser repository
+        uses: actions/checkout@v4
+
+      - name: Checkout Wiki repository ${{ matrix.repo }}
+        uses: actions/checkout@v4
+        with:
+          repository:   ${{ matrix.repo }}.wiki
+          path:         wiki
+          token:        ${{ secrets.PAT_PUBLISH_WIKI }}
+    
+      - name: Copy FAQ to Wiki
+        run: cp "data/${{ matrix.repo }}/faq.md" "wiki/FAQ.md"
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          cwd:              ./wiki
+          add:              FAQ.md
+          message:          'Updated FAQ'
+          default_author:   github_actions

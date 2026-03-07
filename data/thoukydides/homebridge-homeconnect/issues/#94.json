@@ -1,0 +1,14 @@
+{
+    "issue_number": 94,
+    "updated_at": "2026-02-17T05:10:07.951Z",
+    "faq": [
+        {
+            "question": "Why is my Bosch fridge freezer ice maker or dispenser not appearing in HomeKit?",
+            "answer": "Support for ice dispensers and ice makers depends entirely on whether the feature is exposed via the official Home Connect public API. Historically, this feature was unavailable to third-party integrations even if it appeared within the official Home Connect mobile app.\n\nControl for the ice dispenser (`Refrigeration.Common.Setting.Dispenser.Enabled`) was added to the plugin in version `v0.29.0` following an update to the Home Connect API in April 2023. To use this feature, ensure you meet the following requirements:\n\n*   Your plugin version is `v0.29.0` or higher.\n*   Your appliance firmware supports the `Refrigeration.Common.Setting.Dispenser.Enabled` setting via the public API.\n\nIf the ice maker still does not appear as a switch in HomeKit, you can verify API support by running Homebridge with debug logging enabled (using the `-D` flag). If the setting is not listed in the appliance details or event stream within the logs, it is not being sent by the Home Connect servers and cannot be supported by the plugin. In such cases, you may wish to contact Home Connect support to request they expose this setting in their public API.",
+            "semantic_abstract": "The availability of ice maker and dispenser controls in HomeKit is contingent upon the `Refrigeration.Common.Setting.Dispenser.Enabled` setting being exposed via the public Home Connect API. Discrepancies between the official mobile app and the plugin often arise because the mobile app utilizes private API features not yet accessible to third-party integrations.",
+            "alternative_resolution": "Include a section in the README or a dedicated 'API Limitations' document explaining that the official Home Connect app frequently uses private API endpoints, which explains why certain features (like ice makers prior to 2023) may be visible in the app but absent from the plugin.",
+            "confidence": "high",
+            "hash": "e55f6f3969bbe06a979b97e45d8a46b88f4b2638497a8387dd29af67cfe5664a"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "issue_number": 356,
+    "updated_at": "2026-03-03T07:11:01.617Z",
+    "faq": [
+        {
+            "question": "Why does the plugin output a block of TypeScript code with `unrecognised` values in the logs?",
+            "answer": "This log block is a diagnostic feature used to identify data received from the Home Connect API that is not yet defined in the plugin's internal schema. This typically happens when an appliance uses a program, status, or option that is undocumented or was recently introduced via a firmware update.\n\nThe entries marked with `// (unrecognised)` indicate specific values that the plugin does not yet know how to handle. If you see this output in your logs:\n\n1. Ensure you are running the latest version of the plugin, as support for new API values is added frequently.\n2. If the unrecognised values persist on the latest version, open a GitHub issue and provide the complete log block (the section between the `====` separators).\n\nProviding this information allows the maintainer to update the plugin's definitions and ensure your appliance's features are correctly exposed to HomeKit.",
+            "semantic_abstract": "The plugin detects Home Connect API values that are missing from its internal definitions and outputs a diagnostic log block formatted as TypeScript code. This identifies undocumented appliance programs or statuses that require addition to the plugin's schema to be fully supported, often following firmware updates or with newer hardware models.",
+            "confidence": "high",
+            "hash": "30ea46e21062010eadf8370bad62137c25e382ad4a46e1ab0381043aebf24da6"
+        }
+    ]
+}

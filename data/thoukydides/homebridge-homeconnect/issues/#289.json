@@ -1,0 +1,13 @@
+{
+    "issue_number": 289,
+    "updated_at": "2026-02-26T17:33:42.551Z",
+    "faq": [
+        {
+            "question": "Why does setting my hood fan to Auto in the Home app not immediately turn the fan on or change its mode?",
+            "answer": "The plugin prioritises the `Active` characteristic (the power switch) over the `TargetFanState` (Manual/Auto). When the fan is off, selecting **Auto** in HomeKit saves the preference within the plugin, but it typically only takes effect once the fan is subsequently switched to **On** (for example, by adjusting the speed slider). This design choice is a result of several factors:\n\n1. **API Limitations**: Many Home Connect appliances do not report current fan speed when operating in automatic mode. This makes it difficult for the plugin to provide accurate feedback to HomeKit, as the Home app expects both an active state and a rotation speed.\n2. **Hardware Variations**: Different manufacturers (such as Siemens, Bosch, and Thermador) implement automatic modes differently. Some require the fan to be explicitly `Active` before an automatic program can be engaged, while others send combined events.\n3. **HomeKit Specification**: The Apple HomeKit Accessory Protocol (HAP) does not strictly define whether setting a fan to **Auto** should implicitly power it on.\n\nIf your hood does not respond when you toggle **Auto**, ensure the fan is also switched to **On**. Be aware that because some hoods do not report speed in this mode, the Home app may display a \"No Response\" status or show an incorrect speed percentage while the automatic program is running.",
+            "semantic_abstract": "Homebridge-homeconnect manages hood fan states by prioritising the `Active` characteristic over `TargetFanState`, meaning Auto mode preferences are often only applied once the fan is powered on. This design accommodates Home Connect API limitations where some appliances do not report fan speed during automatic programs, preventing accurate HomeKit status updates. Differences in manufacturer implementations may require the fan to be explicitly set to Active before automatic modes can be engaged.",
+            "confidence": "high",
+            "hash": "b4fae942e7a1841d0034e78454b36ed0742f416d7f195eb8c6f44659c2909c64"
+        }
+    ]
+}

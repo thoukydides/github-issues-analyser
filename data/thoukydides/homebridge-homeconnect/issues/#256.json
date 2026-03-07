@@ -1,0 +1,13 @@
+{
+    "issue_number": 256,
+    "updated_at": "2026-02-23T16:29:49.987Z",
+    "faq": [
+        {
+            "question": "Why does the plugin fail to load with a `ReferenceError: ReadableStream is not defined`?",
+            "answer": "This error occurs because the plugin and its underlying dependencies (specifically `undici` used for network requests) require features available in more recent versions of Node.js. Node.js 16 and older do not have `ReadableStream` defined globally by default, which causes the plugin to fail during initialisation.\n\nTo resolve this issue, you must update your Node.js runtime to at least version 18, though version 20 LTS is recommended. If you are using HOOBS, ensure your system is updated to a version that supports Node.js 18 or 20. If you cannot upgrade your Node.js version immediately, you may be forced to use an older version of the plugin (such as v0.30.2), but please note that older versions do not receive bug fixes or support for new Home Connect API features.",
+            "semantic_abstract": "Plugin dependencies in versions 0.41.0 and later rely on global web APIs like `ReadableStream` which were introduced or standardised in Node.js 18. Environments running Node.js 16 or earlier (common in older HOOBS installations) encounter a `ReferenceError` during the fetch implementation's execution. Upgrading the Node.js runtime to a supported LTS version is required to maintain compatibility with the plugin's modern network stack.",
+            "confidence": "high",
+            "hash": "6e0359d71191800f0621c594fdf25f8732e182a2950b8ec626072d1ba042f798"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "issue_number": 230,
+    "updated_at": "2026-02-21T17:52:31.861Z",
+    "faq": [
+        {
+            "question": "Why can I not see the remaining time for my appliance in the Home app?",
+            "answer": "The remaining time for an active program is exposed by the plugin to HomeKit, but the standard Apple Home app does not currently support displaying this characteristic. To view the time remaining and other specific details, you must use a third-party HomeKit app such as the Eve app. More information on how different characteristics are mapped can be found in the project's documentation regarding HomeKit mapping and supported HomeKit apps.",
+            "semantic_abstract": "The Apple Home app lacks UI support for certain HomeKit characteristics like remaining time, although they are correctly exposed by the plugin. Users must utilize third-party HomeKit applications to access these specific appliance state metrics.",
+            "confidence": "high",
+            "hash": "03a53e97d15bd1b1199886cdba7d844f1b5d450a431c4459c49b126cc3514670"
+        },
+        {
+            "question": "Why do all my program switches have the same name in the Home app?",
+            "answer": "If multiple program switches appear with identical generic names (such as \"Dryer\"), this is typically caused by the Apple Home app's display logic rather than the plugin itself. To resolve this:\n\n1. Force-quit and restart the Apple Home app to see if the names refresh.\n2. If the names remain identical, open the settings for an individual switch in the Home app.\n3. Delete the prefix or appliance name from the name field. This action often reveals the unique program name (e.g., \"Cotton Eco\") that was previously hidden.\n4. Manually rename the switch to your preference if necessary.",
+            "semantic_abstract": "Apple Home app UI limitations can cause multiple `Switch` services for appliance programs to appear with duplicate names based on the device category. A manual workaround involving clearing the name field in the Home app settings allows the underlying unique program identifiers to be revealed and customised.",
+            "confidence": "high",
+            "hash": "33838ecb4f9346900caa991c646a8e9d67c5c1cc9b7a28ada1185a0d8fa04e26"
+        }
+    ]
+}

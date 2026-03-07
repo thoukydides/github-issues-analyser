@@ -1,0 +1,13 @@
+{
+    "issue_number": 350,
+    "updated_at": "2026-03-02T09:32:38.802Z",
+    "faq": [
+        {
+            "question": "Why is my appliance door appearing as a security device in HomeKit?",
+            "answer": "Appliance doors are mapped to the HomeKit `Door` service rather than a simple sensor. This is a deliberate design choice to ensure consistent behaviour across all supported appliances and to provide support for devices that allow the door to be opened or closed via the Home Connect API. Using a sensor-based service would preclude the ability to control door actuation where hardware supports it.\n\nBecause Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors, and receive automatic notifications when the door state changes. If these notifications are not desired, they can be disabled within the Apple Home app:\n1. Open the **Home** app and locate the appliance door accessory.\n2. Long-press the tile and select **Accessory Details**.\n3. Scroll down to **Status and Notifications**.\n4. Toggle off **Allow Notifications**.",
+            "semantic_abstract": "The plugin maps appliance door states to the HomeKit `Door` service to support both status monitoring and remote actuation capability. This mapping causes the Apple Home app to categorise the appliance as a security device and enables door-state notifications by default, which must be manually disabled by the user if unwanted.",
+            "confidence": "high",
+            "hash": "8ab53997f2c365f4ba16f964fb65d9e0ca25a96c92500a621463f2349a05ac1e"
+        }
+    ]
+}

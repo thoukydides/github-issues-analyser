@@ -1,0 +1,13 @@
+{
+    "issue_number": 295,
+    "updated_at": "2026-02-27T08:01:22.183Z",
+    "faq": [
+        {
+            "question": "Why do I see a `login session expired` or `access_denied` error during authorisation?",
+            "answer": "This error occurs due to a bug in the Home Connect and SingleKey ID authorisation servers' handling of internationalisation. If your browser's preferred language is set to a locale other than English (for example, German or Spanish), the server may fail to process the login session, returning a JSON response with `\"error\": \"access_denied\"` and `\"error_description\": \"login session expired\"`.\n\nTo resolve this, you can use one of the following workarounds:\n\n1.  **Adjust browser language**: In your web browser settings, move English (`en`) to the top of your preferred languages list before clicking the authorisation link. \n2.  **Adjust Homebridge language**: In the Homebridge UI, navigate to **Settings**, then **Display**, and set the language to **English**. Refresh the page to ensure the change is applied before attempting the authorisation again.\n\nYou can revert these language settings once the plugin has successfully obtained its authorisation tokens.",
+            "semantic_abstract": "Home Connect and SingleKey ID authorisation servers return a `login session expired` JSON error when the browser's `Accept-Language` header specifies a non-English locale, indicating an internationalisation bug in the OAuth device flow implementation. This third-party API limitation prevents successful authentication unless the browser or Homebridge UI is temporarily set to English. This behaviour is independent of the plugin version and affects multiple platforms using the Home Connect API.",
+            "confidence": "high",
+            "hash": "521bcb5efc2357231cbb56748a1b4b741779c200ce85beca8ccf1ca7c5388203"
+        }
+    ]
+}

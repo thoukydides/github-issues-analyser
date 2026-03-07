@@ -1,0 +1,13 @@
+{
+    "issue_number": 240,
+    "updated_at": "2026-02-22T10:53:16.239Z",
+    "faq": [
+        {
+            "question": "Can I disable the Active Program switch for my appliance?",
+            "answer": "Yes, it is possible to disable the Active Program switch in the plugin configuration. However, you should be aware that this service is not a simple toggle; it is a multi-functional service that integrates several key features:\n\n1. **Status Indicators**: The `On`, `Status Active`, and `Status Fault` characteristics are used to indicate the current operational state of the appliance.\n2. **Programme Control**: The `On` characteristic is responsible for starting, stopping, pausing, and resuming the active programme.\n3. **Time Remaining**: The `Remaining Duration` characteristic provides the time remaining until the programme finishes.\n\nDisabling the Active Program switch will remove all of these features from the HomeKit representation of the appliance. This option was introduced in v0.40.0 for users who prefer a simplified interface at the cost of these status and control functions.",
+            "semantic_abstract": "The Active Program switch service aggregates multiple HomeKit characteristics including operational status, programme control, and remaining duration. Although the service can be disabled via configuration to simplify the HomeKit UI, this action results in the loss of these interdependent status and control features.",
+            "confidence": "high",
+            "hash": "ed8fec7c8ad001b57de3ded5433305fcb0415a01043d125f6efaaa8c75b6a4d1"
+        }
+    ]
+}

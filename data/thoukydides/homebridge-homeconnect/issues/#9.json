@@ -1,0 +1,13 @@
+{
+    "issue_number": 9,
+    "updated_at": "2026-03-04T07:06:11.356Z",
+    "faq": [
+        {
+            "question": "Why are some minor changes or bug fixes not listed in the `CHANGELOG.md`?",
+            "answer": "The plugin's `CHANGELOG.md` is curated to highlight significant functional changes and features that impact the majority of users. To maintain clarity and avoid cluttering the documentation with minor technical details or internal code refactorings that do not change the user experience, less significant updates may be omitted from the primary changelog. For a complete and exhaustive record of every change made to the plugin, users should consult the GitHub commit history. Technical context for specific updates is also frequently documented within the associated GitHub issues and pull requests.",
+            "semantic_abstract": "Maintainer documentation policy prioritises user-relevant functional updates in the `CHANGELOG.md` to ensure clarity and relevance. Granular technical changes and minor refactorings are recorded in the GitHub commit history rather than the primary changelog to prevent information overload for the average user while maintaining transparency.",
+            "confidence": "high",
+            "hash": "a04dc8f877d50ea1374f93a655e22d4c55556fe27eae3042188414e4a9df9671"
+        }
+    ]
+}

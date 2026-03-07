@@ -1,0 +1,13 @@
+{
+    "issue_number": 223,
+    "updated_at": "2026-02-21T14:54:04.924Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log unrecognised Home Connect API values?",
+            "answer": "The plugin is designed to identify and log API values that are not yet known to its internal mapping, which often occurs when manufacturers introduce new appliance models or firmware updates with undocumented features. When this occurs, the plugin will output a block of code to the log—such as for `LaundryCare.Dryer.EnumType.ProcessPhase`—and prompt you to report it. Support for these values is then added in subsequent updates; for example, several dryer process phases (`CupboardDryReached`, `Drying`, and `IronDryReached`) were added in version v0.38.0. If you encounter these logs, ensure you are running the latest version of the plugin, and if the values are still listed as unrecognised, please submit a GitHub issue with the provided log snippet.",
+            "semantic_abstract": "The plugin identifies unrecognised Home Connect API identifiers, such as dryer process phases or program options, which are often the result of undocumented firmware updates or newer appliance models. This mechanism allows for the discovery of manufacturer-specific API values that can be subsequently mapped to HomeKit services in plugin updates.",
+            "confidence": "high",
+            "hash": "87a6d4c6fe2b4eb21a2a09e9bf59af7a19c4b39ba89a1b241db48dce4c88add1"
+        }
+    ]
+}

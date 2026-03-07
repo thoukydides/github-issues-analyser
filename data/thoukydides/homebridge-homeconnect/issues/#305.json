@@ -1,0 +1,13 @@
+{
+    "issue_number": 305,
+    "updated_at": "2026-02-27T15:04:02.942Z",
+    "faq": [
+        {
+            "question": "Why does the log contain a block of code with `unrecognised` comments?",
+            "answer": "The plugin includes a diagnostic feature that monitors the Home Connect API for values not currently defined in its internal schema. This occurs when appliance firmware provides undocumented options or states that were previously unknown to the plugin. When this happens, the plugin outputs a formatted block of code to the logs, identifying the specific `ProcessPhase`, `OptionValues`, or other identifiers that need to be added to the plugin definitions. If these blocks appear in your logs, first ensure you are running the latest version of the plugin, as many unrecognised values (such as certain laundry `ProcessPhase` values) are added in regular updates. If the messages persist on the latest version, please report them by opening a GitHub issue and providing the complete output between the `=` delimiters to assist with incorporating the new values into the next release.",
+            "semantic_abstract": "The plugin employs a schema-validation mechanism that identifies undocumented Home Connect API enumeration values and logs them as TypeScript-formatted code blocks. This design facilitates the identification of manufacturer-specific or firmware-dependent values, such as appliance process phases and options, allowing for their systematic integration into the plugin type definitions.",
+            "confidence": "high",
+            "hash": "c3b1f42e2f0b90cd7efaa898c462f820a894a352de47ca3b3ae8c76342cfa40f"
+        }
+    ]
+}

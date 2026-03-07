@@ -1,0 +1,21 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 11,
+    "updated_at": "2026-02-09T11:26:20.704Z",
+    "faq": [
+        {
+            "question": "Why does my appliance occasionally show as not available or return `SDK.Error.504.GatewayTimeout`?",
+            "answer": "The `SDK.Error.504.GatewayTimeout` error message indicates that the Home Connect cloud servers are experiencing internal issues or high latency. This is a server-side problem with the Home Connect API infrastructure and is not caused by the plugin. Users may observe that an appliance remains responsive within the official Home Connect mobile app while failing via HomeKit, as the app and the public API can use different communication paths or experience different levels of load. If these errors occur frequently, it usually indicates transient instability in the Home Connect service.",
+            "alternative_resolution": "The plugin could detect specific common server-side errors like 504 Gateway Timeout and include a brief explanation or a link to the troubleshooting documentation in the log output to reduce user confusion.",
+            "tags": [
+                "SDK.Error.504.GatewayTimeout",
+                "connectivity",
+                "api-error",
+                "coffee-maker"
+            ],
+            "confidence": "high",
+            "hash": "d4f5f82485f5a180cc09bdd61dadc0de3677efaa988aff587cd486aab5549ab0"
+        }
+    ]
+}

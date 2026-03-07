@@ -1,0 +1,14 @@
+{
+    "issue_number": 55,
+    "updated_at": "2026-02-13T15:09:58.277Z",
+    "faq": [
+        {
+            "question": "How can I customise the default duration and temperature for my oven programs?",
+            "answer": "If you wish to override default settings (such as a short default duration) for oven programs, you must define them as custom programs in your `config.json`. The default \"No individual program switches\" setting does not allow for specific parameter customisation.\n\nTo configure custom settings:\n1. Set the `addprograms` property for your appliance to `custom` in the configuration.\n2. Define a `programs` array containing objects for each required program switch.\n3. Use the `options` block within each program object to specify values for keys such as:\n   - `BSH.Common.Option.Duration`: The run time in seconds (e.g. `3600` for one hour).\n   - `Cooking.Oven.Option.SetpointTemperature`: The target temperature for the program.\n   - `Cooking.Oven.Option.FastPreHeat`: Enable (`true`) or disable (`false`) fast pre-heating.\n\nIt is highly recommended to use `homebridge-config-ui-x` to edit these settings, as it helps validate the available options and keys for your specific appliance model.",
+            "semantic_abstract": "Oven program parameters like duration and temperature can be customised by defining explicit program objects in the plugin configuration. Setting `addprograms` to `custom` enables the use of the `options` block to override default Home Connect API values for specific heating modes.",
+            "alternative_resolution": "Update the documentation to clarify that program-specific options like duration and temperature are only configurable when using individual custom program switches rather than the global 'No individual program switches' mode.",
+            "confidence": "high",
+            "hash": "d41a96ae78a0b47c0a826478367dd874ae0969fed570164a353f378ab7d7026c"
+        }
+    ]
+}

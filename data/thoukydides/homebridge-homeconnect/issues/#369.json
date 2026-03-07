@@ -1,0 +1,12 @@
+{
+    "issue_number": 369,
+    "updated_at": "2026-03-06T08:53:55.736Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs show an `export type` block with `(unrecognised)` values?",
+            "answer": "The plugin includes a discovery mechanism for values from the Home Connect API that are not yet defined in its internal schema, such as new program options or appliance states. When these undocumented values are encountered, the plugin generates a TypeScript-formatted code block in the logs to assist with identification and integration.\n\nIf you see these messages in your logs:\n1. Ensure you are running the latest version of the plugin, as support for those specific API values may have already been added in a recent update.\n2. If the values are still flagged as `(unrecognised)` on the latest version, open a new issue on GitHub and provide the complete log block (the section between the `// Union types` and `// Option` lines). This information is essential for the maintainer to update the plugin's definitions and expose the corresponding functionality for your appliance model.",
+            "semantic_abstract": "The Home Connect API schema discovery mechanism identifies undocumented program options and appliance states, outputting them as TypeScript-formatted log blocks when unrecognised values are encountered. This diagnostic output facilitates the manual mapping of appliance-specific API enumerations to plugin features when API responses include options not previously defined in the internal definitions.",
+            "hash": "fc94ff564c782724e783a4b628a690f800409835a6b1b726a3a28677121fc0ff"
+        }
+    ]
+}

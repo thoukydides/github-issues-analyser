@@ -1,0 +1,20 @@
+{
+    "issue_number": 340,
+    "updated_at": "2026-03-01T10:48:02.694Z",
+    "faq": [
+        {
+            "question": "Why does my Neff oven fail to identify all program options like duration?",
+            "answer": "Some Home Connect ovens, particularly those with physical stateful rotary dials, have unique power management behaviours that interfere with the plugin's ability to discover program options. These appliances may reject requests to switch the `BSH.Common.Setting.PowerState` to `On` via the API, even if remote control is enabled. Since the plugin must typically switch an appliance on and select a program to read its supported options (like `BSH.Common.Option.Duration`), this failure prevents full discovery.\n\nThis issue was addressed in version 1.3.0. The plugin now attempts to identify program options even if the oven reports it is `Inactive` and cannot be explicitly switched to `On`, provided that the API allows program selection in that state. If you are experiencing this:\n1. Update to version 1.3.0 or later.\n2. Ensure the rotary dial is set to the **Remote Control** position.\n3. Trigger a manual identification by pressing the **ID** button in the Eve app or restarting Homebridge.",
+            "semantic_abstract": "Physical rotary dials on certain Neff ovens prevent the BSH.Common.Setting.PowerState from being set to On via the API, which traditionally blocks program option discovery. The plugin handles this by attempting to read program options while the appliance is in an Inactive state, accommodating firmware that allows program selection but not explicit power control.",
+            "confidence": "high",
+            "hash": "77ce406405a672bef12c54b69cb6cec127b5f09360267f15c1df3277df9736f5"
+        },
+        {
+            "question": "Why do I get an SDK.Error.InvalidSettingState error when trying to turn on my oven?",
+            "answer": "The `SDK.Error.InvalidSettingState` error (often accompanied by a `409 Conflict`) occurs when the Home Connect API rejects a request to change a setting because the appliance is not in a suitable state. For certain oven models, the `BSH.Common.Setting.PowerState` can only be changed to `Standby` (Off) via the API, but not to `On`. These models require the physical dial to be moved to a specific program or the 'Remote Control' mode to wake the appliance.\n\nIn these cases:\n- The Home app might briefly show the power switch as **On** before it reverts to **Off**.\n- Turning the oven **Off** via HomeKit will likely still work, as the API generally permits switching to `Standby`.\n- Plugin version 1.3.0 and later includes logic to work around this by skipping the explicit power-on step during program discovery for affected models.",
+            "semantic_abstract": "Neff ovens with manual selectors often only support transitioning to BSH.Common.EnumType.PowerState.Standby via the API, returning an SDK.Error.InvalidSettingState when a transition to On is requested. This hardware-specific limitation requires the plugin to bypass traditional power-on sequences for program metadata retrieval.",
+            "confidence": "high",
+            "hash": "9a522638ca225072952bca4c6de4a54770b3139c9bb4f295df89fd34e9899ad8"
+        }
+    ]
+}

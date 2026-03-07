@@ -1,0 +1,13 @@
+{
+    "issue_number": 286,
+    "updated_at": "2026-02-26T09:13:09.528Z",
+    "faq": [
+        {
+            "question": "How should I handle \"unrecognised\" API keys or values reported in the logs?",
+            "answer": "This message appears when an appliance reports programs, options, or statuses that are not yet defined in the plugin's internal dictionary. This is common for new appliance models or firmware updates that introduce features not yet covered by the official Home Connect API documentation.\n\nThe plugin is designed to facilitate reporting these through a semi-automated process:\n\n1. Check if a newer version of the plugin is available, as the keys may have already been added in a recent update.\n2. If the warning persists on the latest version, copy the block of code provided in the log message between the lines of `=` symbols.\n3. Use the GitHub link provided in the log to open a new issue. This link is pre-populated with relevant metadata like your appliance model and plugin version.\n4. Paste the copied code into the Log File field of the issue template.\n\nOnce a maintainer adds these identifiers to the plugin, the warning will disappear and the corresponding features will be correctly mapped to HomeKit.",
+            "semantic_abstract": "The plugin identifies undocumented Home Connect API keys and values missing from its internal schema, providing a structured reporting mechanism for users. These identifiers represent appliance-specific programs or options that must be integrated into the plugin's codebase to ensure accurate HomeKit service mapping and state representation.",
+            "confidence": "high",
+            "hash": "9e5b048c22399022ff2057bd837253faf73b782bba2a284c0197e93391e410cb"
+        }
+    ]
+}

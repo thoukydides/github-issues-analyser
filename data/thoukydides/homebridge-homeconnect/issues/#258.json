@@ -1,0 +1,13 @@
+{
+    "issue_number": 258,
+    "updated_at": "2026-02-24T08:06:45.915Z",
+    "faq": [
+        {
+            "question": "Why does the log show unrecognised or undocumented programmes and options?",
+            "answer": "The Home Connect API frequently employs programmes, options, and enum values that are not documented in the official specification. This is particularly common with newer appliance models, such as the Siemens iQ700 series, or following firmware updates. When the plugin identifies an unmapped value, it generates a diagnostic log block to help identify the missing data.\n\nIf your logs contain the text `(unrecognised)` alongside programme or option keys:\n1. **Update the plugin**: Many unmapped values are added in new releases. For example, support for several washing and drying programmes (like `WoolBasket` and `Steaming`) was added in v0.41.3 following user reports.\n2. **Report new values**: If the values persist on the latest version, the logs indicate features that the plugin cannot yet interpret. Copy the diagnostic block (the sections starting with `// Union types` or `// Option`) into a new GitHub issue. These snapshots are essential for updating the plugin's internal definitions and ensuring all appliance features are correctly exposed to HomeKit.",
+            "semantic_abstract": "Home Connect appliances frequently use undocumented programme keys and option values that differ from the published API specification, especially on newer hardware models like the Siemens iQ700 series. The plugin implements a detection mechanism that logs these unmapped identifiers to assist in updating internal type definitions and service mappings.",
+            "confidence": "high",
+            "hash": "d2a3ec87031bdd5428f09e1628dc5ff196a525a8676c6512d1dab3975bb9e655"
+        }
+    ]
+}

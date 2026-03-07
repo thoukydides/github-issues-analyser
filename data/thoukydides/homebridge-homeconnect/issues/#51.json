@@ -1,0 +1,14 @@
+{
+    "issue_number": 51,
+    "updated_at": "2026-02-13T13:43:07.719Z",
+    "faq": [
+        {
+            "question": "What values should I use for Application ID and Redirect URI when registering the Home Connect application?",
+            "answer": "When registering your application on the Home Connect developer portal, ensure you configure the following settings:\n\n1. **OAuth Flow**: This **must** be set to `Device Flow`. This setting cannot be changed after the application is created. If you have an existing application set to a different flow, you must create a new one.\n2. **Application ID**: This is a friendly name for your reference only. You can enter anything here, such as `Homebridge`.\n3. **Redirect URI** (or Success Redirect): This field is mandatory in the form but is not used by the `Device Flow`. You can enter any valid URL, such as `https://localhost` or `https://google.com`.\n\nNote that the default `API Web Client ID` often visible in new accounts is reserved for the official Home Connect web-based API client and will not work with this plugin. You must create your own application to obtain a compatible Client ID.",
+            "semantic_abstract": "Home Connect API application registration requires the selection of the `Device Flow` OAuth grant type during creation to enable plugin authorisation. While the developer portal mandates an Application ID and Redirect URI, these fields serve only as identifiers and placeholders respectively, as the device flow does not utilise web-based redirection.",
+            "alternative_resolution": "Enhance the plugin's setup documentation to explicitly state that Application ID and Redirect URI are non-functional placeholders for the Device Flow to prevent user confusion during the developer portal registration process.",
+            "confidence": "high",
+            "hash": "db9a4af07e7d4f1dd6eea6a363ea81f1899c8818d355ce88e5a079a079b45759"
+        }
+    ]
+}

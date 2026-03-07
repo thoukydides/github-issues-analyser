@@ -1,0 +1,14 @@
+{
+    "issue_number": 58,
+    "updated_at": "2026-02-13T16:08:45.674Z",
+    "faq": [
+        {
+            "question": "Why is the `HeaterCooler` service not used for fridge or freezer temperature control?",
+            "answer": "The `HeaterCooler` service in HomeKit is designed specifically for environmental climate control, such as room thermostats or air conditioning units. Using this service for appliances like fridges, freezers, or ovens introduces several issues with Siri and HomeKit semantics:\n\n1. Siri conflates the appliance's internal temperature with the ambient room temperature. Asking \"What is the temperature in the kitchen?\" would include the fridge temperature in the calculation of the room's temperature range.\n2. Commands to adjust climate control could affect the appliance. For example, asking Siri to set the room to a specific temperature might inadvertently attempt to set the fridge or freezer to that same temperature if they are assigned to the same HomeKit room.\n3. The \"mode dial\" functionality used in some climate services does not have a documented or consistent mapping for appliance-specific modes (like Sabbath or Super-Cooling) that ensures sensible voice control behaviour.\n\nTo maintain the integrity of voice control via Siri, this plugin exposes fridge and freezer modes (such as Super, Eco, Vacation, and Fresh modes) as individual `Switch` services rather than a combined climate control interface. This ensures that these features can be controlled independently without breaking the semantic model of the home's environmental settings.",
+            "semantic_abstract": "HomeKit `HeaterCooler` service mapping is avoided for appliances to prevent Siri from conflating internal appliance temperatures with ambient room temperature measurements. This design choice ensures that voice commands for climate control do not inadvertently target appliances and that room temperature reporting remains accurate. Appliance-specific modes and settings are instead exposed as discrete `Switch` services to maintain semantic integrity across the HomeKit ecosystem.",
+            "alternative_resolution": "Consider adding a section to the project documentation explaining the project's design philosophy regarding Siri semantic integrity and why specific HomeKit services (like `HeaterCooler` or `Television` inputs) are avoided for appliances.",
+            "confidence": "high",
+            "hash": "06c52134c092f7cda082096dd2350098ad966d0dcbd6feac47b15bd8bb00c29d"
+        }
+    ]
+}

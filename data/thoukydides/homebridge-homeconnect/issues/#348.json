@@ -1,0 +1,13 @@
+{
+    "issue_number": 348,
+    "updated_at": "2026-03-02T08:25:23.720Z",
+    "faq": [
+        {
+            "question": "Can the hood control buttons on a Home Connect hob be used to trigger HomeKit automations?",
+            "answer": "No, the physical buttons on a hob designed to control a hood are not exposed through the Home Connect API. The API does not provide any events or status updates when these buttons are pressed, which means the plugin cannot detect the interaction or expose it to HomeKit. This is a limitation of the Home Connect platform and appliance firmware rather than the plugin. Manufacturers typically design these buttons to communicate directly with compatible Home Connect hoods rather than broadcasting their state to the cloud API.",
+            "semantic_abstract": "Home Connect hobs featuring integrated hood control buttons do not broadcast button press events via the Home Connect API event stream. This API-level limitation prevents the mapping of physical hob controls to HomeKit button or switch services for wider automation purposes.",
+            "confidence": "high",
+            "hash": "2f9ea99fc05e1d5ec455aeec91bb96b9e6d150b96afdaa682c9026d30f4bbb3d"
+        }
+    ]
+}

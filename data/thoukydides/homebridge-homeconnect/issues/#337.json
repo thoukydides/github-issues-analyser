@@ -1,0 +1,13 @@
+{
+    "issue_number": 337,
+    "updated_at": "2026-03-01T07:51:00.106Z",
+    "faq": [
+        {
+            "question": "Why does the log show `unrecognised` values or a `Union types` block?",
+            "answer": "The plugin includes a diagnostic feature to identify and log values from the Home Connect API that have not yet been mapped to specific HomeKit functionalities. This occurs when a new appliance model or a firmware update introduces programs or options that were unknown at the time of the plugin's release.\n\nWhen the plugin detects these values:\n1. It outputs a block of code to the Homebridge log starting with `// Union types`.\n2. Specific entries within that block are marked with a comment such as `// (unrecognised)`.\n\nIf you see this output, please open a new issue on GitHub and provide the complete log block. This information allows the maintainer to update the plugin's internal definitions to support the new features. Once the maintainer incorporates these values into a new release, updating the plugin will resolve the message and enable the associated appliance functionality.",
+            "semantic_abstract": "The plugin utilises a diagnostic logging pattern to capture unmapped Home Connect API program keys and options in a `Union types` format. This design enables the discovery of new appliance-specific features and provides a structured way for users to report them for inclusion in future plugin updates.",
+            "confidence": "high",
+            "hash": "3b2d2ac81abc108b2f38fc46c8cd51bbd3d9a248e0ec277c08f26d9477116b69"
+        }
+    ]
+}

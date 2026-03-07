@@ -1,0 +1,13 @@
+{
+    "issue_number": 345,
+    "updated_at": "2026-03-02T06:06:41.747Z",
+    "faq": [
+        {
+            "question": "Why does the log show code snippets with `(unrecognised)` tags?",
+            "answer": "This occurs when an appliance reports program keys, settings, or options that are not yet included in the plugin's internal definitions. This is common with newer appliance models or firmware updates that introduce features not yet covered by the official Home Connect API documentation. When the plugin encounters these values, it automatically generates a TypeScript code snippet in the log to assist in adding support for them. If you see these messages:\n\n1. Ensure you are running the latest version of the plugin, as support for new programs is added frequently.\n2. If the unrecognised values persist on the latest version, open a GitHub issue and provide the complete log block. This allows the maintainer to update the plugin's schema to support your specific appliance model and its functionality.",
+            "semantic_abstract": "Home Connect appliances frequently report feature keys that are absent from the official API documentation, triggering `(unrecognised)` labels and auto-generated code snippets in the plugin logs. These log entries identify API implementation mismatches, providing the necessary technical data for the maintainer to update the plugin's internal schema and support new hardware models or firmware-specific programs.",
+            "confidence": "high",
+            "hash": "48d8712c421276d27f910fa7e08dbe2aa64b4ea84d39d6f8f0fc2f8398ee77d0"
+        }
+    ]
+}

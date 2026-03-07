@@ -1,0 +1,12 @@
+{
+    "issue_number": 381,
+    "updated_at": "2026-03-07T08:55:22.610Z",
+    "faq": [
+        {
+            "question": "Why does the log contain a block of code starting with `// Union types` and marked as unrecognised?",
+            "answer": "The Home Connect API is occasionally inconsistent, returning identifiers that the plugin does not yet recognise. This typically happens when a new appliance model is released or after a firmware update introduces new programs, options, or internal states.\n\nWhen this occurs, the plugin generates a diagnostic block in the logs (starting with `// Union types`, `// EventNotify`, or `// Option`) that describes these unknown values in a format the developer can easily use. If you see such a block:\n\n1. Copy the entire section, including the lines of `====` at the top and bottom.\n2. Open a new issue on GitHub to report these values.\n3. Include your appliance model number and, if possible, what it was doing at the time (e.g. which program was running).\n\nThe developer uses these reports to update the plugin's internal definitions, ensuring that your appliance's features are correctly mapped to HomeKit. In some cases, the API may return unusual values, such as localised German strings (e.g. `Pflegeleicht`) instead of technical identifiers, and these logs help in creating the necessary workarounds.",
+            "semantic_abstract": "The plugin identifies and logs undocumented Home Connect API values using a TypeScript-formatted template to facilitate the addition of support for new appliance features. These logs capture inconsistencies where the API returns unexpected identifiers or localised strings that require specific mapping or workarounds to function correctly within HomeKit.",
+            "hash": "fa8ed4a40598fccaebdba4b96c8f406dabd1565842d9bb5673e30d66da0acb17"
+        }
+    ]
+}

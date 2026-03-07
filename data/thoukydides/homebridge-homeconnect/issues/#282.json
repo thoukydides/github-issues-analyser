@@ -1,0 +1,13 @@
+{
+    "issue_number": 282,
+    "updated_at": "2026-02-26T03:17:59.002Z",
+    "faq": [
+        {
+            "question": "Why does my Homebridge log show unrecognised program keys like `Cooking.Oven.Program.Microwave.Max`?",
+            "answer": "The Home Connect API frequently introduces new program keys for newer appliances that may not yet be defined in the plugin's internal mapping. When the plugin encounters an unknown key, it outputs a diagnostic block in the logs with the label `(unrecognised)`. Specifically, support for the `Cooking.Oven.Program.Microwave.Max` program was added in `v0.42.2`. To resolve similar log messages, ensure you are running the latest version of the plugin. If the message persists on the latest version, reporting the log output helps include the missing keys in future updates.",
+            "semantic_abstract": "Home Connect appliances frequently introduce new program keys that require explicit mapping within the plugin. Unrecognised keys are flagged in the Homebridge logs to facilitate their inclusion in subsequent plugin releases, such as the addition of the microwave maximum power program for Siemens ovens.",
+            "confidence": "high",
+            "hash": "dfda4e9c4ef485b4f0460a55b275769b7f5d5de5cec0f11955cd672292e66107"
+        }
+    ]
+}

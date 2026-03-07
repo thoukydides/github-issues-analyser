@@ -1,0 +1,20 @@
+{
+    "issue_number": 288,
+    "updated_at": "2026-02-26T12:01:53.638Z",
+    "faq": [
+        {
+            "question": "Why does the log say a selected program is not supported by the Home Connect API?",
+            "answer": "This message appears when the Home Connect API reports that a specific program is currently selected on the appliance (for example, via the physical control dial), yet that same program is missing from the list of supported programs provided by the API for that model. This is an inconsistency within the Home Connect cloud service itself rather than a fault with the plugin. The plugin logs this mismatch to indicate why certain program-specific features might be unavailable or restricted for that selection.",
+            "semantic_abstract": "Home Connect API inconsistency occurs when an appliance reports a currently selected program that is not present in its own supported programs list. This discrepancy originates from the manufacturer's cloud service data and prevents the plugin from fully validating or configuring the program's options.",
+            "confidence": "high",
+            "hash": "926663bb48e573b6d6009a0b8d3af0d6c689ceb84c471545072e8e451116e093"
+        },
+        {
+            "question": "What does the log message `Using expired cache result` mean?",
+            "answer": "The plugin caches technical details about appliance programs, such as valid temperature ranges or spin speeds, because the Home Connect API only allows this information to be retrieved reliably when a program is selected but not yet running. The plugin considers this cache expired if the program has not been selected on the appliance for more than 24 hours. When the plugin requires these details but cannot refresh them from the API (because a different program is currently selected), it will use the last known data and log this message. This is expected behaviour and does not indicate a functional failure; it simply signifies that the plugin is relying on historical data for a program that has not been used recently.",
+            "semantic_abstract": "Plugin metadata caching for appliance programs is limited by the Home Connect API requirement that a program must be actively selected to query its constraints. The `Using expired cache result` warning indicates that the plugin is utilizing data older than 24 hours because the appliance has not recently been set to that specific program to allow a refresh.",
+            "confidence": "high",
+            "hash": "674ab6ebf64095db0a822ef1d0ca8751579c163377c39278918b081a16f0bb3f"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "issue_number": 198,
+    "updated_at": "2026-02-19T19:24:09.536Z",
+    "faq": [
+        {
+            "question": "Why does the log show Unrecognised Option or unrecognised keys/values?",
+            "answer": "This message indicates that your appliance is reporting features, programs, or settings that are not yet documented in the official Home Connect API or have not been previously encountered by the plugin. This is common with newer appliance models or regional variations.\n\nTo resolve this:\n1. Update to the latest version of the plugin, as support for new keys is added frequently.\n2. If the message persists, look for a log entry stating **Home Connect API returned keys/values that are unrecognised by this plugin**.\n3. Follow the instructions provided in the log to open a new GitHub issue. The plugin generates a specific URL that pre-fills the required information; you only need to paste the code block provided in the log into the issue description.\n\nProviding this information allows the maintainer to map these undocumented features and include them in a future release.",
+            "semantic_abstract": "The Home Connect API frequently exposes appliance features and options that are absent from official documentation. The plugin monitors for these undocumented keys and triggers a diagnostic log message to facilitate user reporting and subsequent integration into the plugin feature set.",
+            "alternative_resolution": "The existing log message already provides a direct link to create a pre-filled issue, which is highly effective. A brief section could be added to the troubleshooting documentation to explain that these messages are expected for newer hardware and are not indicative of a system failure.",
+            "confidence": "high",
+            "hash": "658cc2a5adb5fe2b997a9aee78ae4965eb4edb583ca2fbfc1198488bc45af893"
+        }
+    ]
+}

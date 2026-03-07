@@ -1,0 +1,14 @@
+{
+    "issue_number": 189,
+    "updated_at": "2026-02-19T09:15:59.685Z",
+    "faq": [
+        {
+            "question": "Why does the log show Unrecognised Setting or Mismatched type for my appliance?",
+            "answer": "These log messages indicate that your appliance is sending data that the plugin does not yet recognise or that conflicts with the official Home Connect API documentation. This is common with newer or manufacturer-specific features that haven't been previously mapped in the plugin.\n\nSpecific examples include:\n*   **Type Mismatches**: Some refrigeration models report door states (such as `Refrigeration.Common.Status.Door.Freezer`) using string identifiers that do not match the standard API specification.\n*   **Unrecognised Settings**: Features like internal or external fridge lighting (`Refrigeration.Common.Setting.Light.Internal.Power`) or dishwasher modes like `VarioSpeed` may be flagged as unrecognised if they haven't been added to the plugin's internal registry.\n\nTo resolve these:\n1. Ensure you are running the latest version of the plugin, as many of these mappings are added in regular updates.\n2. If the errors persist, enable the `Log API Bodies` and `Log Debug as Info` debug options in the plugin configuration.\n3. Restart the plugin and capture the logs during appliance initialisation. These logs provide the technical details required to add support for the specific settings or data types used by your appliance model.",
+            "semantic_abstract": "Home Connect appliances frequently report status values and settings that deviate from the published API documentation or use model-specific keys. These inconsistencies require the plugin to implement custom mappings for features like refrigeration door states and lighting controls to prevent type mismatch errors during initialisation.",
+            "alternative_resolution": "Enhance the plugin's logging for unrecognised keys to explicitly prompt users to provide debug logs with 'Log API Bodies' enabled to facilitate faster mapping of new appliance features.",
+            "confidence": "high",
+            "hash": "35bc57bc7701b2b321dce5899b861dd2f9d8c61fa75d5d044711c12187fe9fdd"
+        }
+    ]
+}

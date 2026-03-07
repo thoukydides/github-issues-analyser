@@ -1,0 +1,20 @@
+{
+    "issue_number": 1,
+    "updated_at": "2026-03-02T07:16:27.456Z",
+    "faq": [
+        {
+            "question": "Why are the sleep timer and fault codes not visible in my Matter controller",
+            "answer": "Although the plugin parses data for the sleep timer (`sltm`) and specific product fault codes (such as `ste1`, `iuh3`, etc.), these are not currently exposed as interactive controls in Matter. The Matter 1.4 specification does not yet define the necessary clusters or attributes to represent these specific Dyson functions. Support for these fields is included in the plugin's internal MQTT definitions primarily to ensure clean logs and to provide a foundation for future support if the Matter specification is expanded. Note that the location of sleep timer data within MQTT messages changed between older models (like the Pure Cool Link) and newer models (like the TP04), which the plugin handles automatically in version 0.2.5 and later.",
+            "semantic_abstract": "The Matter 1.4 specification provides no standard mapping for Dyson-specific attributes like sleep timers and granular fault codes, resulting in these features being parsed from MQTT but withheld from the Matter fabric. Additionally, Dyson firmware implementations vary the location of sleep timer data across MQTT message types depending on the appliance generation.",
+            "confidence": "high",
+            "hash": "749e358abfb4e5d2ca457e5482b31bdaa141d7425f098436f50f06ce6265d961"
+        },
+        {
+            "question": "Why does the plugin report extraneous field warnings after upgrading from a version older than 0.2.0",
+            "answer": "Version 0.2.0 introduced a significant change to the configuration schema to support MyDyson accounts and AWS IoT connectivity. When upgrading from a version earlier than 0.2.0, the Matterbridge configuration editor may retain legacy settings that are no longer valid. These orphaned settings will be reported as extraneous fields in the logs. To resolve this, you should review the `CHANGELOG` for version 0.2.0 and re-configure the plugin. If upgrade issues persist within the Matterbridge interface, try removing the plugin and installing the latest version to ensure the configuration is correctly initialised.",
+            "semantic_abstract": "A non-backward-compatible configuration schema change in version 0.2.0, necessitated by the shift to MyDyson account and AWS IoT support, causes log warnings for legacy settings when upgrading from earlier versions.",
+            "confidence": "high",
+            "hash": "a0028a9a21268910fbd4c9b9aa9a5da7d81a09f4f49741985296f9fc2e5ee3d4"
+        }
+    ]
+}

@@ -1,0 +1,20 @@
+{
+    "issue_number": 368,
+    "updated_at": "2026-03-06T07:52:08.840Z",
+    "faq": [
+        {
+            "question": "Why are no program switches appearing in HomeKit despite the appliance being detected?",
+            "answer": "The plugin does not automatically expose all programmes advertised by an appliance to HomeKit. This design choice prevents HomeKit from becoming cluttered and avoids exceeding the maximum number of services allowed for a single accessory. If your logs show `Adding services for 0 programs`, it means the `programs` array in your configuration is empty or missing.\n\nTo add programme switches:\n1. Review your Homebridge logs during startup to see the list of programmes advertised by your appliance.\n2. Identify the technical keys for the programmes you want (for example, `LaundryCare.Washer.Program.Cotton` or `LaundryCare.Washer.Program.DrumClean`).\n3. Add these keys to the `programs` section of the appliance configuration in `config.json`.\n4. Restart Homebridge to apply the changes.",
+            "semantic_abstract": "Appliance programmes are not automatically mapped to HomeKit services to prevent UI saturation and platform service limit issues. Users must explicitly define desired programme keys in the configuration file to generate the corresponding HomeKit switches.",
+            "confidence": "high",
+            "hash": "4f23fff9a35d445a6a96d68e2e0a7f94eab70ad007bf14a8d9367983c9dad2e5"
+        },
+        {
+            "question": "What does it mean when a program is reported as 'advertised by appliance currently unavailable' in the logs?",
+            "answer": "This message indicates that the appliance's firmware is currently reporting that a specific programme cannot be selected or started. This is a dynamic status provided by the Home Connect API based on the physical state of the machine. For example, a `DrumClean` programme may be reported as unavailable if the door is open, if a cycle is already in progress, or if specific internal sensors determine it is not appropriate. The plugin accurately reflects these constraints from the manufacturer's API; it is not a bug in the plugin itself.",
+            "semantic_abstract": "The Home Connect API dynamically reports programme availability based on the appliance's internal state and active cycles. Programmes are only available for interaction in HomeKit when the appliance firmware indicates they are valid for the current device state.",
+            "confidence": "high",
+            "hash": "b5fa5ed0afa6808e7279e41f6202508c1e7ec72327e9e3a85102508be4c55b90"
+        }
+    ]
+}

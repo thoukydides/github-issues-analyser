@@ -1,0 +1,13 @@
+{
+    "issue_number": 301,
+    "updated_at": "2026-02-27T10:03:41.639Z",
+    "faq": [
+        {
+            "question": "Why does the log show `unrecognised` code blocks for my Home Connect appliance?",
+            "answer": "The plugin includes a mechanism to detect and report values from the Home Connect API that are not yet known to its internal database. This typically occurs when a new appliance model or firmware update introduces undocumented programmes or options, such as the `LearningDishwasher` features found in some Siemens and Bosch models. When this happens, the plugin logs a block of code delimited by lines of `=` characters, with comments such as `// (unrecognised)`. This is a deliberate design choice to assist in the identification of new API constants. If these blocks appear in your logs, please ensure you are running the latest version of the plugin. If the logs persist, open a GitHub issue and provide the complete code block so that support can be added. This allows the maintainer to update the plugin's definitions and ensure full compatibility with new appliance features.",
+            "semantic_abstract": "The plugin performs runtime detection of undocumented Home Connect API schema elements, logging them as TypeScript definitions to identify missing identifiers. This mechanism captures new appliance features or programme options, such as those found in Intelligent Program models like the `LearningDishwasher`, for inclusion in subsequent plugin updates.",
+            "confidence": "high",
+            "hash": "999568c98dc231aa2ce6df866b90e563c49a40e3193e7c1ac5931a063ad2e8ca"
+        }
+    ]
+}

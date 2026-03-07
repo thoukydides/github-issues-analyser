@@ -1,0 +1,13 @@
+{
+    "issue_number": 259,
+    "updated_at": "2026-02-24T09:29:33.159Z",
+    "faq": [
+        {
+            "question": "Why does the plugin fail with a `Wasm SIMD unsupported` error on older Raspberry Pi models?",
+            "answer": "This error occurs on hardware with CPU architectures that lack SIMD (Single Instruction, Multiple Data) support, such as the ARMv6 processor used in the Raspberry Pi Zero W and early Raspberry Pi models. Certain versions of the `undici` library, a dependency used by this plugin, required these instructions for WebAssembly compilation, leading to a `CompileError` and subsequent Homebridge crash loop. This compatibility issue was addressed in plugin version `v0.41.3`. If you encounter this error, it indicates that you are running an outdated version of the plugin or its dependencies. Ensure you are using the latest release to maintain compatibility with older processor architectures.",
+            "semantic_abstract": "ARMv6 and ARMv7 CPU architectures without SIMD support are incompatible with certain WebAssembly features in Node.js dependencies, leading to `Wasm SIMD unsupported` errors. This hardware limitation requires the use of specific library versions that do not depend on SIMD instructions to ensure compatibility with devices like the Raspberry Pi Zero W.",
+            "confidence": "high",
+            "hash": "62ac0a377df9490efedaa8076f14b74cbbb381a09c985a583d4e737a5f6e1583"
+        }
+    ]
+}

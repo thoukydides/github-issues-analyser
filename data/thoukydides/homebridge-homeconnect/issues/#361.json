@@ -1,0 +1,13 @@
+{
+    "issue_number": 361,
+    "updated_at": "2026-03-03T08:59:54.725Z",
+    "faq": [
+        {
+            "question": "Why are refrigerator doors shown as security devices in the Home app?",
+            "answer": "Home Connect appliance doors are mapped to the HomeKit `Door` service to maintain consistency across the plugin and support advanced features. HomeKit automatically categorises any `Door` service as a security device, grouping it with accessories such as locks, garage doors, and alarm systems. This is a standard HomeKit behaviour that cannot be changed by the plugin.\n\nWhile many refrigerators only provide a read-only door status, the Home Connect API does support `Open Door` and `Partly Open Door` commands for specific high-end appliance types. Mapping these to a `Door` service allows the plugin to expose this control functionality where supported. For appliances that do not support remote opening, the service will simply appear as a read-only door.\n\nIf you prefer not to have the door status appear in the security category, you can disable the door functionality for that specific appliance in your Homebridge `config.json` file. Set the `Door` option to `false` within the appliance's configuration block.",
+            "semantic_abstract": "Home Connect appliance doors are mapped to the HomeKit `Door` service to support remote opening commands available on some models, resulting in HomeKit classifying them as security devices. The maintainer prioritises consistent service mapping across the plugin over device-specific sensor alternatives, even when hardware is read-only. Users can opt-out by disabling the door feature in the plugin configuration.",
+            "confidence": "high",
+            "hash": "065eac9b4ece08654b6cc76c54c779feab7ebc3bdcf5031974e9b8af1ee48e65"
+        }
+    ]
+}

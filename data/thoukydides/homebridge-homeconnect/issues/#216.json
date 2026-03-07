@@ -1,0 +1,13 @@
+{
+    "issue_number": 216,
+    "updated_at": "2026-02-21T08:57:17.465Z",
+    "faq": [
+        {
+            "question": "Why does my log contain code snippets with `(unrecognised)` comments?",
+            "answer": "The plugin includes a discovery mechanism to identify new features or values introduced by Home Connect appliance firmware. When an unknown program option, setting, or enumeration value is encountered, the plugin generates a TypeScript-formatted block in the log marked with `(unrecognised)`. This indicates that the specific feature is not yet fully supported by the plugin's internal mapping.\n\nTo resolve this and help improve the plugin:\n1. Locate the log section containing the `(unrecognised)` tags.\n2. Provide this information in a new GitHub issue, including the appliance model and the specific actions being performed when the log entry was generated.\n\nAdding these unrecognised values allows the maintainer to update the plugin's internal definitions, ensuring that all appliance capabilities are correctly exposed to HomeKit.",
+            "semantic_abstract": "Home Connect appliance firmware updates or newer models may introduce API keys and enumeration values that are missing from the plugin's static definitions. The plugin detects these discrepancies and outputs diagnostic TypeScript snippets to the log to assist in updating the internal API mapping for specific hardware features.",
+            "confidence": "high",
+            "hash": "fa69c9f69386aec7ecc40cb26ff408b6bb2fc20fe58fcecce47363ca7adb2d65"
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+{
+    "issue_number": 132,
+    "updated_at": "2026-02-18T09:12:32.325Z",
+    "faq": [
+        {
+            "question": "How can I disable HomeKit notifications for fridge or freezer door events?",
+            "answer": "Door open and close notifications are managed by the Apple Home app on a per-device basis, rather than by the plugin itself. To disable them:\n\n1. Open the Apple **Home** app.\n2. Tap the **...** (More) icon at the top of the screen and select **Home Settings**.\n3. Navigate to the **Doors** section.\n4. Locate the specific appliance accessory and toggle off **Activity Notifications**.\n\nNote that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, since v0.32.0 of the plugin, you can use the per-appliance configuration options to remove the `Door` service entirely if you do not require its state information in HomeKit.",
+            "semantic_abstract": "Apple Home app notification management for Home Connect appliances where door open/close events trigger unwanted user alerts. Explains the distinction between plugin-provided services and HomeKit-side notification configuration.",
+            "alternative_resolution": "The plugin documentation could be enhanced with a 'Notifications' section explaining that activity alerts are controlled via HomeKit settings, providing the specific path in the Home app to find these toggles.",
+            "confidence": "high",
+            "hash": "791babcfaabe174427b78ff5782ba435beb3878cb00eac339bdfde5bb1a5fa5e"
+        },
+        {
+            "question": "Why are fridge door alarms not mapped to stateful Door or Security services in HomeKit?",
+            "answer": "Home Connect events, such as door alarms or temperature warnings, are essentially stateless within the API for several reasons:\n\n* **No Polling for State**: The API provides no mechanism to query whether an event is currently active (e.g., if an alarm is 'on' or 'off') when Homebridge starts or after a loss of connectivity.\n* **Inconsistent Event Clearing**: While the API reports when an event occurs (e.g., `EventPresentState.Present`), the reporting of the 'off' state is inconsistent across different appliance types and firmware versions. Many appliances simply stop sending the 'present' event rather than explicitly sending a 'cleared' event.\n* **API Undocumented Behaviour**: The frequency of repeated alarm events (e.g., once per second) is not documented, making it unreliable to implement a timeout-based state system.\n\nBecause of these limitations, the plugin maps these events to `Stateless Programmable Switch` services. These can be used to trigger HomeKit automations, but they cannot reliably represent a persistent 'alarm active' state.",
+            "semantic_abstract": "Home Connect API event stream limitations where alarm events lack reliable state polling and 'clearing' notifications. This technical constraint necessitates mapping to HomeKit `Stateless Programmable Switch` instead of stateful services.",
+            "alternative_resolution": "Clarify in the technical documentation that 'Events' in Home Connect are distinct from 'Status' keys, and explain why the stateless nature of the former prevents persistent state mapping in HomeKit.",
+            "confidence": "high",
+            "hash": "67f713458519e3ca9493287f5fe2e71c478d280015216ea354bbb374a54da0a8"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 18,
+    "updated_at": "2026-02-10T14:01:02.738Z",
+    "faq": [
+        {
+            "question": "Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error when configuring programs?",
+            "answer": "The Home Connect API requires that values for certain program options, such as `FillQuantity` for coffee makers or `StartInRelative` for various appliances, must be exact multiples of a specific step size. If a value is provided that does not align with these increments, the API will return an error such as `Home Connect API error: ... validation failed with InvalidStepSize. [SDK.Error.InvalidOptionValue]`. The plugin attempts to mitigate this in the Homebridge configuration UI by providing dropdown menus for options with fewer than 20 permitted values, or by adding the required step size to the field description for larger ranges. When entering values, ensure they are multiples of the required step size. Using the up/down arrows in the Homebridge UI should typically snap the value to the correct increment.",
+            "alternative_resolution": "The plugin's configuration schema has been updated to include `multipleOf` constraints and descriptions. Ensure the Homebridge UI used (e.g. `homebridge-config-ui-x`) is up to date to properly interpret these schema hints.",
+            "tags": [
+                "coffee maker",
+                "InvalidStepSize",
+                "SDK.Error.InvalidOptionValue",
+                "configuration"
+            ],
+            "confidence": "high",
+            "hash": "1fff5d2c1572e350a23a40a439cbe5292aba634fc5fa1f08e715ebb19eb1a0d8"
+        }
+    ]
+}

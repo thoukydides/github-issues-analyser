@@ -1,0 +1,12 @@
+{
+    "issue_number": 19,
+    "updated_at": "2026-03-07T08:49:47.132Z",
+    "faq": [
+        {
+            "question": "Why isn't my Dyson Solarcycle Morph desk light supported?",
+            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) is a Bluetooth-only device, indicated by the `connectionCategory: 'lecOnly'` field in the Dyson cloud manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable on the local network via Wi-Fi (`wifiOnly` or `lecAndWifi`).\n\nWhile the Dyson API manifest for these lights may include MQTT-related fields such as `remoteBrokerType: 'wss'`, testing has confirmed that no traffic or control capability is actually exposed via Dyson's AWS IoT cloud gateway for these models. Without a local network interface or a functional cloud MQTT shadow, there is no technical pathway for the plugin to monitor or control the device.\n\nFrom version 1.9.1 onwards, the plugin is designed to gracefully ignore these Bluetooth-only devices during the initialisation manifest check, allowing other supported hardware (like robot vacuums or air purifiers) to function correctly.",
+            "semantic_abstract": "Dyson Solarcycle Morph desk lights utilise Bluetooth-only connectivity (indicated as `lecOnly` in API manifests), preventing local network access required for Matter bridging. Although the Dyson cloud API provides MQTT metadata for these devices, they do not expose actionable state or control via the cloud gateway, resulting in a hardware-based limitation that precludes support.",
+            "hash": "951c062185ea6fdac9d97c1100d487713e0dba65742c37d93bff45d12df1f1c0"
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "issue_number": 4,
+    "updated_at": "2026-03-07T08:58:13.964Z",
+    "faq": [
+        {
+            "question": "Why might light control for my Home Connect hood be missing or behave unexpectedly?",
+            "answer": "Support for hood lighting is included in the plugin, but its implementation is limited by the lack of physical hardware or a software simulator available to the developer. The Home Connect API documentation for these appliances is often incomplete or inconsistent with actual device behaviour.\n\nUsers experiencing issues with hood light control should be aware that:\n- The implementation relies on community feedback to verify functionality across different models.\n- Discrepancies between the plugin's behaviour and the appliance's capabilities are often due to undocumented API quirks or inaccuracies in the official specification.\n- Providing debug logs when reporting issues is the most effective way to help refine the support for these devices.",
+            "semantic_abstract": "Home Connect hood light controls are implemented based on incomplete API documentation and without access to physical hardware simulators. This results in a dependency on user-provided logs to identify and correct mismatches between the documented API specification and actual appliance behaviour.",
+            "hash": "579a13357848f2d4adb0168dd57598d9b3cbef67c9293bc6df2b9bd89931a2b0"
+        }
+    ]
+}

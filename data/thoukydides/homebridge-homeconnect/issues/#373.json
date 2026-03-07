@@ -1,0 +1,12 @@
+{
+    "issue_number": 373,
+    "updated_at": "2026-03-06T11:44:08.948Z",
+    "faq": [
+        {
+            "question": "Why does the log show unrecognised programs or settings for my Home Connect appliance?",
+            "answer": "The Home Connect API supports a wide variety of appliances, and manufacturers frequently introduce new programs, options, or settings that are not documented in the official API specification. When the plugin encounters these unknown values, it generates a formatted block of code in the logs and marks the specific items as `unrecognised`.\n\nTo have these features supported in Homebridge:\n1. Locate the block in your logs that starts and ends with a line of `=` characters.\n2. Copy the entire block, which includes the `unrecognised` comments.\n3. Open a new issue on the project GitHub, providing the log block and your appliance model details.\n\nOnce the maintainers add these identifiers to the plugin's internal definitions, the corresponding programs or settings will be correctly exposed to HomeKit.",
+            "semantic_abstract": "Manufacturers frequently update appliance firmware with new programs or options that are not yet included in the official Home Connect API documentation. This mismatch results in the plugin logging `unrecognised` debug blocks, which serve as the technical requirement for updating the plugin's internal schema to support new appliance features.",
+            "hash": "0d0522c752081d633a912176b6dee0b1fe578388193914190d74dcd12bcecb41"
+        }
+    ]
+}

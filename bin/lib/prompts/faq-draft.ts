@@ -1,0 +1,4 @@
+import { z } from "zod"
+
+export const FaqDraftSchema = z.object({ "category": z.string().describe("Section heading for this collection of FAQ entries"), "entries": z.array(z.object({ "question": z.string().describe("A concise, searchable question"), "answer": z.string().describe("The FAQ entry body in GitHub-flavoured Markdown; represent paragraph breaks and list items using standard JSON newline escapes (`\n`); do not emit literal backslash characters before `n` unless they are intended to appear in the final Markdown"), "ids": z.array(z.string().describe("The 'id' field from an existing or candidate entry")).describe("IDs of all existing and candidate entries that this entry replaces or incorporates") }).strict().describe("A single FAQ entry")).describe("List of FAQ entries in this category") }).strict().describe("Revised collection of FAQ entries for a category")
+export type FaqDraftSchema = z.infer<typeof FaqDraftSchema>

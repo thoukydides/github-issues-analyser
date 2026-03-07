@@ -1,0 +1,14 @@
+{
+    "issue_number": 144,
+    "updated_at": "2026-02-17T06:33:52.053Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log `Unexpected structure of Home Connect API event` or `Structure validation failed`?",
+            "answer": "These validation errors occur when the response from the Home Connect API does not align with the official OpenAPI/Swagger specification or the behaviour of the official appliance simulators. The plugin performs strict checking of API responses to ensure data integrity, but physical appliances often exhibit undocumented behaviours:\n\n*   **Active Program**: The `BSH.Common.Root.ActiveProgram` status may return a `null` value instead of a string when a program completes.\n*   **Connection Events**: `CONNECTED` and `DISCONNECTED` events often use structures that are not fully described in the API documentation or are missing expected data items.\n*   **Hardware vs Simulator**: Physical hardware often diverges from the behaviour seen in BSH's appliance simulators.\n\nThe plugin has been updated (v0.29.2 and later) to tolerate these specific known discrepancies. If you encounter similar validation errors on the latest version, it usually indicates a previously unseen firmware-specific quirk in the API response for your particular appliance model.",
+            "semantic_abstract": "Discrepancies between the Home Connect API documentation (OpenAPI/Swagger schema) and actual appliance firmware behaviour cause structure validation failures during event processing. These mismatches include `null` values for active programs upon completion and non-standard data structures for appliance connection status events, requiring the plugin to implement specific schema overrides for physical hardware.",
+            "alternative_resolution": "The plugin's documentation could be updated to include a dedicated section on API validation errors, explaining that these logs identify instances where Bosch/Siemens firmware deviates from their own API specifications and requesting that users provide logs to facilitate new schema overrides.",
+            "confidence": "high",
+            "hash": "f92cc1bd4206bd613c55040b3a362967227d609219c534178ee74e23e1f4c74a"
+        }
+    ]
+}

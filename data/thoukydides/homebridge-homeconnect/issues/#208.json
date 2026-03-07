@@ -1,0 +1,13 @@
+{
+    "issue_number": 208,
+    "updated_at": "2026-02-20T11:55:08.608Z",
+    "faq": [
+        {
+            "question": "Why does the log show `[409 Conflict]` for `PowerState` during appliance initialisation?",
+            "answer": "This message indicates that the plugin attempted to switch the appliance to an `On` state to query its supported programs and settings, but the Home Connect API rejected the request. This typically happens if the appliance is in a state that prevents remote power control, such as when it is already running a program, a door is open, manual controls are being used, or it has recently been interacted with. This is usually harmless, though it may result in the plugin reporting that some programs could not be selected. To resolve missing programs or unreliable options:\n\n1. Ensure the appliance is idle, has no active errors, and all consumables are replenished.\n2. Manually select (but do not start) each missing program on the appliance's physical control panel.\n3. Trigger the plugin to re-read the program details by using the **Identify** function in HomeKit (for example, the **ID** button in the Eve app) or by restarting Homebridge.\n\nMessages stating **Appliance initialisation is taking longer than expected** are also normal during this process, as the plugin must respect the Home Connect API rate limits between consecutive requests.",
+            "semantic_abstract": "Home Connect appliances may return `409 Conflict` (`SDK.Error.InvalidSettingState`) when the plugin attempts to set `BSH.Common.Setting.PowerState` to `On` for feature discovery while the device is in an incompatible physical state. This limitation prevents the plugin from querying the full list of supported programs and options, requiring manual program selection on the device followed by a cache refresh via the HomeKit `Identify` routine.",
+            "confidence": "high",
+            "hash": "c4fde10a81ccf7ee7ee27c4f46fea044107b291cdac3b7ab08c34e31d4644684"
+        }
+    ]
+}

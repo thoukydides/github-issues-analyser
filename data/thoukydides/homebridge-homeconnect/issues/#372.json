@@ -1,0 +1,12 @@
+{
+    "issue_number": 372,
+    "updated_at": "2026-03-06T10:55:42.932Z",
+    "faq": [
+        {
+            "question": "Why does the Homebridge log show `(unrecognised)` for some appliance `OptionValues`?",
+            "answer": "The plugin performs a discovery process to map the capabilities of each appliance. If the Home Connect API returns a setting or program option that is not yet known to the plugin, it is marked as `(unrecognised)` in the log. This typically occurs because the Home Connect API often includes undocumented options that are missing from the official BSH developer documentation, or because a new appliance model or firmware update has introduced features not previously encountered by the plugin.\n\nTo support these new features, the plugin needs to be updated with the specific key definitions. If you see these entries in your logs:\n1. Locate the block of text bounded by `export interface OptionValues` and the `====` lines.\n2. Open a GitHub issue and provide this log section.\n3. The maintainer can then map these new keys to allow them to be used within HomeKit in a future release.",
+            "semantic_abstract": "Home Connect API responses frequently contain undocumented program options or settings that are absent from the official developer specification. The plugin identifies these unknown keys during the appliance discovery process and marks them as `(unrecognised)` in the `OptionValues` log block, signifying a mismatch between the API response and the plugin's internal feature mapping.",
+            "hash": "7a45e6bb53e4e586afd44c4a7d0b478e873fb41df4be092a50198bb601882c8a"
+        }
+    ]
+}

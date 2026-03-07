@@ -1,0 +1,14 @@
+{
+    "issue_number": 59,
+    "updated_at": "2026-02-13T17:24:24.294Z",
+    "faq": [
+        {
+            "question": "Why does the Apple Home app show two tiles for a single Home Connect appliance?",
+            "answer": "The appearance of two tiles for a single appliance is a default display behaviour of the Apple Home app (introduced in iOS 14) and does not indicate duplicate devices. The plugin creates a single HomeKit **Accessory** for each physical appliance, which contains multiple **Services**:\n\n1.  **Main Services**: `Switch` services for power control and specific programs.\n2.  **Event Services**: `Stateless Programmable Switch` services used to report appliance events and alarms.\n\nBy default, the Apple Home app groups the main control services onto one tile but places the `Stateless Programmable Switch` services on a second separate tile. This is a design choice by Apple regarding how they present different service types. \n\nThis behaviour has no impact on Siri voice control, which interacts with the underlying accessory and its services regardless of how they are grouped in the UI. \n\nTo change how these are displayed, you can select the **Show as separate tiles** option in the accessory settings to view every service individually, and then use **Group with Other Accessories...** to combine them differently. However, note that the Home app currently does not provide an option to group `Stateless Programmable Switch` services back into the primary tile.",
+            "semantic_abstract": "The Apple Home app UI groups HomeKit services belonging to a single accessory into multiple tiles based on service types, specifically separating `Stateless Programmable Switch` services from primary control services. This presentation logic is an internal feature of the Home app and does not represent duplicate appliances or affect Siri integration.",
+            "alternative_resolution": "The plugin's documentation could be updated with a 'Frequently Seen UI Behaviours' section that explicitly explains the Apple Home app's tile grouping logic for `Stateless Programmable Switch` services to prevent user confusion regarding duplicate devices.",
+            "confidence": "high",
+            "hash": "593ed7c578c50347e94109da0fb1abf48752d2d5ce24a9e9869c853d3893fdc7"
+        }
+    ]
+}

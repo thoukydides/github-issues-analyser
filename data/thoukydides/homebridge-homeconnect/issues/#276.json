@@ -1,0 +1,13 @@
+{
+    "issue_number": 276,
+    "updated_at": "2026-02-25T08:06:56.972Z",
+    "faq": [
+        {
+            "question": "Why am I seeing the error `getaddrinfo ENOTFOUND api.home-connect.com`?",
+            "answer": "The `ENOTFOUND` error is a standard Node.js/system error indicating a DNS resolution failure. It means the host system running Homebridge is unable to translate the hostname `api.home-connect.com` into an IP address. This is typically caused by a network configuration issue or a temporary problem with your DNS provider.\n\nTo resolve this issue, check the following:\n1. Ensure the Homebridge host has a working internet connection.\n2. Test DNS resolution from a shell on the same system using `dig api.home-connect.com` or `nslookup api.home-connect.com`.\n3. If your system is configured to use your router as its DNS server via DHCP, try manually setting a public DNS provider (such as Google's `8.8.8.8` or Cloudflare's `1.1.1.1`) in your operating system's network configuration.\n4. Verify if any local firewall or DNS filtering (like Pi-hole or AdGuard Home) is blocking requests to `api.home-connect.com` or its underlying Amazon Web Services (AWS) endpoints.",
+            "semantic_abstract": "DNS resolution failures on the host system prevent the plugin from locating the Home Connect API gateway, resulting in `getaddrinfo ENOTFOUND` errors during authorisation or appliance communication.",
+            "maintainer_authority": "thoukydides",
+            "hash": "cc5ba5ff7c304198edce50405365dd224cf896755bdaee615d5eee33bc1221ce"
+        }
+    ]
+}

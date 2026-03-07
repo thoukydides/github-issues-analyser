@@ -1,0 +1,22 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 8,
+    "updated_at": "2026-02-12T09:13:04.148Z",
+    "faq": [
+        {
+            "question": "Why can't I see the Pause or Resume options in the Apple Home app?",
+            "answer": "Experimental support for pausing and resuming appliance programs is implemented via the HomeKit `Active` characteristic. Apple's native Home app does not display this specific characteristic for most appliance types. To access these controls, you must use a third-party HomeKit app that supports a wider range of characteristics, such as Eve for HomeKit or Home+.",
+            "semantic_abstract": "Pause and resume functionality is mapped to the HomeKit `Active` characteristic, which is a standard characteristic often hidden by the official Apple Home app UI, requiring third-party clients for access.",
+            "confidence": "high",
+            "hash": "226b2cbfb4c0ba4a78294407de29f5556e50737a87550cd9e91dbb1b91cc27bb"
+        },
+        {
+            "question": "Why is the Pause/Resume support inconsistent between my Home Connect appliances?",
+            "answer": "Support for the `PauseProgram` and `ResumeProgram` commands varies significantly between different appliance types and firmware versions, often deviating from the official Home Connect API documentation. While the API documentation suggests broad support, the plugin has found that:\n\n1. Many appliances (including some Dishwashers and Ovens) do not support these commands via the public API despite documentation claims.\n2. Some appliances, such as certain Siemens Washers, may support `PauseProgram` but not `ResumeProgram`.\n3. The plugin (v0.19.0 and later) dynamically detects available commands for each appliance and only exposes supported functions. If the options are missing, your specific hardware or firmware likely does not support the feature via the Home Connect API.",
+            "semantic_abstract": "Inconsistencies in Pause/Resume support arise from discrepancies between the Home Connect API documentation and actual firmware implementations, where specific command keys like `BSH.Common.Command.PauseProgram` are often unsupported or only partially implemented on a per-device basis.",
+            "confidence": "high",
+            "hash": "5b9ea1c9a493f2f02323e33829e9c2a102ffe8200f19aae25b47a44e0fe7846f"
+        }
+    ]
+}

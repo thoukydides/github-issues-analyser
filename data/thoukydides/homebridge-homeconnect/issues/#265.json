@@ -1,0 +1,12 @@
+{
+    "issue_number": 265,
+    "updated_at": "2026-02-24T17:35:38.483Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs contain a block of code with `(unrecognised)` values?",
+            "answer": "The plugin is designed to detect values returned by the Home Connect API that are not yet documented or supported, such as specific appliance programmes or configuration settings. When these are encountered, a formatted block of TypeScript code is output to the logs, typically starting with `// Union types` and containing `(unrecognised)` comments next to new keys. These blocks are intended to assist in adding support for new features. If you see such a block in your logs, please first ensure you are running the latest version of the plugin. If the values are still reported as unrecognised, open a new GitHub issue and paste the entire block of code from the logs. This allows the maintainer to update the plugin's internal definitions and expose the new functionality to HomeKit.",
+            "semantic_abstract": "Home Connect API implementations frequently return values for programmes, options, or statuses that are not present in official documentation. The plugin detects these discrepancies and generates diagnostic code blocks in the logs to facilitate reporting and subsequent integration into the plugin's internal type definitions.",
+            "hash": "872dfed2ac6f0f65efe64c50d0912e65ac08fb6467748c96a1e7c678700b61e6"
+        }
+    ]
+}

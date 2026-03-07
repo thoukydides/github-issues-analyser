@@ -1,0 +1,13 @@
+{
+    "issue_number": 293,
+    "updated_at": "2026-02-26T16:14:04.733Z",
+    "faq": [
+        {
+            "question": "Why is the scheduled start time for my appliance program not being honoured?",
+            "answer": "The plugin does not perform internal timezone processing or use the location settings from your Home Connect account. Instead, it relies entirely on the local timezone of the server running Node.js and Homebridge. If a scheduled program, such as one using `BSH.Common.Option.StartInRelative`, triggers at an unexpected time, it is likely that your server is configured to a different timezone (often UTC/GMT by default).\n\nTo resolve this:\n1. Verify your server's current timezone configuration. On most Linux distributions, you can use the `timedatectl` command.\n2. Ensure the operating system or container environment is set to your correct local timezone.\n3. If you cannot change the system-wide settings, you can explicitly set the timezone for the Homebridge process by configuring the `TZ` environment variable (for example, `TZ=America/Los_Angeles`).",
+            "semantic_abstract": "The plugin relies on the host server's Node.js environment to determine the local timezone for all time-based calculations and program scheduling. Discrepancies in scheduled appliance start times typically result from the server being configured to a different timezone, such as UTC, rather than the user's actual location. Correcting the system timezone via `timedatectl` or the `TZ` environment variable ensures absolute time values are interpreted correctly.",
+            "confidence": "high",
+            "hash": "c49d44563ee90371290394ae5c2214ef7ae55786b9d84cd631836d6b5ac74a51"
+        }
+    ]
+}

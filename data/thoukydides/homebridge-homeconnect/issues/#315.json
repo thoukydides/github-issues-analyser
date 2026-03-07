@@ -1,0 +1,13 @@
+{
+    "issue_number": 315,
+    "updated_at": "2026-02-28T04:38:24.751Z",
+    "faq": [
+        {
+            "question": "Why is my appliance stuck at `Appliance initialisation is taking longer than expected`?",
+            "answer": "This message, often accompanied by `Waiting for ... features to finish initialising`, indicates that the plugin is unable to retrieve the current state or available features for your appliance from the Home Connect API. This is usually because the appliance is offline or has lost its connection to the Home Connect cloud servers. To resolve this:\n\n1. Confirm the appliance is powered on and has a stable Wi-Fi connection.\n2. Verify that the appliance is responding correctly within the official Home Connect mobile app.\n3. If the appliance is unreachable in the official app, try power cycling the appliance to force it to reconnect to the cloud.\n\nThe plugin will not expose the appliance to HomeKit until these core features (such as `Power`, `Door`, or `Programs`) have successfully initialised, ensuring that the HomeKit services are correctly configured.",
+            "semantic_abstract": "Appliance initialisation timeouts in Homebridge occur when the Home Connect API fails to provide data for required device features. This is typically caused by the physical appliance being disconnected from the manufacturer's cloud service, which prevents the plugin from discovering the device's capabilities and exposing it to HomeKit.",
+            "confidence": "high",
+            "hash": "9e82f9382e9e32110704460bafec282bbde1ba75422b8fecb7d7690cb952d56b"
+        }
+    ]
+}

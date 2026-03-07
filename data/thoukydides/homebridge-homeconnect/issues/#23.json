@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 23,
+    "updated_at": "2026-02-10T19:39:12.136Z",
+    "faq": [
+        {
+            "question": "Why does the plugin not support IFTTT integration for features missing from the Home Connect API?",
+            "answer": "Integration with IFTTT has been explicitly declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes several key technical and design constraints:\n\n* **Complexity and Maintenance**: Implementing a hybrid control system where some actions use the Home Connect API and others use IFTTT would create significant code complexity and \"feature creep\".\n* **User Configuration Burden**: Direct integration would rely on users manually creating appropriate IFTTT applets and then precisely configuring this plugin to match, which is prone to user error.\n* **State Synchronisation**: Updating HomeKit characteristics from IFTTT triggers (e.g. via webhooks for notifications like `i-Dos low`) is technically difficult to implement reliably within the current architecture.\n* **Interface Clutter**: Adding additional manual switches for IFTTT actions would further clutter the HomeKit interface, making the existing list of program switches more difficult to navigate.\n\nFor users who require IFTTT-specific functionality (such as power-off commands for certain appliances where the official API only supports power-on), it is recommended to use a dedicated plugin such as `homebridge-ifttt` alongside this one. This approach keeps the logic for different services separate and more manageable.",
+            "semantic_abstract": "Integration of IFTTT triggers within the Home Connect plugin is rejected to prevent feature creep and complex hybrid control logic between disparate APIs. Technical barriers include the difficulty of state synchronisation via webhooks and the high manual configuration overhead for users. The maintainer recommends using standalone IFTTT Homebridge plugins to bridge functionality gaps caused by Home Connect API limitations.",
+            "alternative_resolution": "The project documentation could be updated to explicitly recommend the use of `homebridge-ifttt` as the standard workaround for accessing appliance features that are exposed via IFTTT but missing from the official Home Connect API.",
+            "confidence": "high",
+            "hash": "d116eb02812b5d43cdab809d718b7443de2bd8665cb5ad23056c061d16b854a2"
+        }
+    ]
+}

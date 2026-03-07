@@ -1,0 +1,13 @@
+{
+    "issue_number": 304,
+    "updated_at": "2026-02-27T11:51:15.140Z",
+    "faq": [
+        {
+            "question": "Why does the plugin fail with `SyntaxError: Unexpected token 'with'` on Node.js v20.9.0?",
+            "answer": "This error occurs when the version of Node.js running Homebridge does not support modern JavaScript syntax (specifically Import Attributes) used by the plugin. This is a common issue for users on Synology DSM, where the available Node.js package is often restricted to v20.9.0.\n\nWhile the plugin generally requires more recent LTS versions, compatibility for Node.js v20.9.0 was specifically restored in plugin version **v1.0.5**. If you encounter this error on a Synology system, ensure you have updated the plugin to at least this version.\n\nFor optimal stability and to support modern syntax, the recommended Node.js versions are:\n1. Node.js 22: `^22.8.0`\n2. Node.js 20: `^20.17.0`\n3. Node.js 18: `^18.20.4`",
+            "semantic_abstract": "Incompatibility between older Node.js v20 minor releases and the plugin's use of Import Attributes results in a `SyntaxError`. While the plugin officially targets more recent LTS versions, specific compatibility for Node.js v20.9.0 was restored to support restricted environments like Synology DSM.",
+            "confidence": "high",
+            "hash": "5f8b5710699a1756025b261e2a48678b24c3353a96630f45c4c900a5007539c5"
+        }
+    ]
+}

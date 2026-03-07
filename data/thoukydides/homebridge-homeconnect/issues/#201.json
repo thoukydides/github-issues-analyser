@@ -1,0 +1,14 @@
+{
+    "issue_number": 201,
+    "updated_at": "2026-02-20T06:14:00.374Z",
+    "faq": [
+        {
+            "question": "Why does the log show warnings about programs being unavailable or missing options?",
+            "answer": "These warnings occur due to the way the Home Connect API handles appliance capabilities and program availability. The plugin attempts to read and cache all supported programs and their options at start-up to avoid hitting strict API rate limits and to provide a fallback when the appliance is offline.\n\nKey reasons for these warnings include:\n\n*   **Hardware Settings**: Certain programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings before they are marked as available via the API.\n*   **Appliance State**: Programs may be unavailable if the appliance is busy, requires maintenance (e.g. cleaning), or has low consumables.\n*   **Option Discovery**: Many appliances only report the valid ranges for program options (like temperature) when that specific program is currently selected. The plugin attempts to switch the appliance on and cycle through programs to read these, but this may fail with a `409 Conflict` (e.g. `BSH.Common.Setting.PowerState currently not available or writable`) if the appliance is in an incompatible state.\n\nIf you need to resolve these warnings for a specific program:\n\n1.  Ensure the program is enabled in the appliance's own settings menu.\n2.  Check that the appliance is idle, has power, and all maintenance requirements are met.\n3.  Manually select (but do not start) the affected program on the appliance and leave it for a few minutes while the plugin is running; this allows the plugin to observe and cache the options.\n4.  Trigger a re-read by restarting Homebridge or using the **Identify** routine for the appliance in your HomeKit app (e.g. the **ID** button in the Eve app).",
+            "semantic_abstract": "Home Connect appliances often report supported programs as unavailable through the API based on internal hardware settings or maintenance states, preventing the plugin from caching program-specific options. Attempts by the plugin to programmatically discover these options by switching the appliance on can trigger `409 Conflict` errors if the device is busy or if specific modes like Sabbath mode are not manually enabled on the physical unit.",
+            "alternative_resolution": "The plugin's log output already provides detailed troubleshooting steps when these warnings occur. Documentation could be updated to explicitly list 'Sabbath mode' as a common feature requiring manual activation on the appliance hardware before it appears in HomeKit.",
+            "confidence": "high",
+            "hash": "356500b47990140575c3ecbb47181630824e6fe8f8a450312b699876fe8a2530"
+        }
+    ]
+}

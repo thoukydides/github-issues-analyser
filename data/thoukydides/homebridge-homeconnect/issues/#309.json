@@ -1,0 +1,13 @@
+{
+    "issue_number": 309,
+    "updated_at": "2026-02-27T17:01:01.501Z",
+    "faq": [
+        {
+            "question": "What should I do if I see `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+            "answer": "This warning appears when your appliance reports features, settings, or washing programmes that the plugin does not yet recognise. This usually occurs with recently released appliance models or after a firmware update introduces new functionality not yet documented in the Home Connect API.\n\nTo help add support for these features:\n1. Ensure you are running the latest version of the plugin, as support for new values is frequently added.\n2. If the warning remains, locate the code block in your logs starting after the line `Just paste the following into the \"Log File\" field and submit the issue`.\n3. Follow the GitHub link provided in the logs to open a new issue. The link is specifically crafted to include your appliance's model information.\n4. Paste the copied code block into the issue and submit it.\n\nThe maintainer uses these reports to update the plugin's internal definitions. Once a new version is released containing these updates (such as the addition of `LaundryCare.Washer.Option.SpinSpeed` in v1.0.7), the warning will disappear and the new functionality may become available in HomeKit.",
+            "semantic_abstract": "Home Connect appliances frequently introduce new API keys or values that require manual addition to the plugin's internal definitions. The plugin facilitates this by detecting unrecognised data and generating a pre-formatted report that users can submit via GitHub to help the maintainer implement support for new hardware features.",
+            "confidence": "high",
+            "hash": "bfa91919922b131faefe74073cb36521ae0852592a56bb9d52479c2de67efc41"
+        }
+    ]
+}

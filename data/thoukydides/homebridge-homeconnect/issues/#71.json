@@ -1,0 +1,14 @@
+{
+    "issue_number": 71,
+    "updated_at": "2026-02-14T08:58:18.191Z",
+    "faq": [
+        {
+            "question": "Why is my Home Connect appliance unresponsive in Homebridge but working in the Home Connect app?",
+            "answer": "The Home Connect mobile app primarily communicates with appliances via the local Wi-Fi network when your phone is connected to the same network. In contrast, this plugin (and all third-party integrations) must use the public Home Connect cloud API. It is possible for an appliance to have a working local connection but a broken or stalled cloud connection.\n\nTo diagnose this, disable Wi-Fi on your mobile device to force the Home Connect app to use a cellular (remote) connection. If the appliance becomes unresponsive in the app while on cellular data, the issue lies with the appliance's connection to the Home Connect servers rather than the plugin.\n\nYou can often resolve this by: \n1.  Opening the **Home Connect app**.\n2.  Navigating to the **Settings** for the specific appliance.\n3.  Checking the **Network** section to ensure all three connection lines (appliance to cloud, cloud to phone) are green.\n4.  Toggling the **Connection to server** setting off and then back on again to force a reconnection to the cloud API.",
+            "semantic_abstract": "Home Connect appliances utilise different communication paths for the official app (local network) and third-party integrations (public cloud API), leading to scenarios where local control remains functional while API-based control fails. This discrepancy usually indicates a stalled cloud session on the appliance firmware, which can be diagnosed by testing the official app over a cellular connection and remediated by toggling the server connection setting within the appliance network configuration.",
+            "alternative_resolution": "The plugin's documentation could be updated to include a dedicated troubleshooting section for 'Local vs Remote Connectivity' explaining how to use the Home Connect app's network status indicators and cellular data testing to isolate cloud-side issues.",
+            "confidence": "high",
+            "hash": "a9f324043610a87a1581fd76f7008aba4e2e6d40cc2be8f0075755653179dc53"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "issue_number": 78,
+    "updated_at": "2026-02-14T15:49:48.282Z",
+    "faq": [
+        {
+            "question": "Why does my dishwasher occasionally turn off shortly after I start it manually?",
+            "answer": "This behaviour is typically caused by a race condition between manual operation and the plugin's background task of refreshing program option data. The Home Connect API can sometimes deliver events out of order, reporting that a program has been selected before reporting that the appliance is switched on. If the plugin's cached data for that program is outdated (older than 24 hours), it attempts to refresh the details.\n\nIf the power status hasn't updated in the plugin's state yet, it may believe it needs to turn the appliance on to read the options, and subsequently turn it back off to restore what it incorrectly perceives as the previous state. Unlike many other Home Connect appliances, dishwashers often do not implement `BSH.Common.Status.LocalControlActive`, which would normally prevent remote commands from interfering while a user is physically interacting with the machine.\n\nWhile this cannot be entirely eliminated due to the Home Connect API architecture, the plugin includes mitigations (from v0.23.8 onwards) such as:\n1. Adding a short delay to allow out-of-order events to arrive before acting.\n2. Avoiding power state changes when refreshing options for a program that is already selected.\n\nEnsure you are running the latest version of the plugin to benefit from these protections.",
+            "semantic_abstract": "Home Connect dishwashers often lack `LocalControlActive` status reporting, allowing the plugin to issue remote power commands during manual operation. Out-of-order API events (reporting program selection before power state) can trigger a race condition where the plugin's program option cache refresh sequence incorrectly turns the appliance off to restore a perceived idle state.",
+            "confidence": "high",
+            "hash": "26c000879e7915c43e5c9afedff7ed8737c05987b730139e80f93d24ecbd8876"
+        },
+        {
+            "question": "What does the log message `Selected program ... is not supported by the Home Connect API` mean?",
+            "answer": "This message is a cosmetic warning that occurs when an appliance reports a program selection event before the plugin has finished fetching or loading the list of supported programs from the Home Connect API. This most commonly happens during the initial plugin startup or after the local cache has been cleared.\n\nThe plugin avoids requesting specific options for a program until it has confirmed the program's existence in the supported list. Once the full list of programs is retrieved from the API, the plugin will automatically fetch the necessary details. This message does not indicate a functional failure and can be safely ignored if it only appears briefly during startup or cache refresh operations.",
+            "semantic_abstract": "The plugin logs a technical warning when a program selection event is received before the internal cache of supported programs is fully populated. This is a transient state occurring during initialisation or cache refresh and does not prevent the plugin from eventually supporting the program once the metadata retrieval is complete.",
+            "alternative_resolution": "The log message could be downgraded from a warning to an info/debug level or suppressed entirely if the `supportedPrograms` list is currently null/loading, as this is an expected transient state during startup.",
+            "confidence": "high",
+            "hash": "c9c798d86feb9440bda60024245ca6cc42cf1f642845606609f4d671df83cc30"
+        }
+    ]
+}

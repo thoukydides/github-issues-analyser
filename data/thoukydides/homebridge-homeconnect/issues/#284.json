@@ -1,0 +1,13 @@
+{
+    "issue_number": 284,
+    "updated_at": "2026-02-26T06:34:30.846Z",
+    "faq": [
+        {
+            "question": "Why does my log show `unrecognised` next to a `ProgramKey` or other API value?",
+            "answer": "The plugin maps Home Connect API keys to HomeKit services and characteristics. If an appliance uses a program or setting that is undocumented or recently introduced by the manufacturer, the plugin will label it as `// (unrecognised)` in the logs. This typically occurs when the appliance firmware includes features not yet documented in the official Home Connect API specification or when a new appliance model uses unique identifiers for its programs. While the plugin can often still operate with these values, they may not be fully exposed to HomeKit until their definitions are added to the code. If you identify unrecognised values (such as `Dishcare.Dishwasher.Program.GlassShine`), please open a GitHub issue including the log output and your appliance model number so the definitions can be updated.",
+            "semantic_abstract": "Home Connect appliance firmware frequently implements program keys and configuration options that are missing from the official API documentation, resulting in `unrecognised` labels within the plugin diagnostic logs. This technical discrepancy between the API specification and actual device behaviour requires manual identification and mapping of specific identifiers to ensure correct HomeKit integration.",
+            "confidence": "high",
+            "hash": "a2a69c754a36a2ff11f5418dc0e548a9ced965c41853dc004ae75bb324b165fe"
+        }
+    ]
+}

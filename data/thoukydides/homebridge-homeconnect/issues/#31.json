@@ -1,0 +1,14 @@
+{
+    "issue_number": 31,
+    "updated_at": "2026-02-18T12:01:38.385Z",
+    "faq": [
+        {
+            "question": "Why are there extra buttons with numeric labels for my Home Connect appliances in the Home app?",
+            "answer": "These buttons represent `Stateless Programmable Switch` services that the plugin creates to enable HomeKit automation triggers for specific appliance events. Examples include a dishwasher finishing its cycle, a cooktop timer ending, or a hood program completing.\n\nDue to a limitation in Apple's Home app, these services are often displayed with generic numeric labels (e.g., 1, 2, 3) rather than the descriptive names provided by the plugin. This makes them appear as unconfigured or mysterious buttons.\n\nYou have several options for managing these:\n1. Use a more advanced HomeKit app (such as Home+) which correctly displays the service names, making it easier to set up automations.\n2. Disable these services globally or per appliance within the plugin configuration. Options are available to remove `Stateless Programmable Switch` services if you do not require automation triggers.\n3. Customise other exposed services, such as `Switch` for appliance mode settings or `Door` for door status, via the same per-appliance configuration settings.",
+            "semantic_abstract": "Home Connect appliance events are mapped to HomeKit `Stateless Programmable Switch` services to enable automation triggers, which the Apple Home app displays as generic numeric buttons due to platform UI limitations. These automation services can be disabled via per-appliance configuration settings if they are not required by the user.",
+            "alternative_resolution": "Ensure the plugin configuration UI clearly categorises these services as 'Automation Triggers' to help users understand their purpose when they appear in the Home app.",
+            "confidence": "high",
+            "hash": "241ed0eddc786ab375c3f6171552083fe143e3852c5aeee8d805a66bb5c2982b"
+        }
+    ]
+}

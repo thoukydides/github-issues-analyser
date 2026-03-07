@@ -1,0 +1,13 @@
+{
+    "issue_number": 278,
+    "updated_at": "2026-02-25T15:33:23.691Z",
+    "faq": [
+        {
+            "question": "How do I report unrecognised programs or Union types appearing in the logs?",
+            "answer": "These log entries appear when the plugin encounters a value from the Home Connect API—such as a program, option, or setting—that is not currently in its internal database. This typically occurs with newer appliance models, regional variants, or firmware updates that introduce undocumented identifiers.\n\nThe plugin is designed to detect these unknown values and print a formatted diagnostic block to the logs to simplify the reporting process. If you see this output:\n\n1. Copy the entire block starting from `// Union types` down to the final `================`. \n2. Open a new issue on the GitHub repository.\n3. Include your appliance model number and the copied log snippet in the report.\n\nThe maintainer will use this information to add the missing identifiers to the plugin. Once the new version is released, the unrecognised values will be fully supported and available for use in HomeKit.",
+            "semantic_abstract": "Home Connect appliances often utilise undocumented program identifiers and settings that are not part of the standard API specification. The plugin identifies these unknown values and outputs diagnostic code snippets to the Homebridge logs, facilitating user reporting and subsequent integration into the plugin's supported feature set.",
+            "confidence": "high",
+            "hash": "e4b620f3b95e43b981350c94e7cdd227eac6caf9680c0dad38c680f4dfa9c59d"
+        }
+    ]
+}

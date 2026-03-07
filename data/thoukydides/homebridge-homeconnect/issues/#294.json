@@ -1,0 +1,13 @@
+{
+    "issue_number": 294,
+    "updated_at": "2026-02-27T03:12:49.889Z",
+    "faq": [
+        {
+            "question": "Do I need to list every appliance in the configuration?",
+            "answer": "No. The plugin is designed to automatically discover all appliances linked to your Home Connect account without requiring them to be manually added to the `config.json` file. You only need to add specific entries to the `appliances` section if you wish to override the default behaviour for a device, such as:\n\n* Disabling a specific appliance so it does not appear in HomeKit.\n* Changing the service type or name for a specific device.\n* Applying specific feature flags or customisations.\n\nAny appliance not explicitly mentioned in your configuration will be enabled and exposed to HomeKit using its default settings. Note that version 1.0.0 briefly introduced a regression where unlisted devices caused a `TypeError: Cannot read properties of undefined (reading 'enabled')`, but this was corrected in version 1.0.1 and the intended automatic discovery behaviour has been restored.",
+            "semantic_abstract": "The plugin implements automatic appliance discovery for all devices associated with the Home Connect account, making manual configuration entries optional. Explicit configuration is only necessary for overriding default behaviours or excluding specific devices from the platform. The discovery mechanism ensures all account-linked devices are exposed to HomeKit by default unless specifically suppressed in the plugin settings.",
+            "confidence": "high",
+            "hash": "4d502464c8edc105f542e359e2cd693fcc85746447e5b6de8b437cc1857a4c44"
+        }
+    ]
+}

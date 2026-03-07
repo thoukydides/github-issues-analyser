@@ -1,0 +1,14 @@
+{
+    "issue_number": 114,
+    "updated_at": "2026-02-16T03:25:54.418Z",
+    "faq": [
+        {
+            "question": "Why does the Apple Home app not show the remaining time for my appliance?",
+            "answer": "The plugin exposes the `Remaining Duration` characteristic to HomeKit for all supported appliances. However, the official Apple Home app only displays this information for specific accessory types, such as `Irrigation System` and `Valve` services. It does not currently show this value for other appliance types like washing machines, dishwashers, or ovens.\n\nTo view the remaining time, you can use third-party HomeKit applications (such as Home+ or Controller for HomeKit), which support displaying a wider range of standard HomeKit characteristics that Apple's own app hides.",
+            "semantic_abstract": "Home Connect appliance program remaining duration is exposed using standard HomeKit characteristics, but the Apple Home app UI restricts its display to specific service types like Irrigation Systems and Valves. This limitation is a characteristic of the Apple Home app rather than the plugin or the Home Connect API.",
+            "alternative_resolution": "Update the documentation to explicitly mention that the `Remaining Duration` characteristic, while provided by the plugin, is not rendered by the official Apple Home app for most appliance categories.",
+            "confidence": "high",
+            "hash": "0f03fbb2e9a0ec2e7df8bb03894b278fbf8c1cd7224ff3fe55a493156300bcfb"
+        }
+    ]
+}

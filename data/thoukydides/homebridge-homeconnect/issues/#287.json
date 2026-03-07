@@ -1,0 +1,13 @@
+{
+    "issue_number": 287,
+    "updated_at": "2026-02-26T10:13:11.887Z",
+    "faq": [
+        {
+            "question": "Why are some appliance programs or options appearing as `unrecognised` in the logs?",
+            "answer": "When the plugin identifies appliance features that do not match the known Home Connect API specification, it logs them as `(unrecognised)`. This typically occurs because the appliance (often a newer model or regional variant like the Siemens `WN54C2070/01` WasherDryer) is using identifiers that are not yet included in the plugin's internal definitions. These missing definitions prevent the plugin from correctly mapping specific programmes or options to HomeKit.\n\nIf you see log output containing blocks like `export type ProgramKey` or `export interface EventNotifyValues` followed by `(unrecognised)`:\n1. Update to the latest version of the plugin. Support for several undocumented `WasherDryer` programs (such as `HHSynthetics`, `WD45`, and `Eco4060`) was added in `v0.42.4`.\n2. If the programs remain unrecognised after an update, please provide the relevant log sections in a GitHub issue. The maintainers use these snippets to update the plugin's logic and support new device capabilities.",
+            "semantic_abstract": "Home Connect appliances may utilise undocumented program or option identifiers that deviate from the standard API specification, appearing as `(unrecognised)` in logs. This mismatch between documented API keys and actual device firmware requires manual updates to the plugin to ensure specific hardware features are correctly exposed to HomeKit.",
+            "confidence": "high",
+            "hash": "a63bcbf68c7c4eec9d54de9856c04057fc9051c4c225b857d4f8eace937cdfd7"
+        }
+    ]
+}

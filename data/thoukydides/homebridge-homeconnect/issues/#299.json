@@ -1,0 +1,13 @@
+{
+    "issue_number": 299,
+    "updated_at": "2026-02-27T07:26:45.193Z",
+    "faq": [
+        {
+            "question": "Why does the authorisation process fail with a `login session expired` error?",
+            "answer": "This error is a known issue caused by a bug in the Home Connect authorisation servers, which often prevents the password prompt from appearing after the username is entered. To resolve this, set **English** as the preferred language in your web browser before starting the authorisation process. Once the plugin is successfully authorised, you can revert your browser language settings to your preference.",
+            "semantic_abstract": "Home Connect authorisation server bugs cause OAuth flow interruptions resulting in `access_denied` and `login session expired` errors when the browser is configured with certain non-English language preferences. This behaviour prevents the password entry phase of the authentication sequence, requiring a temporary change to English language settings to complete the process.",
+            "confidence": "high",
+            "hash": "15d13a97d56a9f2b228d8607859e2b796b4d3a63c7470368edef5ada12d887e9"
+        }
+    ]
+}

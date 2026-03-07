@@ -1,0 +1,13 @@
+{
+    "issue_number": 327,
+    "updated_at": "2026-02-28T14:44:58.421Z",
+    "faq": [
+        {
+            "question": "Why can't I open my dishwasher door through HomeKit?",
+            "answer": "The Home Connect API currently only supports monitoring the door state (open/closed) for dishwashers. Remote control of the door is limited by the API to specific Oven and Fridge/Freezer models, and even then, it is dependent on the specific appliance hardware. For dishwashers, the `Door` service in HomeKit is read-only; it will correctly indicate whether the door is open or closed, but it cannot be used to trigger the door to open. This is a limitation of the Home Connect API rather than the plugin itself.",
+            "semantic_abstract": "The Home Connect API limits door state control to specific Oven and Fridge/Freezer models, providing only read access for Dishwasher door status. Consequently, the HomeKit `Door` service for dishwashers functions exclusively as a sensor to monitor open/closed states rather than an actuator.",
+            "confidence": "high",
+            "hash": "6ad44024538ebc701c6c2f3572844f3feb35acbb39021d31fe23ba80ec07986f"
+        }
+    ]
+}

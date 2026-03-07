@@ -1,0 +1,13 @@
+{
+    "issue_number": 300,
+    "updated_at": "2026-02-27T11:03:38.608Z",
+    "faq": [
+        {
+            "question": "Why does the plugin fail with `SyntaxError: Unexpected token 'with'`?",
+            "answer": "This error occurs when the Node.js runtime environment does not support Import Attributes (the `import ... with` syntax). This syntax was adopted by the plugin to maintain compatibility with breaking changes introduced in Node.js 22 that were subsequently backported to other Long Term Support (LTS) branches.\n\nThe plugin requires relatively recent versions of each supported Node.js LTS branch:\n\n1. **Node.js 18**: Version 18.20.0 or later.\n2. **Node.js 20**: Version 20.10.0 or later.\n3. **Node.js 22**: All versions.\n\nUsers on platforms with restricted update paths, such as Synology NAS (DSM), should ensure they are running at least version 1.0.5 of the plugin, which includes a specific workaround to restore compatibility with Node.js 20.9.0. If the error persists on other versions, you must update your Node.js runtime to a supported LTS release.",
+            "semantic_abstract": "The plugin utilises Node.js Import Attributes to maintain compatibility with breaking changes backported from Node.js 22 to earlier LTS branches. Environments running older Node.js versions (specifically prior to 18.20.0 or 20.10.0) will encounter a `SyntaxError: Unexpected token 'with'`, necessitating either a plugin update to v1.0.5+ or a Node.js runtime upgrade.",
+            "confidence": "high",
+            "hash": "cd351f05101b0285489cee765531566357f1911fd84c6fb150c9d1e85c4a3bd3"
+        }
+    ]
+}

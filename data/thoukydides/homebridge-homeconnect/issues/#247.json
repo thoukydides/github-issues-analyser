@@ -1,0 +1,13 @@
+{
+    "issue_number": 247,
+    "updated_at": "2026-02-23T09:29:57.549Z",
+    "faq": [
+        {
+            "question": "Why does the plugin report unrecognised keys or values from the Home Connect API?",
+            "answer": "The Home Connect API implementation frequently deviates from its official documentation, with many features, options, and event types remaining undocumented or incorrectly specified. Since migrating to TypeScript, the plugin implements rigorous API schema checking to ensure stability and data integrity. \n\nWhen an appliance returns a value not currently defined in the plugin's internal schema, it triggers a log message requesting a report. This process is a deliberate design choice to:\n\n* Discover and support new or undocumented appliance features (such as specific stain programs, lighting controls, or new event types)\n* Improve the robustness of the plugin against unexpected API changes\n* Ensure that all data processed by the plugin matches known types\n\nIf you see this message, please follow the link provided in your logs to report the unrecognised values. These are typically added to the plugin in the subsequent release.",
+            "semantic_abstract": "The Home Connect API frequently includes undocumented or incorrectly documented keys and values that differ from official specifications. The plugin uses strict TypeScript schema validation to identify these discrepancies, requiring periodic updates to its internal definitions to support new appliance features and options discovered through user logs.",
+            "confidence": "high",
+            "hash": "ab8a411bcb7d80a1482b2f8f5e59f0a0ea82c970922b8768b56e42efa0580fd1"
+        }
+    ]
+}

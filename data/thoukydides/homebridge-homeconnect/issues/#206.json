@@ -1,0 +1,13 @@
+{
+    "issue_number": 206,
+    "updated_at": "2026-02-20T11:06:28.477Z",
+    "faq": [
+        {
+            "question": "Why does my log show unrecognised Home Connect API keys or values?",
+            "answer": "The plugin logs Home Connect API keys and values that it does not currently recognise to facilitate the addition of new features and support for specific appliance models. These log entries typically appear within a block bounded by `=====` lines and contain comments like `// (unrecognised)` alongside an `interface` definition such as `OptionValues` or `SettingValues`.\n\nIf you encounter these messages:\n1. Update to the latest version of the plugin to see if support for those values has already been added.\n2. If the keys remain unrecognised, open a new issue on the GitHub repository.\n3. Include the complete log block (from the first `=====` to the last `=====`) and specify your appliance model number.\n\nReporting these values allows the maintainer to update the plugin's internal schemas and ensure that new appliance-specific features, programs, and settings are correctly exposed to HomeKit.",
+            "semantic_abstract": "Home Connect appliances often provide undocumented API keys for specific programs, options, or settings which the plugin flags as unrecognised in the system logs. Reporting these log segments via GitHub issues allows the maintainer to incorporate support for these device-specific features into the plugin's type definitions.",
+            "confidence": "high",
+            "hash": "cf42358aff917c0037246fa4f516770f5cf6a14844b5e0eae11f2eb6da74a9e9"
+        }
+    ]
+}

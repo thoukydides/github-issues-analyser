@@ -1,0 +1,14 @@
+{
+    "issue_number": 125,
+    "updated_at": "2026-02-16T16:06:55.075Z",
+    "faq": [
+        {
+            "question": "Why do I get \"The code entered is invalid or has expired\" when authenticating?",
+            "answer": "This error typically occurs during the initial OAuth authorisation process due to one of the following reasons:\n\n1.  **Propagation Delay**: When you create or modify an application on the Home Connect Developer Portal, it can take up to 15 minutes for those changes to be synchronised across their authorisation servers. If you attempt to authenticate immediately, the request may be rejected.\n2.  **Code Expiration**: The verification codes generated for the `device_verify` URL are only valid for 10 minutes. If you use an older link, it will have expired.\n3.  **Stale UI Links**: If you are using the Homebridge Config UI X web interface, the verification link shown in the plugin configuration does not update automatically. You must close and re-open the configuration editor to see a fresh link. Alternatively, check the Homebridge logs, as a new URL is logged every 10 minutes until authorisation is successful.\n\nIf you continue to experience issues after waiting 15 minutes and using a fresh link from the logs, contact Home Connect support via their developer portal.",
+            "semantic_abstract": "OAuth authorisation failures and \"expired code\" errors often stem from a 15-minute propagation delay for new Home Connect Developer Portal applications and a 10-minute expiration limit on verification codes. Stale links in the Homebridge configuration UI can mislead users, whereas the plugin logs provide the most current authorisation URL.",
+            "alternative_resolution": "The plugin configuration UI could be improved by adding a timestamp to the verification link or a note explicitly mentioning the 15-minute propagation delay and 10-minute expiration window.",
+            "confidence": "high",
+            "hash": "9208ce8ad3c81281ea6b9bbdeea629fdc380fbcfd951324af37b3a853ab4c8c0"
+        }
+    ]
+}

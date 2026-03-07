@@ -1,0 +1,20 @@
+{
+    "issue_number": 5,
+    "updated_at": "2026-03-03T11:00:05.583Z",
+    "faq": [
+        {
+            "question": "Why does my oven show a running program in the logs when it is physically turned off?",
+            "answer": "The plugin is designed to reflect the real-time status and events reported by the Home Connect API servers. If the logs show activity such as `Program 1858 seconds remaining` or `Active and program running` while the appliance is idle, it is because the plugin is receiving these specific events from the Home Connect cloud service.\n\nThis behaviour is usually caused by one of the following:\n1. A server-side state mismatch or backlog within the Home Connect infrastructure.\n2. A delay in the event stream where old status updates are being delivered late.\n3. A bug in the appliance firmware or the cloud API's representation of that specific model.\n\nTo resolve this, you can try manually starting and then stopping a program via the physical appliance interface or the official Home Connect app to 'reset' the server state. If the issue persists, it is a limitation of the Home Connect API that the plugin cannot work around.",
+            "semantic_abstract": "Home Connect API server-side state mismatches or event delivery delays can cause appliances to report active programs and countdown timers in logs despite being physically idle. This behaviour is a result of the plugin accurately reflecting the data stream provided by the Home Connect cloud service.",
+            "confidence": "high",
+            "hash": "4859113ae064974af57b87685435ef38673ae6a7cb7a8a04d05d295b74cb5fdc"
+        },
+        {
+            "question": "Why do I get an `insufficient_scope` error when trying to control my oven or hob?",
+            "answer": "The Home Connect API restricts control functionality for certain appliance categories—specifically Ovens, Hobs, and Fridge-Freezers—to approved business partners. Access to the required authorisation scopes (such as `Oven-Control`, `Hob-Control`, or `FridgeFreezer-Images`) is generally not granted to individual developer accounts.\n\nBecause of these platform-level restrictions:\n- Control for these appliances is typically limited to power on/off (if supported by the model), read-only status monitoring, and notification events.\n- Attempting to start or stop programs via the plugin will result in a `Home Connect API error: Insufficient scope for this resource [insufficient_scope]`.\n\nThis is a permanent limitation of the Home Connect developer program and cannot be resolved by plugin configuration or code changes.",
+            "semantic_abstract": "Home Connect API authorisation constraints prevent individual developer accounts from accessing `Oven-Control` and `Hob-Control` scopes, resulting in `insufficient_scope` errors. The plugin is limited to read-only status and basic power control for these appliance categories due to manufacturer-imposed partnership and security policies.",
+            "confidence": "high",
+            "hash": "f64c6ca46c890eca2563455cf1e3f60154fdffdcb3a7a163de2b2beac49d1c19"
+        }
+    ]
+}

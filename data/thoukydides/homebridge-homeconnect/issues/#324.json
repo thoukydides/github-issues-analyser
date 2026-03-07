@@ -1,0 +1,13 @@
+{
+    "issue_number": 324,
+    "updated_at": "2026-02-28T13:10:32.181Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs show `unrecognised` Home Connect API values?",
+            "answer": "The plugin includes a diagnostic feature that identifies data from the Home Connect API not yet known to its internal schema, which typically occurs when manufacturers release new appliance models or firmware updates. When this happens, a block of TypeScript code is generated in the logs, bounded by `====` lines, with specific entries marked `// (unrecognised)`. If you see such a block in your logs, please open a new issue on GitHub and paste the entire section. This allows the maintainer to update the plugin's internal definitions to support the new features. Always ensure you are running the latest version of the plugin before reporting, as support for those specific values may have already been added.",
+            "semantic_abstract": "The plugin implements an automated discovery mechanism for unknown Home Connect API enums and options by logging them as TypeScript code snippets. This process enables the identification of new appliance features or firmware capabilities that require inclusion in the plugin's internal data definitions.",
+            "confidence": "high",
+            "hash": "386b8661a74a6009aa9444e67cb46b825787f3176e5ef8087d5ff1490c20602c"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "issue_number": 342,
+    "updated_at": "2026-03-01T09:49:48.016Z",
+    "faq": [
+        {
+            "question": "Why does the log show \"Waiting for X features to finish initialising\" for a long period?",
+            "answer": "This message indicates that the plugin is stalled while attempting to read the appliance's capabilities via the Home Connect API. This step is necessary for the plugin to determine which features (such as `Power`, `Door`, `Programs`, etc.) should be exposed as services to HomeKit.\n\nThis issue typically occurs when the Home Connect API reports the appliance status as `\"connected\": false`, even if the official Home Connect app appears to show the device as online. The public API used by this plugin is separate from the private API used by the official app, and they can sometimes fall out of sync.\n\nTo resolve this:\n1. Enable debug logging to confirm if the API is reporting the appliance as `connected: false`.\n2. Power cycle the appliance by switching it off at the mains and back on again. This forces the appliance's internal firmware to re-register with the Home Connect cloud servers.\n3. If the problem persists after a reboot, the issue likely lies with the Home Connect cloud service for your specific appliance, and you may need to contact Home Connect developer support.",
+            "semantic_abstract": "The \"Waiting for features to finish initialising\" log entry occurs when the Home Connect public API reports an appliance as disconnected, preventing the plugin from discovering its capabilities. This often represents a synchronization mismatch between the public API and the private API used by the official app, usually resolvable by power cycling the appliance to force cloud re-registration.",
+            "confidence": "high",
+            "hash": "27bc0ea4cc6a562d479a824e9693ec34c655cbcf89047b0439bc0ce666d46e37"
+        }
+    ]
+}

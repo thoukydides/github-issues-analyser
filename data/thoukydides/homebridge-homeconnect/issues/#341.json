@@ -1,0 +1,13 @@
+{
+    "issue_number": 341,
+    "updated_at": "2026-03-01T14:46:46.085Z",
+    "faq": [
+        {
+            "question": "How can I enable specific dishwasher options like `EfficientDry` or `EcoDry`?",
+            "answer": "Features like `EfficientDry` or `EcoDry` (technically `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API) are considered program options rather than individual HomeKit services. Because they must be set as part of a program's configuration rather than toggled independently, they are not exposed as standalone switches.\n\nTo use these options, you must manually define your dishwasher programs in your `config.json` instead of relying on the plugin to automatically discover them. This allows you to specify exactly which options should be active when that program is triggered. Detailed instructions on how to configure these can be found in the Programs section of the project Wiki.",
+            "semantic_abstract": "Dishwasher drying options such as EfficientDry and EcoDry are implemented as Home Connect program options rather than global appliance settings. These options require manual program configuration within the plugin settings to be exposed to HomeKit, as they cannot be toggled independently of a specific cleaning cycle.",
+            "confidence": "high",
+            "hash": "3673209fef4fb3fdaa401a6a9bfb56ab8b146d0735b971221e72ff979a6335a3"
+        }
+    ]
+}

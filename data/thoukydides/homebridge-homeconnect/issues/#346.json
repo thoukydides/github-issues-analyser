@@ -1,0 +1,20 @@
+{
+    "issue_number": 346,
+    "updated_at": "2026-03-05T11:48:10.974Z",
+    "faq": [
+        {
+            "question": "Why can I only control power and fan speed for my Home Connect air conditioner?",
+            "answer": "The Home Connect API currently provides limited support for air conditioning units. While basic operations like power state (`BSH.Common.Setting.PowerState`) and fan settings (`HeatingVentilationAirConditioning.AirConditioner.Option.FanSpeedPercentage`) are documented, the API lacks several critical capabilities required for a full HomeKit `Thermostat` or `HeaterCooler` service:\n\n* **Ambient Temperature/Humidity**: There is currently no API endpoint to read the current room temperature or humidity.\n* **Temperature Setpoints**: Although some internal keys like `SetpointTemperature` exist, they are not officially supported for control via the public API.\n* **Mode Selection**: Selection of cooling, heating, or auto programmes is not fully exposed for external control.\n\nConsequently, the plugin exposes air conditioners as a **Power Switch** (to toggle between `On` and `Standby`) and a **Fan** (to control fan speed and toggle between manual and automatic modes). Adjusting the target temperature or switching between heat and cool modes must be done via the physical remote or the official Home Connect app. The maintainer is monitoring the API for updates; if these features are officially released, they will be integrated into the plugin.",
+            "semantic_abstract": "Home Connect API specification for `AirConditioner` appliances lacks ambient temperature status and target setpoint settings, necessitating a fallback mapping to `Switch` and `Fan` services until upstream technical constraints are resolved. This platform limitation prevents the implementation of full `Thermostat` functionality within the plugin.",
+            "confidence": "high",
+            "hash": "68d7f6361a81f3d3d9c7ea6e393ce4b31714c3698d34014a644f557e27f04e8c"
+        },
+        {
+            "question": "What should I do if the log shows `Home Connect API returned keys/values that are unrecognised`?",
+            "answer": "When the plugin detects data from the Home Connect API that it has not been programmed to handle, it generates a log entry with instructions for reporting it. This often happens with newer appliance types or firmware versions. To provide the most useful information for the maintainer:\n\n1. Enable `Log API Bodies` and `Log Debug as Info` in the plugin settings.\n2. Perform the actions on your appliance (e.g. changing a setting) that you wish to see supported.\n3. Wait for the plugin to batch the data (this usually takes about two minutes).\n4. Locate the log entry starting with `Please report these by creating a new GitHub issue using this link`.\n5. Click the provided link and paste the requested log block into the issue template.\n\nFollowing this procedure ensures the maintainer has the necessary technical details to map new functionality to HomeKit characteristics.",
+            "semantic_abstract": "Telemetry capture protocol for undocumented Home Connect API keys using `Log API Bodies` and `Log Debug as Info` settings to facilitate the mapping of novel appliance features or firmware variations to HomeKit characteristics. This diagnostic procedure ensures authoritative data is provided for maintainer analysis.",
+            "confidence": "high",
+            "hash": "924fb6727de07d2975984dc5e2ebf86c2a61825a7f9a3758585f930f8f1c6532"
+        }
+    ]
+}

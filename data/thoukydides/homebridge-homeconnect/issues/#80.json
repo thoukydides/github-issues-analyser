@@ -1,0 +1,14 @@
+{
+    "issue_number": 80,
+    "updated_at": "2026-02-14T16:57:03.929Z",
+    "faq": [
+        {
+            "question": "Why does the plugin fail with `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?",
+            "answer": "This error occurs when the plugin is running on a version of Node.js older than **v16.14.0**. The `AbortSignal.timeout` method was introduced in Node.js v16.14.0 and is required by the plugin for handling Home Connect API request timeouts.\n\nTo resolve this issue:\n1. Verify your current Node.js version by running `node -v` in your terminal.\n2. Update Node.js to at least version 16.14.0 (though the current LTS version is recommended).\n3. If using Homebridge Config UI X, you may be able to use the `hb-service update-node` command, or follow the official Homebridge documentation for updating Node.js on your specific platform (e.g., Raspberry Pi, Docker, or Windows).\n\nSince version 0.24.1, the plugin explicitly defines this version requirement in its configuration to prevent installation on incompatible environments.",
+            "semantic_abstract": "The plugin's API interaction layer relies on the `AbortSignal.timeout` method introduced in Node.js v16.14.0. Running the plugin on earlier Node.js versions causes a runtime `TypeError` because the method is undefined in the environment's global scope.",
+            "alternative_resolution": "While the plugin now enforces the Node.js version via `package.json` engines, providing a clear troubleshooting link in the README specifically for 'How to update Node.js' would assist users who encounter the version check error during installation.",
+            "confidence": "high",
+            "hash": "1fb664f977c44290f413f185b7c84345e4d5c92ef7620ed66a9be634a4ad2a90"
+        }
+    ]
+}

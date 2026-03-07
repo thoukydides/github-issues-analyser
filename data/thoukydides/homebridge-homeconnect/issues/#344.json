@@ -1,0 +1,13 @@
+{
+    "issue_number": 344,
+    "updated_at": "2026-03-01T11:40:25.519Z",
+    "faq": [
+        {
+            "question": "Why does the log show unrecognised types or options for my appliance?",
+            "answer": "The plugin includes a discovery mechanism to identify program options and values returned by the Home Connect API that are not yet mapped or documented. This is common with newer appliance models or firmware updates that introduce specific variants of standard features, such as `LaundryCare.WasherDryer` identifiers instead of the usual `LaundryCare.Washer` or `LaundryCare.Dryer` versions.\n\nWhen these are detected, the plugin outputs a structured block of code-like definitions in the Homebridge logs, with entries marked as `(unrecognised)`. This is a deliberate design choice to assist in the identification and integration of new appliance features. If you see this output in your logs:\n\n1. Ensure you are running the latest version of the plugin, as support for those specific values may have already been added.\n2. If the values remain unrecognised, open a GitHub issue and provide the full content of the log block. This information is required for the maintainer to update the plugin definitions and support your appliance's specific functionality.",
+            "semantic_abstract": "The plugin implements a discovery mechanism that logs unrecognised Home Connect API identifiers, which frequently occur when appliances use non-standard or newer firmware-specific variants of program options. These log blocks provide the necessary technical definitions for the maintainer to manually map undocumented appliance features into the plugin's service logic.",
+            "confidence": "high",
+            "hash": "04d9fb061b907fde1791993b7e3cb44d41fe3d2f3aeb96bebac056dd4892310d"
+        }
+    ]
+}

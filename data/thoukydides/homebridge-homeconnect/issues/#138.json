@@ -1,0 +1,14 @@
+{
+    "issue_number": 138,
+    "updated_at": "2026-02-16T19:11:03.981Z",
+    "faq": [
+        {
+            "question": "How can I enable specific dishwasher options like half load or extra dry in HomeKit?",
+            "answer": "Dishwasher options such as `half load` or `extra dry` are not exposed as independent HomeKit switches. Instead, they are configured as part of a specific program switch. By default, the plugin uses a `\"programs\": \"auto\"` configuration which creates one switch for every supported program using its default settings.\n\nTo use specific program options, you must manually configure the programs in your `config.json` file:\n1. Use the `Identify` function or check the Homebridge logs to find the internal names for the programs and options supported by your specific appliance.\n2. Manually define your desired programs in the `programs` array of your appliance configuration.\n3. Add the specific options and their values (e.g. `true` for a toggle option) to the program definition.\n\nPlease note that if you manually define any programs for an appliance, the `auto` discovery is disabled for that device. You must manually list all program switches you want to appear in HomeKit. If a specific option does not appear in the configuration UI or logs, it is likely not supported by your appliance's firmware via the Home Connect API.",
+            "semantic_abstract": "Home Connect dishwasher program options are implemented as configurable parameters within HomeKit program switches rather than independent services. Enabling these options requires manual configuration of the `programs` array in `config.json`, which disables the default automated program discovery for that appliance.",
+            "alternative_resolution": "The plugin's configuration schema or documentation could be updated to more explicitly state that manually defining a single program switch for an appliance disables the 'auto' discovery of all other programs for that specific device.",
+            "confidence": "high",
+            "hash": "eb88ae78a53e8d551268f11cf85a224164f95c45f38f925a707de3913edee411"
+        }
+    ]
+}

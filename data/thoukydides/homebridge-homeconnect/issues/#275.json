@@ -1,0 +1,12 @@
+{
+    "issue_number": 275,
+    "updated_at": "2026-02-25T06:40:22.543Z",
+    "faq": [
+        {
+            "question": "Why am I receiving a `403 Forbidden` error during authorisation in Russia?",
+            "answer": "The Home Connect API appears to be geo-blocked in certain regions, including Russia. This results in a `403 Forbidden` response when the plugin attempts to connect to the authorisation endpoints, such as `POST /security/oauth/device_authorization`. This is a restriction imposed by the service provider or regional network infrastructure. The plugin will not implement features to bypass these geographic restrictions. Users in affected regions may observe similar connectivity issues with the official Home Connect app unless a VPN is used.",
+            "semantic_abstract": "Geographic restrictions and service provider blocks on the Home Connect API in specific regions like Russia cause 403 Forbidden errors during the OAuth device authorisation flow, preventing plugin connectivity.",
+            "hash": "c0e7f106247deb74192caa70eb2ade3c2128a5571ba8e6049cbcc64014bb4f47"
+        }
+    ]
+}

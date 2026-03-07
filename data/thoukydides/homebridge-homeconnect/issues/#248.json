@@ -1,0 +1,13 @@
+{
+    "issue_number": 248,
+    "updated_at": "2026-02-23T10:31:13.984Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log TypeScript-like code snippets for Union types or OptionValues?",
+            "answer": "The plugin identifies values reported by the Home Connect API that it does not yet recognise, often because they are undocumented or recently added by the manufacturer. When this occurs, it prints a formatted block of TypeScript-compatible code to the Homebridge logs, often marked with `(unrecognised)`. If you see these snippets in your logs, please open a GitHub issue and provide the full log output. This information allows the maintainer to update the plugin's internal mappings and support new appliance features or statuses in future releases.",
+            "semantic_abstract": "The homebridge-homeconnect plugin identifies unrecognised Home Connect API program options and status values, logging them as formatted code snippets for user reporting. This mechanism enables the capture of technical data from undocumented API extensions to facilitate their integration into the plugin's service mapping.",
+            "confidence": "high",
+            "hash": "683b1f796c8144073f90946b0f86947b67cc693e1b0f777a9114eaa0544cebe4"
+        }
+    ]
+}

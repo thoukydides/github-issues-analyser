@@ -1,0 +1,13 @@
+{
+    "issue_number": 317,
+    "updated_at": "2026-02-28T07:00:57.854Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs show `unrecognised` Home Connect API values?",
+            "answer": "The plugin includes a diagnostic tool that identifies when an appliance reports values, settings, or options that are not currently defined in its internal schema. These are displayed in the log as a block of TypeScript code bounded by equals signs, with comments like `// (unrecognised)`. If you encounter these, first check if a newer version of the plugin is available and update if necessary. If the messages persist on the latest version, create a new issue on GitHub and provide the complete block of code from the logs. This information is essential for the maintainer to add support for new appliance models and firmware updates. For example, specific coffee strength levels and double-shot options for Siemens coffee makers were added to the plugin after being identified through these diagnostic logs.",
+            "semantic_abstract": "Home Connect appliances may report new enum values or options following firmware updates or for newer hardware models, which the plugin captures as TypeScript-formatted diagnostic logs. This mechanism allows for the identification of undocumented API fields, enabling the maintainer to extend the plugin schema to support these new appliance features.",
+            "confidence": "high",
+            "hash": "9950e21fbc53a52ffb9209c44cbd586e114d46a1bf81003df68b4e0ce2cc1f99"
+        }
+    ]
+}

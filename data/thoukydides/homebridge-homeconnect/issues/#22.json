@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 22,
+    "updated_at": "2026-02-11T05:52:22.538Z",
+    "faq": [
+        {
+            "question": "Why does my coffee machine power switch fail with `SDK.Error.InvalidSettingState`?",
+            "answer": "If you receive an error stating `BSH.Common.Setting.PowerState currently not available or writable [SDK.Error.InvalidSettingState]` when attempting to control your coffee machine (or other appliance), it typically means the appliance is in a state where it cannot process remote commands. \n\nThis commonly occurs when:\n1. A maintenance message is displayed on the physical appliance screen (e.g. \"Change water filter\" or \"Descaling required\") that requires manual confirmation.\n2. The appliance is performing a critical internal process that prevents remote state changes.\n\nBecause the Home Connect API does not always provide specific details about these maintenance prompts (such as water filter status) to the plugin, the plugin cannot proactively warn you or bypass the restriction. You must resolve the prompt on the appliance's physical control panel before remote control via HomeKit can resume.",
+            "semantic_abstract": "Home Connect appliances may return an `SDK.Error.InvalidSettingState` when physical maintenance prompts or internal states block the API from modifying the `PowerState` setting. This occurs because certain hardware-level alerts require manual user acknowledgement on the device before remote commands are accepted.",
+            "alternative_resolution": "While the plugin handles the API error correctly, documentation could be updated to include a troubleshooting section for common `SDK.Error` codes, explaining that they often indicate the appliance is awaiting physical interaction.",
+            "confidence": "high",
+            "hash": "3aca6c344e3aae733599737b9ef15e75205227b083f698576e08edd9b7810913"
+        }
+    ]
+}

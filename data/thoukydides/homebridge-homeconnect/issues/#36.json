@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 36,
+    "updated_at": "2026-02-12T06:39:19.637Z",
+    "faq": [
+        {
+            "question": "Why can I not see my oven door status in the Apple Home app?",
+            "answer": "The oven door status is exposed to HomeKit as a characteristic, but Apple's Home app does not currently display all types of characteristics. To view the door status or use it for automations, you must use a third-party HomeKit app.\n\nRecommended third-party apps include:\n* **Home+** by Matthias Hochgatterer\n* **Eve for HomeKit** by Eve Systems\n\nThe plugin maintainer has decided not to map the door status to a different HomeKit service (such as a `Contact Sensor`) that might be visible in the Apple Home app. This decision was made to avoid cluttering the accessory list with additional services, which is a frequent source of user complaints.",
+            "semantic_abstract": "Home Connect appliance door status is mapped to HomeKit characteristics that are natively unsupported by the Apple Home app UI, requiring third-party HomeKit applications for visibility. The plugin maintains this mapping to avoid accessory service bloat while still enabling automation triggers via the HomeKit framework.",
+            "alternative_resolution": "The documentation could be updated to explicitly list which appliance features (like door status) are hidden in the Apple Home app but visible in third-party apps, potentially reducing confusion for new users.",
+            "confidence": "high",
+            "hash": "116ccc975adfa3e47512f6613f521bf42831f59ad42909fdd68ce9068782fb48"
+        }
+    ]
+}

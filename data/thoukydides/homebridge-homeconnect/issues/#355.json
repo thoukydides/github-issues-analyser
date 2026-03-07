@@ -1,0 +1,13 @@
+{
+    "issue_number": 355,
+    "updated_at": "2026-03-03T06:03:58.486Z",
+    "faq": [
+        {
+            "question": "Why does the log show `(unrecognised)` for some Home Connect API values?",
+            "answer": "The plugin includes a discovery mechanism that identifies status keys, settings, or events provided by the Home Connect API that are not yet defined in its internal schema. This frequently occurs with newer appliance models or firmware updates, such as Siemens ovens reporting `BSH.Common.Status.InteriorIlluminationActive`.\n\nThese log entries are not errors and do not affect the stability of the plugin. Instead, they provide the necessary technical information to add support for new features. If you see a log block containing `export interface` and `(unrecognised)` values, please open a GitHub issue and provide the complete section. This allows the maintainer to map these values to HomeKit characteristics in a future update.",
+            "semantic_abstract": "The plugin's runtime discovery identifies undocumented or new Home Connect API status keys, logging them as unrecognised TypeScript interface snippets. This process allows for the identification of manufacturer-specific features, such as interior illumination status, which can then be manually added to the plugin's schema to enable HomeKit support.",
+            "confidence": "high",
+            "hash": "88d91a8a579fedede64771b9c7d011de80bcdf1ef6181d966ed11af3be1f00af"
+        }
+    ]
+}

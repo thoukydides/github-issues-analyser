@@ -1,0 +1,14 @@
+{
+    "issue_number": 99,
+    "updated_at": "2026-02-15T11:47:29.508Z",
+    "faq": [
+        {
+            "question": "Why can I see the power status of my oven but not control it via HomeKit?",
+            "answer": "This behaviour occurs when the Home Connect API incorrectly reports that an appliance supports both `Off` and `Standby` power states. According to the Home Connect API specification, an appliance should support `On` and only one of either `Off` or `Standby`.\n\nWhen the plugin detects this contradictory information in the device constraints, it logs a message: `[Appliance Name] Claims can be both switched off and placed in standby; treating as cannot be switched off`. To avoid sending invalid commands that could result in API errors or temporary rate-limiting of your account, the plugin treats the power state as read-only until the API returns valid data.\n\nThis is an issue with the appliance firmware or the Home Connect cloud API, rather than the plugin itself. Control functionality will typically resume automatically once Home Connect corrects the device constraints for your specific model.\n\nFor clarity, the plugin handles different switch types as follows:\n* **Power switch**: Sets the `Off` or `Standby` state only if the API constraints are valid.\n* **Active program switch**: Turning this off will *Pause* the program (if supported by the appliance and firmware) or *Stop* the program.\n* **Specific program switch**: If configured to *Start* a program, turning it off *Stops* the active program. If configured to *Select* only, turning it off has no effect.",
+            "semantic_abstract": "Home Connect appliances occasionally report conflicting power state constraints by claiming support for both `Off` and `Standby` states, which violates the API specification. The plugin detects this mismatch and disables write access to the power characteristic to prevent API communication errors and potential rate-limiting, resulting in a read-only power switch in HomeKit.",
+            "alternative_resolution": "Enhance the log message `Claims can be both switched off and placed in standby; treating as cannot be switched off` to explicitly mention that this is a known Home Connect API/firmware limitation and provide a link to the project's documentation explaining the restriction.",
+            "confidence": "high",
+            "hash": "fe79c05cf27813fc4fdddfe6fee8e0e42361bf67cd80e5f4a3d68bb0c63dc001"
+        }
+    ]
+}

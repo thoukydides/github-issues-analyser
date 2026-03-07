@@ -1,0 +1,12 @@
+{
+    "issue_number": 377,
+    "updated_at": "2026-03-07T05:51:45.275Z",
+    "faq": [
+        {
+            "question": "Why do my logs show certain appliance options as `(unrecognised)`?",
+            "answer": "The Home Connect API often includes undocumented options or states that differ across various appliance models and firmware versions. When the plugin detects a value that has not been mapped, it generates a log entry containing a TypeScript interface definition, specifically marking unknown items with the suffix `(unrecognised)`.\n\nTo resolve this:\n1. Update the plugin to the latest version, as support for new options is regularly added.\n2. If the items remain unrecognised in the latest version, open a new issue on the GitHub repository. Provide the complete log block found between the separator lines (e.g. `==================`). This diagnostic information is required to map the appliance-specific identifiers to HomeKit characteristics.",
+            "semantic_abstract": "Home Connect API responses frequently include undocumented program options or status keys which vary by appliance model and firmware. The plugin captures these unmapped identifiers in diagnostic log blocks marked as `(unrecognised)`, providing the technical definitions necessary for implementing formal support in the plugin service mapping.",
+            "hash": "3b830b83949c0aab3229ca7315a310b29934cd0d060a253761e3927e5b920840"
+        }
+    ]
+}

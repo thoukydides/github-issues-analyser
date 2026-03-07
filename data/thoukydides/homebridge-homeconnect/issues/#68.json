@@ -1,0 +1,14 @@
+{
+    "issue_number": 68,
+    "updated_at": "2026-02-14T06:05:56.725Z",
+    "faq": [
+        {
+            "question": "Why doesn't the plugin use a Valve service to show the remaining time for dishwashers or washing machines?",
+            "answer": "The HomeKit `Valve` service (including its sub-types like `Irrigation` or `Shower Head`) is not used for displaying remaining time because it is semantically inappropriate for many Home Connect appliances, such as ovens, hoods, or dryers. To maintain a consistent experience across all supported hardware, the plugin instead adds the `RemainingDuration` characteristic to the **Active Program Switch**.\n\nWhile the native Apple Home app does not always display this timer prominently, it is fully accessible for both viewing and automation in third-party HomeKit applications (e.g. Eve, Home+, or Controller for HomeKit). Using a `Valve` service for only specific appliance types would create an inconsistent architectural model and would break existing automations that rely on the current service structure.",
+            "semantic_abstract": "HomeKit `Valve` service mapping for remaining program time is rejected due to semantic mismatch across diverse appliance categories such as ovens and hoods. `RemainingDuration` is instead implemented as a characteristic on the `Switch` service, ensuring a consistent architectural approach across all Home Connect devices while maintaining compatibility with third-party HomeKit applications.",
+            "alternative_resolution": "The plugin documentation or README could be updated to explicitly state that the remaining program time is exposed via the `RemainingDuration` characteristic and is best viewed using third-party HomeKit applications due to limitations in the native Apple Home app.",
+            "confidence": "high",
+            "hash": "c9450e4f078319db81dc47bc032229d0dff2690de68496eb3292b2a4d385d279"
+        }
+    ]
+}

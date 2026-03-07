@@ -1,0 +1,13 @@
+{
+    "issue_number": 279,
+    "updated_at": "2026-02-25T17:36:07.468Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log TypeScript code blocks such as `export type ProgramKey`?",
+            "answer": "When the plugin encounters programs, options, or settings from the Home Connect API that are not yet in its internal database, it automatically generates and logs a TypeScript union type definition (for example, `export type ProgramKey = ...`). This diagnostic output is a deliberate design choice to assist in identifying and supporting new appliance features. If you see these blocks in your logs:\n\n1. Ensure you are running the latest version of the plugin, as support for those specific values may have already been added.\n2. If the logs persist on the latest version, open a GitHub issue and include the entire code block. This information allows the maintainer to update the plugin's internal definitions to support the unique features of your appliance model.",
+            "semantic_abstract": "The plugin logs TypeScript union type definitions when it identifies Home Connect API keys, such as programs or settings, that are not currently mapped in its internal metadata. This diagnostic mechanism serves as a way for users to report new or unrecognised appliance functionality for future integration.",
+            "confidence": "high",
+            "hash": "b94c7aa1b8027432793d97c7cb15ad21248a64612dccd6529dca7e14faf0e3d6"
+        }
+    ]
+}

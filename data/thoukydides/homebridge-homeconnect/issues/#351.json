@@ -1,0 +1,20 @@
+{
+    "issue_number": 351,
+    "updated_at": "2026-03-02T11:59:52.304Z",
+    "faq": [
+        {
+            "question": "Why does the Home Connect authorisation fail with an `AggregateError` when running in Docker?",
+            "answer": "An `AggregateError` during the initial authorisation request (e.g. `POST /security/oauth/device_authorization`) typically indicates a low-level networking failure occurring before the request reaches the Home Connect servers. This is often caused by DNS resolution issues or misconfigured IPv6 routing within the Docker container.\n\nTo diagnose and resolve this:\n1. **Check Plugin Version**: Ensure you are using `homebridge-homeconnect` v1.5.1 or later, which provides improved logging of the individual sub-errors within an `AggregateError` (such as `ETIMEDOUT` or `ENETUNREACH`).\n2. **Test Connectivity**: Verify network access from within the container by running `curl -v https://api.home-connect.com/security/oauth/device_authorization`. If this fails, the issue is with the container's network stack.\n3. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try the following:\n    - Disable IPv6 for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1`.\n    - Force the container to use a specific DNS provider by adding `--dns 1.1.1.1` to your `docker run` command.\n    - If running on a Synology NAS, ensure firewall rules are not blocking outbound traffic from the container network.\n4. **Network Mode**: Consider switching the container to `host` network mode to bypass Docker's internal bridge networking if issues persist.",
+            "semantic_abstract": "Authorisation failures resulting in `AggregateError` during the Home Connect OAuth device flow are frequently caused by DNS resolution timeouts or IPv6 routing mismatches within Docker environments. This behaviour originates from the underlying `undici` HTTP library failing to establish a socket connection, requiring container-level network adjustments such as disabling IPv6 or overriding DNS resolvers.",
+            "confidence": "high",
+            "hash": "80b2e4b34f23567f40bb290098f5f32be2317aa662ef84b0aa600177759561ab"
+        },
+        {
+            "question": "How do I complete the Home Connect authorisation process if no QR code appears?",
+            "answer": "The Home Connect plugin uses the **Device Flow** for authorisation, which does not use pop-ups or QR codes. Instead, it provides a manual verification URL and a user code in the Homebridge logs and configuration UI.\n\nTo complete the setup:\n1. Restart Homebridge and monitor the log for a message containing a URL like `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`.\n2. Copy and paste this URL into a web browser.\n3. Log in with your SingleKey ID (the account associated with your Home Connect appliances) and grant permission.\n4. Once authorised in the browser, the plugin will automatically detect the completion and finish the setup within a few seconds. Note that the authorisation link typically expires after 30 minutes.",
+            "semantic_abstract": "The Home Connect API authorisation utilizes the OAuth 2.0 Device Authorization Grant flow, which requires manual user interaction via a specific verification URL and code provided in the plugin logs rather than an automated redirect or QR code.",
+            "confidence": "high",
+            "hash": "9e011f9621ce0686f7e0bec362fcce7739f5e893bc790988fbb9c830dd09bfce"
+        }
+    ]
+}

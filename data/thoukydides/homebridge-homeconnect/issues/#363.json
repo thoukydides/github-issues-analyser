@@ -1,0 +1,13 @@
+{
+    "issue_number": 363,
+    "updated_at": "2026-03-05T11:00:26.271Z",
+    "faq": [
+        {
+            "question": "Why are fan controls missing for my integrated venting hob?",
+            "answer": "Extractor fans integrated into hobs (venting hobs) may not be exposed by the Home Connect API as controllable features. The Home Connect API typically represents appliances as discrete types, such as `Hob` or `Hood`. For an integrated unit to function correctly in Homebridge, the API must either expose two separate appliances or include specific fan settings within the `Hob` resource. If your appliance only appears as a `Hob` and lacks fan controls, the limitation exists on the Home Connect API side. You can verify this by examining the cached API responses in the plugin's persist directory. If the fan is not listed there, the plugin cannot access it. Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate `Hood` appliance. Historically, API updates for hob-related features have been slow to implement.",
+            "semantic_abstract": "Home Connect API constraints for integrated venting hobs often result in the omission of fan controls, as the API may fail to expose a discrete `Hood` appliance or relevant fan settings. This platform-level limitation prevents the plugin from mapping fan functionality to HomeKit services, requiring users to request API-side updates from Home Connect.",
+            "confidence": "high",
+            "hash": "2f138a6c31427f913a0f317fbf1ad761829c9fd7beef24a5a45fd49bf6623ca1"
+        }
+    ]
+}

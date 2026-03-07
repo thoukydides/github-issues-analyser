@@ -1,0 +1,13 @@
+{
+    "issue_number": 205,
+    "updated_at": "2026-02-20T10:06:19.117Z",
+    "faq": [
+        {
+            "question": "Why does the log show a block of code with `unrecognised` or `unexpected` values?",
+            "answer": "The Home Connect API frequently includes programs, options, or settings that are not present in the official documentation. These variations often depend on specific appliance models or firmware versions. When the plugin detects a key or value that it does not recognise, it generates a diagnostic block in the log file to help identify the missing information.\n\nIf you see a log section bounded by lines of `=` characters containing an `interface` definition with `// (unrecognised)` or `// (unexpected)` comments:\n\n1. Copy the entire block from the log file.\n2. Open a new issue on GitHub and provide this log block.\n3. Include the model number of your appliance (e.g. `WAV28KH3GB/01`).\n\nThese reports allow the maintainer to update the plugin's internal definitions and add support for the new features in a future release.",
+            "semantic_abstract": "Home Connect API implementations frequently include undocumented program options or settings that are missing from official specifications. The plugin identifies these as unrecognised keys in the logs, requiring manual addition to the codebase to enable full functionality for specific appliance models or firmware versions.",
+            "confidence": "high",
+            "hash": "1db7e5cd1f364d58c9c3d2c45e575914f8d1e565065b91b9ff38e461d218e7c4"
+        }
+    ]
+}

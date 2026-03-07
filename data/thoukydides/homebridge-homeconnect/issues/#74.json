@@ -1,0 +1,14 @@
+{
+    "issue_number": 74,
+    "updated_at": "2026-02-15T06:12:59.215Z",
+    "faq": [
+        {
+            "question": "Why do appliance status updates stop appearing in HomeKit while the plugin is still connected?",
+            "answer": "The `homebridge-homeconnect` plugin relies on a long-lived HTTP event stream from the Home Connect API to receive real-time updates. The API sends a `KEEP-ALIVE` event approximately every 55 seconds to maintain the connection. If the plugin does not receive any activity for 120 seconds, it will automatically tear down and re-establish the stream, which is often logged as `ESOCKETTIMEDOUT`.\n\nIn some cases, the connection may remain technically active (with `KEEP-ALIVE` heartbeats still arriving) while the Home Connect backend stops sending actual state change events (such as power on/off or program status). This is typically a result of a failure in the Home Connect backend distribution service rather than a fault in the plugin or your local network. A major instance of this behaviour was resolved by a Home Connect backend update in April 2022.\n\nIf you experience a stall where updates stop but no errors appear in the logs:\n1. Check if the official Home Connect app is still receiving real-time updates. The app often establishes a fresh connection upon opening, which may mask an underlying stream failure affecting the plugin.\n2. Restart Homebridge to force the plugin to subscribe to a new event stream.\n3. Verify your network configuration. Ensure that your router or firewall is not prematurely terminating long-lived TCP connections (the default TCP idle timeout is typically 300 seconds).",
+            "semantic_abstract": "The Home Connect API uses a long-lived Server-Sent Events (SSE) stream to push appliance state changes to the plugin, including a 55-second heartbeat to prevent connection idle timeouts. Technical issues in the Home Connect backend can cause the event distribution service to fail, resulting in a state where heartbeat packets continue to be delivered while actual state change events are suppressed.",
+            "alternative_resolution": "Improve the plugin's logging to explicitly mention when a `KEEP-ALIVE` is received if debug mode is enabled, helping users distinguish between a completely dropped connection and a stalled event stream from the backend.",
+            "confidence": "high",
+            "hash": "d6d630a513ba59143de53df6a1e2cdda72b6f9218c84e1eb4a0667e13b7ccfd5"
+        }
+    ]
+}

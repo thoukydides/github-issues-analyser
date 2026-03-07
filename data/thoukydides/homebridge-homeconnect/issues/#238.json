@@ -1,0 +1,13 @@
+{
+    "issue_number": 238,
+    "updated_at": "2026-02-22T09:54:48.366Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs show code blocks with values marked as `(unrecognised)`?",
+            "answer": "The plugin includes a diagnostic feature that automatically detects when a Home Connect appliance reports a program, option, or state that is not yet defined in the plugin's internal schema. When this occurs, it logs a block of TypeScript code (such as `export type ProgramKey`) with the missing values explicitly tagged as `(unrecognised)`.\n\nIf you see these entries in your logs:\n1. Verify that you are running the latest version of the plugin, as support for new appliance features is added frequently.\n2. If the values remain unrecognised in the latest version, please open a GitHub issue and provide the complete log block. This information allows the maintainer to update the plugin's definitions to support the specific features of your appliance model.\n\nFor instance, support for the `LaundryCare.Washer.Program.SportShoes` program on Siemens WasherDryer models was integrated in version 0.40.0 following a user report of this type.",
+            "semantic_abstract": "Home Connect appliances frequently report undocumented or model-specific API keys for programs and options, triggering a diagnostic log feature in the plugin. This feature outputs TypeScript union types to facilitate the reporting and subsequent integration of these unknown values into the plugin's schema definitions.",
+            "confidence": "high",
+            "hash": "902bdbcd411808fb319ec4a854ce9ddaa61c8370b27f2a55a77a182b3ab08989"
+        }
+    ]
+}

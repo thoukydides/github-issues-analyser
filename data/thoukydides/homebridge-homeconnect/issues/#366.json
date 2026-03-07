@@ -1,0 +1,12 @@
+{
+    "issue_number": 366,
+    "updated_at": "2026-03-07T07:42:48.271Z",
+    "faq": [
+        {
+            "question": "Why is the colour temperature on my Siemens hood `LC91KLT60` inverted or restricted in range?",
+            "answer": "This behaviour is caused by a discrepancy between specific appliance firmware and the official Home Connect API documentation.\n\n* **Inverted controls**: The Home Connect API specifies that `0%` represents warm light and `100%` represents cold light. The plugin follows this mapping. However, some models (such as the Siemens `LC91KLT60`) have been observed to interpret these percentage values inversely when receiving commands. While the official Home Connect app may appear correct by using discrete presets (e.g. `warm` or `cold`), the plugin uses percentage values to provide granular control in HomeKit, which exposes this firmware quirk. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.\n\n* **Restricted range in presets**: Standard colour temperature presets in the Apple Home app often use a limited range (typically `140–500 MK⁻¹`). Some hoods support a wider range (e.g. down to `50 MK⁻¹` for maximum cold). If the default Home app presets do not reach the full cold or warm potential of your light, use the custom colour slider to select the desired temperature. This value can then be saved as a custom preset within the Home app.",
+            "semantic_abstract": "Siemens hood firmware on certain models (e.g. `LC91KLT60`) interprets the Home Connect API `ColorTemperaturePercent` setting inversely to the official specification, where 0% should be warm and 100% cold. This results in HomeKit temperature controls appearing inverted because the plugin uses the percentage-based API to provide granular control, while the official app typically avoids this quirk by using discrete enum presets. Additionally, HomeKit's default circular presets may not cover the full hardware range, requiring the manual colour slider to reach extreme values.",
+            "hash": "0e9ccad3113d91948a7d3b569b0f52f9d021afde12c2742539f5e1833be10517"
+        }
+    ]
+}

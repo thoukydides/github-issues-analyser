@@ -1,0 +1,14 @@
+{
+    "issue_number": 153,
+    "updated_at": "2026-02-17T13:45:44.273Z",
+    "faq": [
+        {
+            "question": "Why do dishwasher events like `Salt low` or `Program Finished` appear as numbered buttons in the Apple Home app?",
+            "answer": "Appliance events such as `Salt low`, `Rinse aid low`, and `Program Finished` are exposed to HomeKit as `Stateless Programmable Switch` services. The Apple Home app represents these services as a series of numbered buttons rather than descriptive text labels or sensors. Automations can be triggered using the **Single Press** action for each button.\n\nFor dishwasher appliances, the buttons are mapped as follows:\n1. **Program Finished**\n2. **Program Aborted**\n3. **Salt Low**\n4. **Rinse Aid Low**\n\nWhile some third-party HomeKit applications may display the descriptive labels for these events, the Apple Home app requires users to identify the event by its button index.",
+            "semantic_abstract": "Home Connect appliance events are mapped to HomeKit `StatelessProgrammableSwitch` services, which the Apple Home app renders as numbered buttons without descriptive labels. Event-driven automations require configuring the `Single Press` action on specific button indices that correspond to predefined appliance status changes like programme completion or low consumables.",
+            "alternative_resolution": "The plugin could potentially include the event name mapping within the accessory information or service labels where supported, or provide a reference table within the Homebridge configuration UI to help users identify which button index corresponds to which appliance event.",
+            "confidence": "high",
+            "hash": "91f41b43cf851d24369294c629d41246156e4ec71df554968511aebcec787b31"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "issue_number": 291,
+    "updated_at": "2026-02-26T20:03:19.362Z",
+    "faq": [
+        {
+            "question": "Why are some appliance programs or settings marked as `(unrecognised)` in the logs?",
+            "answer": "The plugin uses a comprehensive set of definitions to map Home Connect API values to HomeKit characteristics. Manufacturers like Siemens, Bosch, or Neff occasionally release new appliance models (such as the Siemens WN54C2070/01) or firmware updates that include programs, options, or settings not yet documented in the official API. When the plugin detects these unknown values, it identifies them as `(unrecognised)` in the log. This typically occurs during the initialisation of an appliance when the plugin generates a summary of supported features, often formatted as a `// Union types` block. If you encounter these messages:\n\n1. Update the plugin to the latest version, as support for new values is added in almost every release.\n2. If the values remain unrecognised on the latest version, please open a GitHub issue and include the relevant section of the log containing the unrecognised entries.\n\nProviding this log information allows the maintainer to add formal support for these values, ensuring that all appliance features are correctly represented and controllable within HomeKit.",
+            "semantic_abstract": "The Home Connect API periodically returns undocumented identifiers for programs and options when new appliance models or firmware are released. The plugin identifies these via `(unrecognised)` markers in diagnostic logs and generates formatted `Union types` blocks to facilitate their manual inclusion in the code. This explicit mapping ensures that all appliance functionality is correctly typed and exposed through HomeKit services.",
+            "confidence": "high",
+            "hash": "e54665de5a417ea1c1d255ac1ef525d4c310ca98af28582b05ba4d3766da41d5"
+        }
+    ]
+}

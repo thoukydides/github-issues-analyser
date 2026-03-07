@@ -1,0 +1,12 @@
+{
+    "issue_number": 380,
+    "updated_at": "2026-03-07T08:53:29.545Z",
+    "faq": [
+        {
+            "question": "Why are some appliance programmes listed as unavailable or missing options in the logs?",
+            "answer": "The plugin retrieves a list of advertised programmes from the Home Connect API, but the API may report that certain programmes are currently unavailable or refuse to provide their configuration options (such as temperature or spin speed). This is typically a limitation of the appliance firmware or the Home Connect API service rather than a fault in the plugin.\n\nThis behaviour is often seen with maintenance programmes (such as `DrumClean`) or programmes downloaded via the Home Connect app. In some cases, an appliance may show a specific variant in the official mobile app while only advertising a standard version via the API. Access may also be restricted if certain appliance-specific settings (such as a Sabbath programme) have not been enabled on the device itself.\n\nTo attempt to resolve this:\n1. Ensure the appliance is powered on and idle.\n2. Check if any consumables (detergent, salt, rinse aid) are low or if maintenance is required.\n3. Manually select the affected programme on the appliance's physical control panel and leave it idle for a minute.\n4. Trigger the plugin to re-read the programme details by either restarting the Homebridge instance or invoking the HomeKit `Identify` routine (using the **ID** button in the Eve app).\n\nIf the API continues to refuse access to the programme details, the plugin will be unable to expose it as a functional service in HomeKit.",
+            "semantic_abstract": "Home Connect API may advertise appliance programmes that are reported as unavailable or lacking configuration options due to device firmware restrictions, transient state requirements, or disabled device settings. This often affects maintenance programmes or downloaded variants, necessitating manual interaction with the appliance or state changes to permit remote programmatic access.",
+            "hash": "03ac6b94f28f777f6ef9ce23f41fca9d03617a263b78f31175deea209e515610"
+        }
+    ]
+}

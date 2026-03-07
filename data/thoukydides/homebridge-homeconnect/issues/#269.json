@@ -1,0 +1,12 @@
+{
+    "issue_number": 269,
+    "updated_at": "2026-02-25T10:30:27.660Z",
+    "faq": [
+        {
+            "question": "Why does the log show a message like `Waiting ... before issuing Home Connect API request`?",
+            "answer": "This message indicates that the plugin has hit one of the Home Connect API rate limits. The API imposes several different limits (such as requests per minute or per day) to ensure service stability. If these limits are exceeded, the API returns a `429 Too Many Requests` response indicating when the next request will be permitted. The plugin is designed to respect these limits by pausing all API activity and displaying a countdown in the logs. This behaviour is most common during initial installation or after a restart, as the plugin must issue multiple requests to discover all appliances and enumerate their specific features, programs, and options. You must wait for the specified time to pass before the plugin can resume communication with your appliances.",
+            "semantic_abstract": "Home Connect API rate limiting triggers a `429 Too Many Requests` response when request thresholds are exceeded, typically during appliance discovery, causing the plugin to pause all API activity for a specified duration.",
+            "hash": "720a4f9877a1169d874c0e34b6d33b5f36eacd62936941be849c4cc988a9fef8"
+        }
+    ]
+}

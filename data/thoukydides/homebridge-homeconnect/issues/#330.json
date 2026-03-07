@@ -1,0 +1,13 @@
+{
+    "issue_number": 330,
+    "updated_at": "2026-02-28T17:42:48.050Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log code blocks containing `(unrecognised)`?",
+            "answer": "The plugin generates diagnostic code blocks (formatted as `export type` or `export interface`) when it identifies programs, options, or settings from the Home Connect API that are not defined in its internal schema. This often occurs when a newer appliance model or firmware update introduces features that the plugin has not yet been updated to handle. The labels `(unrecognised)` identify the specific keys that are missing from the plugin's internal mapping. This output is designed to be easily shared in a GitHub issue, providing the maintainer with the exact technical identifiers required to add support. If you see these logs: 1. Check if a newer version of the plugin is available and update if possible. 2. If the latest version still reports these as unrecognised, copy the diagnostic block from your logs and open a GitHub issue to request support for the missing features.",
+            "semantic_abstract": "The plugin generates TypeScript-formatted diagnostic blocks when it encounters unknown API keys from Home Connect appliances, marking them as `(unrecognised)`. This design allows users to easily provide the technical identifiers required to add support for new programs or settings in future plugin updates.",
+            "confidence": "high",
+            "hash": "44aef5c087d6ad20558fb6a93bb7b4d932a357f78c30d8026fa66c8e0c11570f"
+        }
+    ]
+}

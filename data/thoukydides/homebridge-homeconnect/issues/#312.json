@@ -1,0 +1,13 @@
+{
+    "issue_number": 312,
+    "updated_at": "2026-02-27T19:07:34.294Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs show `Home Connect API returned keys/values that are unrecognised`?",
+            "answer": "This warning indicates that an appliance is reporting status keys or enumeration values that are not yet part of the plugin's internal map of the Home Connect API. These are often undocumented by the manufacturer or specific to newer firmware versions, such as certain `ProcessPhase` values for washers and dryers (e.g. `CupboardDryReached` or `AutomaticDirtDetection`). \n\nTo resolve this:\n1. Check if a newer version of the plugin is available, as support for new keys is added regularly. Many laundry-related phases were specifically added in v1.1.1.\n2. If the warning persists on the latest version, follow the instructions and the link provided in your logs to create a new GitHub issue.\n3. Paste the specific block of technical definitions provided in the log (the section between the lines of `=` symbols) into the issue. This allows the maintainer to update the plugin's type definitions and support the new functionality correctly.",
+            "semantic_abstract": "Home Connect appliances frequently report status keys and enumeration values that are undocumented in the official API specification, such as specific laundry process phases. These implementation mismatches require manual updates to the plugin's internal schema definitions to ensure accurate state reporting and to suppress unrecognised key/value warnings.",
+            "confidence": "high",
+            "hash": "1263b0b851a1e593db76d1b12dd5bd6eeb0a1de3047b979d4070138c29dab17f"
+        }
+    ]
+}

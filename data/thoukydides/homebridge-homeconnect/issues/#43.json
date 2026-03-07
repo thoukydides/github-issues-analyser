@@ -1,0 +1,23 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 43,
+    "updated_at": "2026-02-12T15:27:10.094Z",
+    "faq": [
+        {
+            "question": "Why do my appliance buttons appear as `BUTTON 1`, `BUTTON 2`, etc., in the Apple Home app?",
+            "answer": "This is a limitation of the Apple Home app design rather than a bug in the plugin. While the plugin provides descriptive names for `ProgrammableSwitch` buttons (such as `Freezer Door Alarm` or `Refrigerator Door Alarm`), the Home app ignores these labels and displays generic identifiers. Third-party HomeKit applications, such as Eve, typically display the descriptive names correctly.",
+            "semantic_abstract": "Apple Home app ignores custom button labels on `ProgrammableSwitch` services, defaulting to generic numeric identifiers, whereas third-party HomeKit applications correctly render the descriptive metadata provided by the plugin.",
+            "confidence": "high",
+            "hash": "caeeb3375753181db3f8c5066b04a03a1e63baa65047aa00507706951a402d5c"
+        },
+        {
+            "question": "Why can I not distinguish between the fridge and freezer doors for automations?",
+            "answer": "On combined FridgeFreezer appliances, the Home Connect API does not provide separate status updates for individual doors. The `Current Door State` characteristic reflects the state of whichever door (fridge or freezer) was moved most recently. This is a technical limitation of the Home Connect API and cannot be addressed by the plugin. Automations can still be triggered using this characteristic, though you may need a third-party HomeKit app like Eve if the Apple Home app does not expose the specific triggers you require.",
+            "semantic_abstract": "Home Connect API limitations for FridgeFreezer appliances prevent distinct monitoring of individual doors, as a single `DoorState` attribute tracks the most recent event across all appliance doors.",
+            "alternative_resolution": "Update the documentation for FridgeFreezer appliances to explicitly mention this API limitation so users do not mistake it for a plugin bug.",
+            "confidence": "high",
+            "hash": "31665a39750f270621483702af6ad588c0a97231208589e5fe393aaa95696b16"
+        }
+    ]
+}

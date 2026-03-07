@@ -1,0 +1,13 @@
+{
+    "issue_number": 290,
+    "updated_at": "2026-02-26T15:26:38.855Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Appliance initialisation is taking longer than expected`?",
+            "answer": "This message indicates that the plugin is waiting for the Home Connect API to provide the current state of specific appliance features, such as `Power`, `Door`, `Light`, or `Programs`. This state typically occurs when the appliance's connection to the Home Connect cloud is interrupted or when a firmware update has caused a synchronisation delay.\n\nIf the appliance remains in this state and does not respond to HomeKit commands, follow these steps:\n1. Perform a manual reset of the appliance by power cycling it or following the manufacturer's specific reset procedure.\n2. Verify that the appliance is controllable via the official Home Connect app.\n3. Wait for the appliance to re-establish its cloud connection, which allows the plugin to complete its initialisation sequence.\n\nThis procedure forces a synchronisation of the device state with the Home Connect servers, resolving stalls in the plugin's feature discovery process.",
+            "semantic_abstract": "Home Connect appliances may stall during feature initialisation if the device state is out of sync with the cloud API, often triggered by firmware updates or network interruptions. A manual hardware reset of the appliance synchronises the local state with the Home Connect servers, allowing the plugin to retrieve required feature data and complete the initialisation process.",
+            "confidence": "high",
+            "hash": "df655334c4e90e91396f0b386249b45333ef3b03169865b2dbf2a459ce1abc79"
+        }
+    ]
+}

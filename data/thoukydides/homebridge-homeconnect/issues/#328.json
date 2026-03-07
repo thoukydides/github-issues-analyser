@@ -1,0 +1,13 @@
+{
+    "issue_number": 328,
+    "updated_at": "2026-02-28T16:47:03.776Z",
+    "faq": [
+        {
+            "question": "Why are MyCoffee programs on my coffee maker reported as not supported?",
+            "answer": "If your logs indicate that a program like `ConsumerProducts.CoffeeMaker.Program.MyCoffee.MyCoffee1` is not supported, it is because the Home Connect API is not advertising support for that specific program. While the appliance may report that such a program is currently selected (for example, if you chose it manually on the machine), the API does not allow it to be triggered or controlled remotely.\n\nThis limitation typically applies to user-configurable or personalised programs. Changing the display name of the program on the appliance itself will not resolve this, as the internal API key used to identify the program remains unchanged. These programs can generally only be started via the physical controls on the appliance or through the official Home Connect smartphone app.",
+            "semantic_abstract": "Home Connect API constraints often prevent the remote selection of user-defined or personalised coffee maker programs, such as MyCoffee, despite the appliance reporting them as active via the event stream. This limitation is inherent to the API's advertised capabilities for specific hardware models and cannot be bypassed by renaming programs on the device.",
+            "confidence": "high",
+            "hash": "99fca94e31d597de805bc1f812d5320d70dcfb9f522de4381bc73aee9c45af78"
+        }
+    ]
+}

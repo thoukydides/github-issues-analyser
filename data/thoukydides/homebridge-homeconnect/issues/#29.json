@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 29,
+    "updated_at": "2026-02-11T13:55:18.804Z",
+    "faq": [
+        {
+            "question": "Why are some program options (like drink volume or strength) missing for my coffee machine?",
+            "answer": "If specific program options such as volume, strength, or temperature are missing in HomeKit, it is typically because the plugin was unable to query the appliance for its capabilities during initialisation. This occurs if the appliance was unreachable, busy, or powered off when the plugin first attempted to discover its features.\n\nTo resolve this and force a re-discovery of available options:\n1. Stop the Homebridge instance.\n2. Navigate to the Homebridge storage directory and locate the plugin's persistent cache files. Delete the cache files associated with the appliance's HaId (the alphanumeric strings), but **do not** delete the file named `94a08da1fecbb6e8b46990538c7b50b2` as this contains your authorisation tokens.\n3. Ensure the appliance is powered on, idle, and ready (for coffee machines, ensure water and beans are loaded).\n4. Restart Homebridge.\n5. Wait for the plugin to finish its initialisation sequence. It will attempt to turn on the appliance and select each program to read the supported options.\n6. Once finished, use the **Identify** function in the HomeKit app to refresh the accessory characteristics.\n\nIf options remain missing, check the logs for errors during the discovery phase.",
+            "semantic_abstract": "Home Connect appliances, particularly coffee machines, require the plugin to query supported program options like drink volume and strength during initialisation. If the appliance is unavailable or busy during this phase, these options may not be exposed to HomeKit, necessitating a manual cache clearance and a restart while the appliance is idle and connected.",
+            "alternative_resolution": "The plugin's logging could be improved to explicitly warn the user if a program's options failed to load during initialisation, rather than silently omitting the characteristics. Additionally, a configuration option or button in the Homebridge UI to 'Clear Appliance Cache' would reduce the risk of users accidentally deleting the authorisation token file.",
+            "confidence": "high",
+            "hash": "d8b28c9576f43c95e6af3488bbdc7ef76883e81b2600437ea718644ac6a155a7"
+        }
+    ]
+}

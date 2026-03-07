@@ -1,0 +1,18 @@
+{
+    "issue_number": 13,
+    "updated_at": "2026-03-06T09:56:03.507Z",
+    "faq": [
+        {
+            "question": "Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?",
+            "answer": "This error indicates that the MyDyson cloud API has returned data containing unknown firmware capabilities or unexpected device metadata. The plugin uses strict validation for API responses to ensure stability, which can lead to failures when: \n\n*   Newer robot models (such as the 360 Heurist or 360 Vis Nav) are present in the account, introducing new capability flags like `DirectedCleaning`, `Mapping`, or `Restrictions`.\n*   The account contains non-connected appliances (such as the V15 Detect) that lack standard fields like `connectedConfiguration` or a user-configured name.\n\nEnsure you are using the latest version of the plugin, as support for new capabilities and structural variations is added regularly. If the issue persists, provide a debug log so the new API structures can be mapped.",
+            "semantic_abstract": "Strict schema validation of Dyson Cloud API responses causes initialization failures when encountering undocumented firmware capabilities or varying device metadata structures. This typically occurs when accounts contain newer robot vacuum models or a mix of connected and non-connected Dyson hardware that deviates from the expected API response format.",
+            "hash": "4830dac2295594aa89b56db839ef57dac5f718f42d8cdbd1603f6cefdd3f1662"
+        },
+        {
+            "question": "How can I provide debug information to help support a new or unsupported Dyson robot model?",
+            "answer": "To support newer hardware like the 360 Heurist or Vis Nav, the plugin requires specific MQTT message samples to map device states correctly. These models often use different field names or omit standard values returned by older models (for example, the 360 Heurist may omit `batteryChargeLevel` and `faults`, but add `activeFaults` and `currentCleaningStrategy`).\n\nTo provide the necessary data for support:\n1. Enable debug mode by setting `\"debug\": true` in the plugin configuration.\n2. Add `\"Log MQTT Payloads as JSON\"` to the `debugFeatures` configuration array.\n3. Record a log while the appliance is in use, ideally covering a full cleaning cycle and various actions like removing the dustbin or changing settings in the MyDyson app.\n4. Attach the resulting logs to a GitHub issue for the maintainer to analyse.",
+            "semantic_abstract": "Support for newer Dyson robot models requires mapping unique MQTT state formats that may omit standard values or rename status fields. Capturing these variations for development requires the use of the `Log MQTT Payloads as JSON` debug feature during active device cycles to identify model-specific payload structures.",
+            "hash": "7af775dd16b27f0a151ea6a7a3fb3e6d61f5d6c59ad1a9ac84c958e3fa894b7c"
+        }
+    ]
+}

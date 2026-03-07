@@ -1,0 +1,16 @@
+{
+    "owner": "thoukydides",
+    "repo": "homebridge-homeconnect",
+    "issue_number": 38,
+    "updated_at": "2026-02-12T11:13:01.084Z",
+    "faq": [
+        {
+            "question": "Why doesn't the plugin provide a sensor for program finished notifications in HomeKit?",
+            "answer": "The HomeKit Accessory Protocol (HAP) does not support arbitrary notifications. In HomeKit, notifications are strictly tied to specific, pre-defined sensor types (such as motion, smoke, or contact sensors). \n\nImplementing a sensor to indicate that a program has finished would require mapping it to one of these existing types. This would result in a poor user experience, as the notifications would appear as \"Motion Detected\" or \"Contact Sensor Opened\" rather than \"Program Finished\". Due to these platform limitations, the plugin does not provide dedicated notification sensors. Users should continue to use the official Home Connect app for native appliance notifications.",
+            "semantic_abstract": "HomeKit Accessory Protocol constraints prevent the generation of arbitrary notifications, limiting them to specific pre-defined sensor types. Mapping Home Connect program completion events to unrelated sensor categories like motion or smoke would result in misleading notification text, leading to a design decision to rely on the native Home Connect app for these alerts.",
+            "alternative_resolution": "The plugin documentation could be updated to include a section on HomeKit platform limitations regarding custom notifications to help users understand why certain automation triggers are not exposed as sensors.",
+            "confidence": "high",
+            "hash": "9780e8239654bbc8ab475e96e062020eb22dea307a52e9c8641e69cabe546200"
+        }
+    ]
+}

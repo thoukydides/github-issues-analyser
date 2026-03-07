@@ -1,0 +1,13 @@
+{
+    "issue_number": 333,
+    "updated_at": "2026-03-01T05:06:48.862Z",
+    "faq": [
+        {
+            "question": "Why is my appliance stuck at \"Waiting for features to finish initialising\"?",
+            "answer": "This message indicates that the plugin is unable to retrieve the full feature set (such as `Power`, `Programs`, or `Child Lock`) from the Home Connect API. This almost always happens because the appliance is offline or has lost its connection to the Home Connect cloud servers.\n\nTo resolve this, verify the appliance's connectivity using the official Home Connect app:\n\n1. Disable Wi-Fi on your mobile device to force it to use cellular data.\n2. Open the Home Connect app and attempt to control the appliance. If the appliance appears as offline or cannot be controlled, the issue lies with the appliance's network connection, not the plugin.\n3. In the Home Connect app, navigate to the appliance **Settings** and then the **Network** section. It should indicate a stable connection (typically shown as three green lines).\n4. Ensure the appliance has not been put into a \"Deep Standby\" or \"Power Saving\" mode that disables its Wi-Fi module.\n\nThe plugin requires a continuous cloud connection to function; if the appliance cannot communicate with the manufacturer's servers, the plugin cannot complete its initialisation process.",
+            "semantic_abstract": "Home Connect appliances appearing as 'Waiting for features to finish initialising' is caused by the appliance being offline or disconnected from the Home Connect cloud API. This connectivity gap prevents the plugin from fetching the required metadata for services like power and programs, requiring verification of the appliance's network status via the official app over a cellular connection.",
+            "confidence": "high",
+            "hash": "49b8b9cb864bbb38ad21e11ffc575d6bfeb888899af4c7ecd4a28482c5f9fe39"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "issue_number": 297,
+    "updated_at": "2026-02-27T04:59:21.956Z",
+    "faq": [
+        {
+            "question": "Why do the logs show unrecognised options like `LaundryCare.Washer.Option.WaterAndRinsePlus1`?",
+            "answer": "The Home Connect API frequently includes settings and options that are not documented in the official manufacturer specification. When the plugin encounters these undocumented values, it logs the discovered schema and marks them as `unrecognised`. These options will not be available in HomeKit until they are manually added to the plugin. If you find such entries in your logs, please report them by opening a GitHub issue and providing the relevant log snippets. This allows the maintainer to map the undocumented values in a future update. Once implemented, updating to the latest version of the plugin will resolve the message and enable the feature. For example, support for the `LaundryCare.Washer.Option.WaterAndRinsePlus1` option found on some Siemens washers was added in version 1.0.3.",
+            "semantic_abstract": "Siemens and other Home Connect appliances often feature undocumented program options that are absent from the official API specification. The plugin identifies these discrepancies and logs them as unrecognised TypeScript-style interfaces, which serve as a prompt for users to report the values for manual inclusion in future plugin versions.",
+            "confidence": "medium",
+            "hash": "f476437a01a63192be0f01db0a295ec42931e11e7ea36b72ed4c5e75a6dd9db9"
+        }
+    ]
+}

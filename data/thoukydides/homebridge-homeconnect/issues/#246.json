@@ -1,0 +1,13 @@
+{
+    "issue_number": 246,
+    "updated_at": "2026-02-23T08:07:08.613Z",
+    "faq": [
+        {
+            "question": "Why are some coffee maker programs like `CoffeePot` or cleaning cycles missing or labelled as unrecognised?",
+            "answer": "Certain appliance models, particularly newer Siemens coffee makers like the `TQ905` series, use program keys for beverages and maintenance cycles that are not included in the standard Home Connect API documentation. Examples include the `CoffeePot` program and various `CleaningModes` such as `CalcNClean`, `FrostProtection`, and `RinseMilkSystem`. The plugin identifies these as `(unrecognised)` in logs until they are explicitly added to the plugin's internal definitions. Support for these specific programs was added in `v0.40.1`. If you encounter other missing programs, ensure the plugin is updated to the latest version; if they remain missing, providing the log output in a GitHub issue allows these undocumented keys to be mapped.",
+            "semantic_abstract": "Home Connect coffee makers may utilise undocumented API program keys for specific beverages and maintenance routines, such as `CoffeePot` or model-specific cleaning modes, which are not present in official documentation. These gaps between the API specification and implementation require manual mapping within the plugin to ensure all appliance functions are correctly identified and exposed to HomeKit.",
+            "confidence": "high",
+            "hash": "85c60a12665027f769e1cdbd197e1c9da759444d2489ce7d9ade93260ccf39d9"
+        }
+    ]
+}

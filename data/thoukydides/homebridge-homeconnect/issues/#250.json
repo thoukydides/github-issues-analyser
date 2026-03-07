@@ -1,0 +1,13 @@
+{
+    "issue_number": 250,
+    "updated_at": "2026-02-23T13:48:40.229Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log that some appliance programs are currently unavailable at start-up?",
+            "answer": "The Home Connect API provides two lists: all programs supported by an appliance and those currently available for selection. To retrieve the supported options for a program (such as temperature ranges or durations), the plugin must temporarily select each program via the API. If a program advertised by the appliance cannot be selected, the plugin logs an `Info` level warning.\n\nThis unavailability often occurs for several reasons:\n1.  **Maintenance requirements**: The appliance may need a drip tray emptied, a filter cleaned, or consumables (like detergent) replenished.\n2.  **State limitations**: The appliance might be busy, performing start-up operations, or have another program active.\n3.  **Appliance settings**: Some programs (e.g. Sabbath mode on ovens) must be explicitly enabled in the appliance's own settings menu before they can be selected via the API.\n4.  **Firmware/API quirks**: The appliance firmware or the Home Connect API may advertise programs that are not actually selectable on that specific model.\n\nIf the programs are expected to be available, ensure the appliance is idle and all maintenance is complete, then trigger the `Identify` routine in HomeKit to re-scan.",
+            "semantic_abstract": "Home Connect appliances require active program selection to retrieve supported options via the API, which may fail if the appliance is in a state where specific programs are disabled, busy, or require maintenance. The plugin logs these failures at start-up to explain why certain program options or features may be missing from the Homebridge Config UI or HomeKit.",
+            "confidence": "high",
+            "hash": "e41c17b76a917cbf9cd1b37eabaee2a1cf019de58e52ae1aae9fa1f6976b2724"
+        }
+    ]
+}

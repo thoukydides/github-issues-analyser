@@ -1,0 +1,13 @@
+{
+    "issue_number": 314,
+    "updated_at": "2026-02-28T02:42:25.305Z",
+    "faq": [
+        {
+            "question": "Why does the log show `HomeConnect API unexpected values` or `unrecognised` keys?",
+            "answer": "The plugin validates all appliance programs, settings, and options against an internal list of supported features to ensure correct mapping to HomeKit services. If an appliance provides a value that is not yet known to the plugin—often because it is undocumented in the official Home Connect API specification—the log will display `HomeConnect API unexpected values` and flag the keys as `unrecognised`. This is a diagnostic feature intended to help expand plugin support for newer appliance models and firmware versions. If you see this message:\n1. Locate the URL provided in the log message immediately following the list of values.\n2. Click the link to open a pre-filled GitHub issue template.\n3. Submit the issue to provide the maintainer with the technical identifiers needed to support these features.\n\nThe reported values are typically added in the next release of the plugin, after which the warning will no longer appear.",
+            "semantic_abstract": "The plugin performs validation on API keys to ensure HomeKit service mapping accuracy, resulting in warnings when undocumented or new appliance programs are encountered. This diagnostic mechanism addresses gaps between the official Home Connect API specification and actual appliance firmware implementations by facilitating user reports for new keys.",
+            "confidence": "high",
+            "hash": "f707523c0057c2a6ffb352edbe83edca7d5b6a606c4b6912843a00d113308a73"
+        }
+    ]
+}

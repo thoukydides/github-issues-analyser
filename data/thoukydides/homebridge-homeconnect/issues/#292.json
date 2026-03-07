@@ -1,0 +1,13 @@
+{
+    "issue_number": 292,
+    "updated_at": "2026-02-26T19:13:27.952Z",
+    "faq": [
+        {
+            "question": "Why is my hood stuck with a message saying it is waiting for features to finish initialising?",
+            "answer": "If your hood (or any other appliance) is stuck during initialisation with log messages like `Waiting for 3 features to finish initialising: Power, Fan, and Light`, it usually indicates that the appliance is disconnected from the Home Connect cloud servers. The plugin cannot retrieve the necessary feature details from the API until the appliance is reported as connected. This can happen even if the appliance appears functional in the official Home Connect app, as the app may be using a local connection or the cloud status hasn't synchronised. To resolve this, try removing the appliance from the Home Connect app and then re-adding it to your home network to force a fresh connection to the cloud servers.",
+            "semantic_abstract": "Home Connect appliance initialisation delays occur when the Home Connect API reports the device as disconnected, preventing the plugin from querying supported features like power, fan, and light. This state can persist despite local app control, often requiring a full reset and re-pairing of the appliance to the Home Connect cloud service to restore API visibility.",
+            "confidence": "high",
+            "hash": "77b3e4d0a0789756afc799fbef262922600aa9f04d4b81ec4f0e7ed2d0c1b901"
+        }
+    ]
+}

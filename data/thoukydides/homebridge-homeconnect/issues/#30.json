@@ -1,0 +1,14 @@
+{
+    "issue_number": 30,
+    "updated_at": "2026-02-13T08:04:41.379Z",
+    "faq": [
+        {
+            "question": "Why does my oven report `Control scope has not been authorised` when starting a program?",
+            "answer": "This error occurs because the Home Connect API requires specific authorisation scopes to control oven programs. While these permissions were previously restricted by Home Connect for independent developers, they were made available in March 2021. \n\nTo resolve this, you must ensure you are using version `v0.20.0` or later of the plugin and refresh your authorisation scopes. If the error persists, you must force a re-authorisation by following these steps:\n1. Stop Homebridge.\n2. Locate the persistent storage directory for the plugin, typically found at `~/.homebridge/homebridge-homeconnect/persist/`.\n3. Delete the cached token file (e.g. `94a08da1fecbb6e8b46990538c7b50b2`).\n4. Restart Homebridge.\n5. Follow the authorisation link provided in the Homebridge logs to sign in to Home Connect again. \n\nThis refresh ensures the plugin requests the `Control` scope now permitted by the Home Connect API, enabling program control for ovens.",
+            "semantic_abstract": "Home Connect API previously restricted the `Oven-Control` scope to business partners, causing authorisation errors when attempting to start oven programs via third-party integrations. Following an API policy change in March 2021, plugin versions `v0.20.0` and later can now request this scope, though users must manually reset their OAuth tokens to update the permissions granted during initial setup.",
+            "alternative_resolution": "Provide a troubleshooting section in the README or a button in the configuration UI to reset the OAuth token and force re-authorisation without requiring manual file deletion.",
+            "confidence": "high",
+            "hash": "450ae3afc645bb6547bec0e7df87bf7c8fa4d6f540dcf6da942846c6d94e0ed4"
+        }
+    ]
+}

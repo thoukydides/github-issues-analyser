@@ -1,0 +1,13 @@
+{
+    "issue_number": 254,
+    "updated_at": "2026-02-24T03:21:34.404Z",
+    "faq": [
+        {
+            "question": "Why does the log show a block of TypeScript code with `(unrecognised)` comments?",
+            "answer": "The plugin is designed to automatically identify features, options, and states reported by the Home Connect API that have not yet been explicitly defined in the plugin's source code. When the plugin encounters such a value, it generates a diagnostic block of TypeScript in the logs, delimited by equal signs (`===`), and marks the missing entries with `(unrecognised)`. This is a deliberate design choice to capture model-specific variations in appliance firmware. If you see these blocks in your log, please open a GitHub issue and provide the complete log snippet. This allows the maintainer to update the plugin's internal mappings and ensure that all functionality of your specific appliance is correctly supported and exposed to HomeKit.",
+            "semantic_abstract": "The plugin generates diagnostic log snippets containing TypeScript code when it detects unmapped Home Connect API enumeration values or options. This telemetry mechanism allows for the discovery of model-specific appliance features and facilitates their inclusion in the plugin via user-submitted reports.",
+            "confidence": "high",
+            "hash": "ab2e87aff1026e40cec7ba1cf3cbfc97e1ef975a3d33bd0a3945907b0071bada"
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "issue_number": 255,
+    "updated_at": "2026-02-24T05:09:45.778Z",
+    "faq": [
+        {
+            "question": "What should I do if the log shows `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+            "answer": "The plugin maintains an internal database of known appliance programs, options, and settings. Home Connect frequently introduces new features or appliance models that are not yet included in the official API documentation or the plugin's definitions. This is common with newer hardware, such as the Siemens Oven `CM936GCB1/C5`, which introduced `AirFry` heating modes and specific microwave power levels like `360Watt`.\n\nWhen the plugin encounters these unknown identifiers, it logs an alert to help improve the software. If you see this message:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new appliance features is added regularly. Many unrecognised keys reported in older versions are already supported in recent releases.\n2. **Report the values**: If you are already on the latest version, follow the instructions provided in the log. The plugin generates a block of code specifically formatted for inclusion in a new GitHub issue. This allows the maintainer to update the plugin's internal mapping logic for that specific appliance model.\n\nThis reporting mechanism is essential for supporting newer hardware where the manufacturer has not yet updated the public API specifications.",
+            "semantic_abstract": "Home Connect appliances frequently return program or option keys that are absent from the plugin's internal schema due to undocumented API updates or new hardware releases. The plugin identifies these unrecognised values in logs to facilitate user reporting and subsequent integration into the mapping logic, ensuring support for new features such as `AirFry` or specific microwave power levels.",
+            "confidence": "high",
+            "hash": "2835b800386afa3ca826bc93db41d1152479b58fffe80699a02b30aa3f4cb20a"
+        }
+    ]
+}

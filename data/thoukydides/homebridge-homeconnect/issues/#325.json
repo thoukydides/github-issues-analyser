@@ -1,0 +1,13 @@
+{
+    "issue_number": 325,
+    "updated_at": "2026-02-28T13:51:24.003Z",
+    "faq": [
+        {
+            "question": "Why do I get a `409 Conflict` or `SDK.Error.InvalidSettingState` error when trying to turn an appliance on or off?",
+            "answer": "This error typically occurs when the appliance rejects a command because its local configuration prevents remote operation. Even if the Home Connect API indicates that a setting like `PowerState` is supported, the physical device will block the request if the **Remote Start** or **Remote Control** feature is disabled in its onboard settings menu.\n\nTo resolve this:\n1. Access the physical settings menu on your appliance (e.g. coffee maker, oven, or dishwasher).\n2. Locate the settings for remote operation or remote start.\n3. Ensure that **Remote Start** is enabled.\n\nNote that while the Home Connect API usually returns specific errors such as `BSH.Common.Error.RemoteControlNotActive` or `BSH.Common.Error.RemoteStartNotActive`, some appliances (particularly certain coffee maker models) may return a more generic `SDK.Error.InvalidSettingState` or `409 Conflict` instead.",
+            "semantic_abstract": "Home Connect appliances require the physical activation of the Remote Start or Remote Control feature on the device hardware to allow write operations via the API. Failure to enable this hardware setting causes the API to return 409 Conflict or SDK.Error.InvalidSettingState errors when attempting to modify appliance power states or programs.",
+            "confidence": "high",
+            "hash": "329426e8bea37b4ef030e303478c3916a51964dae94b1c0b7bfb454ad7bef57f"
+        }
+    ]
+}

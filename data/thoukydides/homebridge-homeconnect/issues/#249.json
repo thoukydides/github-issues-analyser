@@ -1,0 +1,13 @@
+{
+    "issue_number": 249,
+    "updated_at": "2026-02-23T12:01:07.968Z",
+    "faq": [
+        {
+            "question": "Why does my Bosch or Siemens hood show an unrecognised `ColorTemperature` setting in the logs?",
+            "answer": "A February 2024 update to the Home Connect API introduced a new enumerated setting, `Cooking.Hood.Setting.ColorTemperature`, for certain hood models. This replaced or supplemented the previous numeric `Cooking.Hood.Setting.ColorTemperaturePercent` setting with specific named values such as `neutral`.\n\nSupport for these enumerated colour temperature values was added in version `0.41.0`. If you encounter unrecognised values in your logs, ensure you are running the latest version of the plugin. Note that because the Home Connect developer portal lacks a hood simulator, this functionality is tested against physical hardware reports; if you notice issues with colour temperature control on your hood, please report them as a new issue including your appliance logs.",
+            "semantic_abstract": "The Home Connect API introduced an enumerated `Cooking.Hood.Setting.ColorTemperature` setting for hoods in early 2024, deviating from the previous numeric percentage-based implementation. This change requires the plugin to map specific enum values like `neutral` to HomeKit colour temperature characteristics. Affected devices include newer Bosch, Siemens, and Neff hood models that adopted the updated API specification.",
+            "confidence": "high",
+            "hash": "f95287a19884967ee04fd2d365700f95f2cf42b85053940c2b12fd122a66af85"
+        }
+    ]
+}

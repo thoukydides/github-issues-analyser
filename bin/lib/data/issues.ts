@@ -1,0 +1,79 @@
+// GitHub issues analyser
+// Copyright © 2026 Alexander Thoukydides
+
+import fs from 'node:fs';
+import path from 'node:path';
+import * as core from '@actions/core';
+import { plural } from '../utils.js';
+import { ConfigRepository } from '../../config.js';
+import { getIssuesPath } from './paths.js';
+import { IssueAnalysisSchema } from '../prompts/issue-analysis.js';
+
+// Date of compatible and preferred prompts
+export const ISSUE_DATE_COMPATIBLE = '2026-02-08T00:00:00.000Z';
+export const ISSUE_DATE_PREFERRED  = '2026-03-06T08:51:00.000Z';
+
+// Per-issue stored data
+// (original schema did not include semantic_abstract, so it may be missing)
+type IssueFAQ = Omit<IssueAnalysisSchema[number], 'semantic_abstract'>
+    & Partial<Pick<IssueAnalysisSchema[number], 'semantic_abstract'>>;
+export interface IssueFAQWithHash extends IssueFAQ {
+    hash:           string;
+}
+export interface IssueData {
+    issue_number:   number;
+    updated_at:     string;
+    faq:            IssueFAQWithHash[];
+}
+
+
+// Load all saved issues
+export function loadIssues(repo: ConfigRepository): IssueData[] {
+    const issuesDir = getIssuesPath(repo);
+    const issues: IssueData[] = [];
+    let incompatible = 0;
+    for (const issueFile of listFiles(issuesDir)) {
+        if (!issueFile.endsWith('.json')) continue;
+
+        // Read this issue's saved data
+        const json = fs.readFileSync(issueFile, { encoding: 'utf8' });
+        const issue = JSON.parse(json) as IssueData;
+
+        // Ignore issues updated before the compatibility date
+        if (new Date(issue.updated_at) < new Date(ISSUE_DATE_COMPATIBLE)) {
+            ++incompatible;
+            continue;
+        }
+        issues.push(issue);
+    }
+    core.info(`Loaded saved data for ${plural(issues.length, 'issue')}`
+        + ` (${plural(incompatible, 'incompatible issue')} ignored)`);
+    return issues;
+}
+
+// Load all saved issues indexed by issue_number
+export function loadIssuesMap(repo: ConfigRepository): Map<number, IssueData> {
+    const issues = loadIssues(repo);
+    return new Map<number, IssueData>(issues.map(i => [i.issue_number, i]));
+}
+
+// Save a single issue
+export function saveIssue(repo: ConfigRepository, issue: IssueData): void {
+    const issueFile = getIssuesPath(repo, issue.issue_number);
+    const json = JSON.stringify(issue, null, 4);
+    fs.writeFileSync(issueFile, json);
+    core.info(`Wrote '${issueFile}'`);
+}
+
+// Read directory contents
+function listFiles(dirPath: string): string[] {
+    try {
+        const entries = fs.readdirSync(dirPath, { encoding: 'utf8', withFileTypes: true });
+        const files = entries.filter(e => e.isFile());
+        return files.map(f => path.join(f.parentPath, f.name));
+    } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        core.warning(`Error reading directory '${dirPath}': ${message}`);
+        return [];
+    }
+}
