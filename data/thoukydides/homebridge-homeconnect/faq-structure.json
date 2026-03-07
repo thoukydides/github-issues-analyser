@@ -846,7 +846,7 @@
                     "partitions": [],
                     "subcategories": [
                         {
-                            "heading": "New subcategory",
+                            "heading": "Plugin Installation and Configuration",
                             "preamble": "",
                             "partitions": [
                                 {
@@ -857,22 +857,23 @@
                                             "included_ids": [
                                                 "issue-53-9275"
                                             ]
-                                        }
-                                    ],
-                                    "candidates": [
-                                        {
-                                            "issue_number": 1,
-                                            "id": "issue-1-3b47",
-                                            "question": "How do I find my appliance `haID` for configuration?",
-                                            "answer": "The `haID` (Home Appliance ID) is required for certain configuration patterns and is comprised of the manufacturer name, model number (E-Nr), and a hexadecimal string (e.g., `BOSCH-CTL636ES6-12A34B4567C8`). You can find this value using several methods:\n* **Identify Log**: In your HomeKit app, select the appliance and use the **Identify** function. This will trigger the plugin to write a complete JSON structure of the appliance's capabilities and its `haID` to the Homebridge log.\n* **Serial Number**: In most HomeKit apps, the `haID` is displayed in the appliance's settings as the **Serial Number**.\n* **Debug Logs**: If Homebridge is started with debug mode enabled (`-D`), the `haID` will appear as part of the Home Connect request URLs."
                                         },
                                         {
-                                            "issue_number": 9,
-                                            "id": "issue-9-8790",
-                                            "question": "Where can I find a summary of changes for each version of the plugin?",
-                                            "answer": "A `CHANGELOG.md` file is maintained in the root directory of the plugin repository. This provides a chronological record of features, bug fixes, and technical changes for each version.\n\n* **Homebridge UI Integration**: For users of `homebridge-config-ui-x`, the contents of the changelog are automatically displayed within the dashboard when an update is available.\n* **Development Progress**: More detailed or granular information about ongoing development and specific code changes can be found by reviewing the GitHub commit history."
+                                            "question": "How do I find the `haID` for an appliance?",
+                                            "answer": "The `haID` (Home Appliance ID) is unique to each appliance and is often required for specific configuration settings. It is typically composed of the manufacturer name, model number (E-Nr), and a hexadecimal string (for example, `BOSCH-CTL636ES6-12A34B4567C8`).\n\nYou can find this value using several methods:\n\n* **Identify function**: In the Home app (or another HomeKit app), select the appliance and use the **Identify** function. The plugin will write a JSON structure containing the appliance's capabilities and its `haID` to the Homebridge log.\n* **Serial Number**: Most HomeKit apps display the `haID` in the appliance's settings as the **Serial Number**.\n* **Debug Logs**: If Homebridge is started with debug mode enabled (`-D`), the `haID` will be visible within the Home Connect API request URLs in the log.",
+                                            "included_ids": [
+                                                "issue-1-3b47"
+                                            ]
+                                        },
+                                        {
+                                            "question": "Where can I find the list of changes for each plugin version?",
+                                            "answer": "A `CHANGELOG.md` file is maintained in the root directory of the plugin repository, providing a chronological record of features, bug fixes, and technical changes for each release.\n\n* **Homebridge UI**: For users of `homebridge-config-ui-x`, the changelog is automatically displayed within the dashboard when an update is available.\n* **GitHub History**: More detailed information about ongoing development and specific code changes can be found by reviewing the repository commit history on GitHub.",
+                                            "included_ids": [
+                                                "issue-9-8790"
+                                            ]
                                         }
-                                    ]
+                                    ],
+                                    "candidates": []
                                 }
                             ],
                             "subcategories": []

@@ -90,6 +90,8 @@
     - [Why are features available in IFTTT or the official app missing from this plugin?](#why-are-features-available-in-ifttt-or-the-official-app-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
+    - [How do I find the `haID` for an appliance?](#how-do-i-find-the-haid-for-an-appliance)
+    - [Where can I find the list of changes for each plugin version?](#where-can-i-find-the-list-of-changes-for-each-plugin-version)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -854,8 +856,6 @@ For users who require IFTTT-specific functionality, such as triggering automatio
 
 ### Plugin Installation and Configuration
 
-<!-- PARTITION: New subcategory -->
-
 #### Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?
 
 <!-- INCLUDES: issue-53-9275 -->
@@ -870,21 +870,24 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-#### 🚧 How do I find my appliance `haID` for configuration? 🚧
+#### How do I find the `haID` for an appliance?
 
 <!-- INCLUDES: issue-1-3b47 -->
-The `haID` (Home Appliance ID) is required for certain configuration patterns and is comprised of the manufacturer name, model number (E-Nr), and a hexadecimal string (e.g., `BOSCH-CTL636ES6-12A34B4567C8`). You can find this value using several methods:
-* **Identify Log**: In your HomeKit app, select the appliance and use the **Identify** function. This will trigger the plugin to write a complete JSON structure of the appliance's capabilities and its `haID` to the Homebridge log.
-* **Serial Number**: In most HomeKit apps, the `haID` is displayed in the appliance's settings as the **Serial Number**.
-* **Debug Logs**: If Homebridge is started with debug mode enabled (`-D`), the `haID` will appear as part of the Home Connect request URLs.
+The `haID` (Home Appliance ID) is unique to each appliance and is often required for specific configuration settings. It is typically composed of the manufacturer name, model number (E-Nr), and a hexadecimal string (for example, `BOSCH-CTL636ES6-12A34B4567C8`).
 
-#### 🚧 Where can I find a summary of changes for each version of the plugin? 🚧
+You can find this value using several methods:
+
+* **Identify function**: In the Home app (or another HomeKit app), select the appliance and use the **Identify** function. The plugin will write a JSON structure containing the appliance's capabilities and its `haID` to the Homebridge log.
+* **Serial Number**: Most HomeKit apps display the `haID` in the appliance's settings as the **Serial Number**.
+* **Debug Logs**: If Homebridge is started with debug mode enabled (`-D`), the `haID` will be visible within the Home Connect API request URLs in the log.
+
+#### Where can I find the list of changes for each plugin version?
 
 <!-- INCLUDES: issue-9-8790 -->
-A `CHANGELOG.md` file is maintained in the root directory of the plugin repository. This provides a chronological record of features, bug fixes, and technical changes for each version.
+A `CHANGELOG.md` file is maintained in the root directory of the plugin repository, providing a chronological record of features, bug fixes, and technical changes for each release.
 
-* **Homebridge UI Integration**: For users of `homebridge-config-ui-x`, the contents of the changelog are automatically displayed within the dashboard when an update is available.
-* **Development Progress**: More detailed or granular information about ongoing development and specific code changes can be found by reviewing the GitHub commit history.
+* **Homebridge UI**: For users of `homebridge-config-ui-x`, the changelog is automatically displayed within the dashboard when an update is available.
+* **GitHub History**: More detailed information about ongoing development and specific code changes can be found by reviewing the repository commit history on GitHub.
 
 <!-- PARTITION: Plugin Logging and Runtime Behaviour -->
 
