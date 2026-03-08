@@ -1,24 +1,18 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 19,
-    "updated_at": "2026-02-10T17:03:10.735Z",
+    "updated_at": "2026-03-08T09:44:03.412Z",
     "faq": [
         {
-            "question": "Why does the log show `Gateway Timeout` or `Proxy Error` even though the official app works?",
-            "answer": "These errors (`SDK.Error.504.GatewayTimeout` or `Proxy Error`) are returned directly by the Home Connect API servers and indicate instability or maintenance in their backend infrastructure. \n\nThe public API used by third-party integrations often experiences issues independently of the official Home Connect mobile app. This is a known limitation of the service's reliability that the plugin cannot fix. The plugin is designed to automatically attempt to reconnect and resume the event stream once the Home Connect servers are responsive again. \n\nIf you see frequent `Gateway Timeout` messages, it usually signifies that the Home Connect subsystem is timing out internally before responding to the plugin's requests.",
-            "semantic_abstract": "Home Connect API server-side instability manifests as `Gateway Timeout` (504) or `Proxy Error` messages in logs, frequently affecting third-party integrations while the official mobile app remains functional. These errors indicate transient failures within the BSH backend infrastructure rather than a plugin defect.",
-            "alternative_resolution": "The plugin could benefit from more descriptive error logging that explicitly labels these as remote server errors to help users distinguish between local network issues and BSH API outages.",
-            "confidence": "high",
-            "hash": "61540c49d7221ef951d5cd9c1e40c6d1e352926ddf4c4529f0fc078b961c8dca"
+            "question": "Why does my Home Connect appliance show as offline or report `Gateway Timeout` and `Proxy Error`?",
+            "answer": "These errors, such as `Gateway Timeout`, `Proxy Error`, and `SDK.Error.504.GatewayTimeout`, indicate instability within the Home Connect API infrastructure itself rather than an issue with the plugin or your local network. \n\nWhen the Home Connect cloud servers experience downtime or high latency, the plugin is unable to receive event streams or send commands, resulting in the appliance being reported as offline in Homebridge and HomeKit. It is common for the official Home Connect mobile application to remain functional during these periods because it may use different communication paths or internal API endpoints that are not exposed to third-party integrations. Functionality typically restores automatically once the BSH (Home Connect) servers return to a stable state.",
+            "semantic_abstract": "Home Connect API server-side instability results in `Gateway Timeout` (504) and `Proxy Error` responses, causing appliances to be marked as offline in Homebridge despite potential functionality in the official manufacturer application.",
+            "hash": "d410011b23a7a7fb539d912cc939744a2217125b159b60e8019a4e7ae4c2065b"
         },
         {
-            "question": "Why does my coffee maker turn itself on when Homebridge restarts?",
-            "answer": "This behaviour is a workaround for a limitation in the Home Connect API. Many appliances do not provide details about their available programs or settings unless they are currently powered on and active. \n\nTo correctly map these features into HomeKit, the plugin may need to briefly turn on the appliance to query its capabilities (the `Identify` routine). This data is normally cached to prevent it from happening during every restart. You may see this occur if:\n1. You have just updated the plugin to a new version.\n2. The cache has been invalidated or cleared.\n3. The API language setting has been changed, requiring a refresh of the program metadata.\n\nIf the appliance turns on during every single restart, it may indicate that the plugin is unable to save its cache file or that the appliance is failing to report its configuration correctly.",
-            "semantic_abstract": "Home Connect API limitations prevent the retrieval of program options while appliances are in standby, necessitating a momentary power-on state during initial discovery or cache invalidation to populate the HomeKit service schema. This discovery process is cached to minimise disruption but may recur if the cache is cleared or technical metadata needs refreshing.",
-            "alternative_resolution": "Add a specific log entry during the identification phase stating that the appliance is being powered on temporarily for feature discovery, reducing user confusion.",
-            "confidence": "high",
-            "hash": "6db66690d4ae289ad9b1b7faef3d5f67bdf17c1e41abe89ff65ad8c12d1d8f6c"
+            "question": "Why does my coffee maker or appliance turn on automatically when the plugin starts?",
+            "answer": "This behaviour occurs because the plugin must occasionally perform a discovery routine to identify the specific features and program options supported by your appliance. \n\nDue to limitations in the design of the Home Connect API, many appliances do not provide a complete list of their capabilities (such as available coffee types, temperature settings, or program options) unless they are currently powered on and have a program selected. To ensure that HomeKit is populated with the correct controls and characteristics, the plugin may turn the appliance on to read this configuration schema. \n\nThe retrieved information is cached locally to prevent this from happening on every restart. You should generally only see this behaviour under the following conditions:\n\n*   During the initial setup of a new appliance\n*   After a plugin update that requires a cache refresh\n*   When the API language setting is changed\n*   If the `Identify` routine is manually triggered",
+            "semantic_abstract": "Home Connect API constraints prevent the retrieval of full program and option metadata unless an appliance is active, necessitating a one-time power-on sequence during plugin discovery to populate HomeKit service characteristics.",
+            "hash": "c2a761aef5929a0c2d23cdb0d5fd904794738565a793510e159961f76442f931"
         }
     ]
 }
