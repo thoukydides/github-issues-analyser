@@ -808,16 +808,16 @@
                                     "question": "How do I control my hood fan speed using Siri?",
                                     "answer": "Siri maps fan speeds to specific percentages:\n- **Low** is 25%\n- **Medium** is 50%\n- **High** is 100%\n\nThe plugin maps these percentages to the closest available physical fan settings of your hood. You can use commands like `Hey Siri, set the hood fan to medium` or `Hey Siri, set the hood fan to 100%`. Note that numeric settings like `set fan to 1` are not supported by Siri for HomeKit fan services.",
                                     "included_ids": []
+                                },
+                                {
+                                    "question": "Why does Siri report an appliance as not responding when the command was successful?",
+                                    "answer": "Siri often reports that an appliance \"failed to respond\" or is \"not responding\" if it encounters any error when communicating with HomeKit, even if the primary command (such as turning the device on) was successful. This behaviour is often specific to Siri and may not occur when using the Apple Home app.\n\nHistorically, this occurred because the plugin included a non-standard `Active` characteristic within the power `Switch` service. Siri would attempt to write to both the standard `On` and `Active` characteristics simultaneously. If the `Active` characteristic was read-only (for appliances not supporting pausing), Siri treated the restricted write as a failure of the entire request. To resolve this, the plugin was redesigned to isolate these functions:\n- **Power Control**: The main power `Switch` now only contains standard characteristics.\n- **Program Status**: Features such as `Remaining Duration`, `Status Active`, and `Status Fault` have been moved to a separate \"Current Program\" `Switch` service.\n\nIf you still experience this issue, it is likely due to a timeout. HomeKit enforces a 10-second limit for each request. If the Home Connect API takes longer than this to acknowledge a command, Siri will report a failure even if the command eventually completes. This is a result of Home Connect API latency.",
+                                    "included_ids": [
+                                        "issue-10-f724"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 10,
-                                    "id": "issue-10-f724",
-                                    "question": "Why does Siri say an appliance is not responding even though it turns on or off correctly?",
-                                    "answer": "Siri often reports that an appliance \"failed to respond\" or is \"not responding\" if it encounters any error when communicating with HomeKit, even if the primary command (such as turning the device on) was successful. This behaviour is often specific to Siri and may not occur when using the Apple Home app or other third-party HomeKit apps.\n\nHistorically, this occurred because the plugin included a non-standard `Active` characteristic within the power `Switch` service. When Siri is instructed to turn an appliance on or off, it attempts to write to both the standard `On` characteristic and the `Active` characteristic simultaneously. If the `Active` characteristic is read-only (as it was for appliances that do not support pausing), Siri treats the restricted write as a failure of the entire request.\n\nTo resolve this, the plugin was redesigned to isolate these functions:\n\n*   **Power Control**: The main power `Switch` now only contains standard characteristics expected by Siri.\n*   **Program Status**: Program-specific information and controls (such as `Remaining Duration`, `Status Active`, and `Status Fault`) have been moved to a separate \"Current Program\" `Switch` service.\n\nIf you continue to experience this issue, it may be due to a genuine timeout. HomeKit typically enforces a 10-second limit for each request. If the Home Connect API takes longer than 10 seconds to acknowledge a command, Siri will report that the device is not responding. This is a limitation of the Home Connect API latency and HomeKit's fixed timeouts."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

@@ -86,6 +86,7 @@
     - [How can I disable HomeKit notifications for door events?](#how-can-i-disable-homekit-notifications-for-door-events)
   - **[Siri](#siri)**
     - [How do I control my hood fan speed using Siri?](#how-do-i-control-my-hood-fan-speed-using-siri)
+    - [Why does Siri report an appliance as not responding when the command was successful?](#why-does-siri-report-an-appliance-as-not-responding-when-the-command-was-successful)
 - **[Compatibility and Integration](#compatibility-and-integration)**
   - **[Third-party Platforms](#third-party-platforms)**
     - [Is this plugin compatible with HOOBS?](#is-this-plugin-compatible-with-hoobs)
@@ -844,19 +845,16 @@ Siri maps fan speeds to specific percentages:
 
 The plugin maps these percentages to the closest available physical fan settings of your hood. You can use commands like `Hey Siri, set the hood fan to medium` or `Hey Siri, set the hood fan to 100%`. Note that numeric settings like `set fan to 1` are not supported by Siri for HomeKit fan services.
 
-#### 🚧 Why does Siri say an appliance is not responding even though it turns on or off correctly? 🚧
+#### Why does Siri report an appliance as not responding when the command was successful?
 
 <!-- INCLUDES: issue-10-f724 -->
-Siri often reports that an appliance "failed to respond" or is "not responding" if it encounters any error when communicating with HomeKit, even if the primary command (such as turning the device on) was successful. This behaviour is often specific to Siri and may not occur when using the Apple Home app or other third-party HomeKit apps.
+Siri often reports that an appliance "failed to respond" or is "not responding" if it encounters any error when communicating with HomeKit, even if the primary command (such as turning the device on) was successful. This behaviour is often specific to Siri and may not occur when using the Apple Home app.
 
-Historically, this occurred because the plugin included a non-standard `Active` characteristic within the power `Switch` service. When Siri is instructed to turn an appliance on or off, it attempts to write to both the standard `On` characteristic and the `Active` characteristic simultaneously. If the `Active` characteristic is read-only (as it was for appliances that do not support pausing), Siri treats the restricted write as a failure of the entire request.
+Historically, this occurred because the plugin included a non-standard `Active` characteristic within the power `Switch` service. Siri would attempt to write to both the standard `On` and `Active` characteristics simultaneously. If the `Active` characteristic was read-only (for appliances not supporting pausing), Siri treated the restricted write as a failure of the entire request. To resolve this, the plugin was redesigned to isolate these functions:
+- **Power Control**: The main power `Switch` now only contains standard characteristics.
+- **Program Status**: Features such as `Remaining Duration`, `Status Active`, and `Status Fault` have been moved to a separate "Current Program" `Switch` service.
 
-To resolve this, the plugin was redesigned to isolate these functions:
-
-*   **Power Control**: The main power `Switch` now only contains standard characteristics expected by Siri.
-*   **Program Status**: Program-specific information and controls (such as `Remaining Duration`, `Status Active`, and `Status Fault`) have been moved to a separate "Current Program" `Switch` service.
-
-If you continue to experience this issue, it may be due to a genuine timeout. HomeKit typically enforces a 10-second limit for each request. If the Home Connect API takes longer than 10 seconds to acknowledge a command, Siri will report that the device is not responding. This is a limitation of the Home Connect API latency and HomeKit's fixed timeouts.
+If you still experience this issue, it is likely due to a timeout. HomeKit enforces a 10-second limit for each request. If the Home Connect API takes longer than this to acknowledge a command, Siri will report a failure even if the command eventually completes. This is a result of Home Connect API latency.
 
 ## Compatibility and Integration
 
