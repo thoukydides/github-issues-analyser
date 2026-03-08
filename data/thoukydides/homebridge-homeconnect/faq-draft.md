@@ -384,10 +384,11 @@ Once these identifiers are added to the plugin, the warning will disappear and t
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-42-1683 issue-44-70cc issue-62-1f79 issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-42-1683 issue-44-70cc issue-62-1f79 issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
 There are several reasons why features may be missing from the plugin or appear as `currently unavailable` or `advertised by appliance currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. This includes features like **double dispensing** (Doppelbezug) for coffee machines. If a program or other feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
+- **Coffee Maker Constraints**: The public API currently only supports a specific subset of options for coffee makers: `BeanAmount`, `FillQuantity`, and `CoffeeTemperature`. Other options shown in the official app cannot be controlled via third-party plugins until BSH adds them to the public API.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
 - **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options (like temperature or spin speed) via the public Home Connect API.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.
@@ -427,9 +428,16 @@ Note that the official Home Connect app uses a private API and may still appear 
 
 #### Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?
 
-The Home Connect API requires that certain values follow strict increments. If a value is provided that is not an exact multiple of the required step size, the API will return a validation error.
+<!-- INCLUDES: issue-18-14c6 -->
+The Home Connect API requires that program options—such as a coffee maker's `FillQuantity`—follow strict increments. If a value is provided that is not an exact multiple of the required step size (for example, increments of 10ml), the API will return a validation error even if the value falls within the permitted minimum and maximum range.
 
-The plugin attempts to mitigate this by providing dropdown menus or adding the required step size to the field description in the Homebridge UI. When manually entering values, ensure they align with the increments specified in the configuration interface. Using the up/down arrows in the Homebridge UI will typically snap the value to the correct step.
+The plugin implements several strategies in the Homebridge configuration UI to prevent these errors:
+
+- **Enumeration**: If an option has fewer than 20 permitted values, they are presented as a dropdown menu.
+- **Contextual Hints**: For options with 20 or more values, the required step size is explicitly stated in the field description.
+- **Schema Constraints**: The plugin calculates the Greatest Common Divisor (GCD) of step sizes across all programs for that option and applies it as a `multipleOf` constraint.
+
+When entering values manually, use the up/down arrows in the Homebridge UI to snap to the correct increment, or refer to the description field to ensure your input is a valid multiple of the step size.
 
 #### Why are Pause and Resume features missing or inconsistent?
 
@@ -484,10 +492,16 @@ Because these are program options rather than independent settings, they must be
 
 #### Why does my appliance turn on automatically or Homebridge startup stall?
 
-<!-- INCLUDES: issue-72-9eb7 issue-201-3565 -->
-To learn an appliance's specific options, the plugin must select each program via the API. Many appliances only report valid option ranges when the power is on and that specific program is selected.
+<!-- INCLUDES: issue-19-c2a7 issue-20-397f issue-72-9eb7 issue-201-3565 -->
+To identify an appliance's specific programs and valid option ranges (such as bean strength or temperature), the plugin must occasionally perform a discovery routine. Many appliances only report this data via the API when they are powered on and the specific program is selected.
 
-If the plugin does not have a valid cache, it will attempt to turn the appliance on, iterate through all available programs, and then restore the appliance to its original state. This should only happen **once**. If it occurs every time Homebridge restarts, discovery may be failing with a `409 Conflict` (e.g. `BSH.Common.Setting.PowerState currently not available or writable`) because the appliance is busy, in an incompatible state, or the door is open. If no cache exists and the appliance is offline, startup will stall until a connection is established.
+During this process, you may observe the following:
+
+1. **Power On**: The appliance switches on automatically. If it has an automatic rinsing cycle (common with coffee machines), the plugin will wait up to two minutes for it to finish.
+2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options. These selections may appear on the appliance's display.
+3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).
+
+This typically happens only once—during initial setup, after a cache deletion, or if a manual **Identify** is triggered. The results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open.
 
 #### Which settings are used for programs started without specific options?
 
@@ -555,68 +569,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is a restriction of the Home Connect platform itself rather than the plugin.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why are some coffee maker options missing from the plugin configuration? 🚧
-
-<!-- INCLUDES: issue-17-56af -->
-Many Home Connect coffee makers only expose specific program options (such as `BeanAmount`, `FillQuantity`, or `CoffeeTemperature`) through the API once that specific program has been selected on the appliance. If the plugin attempts to read supported options while a different program is active, the API may return an incomplete list. This information is then cached by the plugin.
-
-To resolve this and ensure all available options are discovered:
-
-1. Ensure the appliance is in a `Ready` state (e.g. drip tray empty, water and beans full).
-2. Ensure `Remote Control Start` is enabled on the appliance if required.
-3. Use the **Identify** function for the coffee maker in the Home app (or your preferred HomeKit controller).
-4. The plugin will then attempt to cycle through and select each available program to fetch and cache its supported options.
-
-Note that the public Home Connect API currently only supports a subset of the options available in the official Home Connect app:
-
-* `ConsumerProducts.CoffeeMaker.Option.BeanAmount` 
-* `ConsumerProducts.CoffeeMaker.Option.FillQuantity` 
-* `ConsumerProducts.CoffeeMaker.Option.CoffeeTemperature` 
-
-Options not in this list cannot be controlled via this plugin until they are added to the official API by BSH. If options appear missing in the configuration schema even after using **Identify**, ensure that the appliance is not reporting a status that prevents program selection, such as an empty bean container or a full drip tray.
-
-#### 🚧 Why does the Home Connect API return an `InvalidStepSize` error? 🚧
-
-<!-- INCLUDES: issue-18-14c6 -->
-The `InvalidStepSize` error (often accompanied by `SDK.Error.InvalidOptionValue`) indicates that a value provided for an appliance program option—such as a coffee maker's `FillQuantity`—does not align with the specific increments required by the Home Connect API. Even if a value falls within the permitted minimum and maximum range, the API rejects it if it is not a multiple of the appliance's defined step size (for example, increments of 10ml).
-
-To prevent these errors, the plugin employs several strategies within the Homebridge configuration interface:
-* **Enumeration**: If a program option has fewer than 20 permitted values, the UI presents them as a dropdown list of specific choices.
-* **Contextual Hints**: For options with 20 or more permitted values, the required step size is explicitly stated in the option's description.
-* **Schema Constraints**: The plugin calculates the Greatest Common Divisor (GCD) of step sizes across all programs for a specific option and applies this as a `multipleOf` constraint in the configuration schema.
-
-When configuring appliance programs in the UI:
-1. Refer to the description field for specific step size requirements.
-2. Use the up/down arrows provided by the numeric input field, as these are configured to respect the permitted increments.
-3. Verify that any manually entered value is a multiple of the required step size.
-
-#### 🚧 Why does my coffee maker or appliance turn on automatically when the plugin starts? 🚧
-
-<!-- INCLUDES: issue-19-c2a7 -->
-This behaviour occurs because the plugin must occasionally perform a discovery routine to identify the specific features and program options supported by your appliance. 
-
-Due to limitations in the design of the Home Connect API, many appliances do not provide a complete list of their capabilities (such as available coffee types, temperature settings, or program options) unless they are currently powered on and have a program selected. To ensure that HomeKit is populated with the correct controls and characteristics, the plugin may turn the appliance on to read this configuration schema. 
-
-The retrieved information is cached locally to prevent this from happening on every restart. You should generally only see this behaviour under the following conditions:
-
-*   During the initial setup of a new appliance
-*   After a plugin update that requires a cache refresh
-*   When the API language setting is changed
-*   If the `Identify` routine is manually triggered
-
-#### 🚧 Why does my coffee machine turn on and off automatically when Homebridge starts? 🚧
-
-<!-- INCLUDES: issue-20-397f -->
-When the plugin is first installed, or if the appliance cache is deleted, it must identify all supported programs and their associated options (such as bean strength or milk volume) to correctly map them to HomeKit services. For many coffee machine models, the Home Connect API only allows these options to be queried while the appliance is powered on.
-
-During this initialisation process, you may observe the following behaviour:
-1. The appliance switches on automatically.
-2. If the machine has an automatic rinsing cycle, it will perform this immediately after powering on. The plugin will wait (up to two minutes) for the machine to reach a `Ready` state before proceeding.
-3. The plugin will briefly select each supported program in sequence to read its valid configuration options. These may appear on the machine's display.
-4. Once all programs are documented, the plugin will switch the appliance back to its original power state (usually standby or off).
-
-This is expected behaviour and should only occur once. The discovered options are then cached in a file (typically named `9821f57728368e7e8c33dc260c204471` in the plugin's `persist` directory). Subsequent Homebridge restarts will use this cache and will not trigger the power cycle. If the machine continues to turn on with every restart, check the logs for API errors such as `SDK.Error.WrongOperationState`, which indicate that the plugin was unable to complete the discovery process successfully.
 
 ### Appliance Status
 
