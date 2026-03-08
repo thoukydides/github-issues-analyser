@@ -63,8 +63,8 @@
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
 - **[Apple HomeKit](#apple-homekit)**
-  - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
-    - [Why does the Apple Home app not show the remaining time, or why is it displayed in seconds?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-why-is-it-displayed-in-seconds)
+  - **[HomeKit Accessory Mapping](#homekit-accessory-mapping)**
+    - [Why are some appliance features, such as remaining time, only visible in third-party HomeKit apps?](#why-are-some-appliance-features-such-as-remaining-time-only-visible-in-third-party-homekit-apps)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
     - [Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?](#why-can-i-not-hide-certain-switches-or-why-do-they-remain-visible-or-unresponsive-after-being-disabled)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
@@ -73,6 +73,7 @@
     - [Why do multiple program switches appear with identical names in the Home app?](#why-do-multiple-program-switches-appear-with-identical-names-in-the-home-app)
     - [Why can I not see or control the child lock for my appliance in the Apple Home app?](#why-can-i-not-see-or-control-the-child-lock-for-my-appliance-in-the-apple-home-app)
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
+    - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
     - [Can the hood control buttons on a Home Connect hob be used to trigger HomeKit automations?](#can-the-hood-control-buttons-on-a-home-connect-hob-be-used-to-trigger-homekit-automations)
     - [Why can I only control power and fan speed for my Home Connect air conditioner?](#why-can-i-only-control-power-and-fan-speed-for-my-home-connect-air-conditioner)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
@@ -650,20 +651,20 @@ No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk
 
 ## Apple HomeKit
 
-### HomeKit Accessories, Services, and Characteristics
+### HomeKit Accessory Mapping
 
-#### Why does the Apple Home app not show the remaining time, or why is it displayed in seconds?
+#### Why are some appliance features, such as remaining time, only visible in third-party HomeKit apps?
 
-<!-- INCLUDES: issue-3-a6f3 issue-48-237c issue-68-c945 issue-114-0f03 issue-124-9bb6 issue-225-731f issue-230-03a5 -->
-The plugin exposes the `Remaining Duration` characteristic to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. These services are semantically inappropriate for most Home Connect appliances, and using them would create an inconsistent architectural model and break existing automations.
+<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-48-237c issue-68-c945 issue-114-0f03 issue-124-9bb6 issue-225-731f issue-230-03a5 -->
+The Apple Home app does not support certain HomeKit characteristics that are highly relevant for appliances, such as `Remaining Duration` and `Status Active`. While the plugin exposes these following official HomeKit Accessory Protocol (HAP) standards, Apple's app often hides them entirely.
 
-Furthermore, the HAP specification defines the `Remaining Duration` characteristic as an integer value representing time in seconds. While the plugin follows this official standard, the way the value is displayed depends on the specific HomeKit app:
+Specific display behaviours include:
 
-- **Apple Home**: Usually hides the characteristic entirely for appliances.
-- **Eve** and **Home+**: Typically format this value into human-readable minutes and seconds.
-- **Other apps**: May display the raw value in seconds.
+- **Remaining Time**: The `Remaining Duration` characteristic is defined as an integer in seconds. Apple Home usually hides this for appliances, whereas apps like **Eve** or **Home+** format it into human-readable minutes and seconds.
+- **Automation Labels**: While automation triggers for events like `Program Finished` work in the Apple Home app, they are often displayed with generic numeric labels rather than descriptive names.
+- **Status Indicators**: Characteristics like `Status Active` (used for the red warning triangle in Eve) are ignored by the Apple Home app.
 
-To view the remaining time or use it for automations, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). These applications support displaying and formatting a wider range of standard HomeKit characteristics that Apple's own app hides.
+To view this information or use it for complex automations, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). These applications support displaying and formatting a wider range of standard HomeKit characteristics that Apple's own app restricts.
 
 #### Why are the power and program switches for my appliance in a random order in HomeKit?
 
@@ -742,6 +743,13 @@ The plugin represents Home Connect hood functionality using a combination of a `
 
 Because HomeKit fan speed controls represent a linear progression, incorporating a mode that reverts to an arbitrary previous state is not natively supported by the speed slider. Exposing `Boost` as a separate `Switch` better represents this hardware behaviour and allows it to be activated independently of the current speed. This `Switch` can be hidden in the plugin configuration if it is not required.
 
+#### Why is hood fan speed controlled using percentages instead of discrete levels?
+
+<!-- INCLUDES: issue-2-aa7e -->
+The HomeKit Accessory Protocol (HAP) defines the `Rotation Speed` characteristic as a percentage (0–100%). To maintain compatibility with Siri voice commands such as "low", "medium", and "high", the plugin maps the appliance's discrete speed levels (e.g. stages 1 to 4) to specific percentage values (e.g. 25%, 50%, 75%, and 100%).
+
+Direct control using discrete level numbers is not supported by the HomeKit fan service specification. Using percentages ensures that the fan works correctly with standard HomeKit sliders and provides consistent voice control across all Apple devices.
+
 #### Can the hood control buttons on a Home Connect hob be used to trigger HomeKit automations?
 
 <!-- INCLUDES: issue-348-2f9e -->
@@ -759,16 +767,12 @@ Consequently, the plugin exposes air conditioners as a power **Switch** (to togg
 
 #### Why are appliance lights mapped as lightbulbs instead of switches?
 
-<!-- INCLUDES: issue-362-0e29 -->
-The Home Connect API defines appliance lights (such as internal refrigerator lights or hood lighting) as settings that often include more than just simple on/off functionality. These can support `Brightness`, `ColorTemperature`, or `Color` depending on the specific model and appliance type.
+<!-- INCLUDES: issue-2-bdbd issue-362-0e29 -->
+The Home Connect API defines appliance lights (such as internal refrigerator lights or hood lighting) as settings that often include more than just simple on/off functionality. These can support `Brightness`, `ColorTemperature`, or `Color` depending on the specific model and appliance type. The plugin uses the HomeKit `Lightbulb` service to allow for the full range of hardware capabilities, such as dimming, to be exposed to HomeKit.
 
-The plugin uses the HomeKit `Lightbulb` service for these features because:
+Note that many Home Connect models (particularly hoods) have a hardware-enforced minimum brightness of 10%. The Home Connect API reflects this limitation; dragging the brightness slider below this threshold in HomeKit will typically turn the light off entirely rather than dimming it further.
 
-- A `Switch` service does not support the brightness or colour controls provided by the Home Connect API.
-- It maintains a consistent mapping across all appliance types where lighting is a feature (e.g. extractor hoods and refrigerators).
-- It allows for the full range of hardware capabilities, such as dimming, to be exposed to HomeKit.
-
-A side effect of this mapping is that Siri will include these appliance lights when you issue commands to turn off the lights in a specific room. If you do not want an appliance light to be controlled or grouped with your room lighting, you should disable that specific service in your Homebridge configuration.
+A side effect of the lightbulb mapping is that Siri will include these appliance lights when you issue commands to turn off the lights in a specific room. If you do not want an appliance light to be controlled or grouped with your room lighting, you should disable that specific service in your Homebridge configuration.
 
 #### Why is the colour temperature on my hood inverted?
 
@@ -779,7 +783,7 @@ The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%`
 
 #### Why does the Eve app show a red warning triangle or an 'Inactive' status for my appliance?
 
-<!-- INCLUDES: issue-1-6c10 issue-6-a773 -->
+<!-- INCLUDES: issue-1-6c10 issue-2-4fcb issue-6-a773 -->
 This behaviour occurs because some third-party HomeKit apps, such as Elgato Eve, interpret the standard `Status Active` characteristic as a health or readiness indicator. If this characteristic is set to `false`, Eve may display a red warning triangle or label the accessory as 'Inactive'.
 
 To prevent misleading error displays while staying consistent with the appliance state, the plugin maps the Home Connect `BSH.Common.Status.OperationState` to the HomeKit `Status Active` characteristic. It remains `true` during all normal operating conditions (including `Inactive`, `Ready`, `DelayedStart`, `Run`, or `Finished`). It only switches to `false` when the appliance requires user intervention or has encountered a fault, specifically in the following states:
@@ -790,21 +794,6 @@ To prevent misleading error displays while staying consistent with the appliance
 - **Aborting**: The appliance is in the process of cancelling a program.
 
 Note that the standard Apple Home app does not display the `Status Active` characteristic, so this visual quirk is only observed in more advanced HomeKit browsers or third-party apps.
-
-#### 🚧 Why are some appliance features only visible in third-party HomeKit apps? 🚧
-
-<!-- INCLUDES: issue-2-4fcb -->
-Apple's Home app does not support certain HomeKit characteristics that are highly relevant for appliances, such as `Active`, `Status Active`, and `Remaining Duration`. These characteristics are included by the plugin and can be viewed or used as automation triggers in third-party apps like Eve or Home+. Additionally, while automation triggers for events like `Program Finished` work in the Home app, they are often displayed with generic numeric labels rather than their descriptive names.
-
-#### 🚧 Why is hood fan speed controlled via percentages instead of discrete levels? 🚧
-
-<!-- INCLUDES: issue-2-aa7e -->
-HomeKit defines the `Rotation Speed` characteristic as a percentage. To maintain compatibility with Siri voice commands such as `low`, `medium`, and `high`, the plugin maps the appliance's discrete speed levels (e.g., stages 1 to 4) to percentage values like 25%, 50%, 75%, and 100%. Direct control using discrete level numbers is not supported by the HomeKit fan service specification.
-
-#### 🚧 Why does my hood light only dim to 10% minimum brightness? 🚧
-
-<!-- INCLUDES: issue-2-bdbd -->
-Many Home Connect hood models have a hardware-enforced minimum brightness for their functional lights. The Home Connect API reflects this limitation, where the lowest supported value for `LightingBrightness` is 10%. The plugin mirrors this behaviour in HomeKit; dragging the brightness slider below this threshold will typically turn the light off entirely rather than dimming it further.
 
 ### Notifications & Events
 
