@@ -19,8 +19,10 @@
     - [Why does the log show `Home Connect subsystem not available` or a `503` error?](#why-does-the-log-show-home-connect-subsystem-not-available-or-a-503-error)
     - [Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?](#why-am-i-seeing-network-errors-like-eai_again-enotfound-etimedout-or-enetunreach)
     - [Why is the log flooded with errors during a Home Connect outage?](#why-is-the-log-flooded-with-errors-during-a-home-connect-outage)
+    - [Why does the log show `SyntaxError: Unexpected end of JSON input`?](#why-does-the-log-show-syntaxerror-unexpected-end-of-json-input)
     - [Why does my multi-cavity oven show a `BSH.Common.Error.InvalidUIDValue` error?](#why-does-my-multi-cavity-oven-show-a-bshcommonerrorinvaliduidvalue-error)
     - [Why does starting the Silence program on my dishwasher fail?](#why-does-starting-the-silence-program-on-my-dishwasher-fail)
+    - [How can I refresh appliance capabilities or resolve stale program information?](#how-can-i-refresh-appliance-capabilities-or-resolve-stale-program-information)
   - **[Local/Remote Control](#localremote-control)**
     - [Why does my appliance show `No Response` when I try to start a program?](#why-does-my-appliance-show-no-response-when-i-try-to-start-a-program)
     - [What does `LockedByLocalControl` or "Local Intervention" mean?](#what-does-lockedbylocalcontrol-or-local-intervention-mean)
@@ -188,24 +190,16 @@ Most of the limits reset after either 1 or 10 minutes, but there is also a daily
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-40-f8f5 issue-61-1c74 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
-The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details of the specific reason. Some of the more common cases are:
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-40-f8f5 issue-61-1c74 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
+The Home Connect API uses `409 Conflict` errors for failures that result in a request being rejected. When a command is rejected, the plugin forwards the error to HomeKit, which may cause the characteristic in the Home app to briefly show an error or revert to its previous state. Common causes include:
 
-- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
-  1. In the official app, navigate to the appliance's **Settings** > **Network** and ensure all three connection stages (appliance-app, appliance-cloud, and app-cloud) are green.
-  2. Test the official app while your phone's Wi-Fi is disabled; if it fails to control the appliance over cellular data, the issue is with the appliance's cloud connection.
-  3. Power cycle the appliance or restart your router to refresh the connection to the Home Connect servers.
-  4. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages.
+- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates the appliance is not connected to the Home Connect cloud. Note that the official app may still work via local Wi-Fi, while this plugin is restricted to the cloud API. To troubleshoot: disable Wi-Fi on your phone to see if the official app fails over cellular; power cycle the appliance; or check the [Home Connect Server Status](https://homeconnect.thouky.co.uk).
+- `SDK.Error.InvalidSettingState`: Occurs when a setting is read-only or unavailable. This is common when a maintenance message (e.g. "Change water filter" or "Descaling required") is displayed on the appliance screen, requiring manual confirmation. It can also indicate that **Remote Start** is disabled or the appliance is in an internal process (e.g. heating up).
+- `SDK.Error.WrongOperationState`: The appliance is in an incorrect state for the operation, such as starting a program while another is running.
+- `SDK.Error.ProgramNotAvailable`: The program is unavailable for remote execution due to safety features or firmware constraints.
+- `BSH.Common.Error.400.BadRequest`: Often indicates an attempt to stop a program that is already stopped.
 
-- `SDK.Error.InvalidSettingState`: This occurs when a setting is currently read-only or unavailable. It is often caused by inconsistencies in the API regarding power state capabilities (common with fridges, freezers, and hobs). It can also indicate that **Remote Start** or **Remote Control** has been disabled in the appliance's physical settings menu. While the API usually returns specific errors like `BSH.Common.Error.RemoteControlNotActive`, some appliances (particularly coffee makers) return `SDK.Error.InvalidSettingState` instead. On other appliances, it frequently indicates a maintenance message is displayed on the physical screen (e.g. "Change water filter" or "Descaling required") that requires manual confirmation before remote control can resume.
-
-- `SDK.Error.WrongOperationState`: This indicates that the appliance is in an incorrect state for the requested operation, such as attempting to start a program while another is already running or if the appliance is currently performing a self-cleaning cycle.
-
-- `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program that the API considers unavailable for remote execution. This may be due to appliance settings, safety features (e.g. local control active), or firmware bugs.
-
-- `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggle together.
-
-For details of other `409` errors refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
+If a feature remains unresponsive without a clear log error, enable advanced debugging by starting Homebridge with the environment variable `DEBUG=*` (e.g. `DEBUG=* homebridge -D`).
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
@@ -225,10 +219,10 @@ Failure to power certain ovens on or off is a known bug in the Home Connect API 
 
 #### What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?
 
-<!-- INCLUDES: issue-11-73ec issue-13-549a -->
+<!-- INCLUDES: issue-11-73ec issue-13-549a issue-19-d410 -->
 Errors such as `SDK.Error.504.GatewayTimeout` (often logged as `Timeout on Home Connect subsystem`) or `Proxy Error` indicate that the Home Connect cloud servers are experiencing internal issues, high latency, or have unexpectedly terminated the event stream. 
 
-Because the Home Connect infrastructure acts as a bridge between the plugin and the physical appliance, the plugin is dependent on their cloud services being responsive. These are server-side problems within the Home Connect infrastructure and cannot be resolved by the plugin. You may observe the appliance appearing connected in the official Home Connect app but failing when controlled via HomeKit, as the official app can sometimes communicate directly over your local network while the API is restricted to cloud communication. The device may also briefly switch to `Not Available` immediately after a command is sent during these periods.
+Because the Home Connect infrastructure acts as a bridge between the plugin and the physical appliance, the plugin is dependent on their cloud services being responsive. These are server-side problems within the Home Connect infrastructure and cannot be resolved by the plugin. It is common for the official Home Connect mobile application to remain functional during these periods because it may use different communication paths or internal API endpoints that are not exposed to third-party integrations.
 
 **What you can do**:
 - Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for known outages
@@ -253,10 +247,7 @@ To resolve this issue, ensure your Homebridge server has a stable internet conne
 
 If you are using a Docker container then perform these diagnostics within the container environment, and additionally try:
 
-1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try the following:
-    - Disable IPv6 for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1`.
-    - Force the container to use a specific DNS provider by adding `--dns 1.1.1.1` to your `docker run` command.
-    - Ensure any host firewall rules are not blocking outbound traffic from the container network.
+1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try disabling IPv6 for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or forcing a specific DNS provider using `--dns 1.1.1.1`.
 2. **Network Mode**: Consider switching the container to `host` network mode to bypass Docker's internal bridge networking if issues persist.
 
 The plugin will automatically attempt to reconnect once the network connection is restored.
@@ -276,6 +267,13 @@ Technical rationale:
 
 While this results in a high volume of logs during an outage, it ensures the plugin recovers as reliably as possible without manual intervention.
 
+#### Why does the log show `SyntaxError: Unexpected end of JSON input`?
+
+<!-- INCLUDES: issue-21-fdd3 -->
+The Home Connect cloud service event stream occasionally transmits spurious or "garbage" characters that are not valid JSON. This behaviour appears to be an issue with the Home Connect API itself, possibly caused by server-side debugging code.
+
+To prevent these malformed events from crashing Homebridge, the plugin includes logic to detect invalid JSON syntax within the event stream. When these characters are encountered, the plugin will trap the error, log the occurrence, and automatically restart the event stream to recover the connection. If you see this error, it is a transient issue with the Home Connect servers that the plugin has successfully mitigated.
+
 #### Why does my multi-cavity oven show a `BSH.Common.Error.InvalidUIDValue` error?
 
 This error typically occurs with multi-cavity appliances where only the main oven supports Home Connect functionality. If the Home Connect API continues to advertise the secondary oven despite it lacking remote capabilities, queries for its programs will fail with `BSH.Common.Error.InvalidUIDValue`. 
@@ -291,72 +289,18 @@ The Home Connect API restricts appliances to one active program at a time. If yo
 
 This plugin supports configuration of program options to be used when starting a new program, including the `SilenceOnDemand` option for programs that support it. However, it does not implement mapping of program options to dedicated HomeKit services to enable changing them for a program that is already running. This is a deliberate design choice because the API does not clearly signal which options are valid to modify dynamically, and there is no appropriate way to map these temporary, time-limited behaviours to the standard HomeKit service model.
 
-#### 🚧 Why does my Home Connect appliance show as offline or report `Gateway Timeout` and `Proxy Error`? 🚧
-
-<!-- INCLUDES: issue-19-d410 -->
-These errors, such as `Gateway Timeout`, `Proxy Error`, and `SDK.Error.504.GatewayTimeout`, indicate instability within the Home Connect API infrastructure itself rather than an issue with the plugin or your local network. 
-
-When the Home Connect cloud servers experience downtime or high latency, the plugin is unable to receive event streams or send commands, resulting in the appliance being reported as offline in Homebridge and HomeKit. It is common for the official Home Connect mobile application to remain functional during these periods because it may use different communication paths or internal API endpoints that are not exposed to third-party integrations. Functionality typically restores automatically once the BSH (Home Connect) servers return to a stable state.
-
-#### 🚧 Why does the plugin log a `SyntaxError: Unexpected end of JSON input` and restart? 🚧
-
-<!-- INCLUDES: issue-21-fdd3 -->
-The Home Connect cloud service event stream occasionally transmits spurious or "garbage" characters that are not valid JSON. This behaviour appears to be an issue with the Home Connect API itself, possibly caused by server-side debugging code. 
-
-To prevent these malformed events from crashing Homebridge, the plugin includes logic to detect invalid JSON syntax within the event stream. When these characters are encountered, the plugin will:
-1. Trap the error to prevent a process crash
-2. Log the occurrence
-3. Automatically restart the event stream to recover the connection
-
-If you see this error in your logs, it is an indication of a transient issue with the Home Connect servers that the plugin has successfully mitigated.
-
-#### 🚧 Why does a HomeKit command fail with `SDK.Error.InvalidSettingState`, and why might a characteristic become unresponsive? 🚧
-
-<!-- INCLUDES: issue-22-defe -->
-When you attempt to control a Home Connect appliance via HomeKit, and the operation fails with an error like `BSH.Common.Setting.PowerState currently not available or writable [SDK.Error.InvalidSettingState]` in the Homebridge logs, this indicates that the Home Connect API rejected the command.
-
-This typically occurs because the appliance's current state prevents the requested operation. For example:
-
-*   An appliance may be displaying a maintenance message (e.g., "change water filter" on a coffee machine) and will not accept commands like `PowerState.Standby` until that message is acknowledged on the appliance itself.
-*   The appliance might be in an internal process (e.g., cleaning, heating up) where certain settings cannot be changed.
-
-In such cases:
-
-1.  **The plugin does not crash**: The `homebridge-homeconnect` plugin correctly handles this error by forwarding the rejection back to HomeKit, which may cause the characteristic in your HomeKit app to revert to its previous state or show an error.
-2.  **API limitations**: The Home Connect API does not expose all internal device states or messages (e.g., the specific "change water filter" message). Therefore, the plugin cannot proactively prevent you from attempting a command that the appliance will ultimately reject.
-3.  **Resolution**: To resolve this, interact directly with the appliance to clear any messages or complete any necessary actions. Once the appliance is in a state where the operation is permitted, HomeKit commands should function normally.
-
-If a characteristic remains unresponsive even after the appliance state has changed and no API errors are reported in the logs, enabling debug logging for Homebridge (`-D`) and HAP-NodeJS (`DEBUG=*`) can provide more insight into why HomeKit commands are not being processed correctly by the plugin:
-
-```
-DEBUG=* homebridge -D
-```
-
-(Note: The exact command for your Homebridge instance may vary depending on your installation method.)
-
-#### 🚧 Why is a specific Home Connect appliance program showing "not responding" or failing to start in HomeKit? 🚧
+#### How can I refresh appliance capabilities or resolve stale program information?
 
 <!-- INCLUDES: issue-26-db7c -->
-If a particular Home Connect appliance program stops responding or fails to start, while other programs or the appliance itself remain functional, several factors could be at play:
+If an appliance program stops responding, fails to start, or reflects outdated capabilities (possibly due to a firmware update or server glitch), you can force the plugin to refresh its data:
 
-*   **Appliance Firmware Update**: The appliance might have received a firmware update that changed the availability or name of a program.
-*   **Home Connect Server Issue**: There could be a temporary server glitch, bug, or a change on the Home Connect server side regarding program support. The Home Connect API error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` often indicates that the Home Connect servers are unable to reach your appliance.
-*   **Stale Plugin Cache**: The plugin maintains a cache of appliance capabilities, including supported programs. If this cache becomes outdated or corrupted, it might present incorrect information to HomeKit.
-
-To troubleshoot this issue, consider the following steps:
-
-1.  **Use the HomeKit `Identify` Method**: Activating the HomeKit `Identify` method for the accessory can force the plugin to refresh its list of supported programs and rebuild the configuration schema. This will log information about supported programs in the Homebridge logs.
-
-2.  **Safely Delete Plugin Cache Files**:
-    If the `Identify` method does not resolve the issue, you can try deleting specific cache files to force a complete refresh. This procedure is safe and will not result in loss of configuration or requiring re-authorisation, provided you follow the instructions carefully.
-
-    *   **Stop Homebridge** before proceeding.
-    *   Navigate to the plugin's persistent cache directory. This is typically located at `~/.homebridge/homebridge-homeconnect/persist` (or an equivalent path for your Homebridge instance).
-    *   **Do not delete** the file that stores your Home Connect account authorisation token. This file typically has a name like `94a08da1fecbb6e8b46990538c7b50b2` or similar unique identifier and contains authentication-related data. Deleting it would require you to re-authorise your Home Connect account.
-    *   You can **safely delete all other files** in the `persist` directory. These files contain cached appliance capabilities and configuration schemas, which will be regenerated automatically when Homebridge restarts.
-    *   **Start Homebridge** again. The plugin will fetch fresh data from the Home Connect API, which may resolve issues caused by stale or corrupted program information.
-
-This process helps ensure the plugin has the most current understanding of your appliance's capabilities directly from the Home Connect API, which can resolve discrepancies caused by server-side changes or appliance firmware updates.
+1. **HomeKit Identify**: Activating the `Identify` method for the accessory in the Home app forces the plugin to refresh supported programs and rebuild the configuration schema. Check the Homebridge logs for the updated list.
+2. **Clear Plugin Cache**: If the issue persists, you can safely delete the cached appliance data:
+    - **Stop Homebridge**.
+    - Navigate to the plugin's persistent cache directory (typically `~/.homebridge/homebridge-homeconnect/persist`).
+    - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name like `94a08da1...`). Deleting this will require you to re-authorise the plugin.
+    - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
+    - **Start Homebridge**. The plugin will fetch fresh data from the Home Connect API.
 
 ### Local/Remote Control
 
