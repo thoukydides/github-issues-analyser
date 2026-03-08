@@ -757,14 +757,15 @@
                             "entries": [
                                 {
                                     "question": "Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?",
-                                    "answer": "Home Connect communicates many appliance states—such as a coffee maker's `Drip tray full` or a dishwasher's `iDos fill level poor`—as **transient events** rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so they can be used as automation triggers. This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears. Consequently, these services do not show a continuous 'full' or 'empty' state in the Home app.\n\nThe Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup or use a third-party app like *Eve* or *Home+* which can display descriptive labels. If you do not require these events for automations, you can disable them per-appliance in the plugin configuration to prevent them from appearing in the Home app.",
+                                    "answer": "Home Connect communicates many appliance states—such as a dishwasher's `Program Finished` or a coffee maker's `Drip tray full`—as **transient events** rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so they can be used as automation triggers (e.g. turning on a light or playing a sound when a cycle completes). This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears. Consequently, these services do not show a continuous 'full' or 'active' state in the Home app.\n\nThe Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup or use a third-party app like *Eve* or *Home+* which can display descriptive labels. If you do not require these events for automations, you can disable them per-appliance in the plugin configuration to prevent them from appearing in the Home app.",
                                     "included_ids": [
                                         "issue-31-241e",
                                         "issue-43-caee",
                                         "issue-45-fb59",
                                         "issue-153-91f4",
                                         "issue-323-9301",
-                                        "issue-1-c1c9"
+                                        "issue-1-c1c9",
+                                        "issue-2-aadc"
                                     ]
                                 },
                                 {
@@ -792,14 +793,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 2,
-                                    "id": "issue-2-aadc",
-                                    "question": "What are the programmable switch accessories associated with my appliance?",
-                                    "answer": "The plugin exposes specific appliance events, such as `Program Finished` or `Preheat Finished`, as `Stateless Programmable Switch` services. These appear in HomeKit as buttons (e.g., `Button 1`) that cannot be manually pressed but are 'triggered' by the plugin when the corresponding event occurs. These can be used to start HomeKit automations, such as turning on a light or playing a sound when a dishwasher cycle completes."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
