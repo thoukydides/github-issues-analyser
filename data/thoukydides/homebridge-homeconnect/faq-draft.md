@@ -315,9 +315,10 @@ This plugin exposes the appliance's Remote Start status via the `Program Mode` c
 
 #### What does `LockedByLocalControl` or "Local Intervention" mean?
 
+<!-- INCLUDES: issue-2-c3f8 issue-16-c565 -->
 If you see an error like `Request cannot be performed temporarily! due to local actuated user intervention [BSH.Common.Error.LockedByLocalControl]`, it means the appliance is currently being operated via its physical buttons or knobs. This is a restriction built into the appliance firmware and the Home Connect API; it cannot be bypassed by the plugin.
 
-To prevent conflicting commands and ensure safety, the Home Connect API blocks all remote control while a user is physically interacting with the appliance. This lockout usually clears a few seconds after you stop touching the controls, although some appliances may maintain the lockout for a longer period during certain maintenance cycles or until a specific manual interaction is completed.
+To prevent conflicting commands and ensure safety, the Home Connect API blocks all remote control while a user is physically interacting with the appliance. While this lockout usually clears a few seconds after you stop touching the controls, some appliances (notably coffee makers) may maintain this state for up to 15 minutes during certain cycles. When this state is active, the plugin logs often report `Manual mode (remote start allowed, being operated locally)`.
 
 This plugin exposes the appliance's Local Control status via the `Program Mode` characteristic on the power `Switch` service. It is not shown in the Home app, but can be viewed or used to gate automations in third-party apps like *Eve*.
 
@@ -335,6 +336,7 @@ Note that some functionality, such as the `FridgeFreezer-Images` scope, remains 
 
 #### Why is there a delay when controlling appliances via HomeKit?
 
+<!-- INCLUDES: issue-2-6026 -->
 The Home Connect API is inherently slow, typically taking 1 to 2 seconds to complete a single request. Furthermore, Home Connect imposes strict rate limits, such as a maximum of 5 program starts per minute. To ensure reliability and avoid being blocked, the plugin serialises multiple characteristic changes (e.g. simultaneously turning on a light and adjusting brightness) into sequential API calls. Additional delays are inserted if the API indicates that a rate limit has been exceeded. This results in a noticeable but necessary lag between the HomeKit command and the appliance's physical response.
 
 #### Why does my appliance fail to start when using the switch in the Home app?
@@ -362,28 +364,6 @@ Frequent transitions between `Connected` and `Disconnected` states usually indic
 - **Local Network**: Weak Wi-Fi signals or intermittent internet drops can cause the appliance to lose its cloud heartbeat.
 
 When these disconnections occur, the plugin logs the event and updates the HomeKit status to reflect that the device is unreachable. This is a reporting of the appliance's actual cloud state and cannot be resolved via plugin code changes.
-
-#### 🚧 Why do I get the error `BSH.Common.Error.LockedByLocalControl` when trying to control my appliance? 🚧
-
-<!-- INCLUDES: issue-16-c565 -->
-The error `Request cannot be performed temporarily! due to local actuated user intervention [BSH.Common.Error.LockedByLocalControl]` is returned directly by the Home Connect API. It indicates that the appliance has recently been operated manually at the physical control panel, and the API is temporarily preventing remote commands to ensure local control priority.
-
-According to the Home Connect documentation, this state should typically only last for a few seconds. However, user reports suggest that some appliances, particularly coffee makers, may remain in this locked state for significantly longer, sometimes up to 15 minutes.
-
-Key points regarding this behaviour:
-1. The plugin cannot bypass this restriction as it is enforced by the appliance firmware and the Home Connect cloud servers.
-2. When this state is active, the plugin logs will often show `Manual mode (remote start allowed, being operated locally)`, reflecting that the `BSH.Common.Status.LocalControlActive` status is set to `true`.
-3. If the error persists for an extended period without any manual intervention, it likely indicates a transient issue or bug with the Home Connect servers.
-
-#### 🚧 Why do I receive the error `BSH.Common.Error.LockedByLocalControl`? 🚧
-
-<!-- INCLUDES: issue-2-c3f8 -->
-This error is returned by the Home Connect API when an appliance is being operated manually via its physical buttons. For safety reasons, the API locks out remote control commands while local interaction is occurring or for a short period thereafter. Remote control via HomeKit will automatically become available once the appliance's local lockout period expires.
-
-#### 🚧 Why are appliance control requests sometimes slow or failing when changed together? 🚧
-
-<!-- INCLUDES: issue-2-6026 -->
-The Home Connect API is relatively slow, often requiring 1 to 2 seconds to complete a single request. When multiple HomeKit characteristics change simultaneously (such as turning a light on and adjusting its brightness), the plugin must serialise these requests to prevent overlapping and state inconsistency. Furthermore, the API enforces strict rate limits, such as a maximum of 5 program-start calls per minute, which can be easily exceeded if settings are adjusted rapidly.
 
 ### Programs and Options
 
