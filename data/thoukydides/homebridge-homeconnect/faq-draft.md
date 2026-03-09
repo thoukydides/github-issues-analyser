@@ -41,7 +41,7 @@
     - [Why is the `Active Program` switch failing or unavailable in HomeKit?](#why-is-the-active-program-switch-failing-or-unavailable-in-homekit)
     - [How can I trigger the Identify function in the Eve app?](#how-can-i-trigger-the-identify-function-in-the-eve-app)
     - [How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?](#how-can-i-enable-dishwasher-options-like-half-load-extra-dry-or-efficient-dry-in-homekit)
-    - [Why does my appliance turn on automatically or Homebridge startup stall?](#why-does-my-appliance-turn-on-automatically-or-homebridge-startup-stall)
+    - [Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?](#why-does-my-appliance-turn-on-automatically-switch-off-immediately-or-homebridge-startup-stall)
     - [Which settings are used for programs started without specific options?](#which-settings-are-used-for-programs-started-without-specific-options)
     - [Why do my oven programs only run for one minute?](#why-do-my-oven-programs-only-run-for-one-minute)
     - [Why is the scheduled start time for my appliance program not being honoured?](#why-is-the-scheduled-start-time-for-my-appliance-program-not-being-honoured)
@@ -50,6 +50,7 @@
     - [Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?](#why-does-setting-my-hood-fan-to-auto-in-the-home-app-not-immediately-turn-it-on)
     - [Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?](#why-does-the-plugin-log-unrecognised-powerstate-values-like-undefined-or-mainsoff)
     - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
+    - [Why are ambient light colour and brightness controls missing for my hood or dishwasher?](#why-are-ambient-light-colour-and-brightness-controls-missing-for-my-hood-or-dishwasher)
   - **[Appliance Status](#appliance-status)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive in Homebridge but working in the Home Connect app?](#why-is-my-appliance-unresponsive-in-homebridge-but-working-in-the-home-connect-app)
@@ -378,15 +379,15 @@ Once these identifiers are added to the plugin, the warning will disappear and t
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-42-1683 issue-44-70cc issue-62-1f79 issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-42-1683 issue-44-70cc issue-62-1f79 issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
 There are several reasons why features may be missing from the plugin or appear as `currently unavailable` or `advertised by appliance currently unavailable` in the logs:
 
-- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
+- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature (e.g. certain coffee machine strength or volume settings) is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
-- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options (like temperature or spin speed) via the public Home Connect API.
+- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.
 
-If a program is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
+If a program or option is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
 
 #### Why are fan controls missing for my integrated venting hob?
 
@@ -407,17 +408,17 @@ In these cases, the messages are often cosmetic or indicate a limitation of the 
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-42-9162 issue-54-f83f issue-76-eaa5 issue-186-ee7e issue-201-3565 issue-273-c05e issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
-The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability or missing consumables (e.g. low salt or a full drip tray) can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
+<!-- INCLUDES: issue-27-a038 issue-42-9162 issue-54-f83f issue-76-eaa5 issue-186-ee7e issue-201-3565 issue-273-c05e issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
+The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`. You may also see error codes such as `SDK.Error.UnsupportedSetting` (specifically for `PowerState`), `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`.
 
-Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:
+Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this:
 
 1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.
-2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If the official app shows the device as offline or cannot control it, the issue lies with the appliance's connection to the Home Connect cloud servers.
+2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If the official app shows the device as offline, the issue lies with the appliance's connection to the Home Connect cloud.
 3. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met.
-4. **Power Cycle**: Disconnect the appliance from the mains power for 30 seconds to force its internal firmware to re-register with the cloud servers.
-5. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist` (filenames are MD5 hashes; do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`).
-6. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.
+4. **Power Cycle**: Disconnect the appliance from the mains power for 30 seconds to force its internal firmware to re-register.
+5. **Delete Cache Files**: Stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
+6. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it.
 
 #### Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?
 
@@ -477,18 +478,18 @@ Home Connect distinguishes between global [settings](https://api-docs.home-conne
 
 Because these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.
 
-#### Why does my appliance turn on automatically or Homebridge startup stall?
+#### Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?
 
-<!-- INCLUDES: issue-19-c2a7 issue-20-397f issue-72-9eb7 issue-201-3565 -->
-To identify an appliance's specific programs and valid option ranges (such as bean strength or temperature), the plugin must occasionally perform a discovery routine. Many appliances only report this data via the API when they are powered on and the specific program is selected.
+<!-- INCLUDES: issue-19-c2a7 issue-20-397f issue-32-acbc issue-72-9eb7 issue-201-3565 -->
+To identify an appliance's specific programs and valid option ranges, the plugin must occasionally perform a discovery routine. Many appliances only report this data via the API when they are powered on and the specific program is selected.
 
 During this process, you may observe the following:
 
 1. **Power On**: The appliance switches on automatically. If it has an automatic rinsing cycle (common with coffee machines), the plugin will wait up to two minutes for it to finish.
-2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options. These selections may appear on the appliance's display.
-3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).
+2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options.
+3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby). If the plugin missed a manual power-on event or if the appliance was performing a self-cleaning cycle when the plugin started, it might incorrectly restore the machine to `Standby`, causing it to turn off immediately after you manually turned it on.
 
-This typically happens only once during initial setup, after a cache deletion, or if a manual **Identify** is triggered. The results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open. If no cache exists and the appliance is offline, startup will stall until a connection is established.
+This typically happens only once during initial setup or after a cache deletion. Results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open.
 
 #### Which settings are used for programs started without specific options?
 
@@ -526,7 +527,7 @@ By default, the plugin creates individual `Switch` services for every supported 
 #### What does the log message `Using expired cache result` mean?
 
 <!-- INCLUDES: issue-288-674a -->
-The plugin caches technical details about appliance programs, such as valid temperature ranges or spin speeds, because the Home Connect API only allows this information to be retrieved reliably when a program is selected but not yet running. The plugin considers this cache expired if the program has not been selected on the appliance for more than 24 hours.
+The plugin caches technical details about appliance programs because the Home Connect API only allows this information to be retrieved reliably when a program is selected but not yet running. The plugin considers this cache expired if the program has not been selected on the appliance for more than 24 hours.
 
 When the plugin requires these details but cannot refresh them from the API (because a different program is currently selected), it will use the last known data and log this message. This is expected behaviour and does not indicate a functional failure; it simply signifies that the plugin is relying on historical data for a program that has not been used recently.
 
@@ -541,7 +542,7 @@ This design choice is driven by several factors:
 - **Hardware Variations**: Different manufacturers implement automatic modes differently. Some require the fan to be explicitly `Active` before an automatic program can be engaged.
 - **HomeKit Specification**: The Apple HomeKit Accessory Protocol (HAP) does not define whether setting a fan to `Auto` should implicitly power it on.
 
-If your hood does not respond when you toggle `Auto`, ensure the fan is also switched to `On`. Note that because some hoods do not report speed in this mode, the Home app may display an incorrect speed percentage while the automatic program is running.
+If your hood does not respond when you toggle `Auto`, ensure the fan is also switched to `On`.
 
 #### Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?
 
@@ -557,55 +558,19 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
-#### 🚧 Why are ambient light colour and brightness controls missing for my hood or dishwasher? 🚧
+#### Why are ambient light colour and brightness controls missing for my hood or dishwasher?
 
 <!-- INCLUDES: issue-24-8ee6 -->
-The Home Connect API often omits certain settings, such as `BSH.Common.Setting.AmbientLightBrightness` and `BSH.Common.Setting.AmbientLightCustomColor`, from its responses if the appliance or the light itself is switched off. Furthermore, the API implements two mutually exclusive control modes for ambient lighting:
+The Home Connect API often hides lighting settings if the light is off. Additionally, the API implements two mutually exclusive control modes for ambient lighting:
 
-1. `CustomColor` mode: The brightness is integrated into the `BSH.Common.Setting.AmbientLightCustomColor` value. The separate `BSH.Common.Setting.AmbientLightBrightness` setting is typically unavailable or ignored by the API in this mode.
-2. Fixed colour mode: The light uses one of the predefined colours (1-99). In this mode, `BSH.Common.Setting.AmbientLightBrightness` is used to control intensity, but `BSH.Common.Setting.AmbientLightCustomColor` is unavailable.
+1. **CustomColour mode**: The brightness is integrated into the `AmbientLightCustomColor` value. The separate `AmbientLightBrightness` setting is typically unavailable or ignored in this mode.
+2. **Fixed colour mode**: The light uses predefined colours. In this mode, `AmbientLightBrightness` is used to control intensity, but `AmbientLightCustomColor` is unavailable.
 
-To resolve this and properly expose all characteristics to HomeKit, the plugin attempts to automatically discover these capabilities during its first run. If the ambient light is off, the plugin will briefly switch it on to query the supported settings and colour ranges before restoring the original power state. Once discovered, these capabilities are stored in the plugin's cache. If you still encounter missing controls, you can try the following:
+To resolve this, the plugin attempts to automatically discover these capabilities by briefly switching the light on during its first run. If you still encounter missing controls:
 
 * Manually switch on the ambient light and set it to a custom colour using the official Home Connect app.
 * Restart Homebridge to allow the plugin to re-scan the active settings.
-* If the issue persists, deleting the plugin's cache file (excluding the file containing OAuth tokens) and restarting Homebridge while the light is on will force a clean rediscovery.
-
-#### 🚧 Why does my appliance report "Does not support any programs" or `SDK.Error.UnsupportedSetting` for power state? 🚧
-
-<!-- INCLUDES: issue-27-a038 -->
-This behaviour typically indicates transient issues with the Home Connect API servers rather than a fault with the plugin or your specific appliance. If the API fails to return mandatory settings that should be universal—such as `BSH.Common.Setting.PowerState`—or returns errors like `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`, the plugin will be unable to correctly identify the appliance's capabilities.
-
-To resolve this when the servers have stabilised:
-1. Stop Homebridge.
-2. Delete the plugin's persistent cache files. These are located in the Homebridge storage directory (typically `homebridge-homeconnect.cache`).
-3. Restart Homebridge to force the plugin to perform a fresh retrieval of all appliance data and capabilities from the API.
-
-If the `SDK.Error.UnsupportedSetting` error persists for the `PowerState` setting after clearing the cache and waiting for server stability, you may need to report the issue directly to [Home Connect developer support](https://developer.home-connect.com/support/contact) as it suggests a problem with your account or appliance registration on their backend.
-
-#### 🚧 Why are some coffee machine program options, such as amount or strength, missing in HomeKit? 🚧
-
-<!-- INCLUDES: issue-29-ff17 -->
-The plugin discovers the available options for each appliance program (such as volume or strength for coffee machines) by querying the Home Connect API during initialisation. If the appliance is unavailable or the API returns an error during this process, some options may not be exposed to HomeKit.
-
-To restore missing program options, perform the following steps:
-1. Stop the Homebridge instance.
-2. Navigate to the Homebridge storage directory and delete the plugin's cache files. **Do not** delete the file named `94a08da1fecbb6e8b46990538c7b50b2`, as this contains your authorisation tokens.
-3. Ensure the appliance is idle and ready (for example, ensure a coffee machine has sufficient water and beans).
-4. Restart Homebridge.
-5. Wait for the plugin to complete its initialisation sequence.
-6. Use the **Identify** method for the accessory within the Home app to refresh the configuration.
-
-If the options are still missing after these steps, it usually indicates a transient issue with the Home Connect servers or the appliance firmware failing to report its capabilities at that specific time.
-
-#### 🚧 Why does my Home Connect coffee maker switch off immediately after I turn it on manually? 🚧
-
-<!-- INCLUDES: issue-32-acbc -->
-This behaviour typically occurs when the plugin needs to read and cache supported program options from the Home Connect API, a process which requires the appliance to be in the `On` state. If the plugin's internal state incorrectly believes the appliance is currently in `Standby`, it will attempt to restore that state after reading the necessary data, effectively switching the machine off.
-
-This mismatch usually happens because the Home Connect API may fail to send a `PowerState` update event when an appliance is manually activated or while it is performing an initial self-cleaning cycle. The plugin relies on these events to track the current state of the hardware.
-
-To address this, the plugin includes logic to infer the power status from other events. For example, if the appliance reports an `OperationState` of `Ready`, the plugin now automatically treats the appliance as being `On`. Ensure you are using the latest version of the plugin to benefit from these state inference improvements.
+* If the issue persists, delete the plugin's cache file (excluding the authorisation file) and restart Homebridge while the light is on.
 
 ### Appliance Status
 
