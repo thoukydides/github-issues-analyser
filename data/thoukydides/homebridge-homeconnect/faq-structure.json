@@ -628,7 +628,7 @@
                             "entries": [
                                 {
                                     "question": "Why does the Apple Home app not show the remaining time or detailed status for my appliance?",
-                                    "answer": "The plugin exposes the `Remaining Duration` characteristic to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. These services are semantically inappropriate for most Home Connect appliances, and using them would create an inconsistent architectural model and break existing automations.\n\nTo view the remaining time or use it for automations, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support displaying a wider range of standard HomeKit characteristics that Apple's own app hides.",
+                                    "answer": "The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. These services are semantically inappropriate for most Home Connect appliances, and the plugin's design intentionally avoids creating additional services purely for displaying minor characteristics in Apple's Home app to prevent cluttering the interface and breaking the architectural model.\n\nTo view the remaining time, or use other characteristics that the Apple Home app hides (such as specific door states or child lock status), you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support displaying the full range of standard HomeKit characteristics and allow them to be used in automations.",
                                     "included_ids": [
                                         "issue-2-4fcb",
                                         "issue-3-a6f3",
@@ -637,13 +637,16 @@
                                         "issue-114-0f03",
                                         "issue-124-9bb6",
                                         "issue-225-731f",
-                                        "issue-230-03a5"
+                                        "issue-230-03a5",
+                                        "issue-36-ee06"
                                     ]
                                 },
                                 {
                                     "question": "Why are the power and program switches for my appliance in a random order in HomeKit?",
                                     "answer": "The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined way for plugins to enforce the display order of multiple services within a single accessory. While the plugin exposes several services, such as the power `Switch`, various program control `Switch` services, and event `Stateless Programmable Switch` services, individual HomeKit apps determine how to order them.\n\nAlthough HAP includes a `Service Label Index` characteristic, it is specifically intended for ordering `Stateless Programmable Switch` services and is not officially supported or respected by apps for other service types. Technical attempts to influence the order—such as marking the power switch as a `Primary` service or using `Linked` services to group controls—have proven inconsistent across different applications. In some cases, these changes actually made the Apple Home app's ordering less predictable. Most third-party HomeKit apps, such as *Eve*, *Home+*, and *Hesperus*, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.",
-                                    "included_ids": []
+                                    "included_ids": [
+                                        "issue-7-871f"
+                                    ]
                                 },
                                 {
                                     "question": "Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?",
@@ -733,28 +736,16 @@
                                     "included_ids": [
                                         "issue-366-0e9c"
                                     ]
+                                },
+                                {
+                                    "question": "Why are appliances or switches difficult to identify when creating automations in the Apple Home app?",
+                                    "answer": "When creating automations in the Apple Home app, individual services (such as the power `Switch` or various program switches) may appear as generic toggles without clearly indicating which appliance they belong to. This is a limitation of the Apple Home app user interface and how it displays service names in the automation screen, rather than an issue with the plugin itself.\n\nTo manage complex automations more easily, consider using third-party HomeKit applications which provide a clearer interface for selecting specific appliance services with their full context. Recommended alternatives include *Eve for HomeKit*, *Controller for HomeKit*, and *Home+*.",
+                                    "included_ids": [
+                                        "issue-33-75c5"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 33,
-                                    "id": "issue-33-75c5",
-                                    "question": "Why are appliances difficult to identify when creating automations in the Apple Home app?",
-                                    "answer": "When creating automations in the Apple Home app, multiple appliances may appear as generic toggles (such as `Power`) without clearly indicating which device they belong to. This is a limitation of the Apple Home app user interface and how it chooses to display service characteristics, rather than an issue with the plugin itself.\n\nTo manage complex automations more easily, consider using third-party HomeKit applications which often provide a more detailed and clearer interface for selecting specific appliance services. Recommended alternatives include:\n* **Eve for HomeKit**\n* **Controller for HomeKit**\n* **Home+**"
-                                },
-                                {
-                                    "issue_number": 36,
-                                    "id": "issue-36-ee06",
-                                    "question": "Why can't I see my oven door status (open/closed) in Apple's Home app?",
-                                    "answer": "The oven door status is fully supported by the plugin and exposed as a HomeKit characteristic. However, Apple's own Home app does not display all HomeKit characteristics, especially those not directly mapped to a primary service type visible within the app. The plugin's design intentionally avoids creating additional services purely for displaying minor characteristics in Apple's Home app, to prevent cluttering the app, a common complaint from users.\n\nTo view the oven door status and use it in HomeKit automations, you need to use a third-party HomeKit application. Recommended options include:\n\n*   **Home+ by Matthias Hochgatterer**: This app provides a comprehensive view of all HomeKit characteristics and services.\n*   **Eve by Elgato**: Another capable third-party app that can display the oven door status.\n\nFor more details on supported functionality, refer to the plugin's documentation on [Functionality](https://github.com/thoukydides/homebridge-homeconnect/wiki/Functionality) and [HomeKit Mapping](https://github.com/thoukydides/homebridge-homeconnect/wiki/HomeKit-Mapping)."
-                                },
-                                {
-                                    "issue_number": 7,
-                                    "id": "issue-7-871f",
-                                    "question": "Why are the services for my Home Connect appliance displayed in a random or awkward order?",
-                                    "answer": "The `homebridge-homeconnect` plugin creates multiple services for each appliance, such as a power `Switch` and various program `Switch` services. HomeKit does not provide a robust, universal mechanism for plugins to define the display order of these services within an accessory.\n\nThe plugin uses the `Service Label Index` to order `Stateless Programmable Switch` services (used for event triggers), but this characteristic is not officially supported or respected by most HomeKit apps for other service types like standard switches.\n\nInternal testing of different HomeKit attributes yielded the following results:\n- **Primary Service**: Marking the power switch as the primary service did not consistently place it first and, in some apps like Apple Home, occasionally made the ordering worse.\n- **Linked Services**: Creating logical links between program switches did not improve grouping or ordering in popular HomeKit applications.\n\nIf the default order is unsatisfactory, consider using a third-party HomeKit app that supports manual reordering of services within an accessory, such as **Eve**, **Home+**, or **Hesperus**. The official Apple Home app does not currently allow users to manually reorder the individual services of a single accessory."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
