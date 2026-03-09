@@ -61,6 +61,7 @@
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
+    - [Why does my Siemens coffee maker power state not update correctly after auto-standby?](#why-does-my-siemens-coffee-maker-power-state-not-update-correctly-after-auto-standby)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
@@ -643,14 +644,14 @@ The Home Connect API currently restricts door functionality for dishwasher appli
 <!-- INCLUDES: issue-306-65ff -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
 
-#### 🚧 Why does my Siemens coffee maker's HomeKit power state not update correctly after auto-standby? 🚧
+#### Why does my Siemens coffee maker power state not update correctly after auto-standby?
 
 <!-- INCLUDES: issue-35-302a -->
 Certain Home Connect appliances, such as the Siemens CoffeeMaker (E-Nr: TI9575X1DE/10), do not provide distinct `PowerState` events when they transition into an auto-standby mode. The Home Connect API reports `BSH.Common.EnumType.OperationState.Inactive` for both `BSH.Common.EnumType.PowerState.Off` and `BSH.Common.EnumType.PowerState.Standby` states.
 
 This ambiguity prevents the plugin from directly knowing if the appliance is truly off or just in standby based on `PowerState` events alone. To address this, the plugin infers the standby state. When the appliance was previously active (`On`) and then reports `BSH.Common.EnumType.OperationState.Inactive`, the plugin interprets this as a transition to `Standby`.
 
-This behaviour was addressed in plugin version `0.18.3` to ensure that the HomeKit accessory accurately reflects the coffee maker's power status after auto-standby.
+This behaviour was addressed in plugin version `v0.18.3` to ensure that the HomeKit accessory accurately reflects the coffee maker's power status after auto-standby.
 
 ## Apple HomeKit
 
