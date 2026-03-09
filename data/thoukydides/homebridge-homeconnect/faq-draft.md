@@ -882,31 +882,18 @@ For Home Assistant users, there are alternative community-maintained integration
 
 #### Why are features available in IFTTT or the official app missing from this plugin?
 
-<!-- INCLUDES: issue-188-cb08 -->
+<!-- INCLUDES: issue-23-272e issue-188-cb08 -->
 This plugin is restricted by the capabilities of the public Home Connect API. Certain features are available to official partners like IFTTT via private API integrations but are not exposed to third-party developers. If a specific program or option is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options/), it cannot be supported by this plugin. If you require these features, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) directly to request their addition to the public API.
 
 Direct integration with IFTTT to bridge these gaps has been explicitly declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes several key technical and design constraints:
 
 - **Complexity and Maintenance**: Implementing a hybrid control system where some actions use the Home Connect API and others use IFTTT would create significant code complexity and "feature creep".
 - **User Configuration Burden**: Direct integration would rely on users manually creating appropriate IFTTT applets and then precisely configuring this plugin to match, which is prone to user error.
+- **State Synchronisation**: Updating HomeKit characteristics from IFTTT triggers via webhooks to reflect the appliance's actual state would be challenging to implement reliably.
 - **Interface Clutter**: Adding additional manual switches for IFTTT actions would further clutter the HomeKit interface, making the existing list of program switches more difficult to navigate.
 - **Free Plan Limitations**: The IFTTT free tier supports a maximum of two applets, and some Home Connect features are only available via a "Pro+" plan, so most users would receive limited benefit.
 
 For users who require IFTTT-specific functionality, such as triggering automations from Hood Favourite button presses, it is recommended to use a dedicated plugin such as `homebridge-ifttt` alongside this one. This approach keeps the logic for different services separate and more manageable.
-
-#### 🚧 Why doesn't the `homebridge-homeconnect` plugin integrate IFTTT functionality for Home Connect appliances? 🚧
-
-<!-- INCLUDES: issue-23-272e -->
-The `homebridge-homeconnect` plugin does not directly integrate IFTTT functionality for several reasons, primarily to avoid complexity, feature creep, and potential user experience issues.
-
-Integrating IFTTT in a transparent way would require a complicated hybrid control mechanism, where some appliance functions might use the Home Connect API and others IFTTT, potentially even for basic controls like switching an appliance on or off depending on its type. This approach introduces significant technical challenges:
-
-*   **Complexity and feature creep:** Direct integration would greatly increase the plugin's complexity and maintenance burden.
-*   **Manual user configuration:** It would rely on users manually creating specific IFTTT applets and then configuring this plugin to match, which adds a significant setup overhead.
-*   **State synchronisation:** Updating HomeKit characteristics from IFTTT triggers via webhooks to reflect the appliance's actual state would be challenging to implement reliably.
-*   **User experience:** If IFTTT-controlled functions were exposed as separate switches alongside existing Home Connect programs, it could make the HomeKit interface more confusing rather than improving it.
-
-For users wishing to integrate IFTTT functionality into Homebridge, the dedicated [`homebridge-ifttt`](https://www.npmjs.com/package/homebridge-ifttt) plugin is recommended. This plugin allows you to create HomeKit switches that trigger IFTTT applets independently of your Home Connect appliances.
 
 ### Plugin Installation and Configuration
 
