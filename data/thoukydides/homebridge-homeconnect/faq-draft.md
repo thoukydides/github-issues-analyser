@@ -855,9 +855,16 @@ Support policy for HOOBS users:
 
 #### Will there be a Home Assistant version of this plugin?
 
+<!-- INCLUDES: issue-14-096d -->
 No. This plugin is specifically designed for Homebridge to provide HomeKit integration for Home Connect appliances. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.
 
-For Home Assistant users, there are alternative community-maintained integrations available for Home Connect appliances.
+For Home Assistant users, there are alternative community-maintained integrations available for Home Connect appliances, such as:
+
+- `homeassistant-bosch_dryer` 
+- `homeassistant-bosch_washer` 
+- `homeassistant-bosch-oven` 
+
+Note that these are independent projects and are not affiliated with `homebridge-homeconnect`.
 
 #### Why are features available in IFTTT or the official app missing from this plugin?
 
@@ -872,18 +879,6 @@ Direct integration with IFTTT to bridge these gaps has been explicitly declined 
 - **Free Plan Limitations**: The IFTTT free tier supports a maximum of two applets, and some Home Connect features are only available via a "Pro+" plan, so most users would receive limited benefit.
 
 For users who require IFTTT-specific functionality, such as triggering automations from Hood Favourite button presses, it is recommended to use a dedicated plugin such as `homebridge-ifttt` alongside this one. This approach keeps the logic for different services separate and more manageable.
-
-#### 🚧 Does this plugin support Home Assistant? 🚧
-
-<!-- INCLUDES: issue-14-096d -->
-This plugin is dedicated exclusively to integrating Home Connect appliances into Apple HomeKit via Homebridge or Matterbridge. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.
-
-Users looking for Home Assistant integration may wish to investigate other community-developed projects, such as:
-* `homeassistant-bosch_dryer` 
-* `homeassistant-bosch_washer` 
-* `homeassistant-bosch-oven` 
-
-Note that these are independent projects and are not affiliated with `homebridge-homeconnect`.
 
 ### Plugin Installation and Configuration
 

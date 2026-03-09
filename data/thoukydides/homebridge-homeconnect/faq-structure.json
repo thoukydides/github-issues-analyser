@@ -840,8 +840,10 @@
                                 },
                                 {
                                     "question": "Will there be a Home Assistant version of this plugin?",
-                                    "answer": "No. This plugin is specifically designed for Homebridge to provide HomeKit integration for Home Connect appliances. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.\n\nFor Home Assistant users, there are alternative community-maintained integrations available for Home Connect appliances.",
-                                    "included_ids": []
+                                    "answer": "No. This plugin is specifically designed for Homebridge to provide HomeKit integration for Home Connect appliances. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.\n\nFor Home Assistant users, there are alternative community-maintained integrations available for Home Connect appliances, such as:\n\n- `homeassistant-bosch_dryer` \n- `homeassistant-bosch_washer` \n- `homeassistant-bosch-oven` \n\nNote that these are independent projects and are not affiliated with `homebridge-homeconnect`.",
+                                    "included_ids": [
+                                        "issue-14-096d"
+                                    ]
                                 },
                                 {
                                     "question": "Why are features available in IFTTT or the official app missing from this plugin?",
@@ -852,14 +854,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 14,
-                                    "id": "issue-14-096d",
-                                    "question": "Does this plugin support Home Assistant?",
-                                    "answer": "This plugin is dedicated exclusively to integrating Home Connect appliances into Apple HomeKit via Homebridge or Matterbridge. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.\n\nUsers looking for Home Assistant integration may wish to investigate other community-developed projects, such as:\n* `homeassistant-bosch_dryer` \n* `homeassistant-bosch_washer` \n* `homeassistant-bosch-oven` \n\nNote that these are independent projects and are not affiliated with `homebridge-homeconnect`."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
