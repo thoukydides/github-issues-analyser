@@ -1,16 +1,12 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 14,
-    "updated_at": "2026-02-11T10:28:57.799Z",
+    "updated_at": "2026-03-09T06:11:34.380Z",
     "faq": [
         {
-            "question": "Will there be a Home Assistant version of this plugin?",
-            "answer": "No. This plugin is specifically designed for Homebridge to provide HomeKit integration for Home Connect appliances. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.\n\nFor Home Assistant users, there are alternative community-maintained integrations available for Bosch, Siemens, and other Home Connect appliances.",
-            "semantic_abstract": "The homebridge-homeconnect project is strictly limited to Homebridge and HomeKit integration, with the maintainer explicitly declining support for Home Assistant due to personal platform preference and development scope.",
-            "alternative_resolution": "Ensure the project documentation clearly states its exclusive focus on Homebridge to manage user expectations regarding other automation platforms.",
-            "confidence": "high",
-            "hash": "2728c5ae66f6609228de097f8636cf78254bfdea1e0a048b4ed8a090d07ca4fc"
+            "question": "Does this plugin support Home Assistant?",
+            "answer": "This plugin is dedicated exclusively to integrating Home Connect appliances into Apple HomeKit via Homebridge or Matterbridge. The maintainer does not use Home Assistant and has no plans to develop or maintain a version for that platform.\n\nUsers looking for Home Assistant integration may wish to investigate other community-developed projects, such as:\n* `homeassistant-bosch_dryer` \n* `homeassistant-bosch_washer` \n* `homeassistant-bosch-oven` \n\nNote that these are independent projects and are not affiliated with `homebridge-homeconnect`.",
+            "semantic_abstract": "The homebridge-homeconnect project scope is limited to Apple HomeKit integration via Homebridge and Matterbridge platforms. Support for Home Assistant is excluded from the project roadmap to maintain focus on HomeKit-centric automation architectures.",
+            "hash": "096d7179007a87f2e51bd298bb7900c3185a0e52164379bcd3d1c36b9de49688"
         }
     ]
 }
