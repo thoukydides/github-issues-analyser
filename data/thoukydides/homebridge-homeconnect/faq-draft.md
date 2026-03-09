@@ -94,7 +94,7 @@
     - [Why are features available in IFTTT or the official app missing from this plugin?](#why-are-features-available-in-ifttt-or-the-official-app-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
-    - [How do I find the `haID` for an appliance?](#how-do-i-find-the-haid-for-an-appliance)
+    - [How do I find the `haID` for an appliance and why are my configuration settings being ignored?](#how-do-i-find-the-haid-for-an-appliance-and-why-are-my-configuration-settings-being-ignored)
     - [Where can I find the list of changes for each plugin version?](#where-can-i-find-the-list-of-changes-for-each-plugin-version)
     - [Why are there no log entries for the Home Connect plugin for several hours?](#why-are-there-no-log-entries-for-the-home-connect-plugin-for-several-hours)
     - [Why did my Homebridge instance stop with a `SIGTERM` signal?](#why-did-my-homebridge-instance-stop-with-a-sigterm-signal)
@@ -897,8 +897,6 @@ For users who require IFTTT-specific functionality, such as triggering automatio
 
 ### Plugin Installation and Configuration
 
-<!-- PARTITION: Plugin Installation and Configuration -->
-
 #### Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?
 
 <!-- INCLUDES: issue-53-9275 -->
@@ -913,16 +911,18 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-#### How do I find the `haID` for an appliance?
+#### How do I find the `haID` for an appliance and why are my configuration settings being ignored?
 
-<!-- INCLUDES: issue-1-3b47 -->
-The `haID` (Home Appliance ID) is unique to each appliance and is often required for specific configuration settings. It is typically composed of the manufacturer name, model number (E-Nr), and a hexadecimal string (for example, `BOSCH-CTL636ES6-12A34B4567C8`).
+<!-- INCLUDES: issue-1-3b47 issue-25-a46c -->
+The `haID` (Home Appliance ID) is unique to each appliance and is required for appliance-specific configuration settings in your `config.json`. It is typically composed of the manufacturer name, model number (E-Nr), and a hexadecimal string (for example, `BOSCH-CTL636ES6-12A34B4567C8`).
 
 You can find this value using several methods:
 
 * **Identify function**: In the Home app (or another HomeKit app), select the appliance and use the **Identify** function. The plugin will write a JSON structure containing the appliance's capabilities and its `haID` to the Homebridge log.
 * **Serial Number**: Most HomeKit apps display the `haID` in the appliance's settings as the **Serial Number**.
 * **Debug Logs**: If Homebridge is started with debug mode enabled (`-D`), the `haID` will be visible within the Home Connect API request URLs in the log.
+
+If appliance-specific settings (such as setting `programSwitches` to `none`) are being ignored, it is almost always due to a mismatch in the `haID`. The plugin requires an **exact, case-sensitive match** to associate settings with an appliance. Ensure there are no leading or trailing spaces and that the case and punctuation match the reported value exactly (e.g. `BOSCH-...` is different from `bosch-...`). If settings work correctly for one appliance but not another (for example, a dishwasher and a dryer), the configuration for the affected appliance is the likely cause.
 
 #### Where can I find the list of changes for each plugin version?
 
@@ -931,21 +931,6 @@ A `CHANGELOG.md` file is maintained in the root directory of the plugin reposito
 
 * **Homebridge UI**: For users of `homebridge-config-ui-x`, the changelog is automatically displayed within the dashboard when an update is available.
 * **GitHub History**: More detailed information about ongoing development and specific code changes can be found by reviewing the repository commit history on GitHub.
-
-#### 🚧 Why are individual program switches still visible for my dryer after setting "No individual program switches"? 🚧
-
-<!-- INCLUDES: issue-25-a46c -->
-This behaviour is almost certainly caused by an incorrect configuration within your `config.json` file. The plugin uses the same underlying code to handle program switches for most appliance types (with the exception of Hood appliances).
-
-If you have successfully hidden program switches for one appliance (e.g., your dishwasher) but not another (e.g., your dryer), the most common reason is an incorrectly specified Home Connect Appliance ID (`haid`) for the affected appliance in your `config.json`.
-
-Ensure that the `haid` in your configuration exactly matches the actual appliance ID. This includes:
-
-*   **Matching case** (e.g., `BOSCH-DISHWASHER-123` is different from `bosch-dishwasher-123`).
-*   **Matching punctuation**.
-*   **No trailing or leading spaces**.
-
-The plugin requires an exact `haid` match to apply appliance-specific settings correctly. If the `haid` does not match precisely, the plugin will not associate the appliance with the specified `programSwitches` setting, causing all programs to remain visible.
 
 <!-- PARTITION: Plugin Logging and Runtime Behaviour -->
 
