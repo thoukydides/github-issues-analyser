@@ -1,16 +1,12 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 29,
-    "updated_at": "2026-02-11T13:55:18.804Z",
+    "updated_at": "2026-03-09T09:32:36.163Z",
     "faq": [
         {
-            "question": "Why are some program options (like drink volume or strength) missing for my coffee machine?",
-            "answer": "If specific program options such as volume, strength, or temperature are missing in HomeKit, it is typically because the plugin was unable to query the appliance for its capabilities during initialisation. This occurs if the appliance was unreachable, busy, or powered off when the plugin first attempted to discover its features.\n\nTo resolve this and force a re-discovery of available options:\n1. Stop the Homebridge instance.\n2. Navigate to the Homebridge storage directory and locate the plugin's persistent cache files. Delete the cache files associated with the appliance's HaId (the alphanumeric strings), but **do not** delete the file named `94a08da1fecbb6e8b46990538c7b50b2` as this contains your authorisation tokens.\n3. Ensure the appliance is powered on, idle, and ready (for coffee machines, ensure water and beans are loaded).\n4. Restart Homebridge.\n5. Wait for the plugin to finish its initialisation sequence. It will attempt to turn on the appliance and select each program to read the supported options.\n6. Once finished, use the **Identify** function in the HomeKit app to refresh the accessory characteristics.\n\nIf options remain missing, check the logs for errors during the discovery phase.",
-            "semantic_abstract": "Home Connect appliances, particularly coffee machines, require the plugin to query supported program options like drink volume and strength during initialisation. If the appliance is unavailable or busy during this phase, these options may not be exposed to HomeKit, necessitating a manual cache clearance and a restart while the appliance is idle and connected.",
-            "alternative_resolution": "The plugin's logging could be improved to explicitly warn the user if a program's options failed to load during initialisation, rather than silently omitting the characteristics. Additionally, a configuration option or button in the Homebridge UI to 'Clear Appliance Cache' would reduce the risk of users accidentally deleting the authorisation token file.",
-            "confidence": "high",
-            "hash": "d8b28c9576f43c95e6af3488bbdc7ef76883e81b2600437ea718644ac6a155a7"
+            "question": "Why are some coffee machine program options, such as amount or strength, missing in HomeKit?",
+            "answer": "The plugin discovers the available options for each appliance program (such as volume or strength for coffee machines) by querying the Home Connect API during initialisation. If the appliance is unavailable or the API returns an error during this process, some options may not be exposed to HomeKit.\n\nTo restore missing program options, perform the following steps:\n1. Stop the Homebridge instance.\n2. Navigate to the Homebridge storage directory and delete the plugin's cache files. **Do not** delete the file named `94a08da1fecbb6e8b46990538c7b50b2`, as this contains your authorisation tokens.\n3. Ensure the appliance is idle and ready (for example, ensure a coffee machine has sufficient water and beans).\n4. Restart Homebridge.\n5. Wait for the plugin to complete its initialisation sequence.\n6. Use the **Identify** method for the accessory within the Home app to refresh the configuration.\n\nIf the options are still missing after these steps, it usually indicates a transient issue with the Home Connect servers or the appliance firmware failing to report its capabilities at that specific time.",
+            "semantic_abstract": "Home Connect program options are dynamically discovered during plugin initialisation, but failure to communicate with the appliance or API can result in missing HomeKit characteristics for parameters like volume or strength. Clearing specific plugin cache files while preserving authorisation tokens forces a re-discovery cycle, which should be performed while the appliance is idle to ensure all supported options are correctly mapped.",
+            "hash": "ff17180e22fd4905061c23f4164020ca125f96391eabf560e51bc76d8a6c8f75"
         }
     ]
 }
