@@ -1,16 +1,12 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 27,
-    "updated_at": "2026-02-11T11:26:55.678Z",
+    "updated_at": "2026-03-09T07:18:44.247Z",
     "faq": [
         {
-            "question": "Why does my appliance suddenly report it \"Does not support any programs\" or show `SDK.Error.UnsupportedSetting`?",
-            "answer": "These errors typically indicate that the Home Connect API servers are experiencing instability or an outage. The plugin relies on the API to report appliance capabilities and state; if the API fails to return mandatory settings (such as `BSH.Common.Setting.PowerState`), the plugin cannot correctly initialise the accessory and may incorrectly report that no programs are supported.\n\nTo resolve this issue, follow these steps:\n1. Check the logs for server-side error messages such as `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`.\n2. Wait for a few hours to allow the Home Connect service to stabilise.\n3. Stop Homebridge.\n4. Delete the plugin's persistent cache files (refer to the plugin wiki for the file locations).\n5. Restart Homebridge.\n\nIf the error `SDK.Error.UnsupportedSetting` persists for universal settings like `BSH.Common.Setting.PowerState` even after clearing the cache, the issue is likely a backend fault with the Home Connect service itself. In such cases, you should report the issue to Home Connect developer support.",
-            "semantic_abstract": "Home Connect API server instability or outages can cause mandatory appliance settings like `BSH.Common.Setting.PowerState` to become unavailable. This prevents the plugin from discovering appliance capabilities, leading to errors regarding unsupported programs or missing settings, which requires a cache clear and restart once the API stabilises.",
-            "alternative_resolution": "The plugin could potentially implement a more descriptive warning when mandatory settings like power state are missing, explicitly suggesting that the user check for API outages and clear the cache.",
-            "confidence": "high",
-            "hash": "2626ca48583b9c4165bce428385063bd6d7b7054b41051c6cb7b301e9c0d35f6"
+            "question": "Why does my appliance report \"Does not support any programs\" or `SDK.Error.UnsupportedSetting` for power state?",
+            "answer": "This behaviour typically indicates transient issues with the Home Connect API servers rather than a fault with the plugin or your specific appliance. If the API fails to return mandatory settings that should be universal—such as `BSH.Common.Setting.PowerState`—or returns errors like `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`, the plugin will be unable to correctly identify the appliance's capabilities.\n\nTo resolve this when the servers have stabilised:\n1. Stop Homebridge.\n2. Delete the plugin's persistent cache files. These are located in the Homebridge storage directory (typically `homebridge-homeconnect.cache`).\n3. Restart Homebridge to force the plugin to perform a fresh retrieval of all appliance data and capabilities from the API.\n\nIf the `SDK.Error.UnsupportedSetting` error persists for the `PowerState` setting after clearing the cache and waiting for server stability, you may need to report the issue directly to [Home Connect developer support](https://developer.home-connect.com/support/contact) as it suggests a problem with your account or appliance registration on their backend.",
+            "semantic_abstract": "Home Connect API server instability or transient backend errors can cause the omission of mandatory appliance settings like `BSH.Common.Setting.PowerState`, leading to incorrect capability mapping in HomeKit. This state mismatch results in the plugin reporting that no programs are supported and requires a manual cache purge once server stability is restored to re-synchronise appliance data.",
+            "hash": "a03815573d640b09b139db770cd88bed8df0738b51252d26795475cb85bf7ea4"
         }
     ]
 }
