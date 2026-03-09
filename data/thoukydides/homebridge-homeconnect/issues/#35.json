@@ -1,16 +1,12 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 35,
-    "updated_at": "2026-02-12T05:15:01.335Z",
+    "updated_at": "2026-03-09T14:36:25.643Z",
     "faq": [
         {
-            "question": "Why does my Siemens coffee maker still show as On in HomeKit after it enters auto-standby?",
-            "answer": "Some coffee makers, particularly certain Siemens models like the TI95 series, do not reliably emit a `PowerState` change event through the Home Connect API when they automatically transition to standby mode after a period of inactivity. This results in the HomeKit power switch remaining in the **On** position even though the appliance is inactive.\n\nThe plugin includes a workaround for this behaviour by monitoring the `BSH.Common.Status.OperationState`. When the appliance reports that it has become `Inactive`, the plugin infers that the power has been switched off or moved to standby. \n\nThis logic was implemented in version `v0.18.3`. If you are encountering this issue, please ensure:\n1. You are running the latest version of the plugin.\n2. You have not disabled status updates in your configuration.\n\nNote that the plugin does not distinguish between the `Off` and `Standby` states for the purposes of the HomeKit power switch; both are treated as **Off**.",
-            "semantic_abstract": "Siemens coffee maker firmware fails to broadcast `PowerState` change events during automatic standby transitions, causing HomeKit status desynchronisation. The plugin mitigates this API limitation by inferring a power-off state when the `OperationState` transitions to `Inactive`.",
-            "alternative_resolution": "The plugin's documentation could be updated to explicitly list the mapping between Home Connect `PowerState`/`OperationState` combinations and the HomeKit `On` characteristic to manage user expectations for appliances with inconsistent API reporting.",
-            "confidence": "high",
-            "hash": "2eee0715537238c6e90d7da50539e621d809ad1a5415048e5f2d315c480e900d"
+            "question": "Why does my Siemens coffee maker's HomeKit power state not update correctly after auto-standby?",
+            "answer": "Certain Home Connect appliances, such as the Siemens CoffeeMaker (E-Nr: TI9575X1DE/10), do not provide distinct `PowerState` events when they transition into an auto-standby mode. The Home Connect API reports `BSH.Common.EnumType.OperationState.Inactive` for both `BSH.Common.EnumType.PowerState.Off` and `BSH.Common.EnumType.PowerState.Standby` states.\n\nThis ambiguity prevents the plugin from directly knowing if the appliance is truly off or just in standby based on `PowerState` events alone. To address this, the plugin infers the standby state. When the appliance was previously active (`On`) and then reports `BSH.Common.EnumType.OperationState.Inactive`, the plugin interprets this as a transition to `Standby`.\n\nThis behaviour was addressed in plugin version `0.18.3` to ensure that the HomeKit accessory accurately reflects the coffee maker's power status after auto-standby.",
+            "semantic_abstract": "Certain Siemens coffee maker models exhibit ambiguous power state reporting via the Home Connect API, where `BSH.Common.EnumType.OperationState.Inactive` is used for both `PowerState.Off` and `PowerState.Standby`. The plugin addresses this API limitation by inferring the actual standby status from the `OperationState` transition, enabling accurate HomeKit accessory state synchronisation.",
+            "hash": "302a72e51dfa187c980f2b09ecf836d37f5da2566b07bfe1a31bbe8cf77a31e4"
         }
     ]
 }
