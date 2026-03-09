@@ -98,12 +98,13 @@
 
 #### Why is the plugin not starting or failing to show an authorisation URL?
 
-<!-- INCLUDES: issue-60-6eaf -->
+<!-- INCLUDES: issue-28-485b issue-60-6eaf -->
 If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.
 
-First, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, verify your configuration:
-- **Incorrect Nesting**: Ensure the `HomeConnect` platform block is a top-level item within the `platforms` array and not accidentally nested inside another plugin's configuration.
+First, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, the plugin is not being loaded. Common causes include:
+- **Incorrect Nesting**: Ensure the `HomeConnect` platform block is a separate top-level item within the `platforms` array and not accidentally nested inside another plugin's configuration.
 - **Missing Client ID**: The plugin requires the `clientid` property to be set. If missing, it will log an error and stop initialisation.
+- **Manual Editing Errors**: Structural JSON errors are common during manual editing. It is recommended to use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration.
 
 #### Why does authorisation fail with `invalid_request` or `request rejected by client authorization authority`?
 
@@ -169,18 +170,6 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 3. If you are configuring the plugin manually via `config.json`, add `"china": true` to the plugin configuration object.
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
-
-#### 🚧 Why is the Home Connect plugin not starting or showing an authorisation URL in the logs? 🚧
-
-<!-- INCLUDES: issue-28-485b -->
-If your Homebridge logs do not contain the entry `Initializing HomeConnect platform...`, the plugin is not being loaded by Homebridge. This is typically caused by a misconfiguration in the `config.json` file where the `HomeConnect` platform object is either missing or incorrectly nested inside the configuration of another plugin.
-
-To resolve this:
-1. Ensure the `HomeConnect` configuration is a separate object within the top-level `platforms` array in `config.json`.
-2. Verify that the `clientid` property is present and contains your Home Connect application's Client ID.
-3. Use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration; this prevents structural JSON errors that often occur during manual editing.
-
-If the plugin is loading but you see `Platform HomeConnect config.json is missing 'clientid' property`, double-check that your Client ID has been entered correctly in the plugin settings.
 
 ### Home Connect API Errors
 

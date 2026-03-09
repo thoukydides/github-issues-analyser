@@ -16,9 +16,10 @@
                             "entries": [
                                 {
                                     "question": "Why is the plugin not starting or failing to show an authorisation URL?",
-                                    "answer": "If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.\n\nFirst, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, verify your configuration:\n- **Incorrect Nesting**: Ensure the `HomeConnect` platform block is a top-level item within the `platforms` array and not accidentally nested inside another plugin's configuration.\n- **Missing Client ID**: The plugin requires the `clientid` property to be set. If missing, it will log an error and stop initialisation.",
+                                    "answer": "If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.\n\nFirst, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, the plugin is not being loaded. Common causes include:\n- **Incorrect Nesting**: Ensure the `HomeConnect` platform block is a separate top-level item within the `platforms` array and not accidentally nested inside another plugin's configuration.\n- **Missing Client ID**: The plugin requires the `clientid` property to be set. If missing, it will log an error and stop initialisation.\n- **Manual Editing Errors**: Structural JSON errors are common during manual editing. It is recommended to use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration.",
                                     "included_ids": [
-                                        "issue-60-6eaf"
+                                        "issue-60-6eaf",
+                                        "issue-28-485b"
                                     ]
                                 },
                                 {
@@ -75,14 +76,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 28,
-                                    "id": "issue-28-485b",
-                                    "question": "Why is the Home Connect plugin not starting or showing an authorisation URL in the logs?",
-                                    "answer": "If your Homebridge logs do not contain the entry `Initializing HomeConnect platform...`, the plugin is not being loaded by Homebridge. This is typically caused by a misconfiguration in the `config.json` file where the `HomeConnect` platform object is either missing or incorrectly nested inside the configuration of another plugin.\n\nTo resolve this:\n1. Ensure the `HomeConnect` configuration is a separate object within the top-level `platforms` array in `config.json`.\n2. Verify that the `clientid` property is present and contains your Home Connect application's Client ID.\n3. Use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration; this prevents structural JSON errors that often occur during manual editing.\n\nIf the plugin is loading but you see `Platform HomeConnect config.json is missing 'clientid' property`, double-check that your Client ID has been entered correctly in the plugin settings."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
