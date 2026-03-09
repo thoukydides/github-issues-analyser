@@ -257,17 +257,16 @@ The plugin will automatically attempt to reconnect once the network connection i
 
 #### Why is the log flooded with errors during a Home Connect outage?
 
-When the Home Connect API experiences a service outage, the plugin may rapidly log attempts to restart the event stream.
+<!-- INCLUDES: issue-34-cf10 -->
+When the Home Connect API experiences a service outage, the plugin may rapidly log attempts to restart the event stream, often resulting in a flood of `Service Temporarily Unavailable` errors.
 
-**This is expected behaviour.** The plugin is designed to recover automatically as soon as the service resumes.
+**This is expected behaviour.** The plugin is designed to recover automatically as soon as the service resumes. The high volume of log messages is a deliberate design choice based on the following technical rationale:
 
-Technical rationale:
+1. **State Consistency and Data Integrity**: The plugin relies on the event stream for real-time updates. When the stream is terminated, there is a risk of missing appliance events, which would cause the plugin's cached state to differ from the actual state. Frequent reconnection attempts minimise this window for potential data loss and ensure synchronisation as soon as the service resumes.
+2. **Diagnostic Integrity**: The Home Connect API occasionally exhibits intermittent problems that are difficult to reproduce. Detailed logs of every connection attempt and the specific error returned (e.g. `Service Temporarily Unavailable`) are vital for diagnosing failures and developing workarounds. Implementing log filtering or suppressing these errors would hinder future debugging efforts.
+3. **API Rate Limits**: The plugin is optimised to stay within rate limits. Introducing artificial delays or 'wait' logic adds complexity that could interfere with the normal recovery process.
 
-1. **State Consistency**: The plugin relies on the event stream for real-time updates. Frequent reconnection attempts ensure the plugin synchronises with your appliances as soon as the service resumes, minimising stale data in HomeKit.
-2. **Diagnostic Integrity**: Detailed logs of every connection attempt and the specific error returned (e.g. `Service Temporarily Unavailable`) are vital for diagnosing complex or intermittent API failures.
-3. **API Rate Limits**: The plugin is optimised to stay within rate limits. Introducing manual delays or 'wait' logic adds complexity that could interfere with the normal recovery process.
-
-While this results in a high volume of logs during an outage, it ensures the plugin recovers as reliably as possible without manual intervention.
+While this approach produces more log data during an outage, it ensures the plugin recovers as reliably as possible without manual intervention.
 
 #### Why does my multi-cavity oven show a `BSH.Common.Error.InvalidUIDValue` error?
 
@@ -296,17 +295,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name like `94a08da1...`). Deleting this will require you to re-authorise the plugin.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge**. The plugin will fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does the Homebridge Home Connect plugin flood the logs with 'Service Temporarily Unavailable' errors when the Home Connect API is down? 🚧
-
-<!-- INCLUDES: issue-34-cf10 -->
-The Homebridge Home Connect plugin relies entirely on the Home Connect API's event stream to receive real-time updates from your appliances. When this event stream is terminated, there is a risk that appliance events may be missed, leading to the plugin's cached state differing from the actual state of your appliances.
-
-To minimise the window for potential data loss and ensure the plugin's state accurately reflects your appliances, the plugin attempts to re-establish the event stream as quickly as possible without introducing delays.
-
-Additionally, the Home Connect API has historically exhibited intermittent and difficult-to-reproduce problems. Detailed logs of each connection attempt and its outcome are crucial for diagnosing and developing workarounds for these failure mechanisms. Reducing the amount of information logged, even during prolonged outages, would hinder future debugging efforts.
-
-While this can result in a high volume of log messages during API outages, it is a deliberate design choice to prioritise data integrity and diagnostic capability. Therefore, the plugin does not currently implement log filtering or introduce delays for `Service Temporarily Unavailable` errors, as these severe, prolonged outages are expected to be infrequent.
 
 ### Local/Remote Control
 
