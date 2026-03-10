@@ -1,23 +1,24 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 43,
-    "updated_at": "2026-02-12T15:27:10.094Z",
+    "updated_at": "2026-03-10T13:37:52.034Z",
     "faq": [
         {
-            "question": "Why do my appliance buttons appear as `BUTTON 1`, `BUTTON 2`, etc., in the Apple Home app?",
-            "answer": "This is a limitation of the Apple Home app design rather than a bug in the plugin. While the plugin provides descriptive names for `ProgrammableSwitch` buttons (such as `Freezer Door Alarm` or `Refrigerator Door Alarm`), the Home app ignores these labels and displays generic identifiers. Third-party HomeKit applications, such as Eve, typically display the descriptive names correctly.",
-            "semantic_abstract": "Apple Home app ignores custom button labels on `ProgrammableSwitch` services, defaulting to generic numeric identifiers, whereas third-party HomeKit applications correctly render the descriptive metadata provided by the plugin.",
-            "confidence": "high",
-            "hash": "caeeb3375753181db3f8c5066b04a03a1e63baa65047aa00507706951a402d5c"
+            "question": "Why are programmable switches for alarms named BUTTON 1, BUTTON 2, and BUTTON 3 in the Home app?",
+            "answer": "This is a design limitation of the Apple Home app. While the HomeKit framework allows for descriptive labels on buttons within a `Programmable Switch` service, and these names are often displayed correctly in third-party apps like Eve, the Apple Home app defaults to generic numbering like `BUTTON 1`. There is no configuration or code change within the plugin that can override this behaviour, as it is controlled entirely by Apple's user interface design.",
+            "semantic_abstract": "The Apple Home app user interface fails to display custom metadata labels for individual buttons within a `Programmable Switch` service, despite the information being correctly provided via the HomeKit framework and visible in third-party applications.",
+            "hash": "3f3575a5b41978fe4671722b636dbf83e15ca3d136c83ec173f599eaad88f082"
         },
         {
-            "question": "Why can I not distinguish between the fridge and freezer doors for automations?",
-            "answer": "On combined FridgeFreezer appliances, the Home Connect API does not provide separate status updates for individual doors. The `Current Door State` characteristic reflects the state of whichever door (fridge or freezer) was moved most recently. This is a technical limitation of the Home Connect API and cannot be addressed by the plugin. Automations can still be triggered using this characteristic, though you may need a third-party HomeKit app like Eve if the Apple Home app does not expose the specific triggers you require.",
-            "semantic_abstract": "Home Connect API limitations for FridgeFreezer appliances prevent distinct monitoring of individual doors, as a single `DoorState` attribute tracks the most recent event across all appliance doors.",
-            "alternative_resolution": "Update the documentation for FridgeFreezer appliances to explicitly mention this API limitation so users do not mistake it for a plugin bug.",
-            "confidence": "high",
-            "hash": "31665a39750f270621483702af6ad588c0a97231208589e5fe393aaa95696b16"
+            "question": "Can I trigger HomeKit automations when my fridge or oven door is opened?",
+            "answer": "Yes. The plugin exposes a `Current Door State` characteristic for appliances that report their door status. This characteristic can be used to trigger automations. \n\nNote that the Apple Home app may have limitations on which characteristics can be used as automation triggers. If the door state does not appear as a trigger option in the Home app, you can use a third-party HomeKit app such as Eve or Home+ to create the automation rule, which will then function across your HomeKit ecosystem.",
+            "semantic_abstract": "Appliance door status is mapped to the standard HomeKit `Current Door State` characteristic, enabling automation triggers based on real-time hardware state changes through third-party HomeKit applications.",
+            "hash": "682b0c1c493dcf31d17cdafaca6b7a49c1000fd90250695ab4f51eea454a07e6"
+        },
+        {
+            "question": "Why does my fridge-freezer only show a single door status for both the fridge and freezer compartments?",
+            "answer": "The Home Connect API for combined fridge-freezer appliances does not provide separate status streams for individual doors. Instead, it provides a single `BSH.Common.Status.DoorState` event that updates whenever either door is moved. \n\nConsequently, the `Current Door State` characteristic in HomeKit reflects the state of whichever door was most recently opened or closed. This is a technical limitation of the manufacturer's API and cannot be resolved by the plugin.",
+            "semantic_abstract": "Home Connect API constraints for combined refrigeration units prevent the distinction of individual door states, resulting in a single aggregate `Current Door State` characteristic that tracks the most recent compartment activity.",
+            "hash": "380f8d40a2bfbc663cd2aaa8cecd037545dcfed469b325f1f3b5e4facf349e39"
         }
     ]
 }
