@@ -1,0 +1,12 @@
+{
+    "issue_number": 382,
+    "updated_at": "2026-03-10T07:08:26.431Z",
+    "faq": [
+        {
+            "question": "How can I determine if an appliance issue is caused by the plugin or the Home Connect cloud service?",
+            "answer": "To isolate whether an issue is caused by the plugin, your local network, or the Home Connect cloud service, follow these diagnostic steps:\n\n1. **Test the native app**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If the appliance does not respond, the problem is likely with the appliance's connection to the Home Connect cloud or the cloud service itself.\n2. **Check network status**: In the Home Connect app, verify that the appliance's network settings show a stable connection, typically represented by three green lines in the network section.\n3. **Monitor server status**: Visit the unofficial [Home Connect Server Status](https://homeconnect.thouky.co.uk) page. This resource tracks the availability of the Home Connect API and displays recent error rates, which can help identify global or regional outages.\n4. **Review API errors**: If the plugin logs contain specific error codes, cross-reference them with the official Home Connect API documentation for general and `authorisation` errors to understand the root cause reported by the servers.",
+            "semantic_abstract": "Cloud-dependent appliance functionality requires verification of the Home Connect API status and the appliance's own cloud connection via the native app. These diagnostic steps distinguish between local configuration issues and external service disruptions or authentication failures.",
+            "hash": "f79b737949cfec5c0ca83560bb05ed63a804c33bd71a9f92eb30e13e15eeef41"
+        }
+    ]
+}
