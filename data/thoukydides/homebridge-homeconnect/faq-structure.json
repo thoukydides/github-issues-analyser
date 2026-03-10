@@ -341,7 +341,7 @@
                                 },
                                 {
                                     "question": "Why are some appliance features, programs, or options missing or unavailable?",
-                                    "answer": "There are several reasons why features may be missing from the plugin or appear as `currently unavailable` or `advertised by appliance currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature (e.g. certain coffee machine strength or volume settings) is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.\n\nIf a program or option is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
+                                    "answer": "There are several reasons why features may be missing from the plugin or appear as `currently unavailable`, `advertised by appliance currently unavailable`, or `This appliance does not support any programs` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature (e.g. `Hot Water` or `Coffee Jug` for coffee machines, or certain strength settings) is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.\n\nIf a program or option is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
                                     "included_ids": [
                                         "issue-1-d662",
                                         "issue-17-56af",
@@ -358,7 +358,9 @@
                                         "issue-316-e6c5",
                                         "issue-368-b5fa",
                                         "issue-380-03ac",
-                                        "issue-29-ff17"
+                                        "issue-29-ff17",
+                                        "issue-44-1e1b",
+                                        "issue-42-d406"
                                     ]
                                 },
                                 {
@@ -380,7 +382,7 @@
                                 },
                                 {
                                     "question": "Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?",
-                                    "answer": "The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`. You may also see error codes such as `SDK.Error.UnsupportedSetting` (specifically for `PowerState`), `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`.\n\nNote that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this:\n\n1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.\n2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If the official app shows the device as offline, the issue lies with the appliance's connection to the Home Connect cloud.\n3. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met.\n4. **Power Cycle**: Disconnect the appliance from the mains power for 30 seconds to force its internal firmware to re-register.\n5. **Delete Cache Files**: Stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.\n6. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it.",
+                                    "answer": "The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail, leading to messages like `This appliance does not support any programs`.\n\nWhen this occurs, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`. You may also see error codes such as `SDK.Error.UnsupportedSetting` (specifically for `PowerState`), `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`.\n\nNote that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this:\n\n1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.\n2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If the official app shows the device as offline, the issue lies with the appliance's connection to the Home Connect cloud.\n3. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met.\n4. **Power Cycle**: Disconnect the appliance from the mains power for 30 seconds to force its internal firmware to re-register.\n5. **Delete Cache Files**: Stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.\n6. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it.",
                                     "included_ids": [
                                         "issue-54-f83f",
                                         "issue-76-eaa5",
@@ -395,7 +397,8 @@
                                         "issue-333-49b8",
                                         "issue-335-7107",
                                         "issue-342-27bc",
-                                        "issue-27-a038"
+                                        "issue-27-a038",
+                                        "issue-42-d406"
                                     ]
                                 },
                                 {
@@ -407,8 +410,10 @@
                                 },
                                 {
                                     "question": "Why are Pause and Resume features missing or inconsistent?",
-                                    "answer": "Experimental support for pausing and resuming programs is implemented via the HomeKit `Active` characteristic, but there are several limitations:\n\n- **App Support**: Apple's native Home app does not display the pause/resume controls for most appliance types. You must use a third-party app like *Eve* or *Home+* to access these functions.\n- **API Inconsistency**: Support for these commands varies significantly between firmware versions. Many appliances do not support `PauseProgram` via the public API despite documentation suggesting otherwise. Others may support pausing but not resuming.\n\nThe plugin dynamically detects supported commands for each specific appliance. If the options do not appear in a compatible third-party app, it indicates your hardware or firmware does not support the feature via the public API.",
-                                    "included_ids": []
+                                    "answer": "Experimental support for pausing and resuming programs is implemented via the HomeKit `Active` characteristic, but there are several limitations:\n\n- **App Support**: Apple's native Home app does not display the pause/resume controls for most appliance types. You must use a third-party app like *Eve*, *Home+*, or *Controller for HomeKit* to access these functions.\n- **API Inconsistency**: Support for `BSH.Common.Command.PauseProgram` and `BSH.Common.Command.ResumeProgram` varies significantly between firmware versions. Many appliances do not support these commands via the public API despite documentation suggesting otherwise. If the plugin logs `SDK.Error.UnsupportedCommand`, the functionality is not currently available for that specific appliance.\n\nThe plugin dynamically detects supported commands for each specific appliance using the `GET /homeappliances/{haid}/commands` endpoint. If the options do not appear in a compatible third-party app, it indicates your hardware or firmware does not support the feature via the public API.",
+                                    "included_ids": [
+                                        "issue-8-8852"
+                                    ]
                                 },
                                 {
                                     "question": "Why doesn't the plugin automatically turn on my coffee machine when I start a beverage program?",
@@ -427,7 +432,9 @@
                                 {
                                     "question": "How can I trigger the Identify function in the Eve app?",
                                     "answer": "To trigger the `Identify` mechanism within the Eve app:\n\n1. Navigate to the **Rooms** tab and locate the appliance.\n2. Tap the name of the appliance to open the detailed view (do not tap a toggle or slider).\n3. Tap the appliance name or the small arrow at the top of the screen, just below the **Edit** button.\n4. Tap the **ID** button that appears next to the settings cog.\n\nThis will trigger the identification sequence on the physical appliance and force the plugin to refresh its cached data.",
-                                    "included_ids": []
+                                    "included_ids": [
+                                        "issue-37-73d3"
+                                    ]
                                 },
                                 {
                                     "question": "How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?",
@@ -509,44 +516,14 @@
                                 },
                                 {
                                     "question": "Why are ambient light colour and brightness controls missing for my hood or dishwasher?",
-                                    "answer": "The Home Connect API often hides lighting settings if the light is off. Additionally, the API implements two mutually exclusive control modes for ambient lighting:\n\n1. **CustomColour mode**: The brightness is integrated into the `AmbientLightCustomColor` value. The separate `AmbientLightBrightness` setting is typically unavailable or ignored in this mode.\n2. **Fixed colour mode**: The light uses predefined colours. In this mode, `AmbientLightBrightness` is used to control intensity, but `AmbientLightCustomColor` is unavailable.\n\nTo resolve this, the plugin attempts to automatically discover these capabilities by briefly switching the light on during its first run. If you still encounter missing controls:\n\n* Manually switch on the ambient light and set it to a custom colour using the official Home Connect app.\n* Restart Homebridge to allow the plugin to re-scan the active settings.\n* If the issue persists, delete the plugin's cache file (excluding the authorisation file) and restart Homebridge while the light is on.",
+                                    "answer": "The Home Connect API often hides lighting settings if the light is off. Furthermore, the API implementation for ambient lighting involves several constraints:\n\n- **Device Category Restrictions**: In many dishwasher models, the Home Connect API restricts ambient light control to the Hood category only. Even if the machine has physical lighting controls, the public API used by this plugin may not expose them.\n- **Mutually Exclusive Modes**: The API uses two separate control modes. In **CustomColour** mode, brightness is integrated into the colour value and the separate brightness setting is ignored. In **Fixed colour** mode, brightness is controllable but custom colours are unavailable.\n\nTo resolve missing controls, ensure the light is manually switched on using the official app and set to a custom colour, then restart Homebridge to allow the plugin to re-scan. If issues persist, delete the plugin's cache file (excluding the authorisation file) while the light is active.",
                                     "included_ids": [
-                                        "issue-24-8ee6"
+                                        "issue-24-8ee6",
+                                        "issue-42-e5af"
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 37,
-                                    "id": "issue-37-73d3",
-                                    "question": "How do I trigger the `Identify` function for an appliance in the Eve app?",
-                                    "answer": "The `Identify` function is a standard HomeKit feature used to locate a specific physical appliance. Although its visibility varies across different HomeKit applications, it can be triggered in the Eve app using the following steps:\n1. Open the Eve app and select the **Rooms** tab.\n2. Find the appliance and tap on its name (avoid tapping active controls like power switches).\n3. On the appliance detail screen, tap the appliance name/arrow located at the top of the screen (below the back and edit buttons).\n4. Two buttons will appear: a cog icon for settings and an **ID** button.\n5. Tap the **ID** button to trigger the appliance's identification mechanism."
-                                },
-                                {
-                                    "issue_number": 42,
-                                    "id": "issue-42-d406",
-                                    "question": "Why does my Home Connect appliance say `This appliance does not support any programs`?",
-                                    "answer": "This message is typically displayed when the plugin is unable to successfully retrieve the list of available programmes from the Home Connect servers during its initialisation phase. This behavior is usually the result of transient flakiness or temporary outages on the Home Connect API servers.\n\nTo resolve this:\n1. Restart Homebridge to trigger a fresh attempt to fetch the supported programmes.\n2. Ensure the appliance is powered on and correctly connected to the Home Connect cloud service via the official mobile app.\n3. Check the Homebridge logs for any specific API request errors (such as timeouts or server errors) occurring during the plugin's startup sequence."
-                                },
-                                {
-                                    "issue_number": 42,
-                                    "id": "issue-42-e5af",
-                                    "question": "Why can I not control the ambient light on my dishwasher?",
-                                    "answer": "Although many dishwasher models include hardware for internal or ambient lighting, the Home Connect API currently restricts control of this feature to Hood appliances. This is a technical limitation of the manufacturer's API specification rather than the plugin itself.\n\nEven if you can control the lighting via the physical buttons on the machine or the official Home Connect app, the third-party API used by this plugin does not yet expose these controls for the dishwasher category. Support will be added if and when the API specification is updated by the manufacturer to include this functionality for dishwashers."
-                                },
-                                {
-                                    "issue_number": 44,
-                                    "id": "issue-44-1e1b",
-                                    "question": "Why are some coffee machine programmes like `Hot Water` or `Coffee Jug` missing?",
-                                    "answer": "Certain appliance functionalities are not exposed through the official Home Connect API. This plugin is limited by the capabilities provided by the API; if a programme or option is not supported by the Home Connect servers, it cannot be made available in HomeKit.\n\nSpecific examples for coffee makers that are often missing include `Hot Water` and `Coffee Jug`. You can verify which programmes are officially supported by checking the [Home Connect API documentation for coffee makers](https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options).\n\nIf you find a feature is missing, you may wish to contact Home Connect support directly to request its inclusion in the API, as the plugin can only implement functionality once it is officially documented and exposed."
-                                },
-                                {
-                                    "issue_number": 8,
-                                    "id": "issue-8-8852",
-                                    "question": "Why can't I pause or resume my Home Connect appliance programmes in the Home app?",
-                                    "answer": "The plugin implements program pause and resume functionality via the HomeKit `Active` characteristic. There are two primary reasons why these controls may not appear or function as expected:\n\n1. **Home App Limitations**: Apple's Home app does not display the `Active` characteristic for most appliance categories. To access pause and resume controls, you must use a third-party HomeKit app such as Eve, Home+, or Controller for HomeKit.\n2. **API and Firmware Support**: Support for `BSH.Common.Command.PauseProgram` and `BSH.Common.Command.ResumeProgram` varies significantly between models and manufacturers. In many cases, the physical appliance firmware or the Home Connect cloud API does not yet support these commands for specific devices, even if they are listed in the general API documentation. If the plugin logs `SDK.Error.UnsupportedCommand`, the functionality is not currently available for that specific appliance via the public API.\n\nWhen the plugin starts, it attempts to retrieve the list of supported commands from the API using `GET /homeappliances/{haid}/commands`. If an appliance reports that it supports these commands, the plugin will attempt to expose them; however, some appliances return an empty list or an error even when the documentation suggests they should be compatible."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
