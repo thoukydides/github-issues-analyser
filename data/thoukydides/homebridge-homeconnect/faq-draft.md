@@ -60,8 +60,9 @@
     - [Why is my Homebridge log filling up with oven `Event STATUS` temperature messages?](#why-is-my-homebridge-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
-    - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
+    - [Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
     - [Why does my Siemens coffee maker power state not update correctly after auto-standby?](#why-does-my-siemens-coffee-maker-power-state-not-update-correctly-after-auto-standby)
+    - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
@@ -593,10 +594,16 @@ To troubleshoot:
 
 #### Why is my appliance unresponsive in Homebridge but working in the Home Connect app?
 
-<!-- INCLUDES: issue-71-a9f3 -->
-The official Home Connect mobile app can communicate with appliances via the local Wi-Fi network when your phone is on the same network. In contrast, this plugin and all third-party integrations must use the public Home Connect cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection.
+<!-- INCLUDES: issue-40-61af issue-71-a9f3 -->
+The official Home Connect mobile app can communicate with appliances via two distinct paths: a local network connection (when your phone and appliance are on the same Wi-Fi) and the public Home Connect cloud API. All third-party integrations, including this plugin, are restricted to using the cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection, often resulting in an `Error: The appliance is offline` message in the logs.
 
-To diagnose this, disable Wi-Fi on your mobile device to force the Home Connect app to use a cellular (remote) connection. If the appliance becomes unresponsive in the app while on cellular data, the issue lies with the appliance's connection to the Home Connect servers rather than the plugin. You can often resolve this by power cycling the appliance. If problems persist check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages.
+To diagnose this, check the appliance's cloud connectivity in the official app:
+
+1. Open the Home Connect app and navigate to the appliance settings.
+2. Locate the **Network** section. A fully functional connection is shown by three green lines between the phone, the cloud, and the appliance. If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.
+3. Alternatively, disable Wi-Fi on your mobile device to force the app to use cellular data. If the appliance becomes unresponsive in the app, the issue is with its connection to the Home Connect servers.
+
+You can often resolve this by power cycling the appliance. If problems persist, check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages or ensure your network is not blocking outbound connections.
 
 #### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
@@ -642,10 +649,18 @@ There are plans to replace this polling mechanism with a more efficient event-ba
 <!-- INCLUDES: issue-327-6ad4 -->
 The Home Connect API currently restricts door functionality for dishwasher appliances to monitoring-only. Remote control of the door is limited by the API to specific oven and fridge/freezer models, and even then, it is dependent on the specific appliance hardware. For dishwashers, the `Door` service in HomeKit is read-only; it will correctly indicate whether the door is open or closed, but it cannot be used to trigger the door to open. This is a limitation of the Home Connect API rather than the plugin itself.
 
-#### Can I use data from the Home Connect status page for automations or scripts?
+#### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-306-65ff -->
-No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
+<!-- INCLUDES: issue-382-7d17 -->
+According to the HomeKit Accessory Protocol Specification, a value of `0%` indicates a door is fully closed and `100%` indicates it is fully open. If an appliance is stuck showing as `Open` (`100%`), it is usually because the Home Connect API is reporting an incorrect state or failing to send update events.
+
+Some appliances, such as certain Thermador models, have been observed to correctly trigger a door alarm (`DoorAlarmRefrigerator`) while failing to update the actual door status (`DoorState`) in the API. This suggests a firmware limitation or a bug in the Home Connect cloud service.
+
+To troubleshoot and potentially work around this:
+
+1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.
+2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
+3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to Home Connect Developer Support as it likely requires a firmware fix.
 
 #### Why does my Siemens coffee maker power state not update correctly after auto-standby?
 
@@ -656,35 +671,10 @@ This ambiguity prevents the plugin from directly knowing if the appliance is tru
 
 This behaviour was addressed in plugin version `v0.18.3` to ensure that the HomeKit accessory accurately reflects the coffee maker's power status after auto-standby.
 
-#### 🚧 Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed? 🚧
+#### Can I use data from the Home Connect status page for automations or scripts?
 
-<!-- INCLUDES: issue-382-7d17 -->
-According to the HomeKit Accessory Protocol Specification, a value of `0%` indicates a door is fully closed and `100%` indicates it is fully open. The plugin follows this standard. If an appliance is stuck showing as `Open` (`100%`), it is usually because the Home Connect API is reporting an incorrect state or failing to send update events.
-
-Some appliances, such as certain Thermador models, have been observed to correctly trigger a door alarm (`DoorAlarmRefrigerator`) while failing to update the actual door status (`DoorState`) in the API. This suggests a firmware limitation or a bug in the Home Connect cloud service rather than the plugin. The plugin can only reflect the data it receives from the official API.
-
-To troubleshoot and potentially work around this:
-
-1.  **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g., `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.
-2.  **Enable debug logging**: Use the **Log Debug as Info** option or set the `DEBUG=*` environment variable to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
-3.  **Contact Support**: If the raw API values are incorrect, the issue should be reported to Home Connect Developer Support as it likely requires a firmware fix on the appliance side.
-
-#### 🚧 Why does the plugin report that my appliance is offline even though I can control it via the Home Connect app? 🚧
-
-<!-- INCLUDES: issue-40-61af -->
-The Home Connect mobile app is capable of communicating with appliances via two distinct paths:
-
-1.  **Local Network**: Direct communication over your home Wi-Fi when your phone and appliance are on the same network.
-2.  **Cloud API**: Communication via the Home Connect cloud servers.
-
-All third-party integrations, including this plugin, are restricted to using the Home Connect Cloud API. If your appliance has a stable Wi-Fi connection but cannot reach the Home Connect cloud servers, it will appear as offline in Homebridge (often with an `Error: The appliance is offline` message in the logs) while still being controllable via the official app locally.
-
-To verify your appliance's cloud connectivity, open the Home Connect app, navigate to the appliance settings, and locate the **Network** section. A fully functional connection is represented by three green lines connecting the phone, the cloud, and the appliance. If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.
-
-If the cloud connection is missing:
-*   Ensure your network or firewall is not blocking outbound connections to Home Connect servers.
-*   Consult the official Home Connect troubleshooting checklist for your region.
-*   Contact Home Connect customer service if the appliance consistently fails to connect to the cloud despite a strong Wi-Fi signal.
+<!-- INCLUDES: issue-306-65ff -->
+No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
 
 ## Apple HomeKit
 

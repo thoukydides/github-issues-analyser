@@ -545,9 +545,10 @@
                                 },
                                 {
                                     "question": "Why is my appliance unresponsive in Homebridge but working in the Home Connect app?",
-                                    "answer": "The official Home Connect mobile app can communicate with appliances via the local Wi-Fi network when your phone is on the same network. In contrast, this plugin and all third-party integrations must use the public Home Connect cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection.\n\nTo diagnose this, disable Wi-Fi on your mobile device to force the Home Connect app to use a cellular (remote) connection. If the appliance becomes unresponsive in the app while on cellular data, the issue lies with the appliance's connection to the Home Connect servers rather than the plugin. You can often resolve this by power cycling the appliance. If problems persist check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages.",
+                                    "answer": "The official Home Connect mobile app can communicate with appliances via two distinct paths: a local network connection (when your phone and appliance are on the same Wi-Fi) and the public Home Connect cloud API. All third-party integrations, including this plugin, are restricted to using the cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection, often resulting in an `Error: The appliance is offline` message in the logs.\n\nTo diagnose this, check the appliance's cloud connectivity in the official app:\n\n1. Open the Home Connect app and navigate to the appliance settings.\n2. Locate the **Network** section. A fully functional connection is shown by three green lines between the phone, the cloud, and the appliance. If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.\n3. Alternatively, disable Wi-Fi on your mobile device to force the app to use cellular data. If the appliance becomes unresponsive in the app, the issue is with its connection to the Home Connect servers.\n\nYou can often resolve this by power cycling the appliance. If problems persist, check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages or ensure your network is not blocking outbound connections.",
                                     "included_ids": [
-                                        "issue-71-a9f3"
+                                        "issue-71-a9f3",
+                                        "issue-40-61af"
                                     ]
                                 },
                                 {
@@ -593,10 +594,10 @@
                                     ]
                                 },
                                 {
-                                    "question": "Can I use data from the Home Connect status page for automations or scripts?",
-                                    "answer": "No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.",
+                                    "question": "Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?",
+                                    "answer": "According to the HomeKit Accessory Protocol Specification, a value of `0%` indicates a door is fully closed and `100%` indicates it is fully open. If an appliance is stuck showing as `Open` (`100%`), it is usually because the Home Connect API is reporting an incorrect state or failing to send update events.\n\nSome appliances, such as certain Thermador models, have been observed to correctly trigger a door alarm (`DoorAlarmRefrigerator`) while failing to update the actual door status (`DoorState`) in the API. This suggests a firmware limitation or a bug in the Home Connect cloud service.\n\nTo troubleshoot and potentially work around this:\n\n1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.\n2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.\n3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to Home Connect Developer Support as it likely requires a firmware fix.",
                                     "included_ids": [
-                                        "issue-306-65ff"
+                                        "issue-382-7d17"
                                     ]
                                 },
                                 {
@@ -605,22 +606,16 @@
                                     "included_ids": [
                                         "issue-35-302a"
                                     ]
-                                }
-                            ],
-                            "candidates": [
-                                {
-                                    "issue_number": 382,
-                                    "id": "issue-382-7d17",
-                                    "question": "Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?",
-                                    "answer": "According to the HomeKit Accessory Protocol Specification, a value of `0%` indicates a door is fully closed and `100%` indicates it is fully open. The plugin follows this standard. If an appliance is stuck showing as `Open` (`100%`), it is usually because the Home Connect API is reporting an incorrect state or failing to send update events.\n\nSome appliances, such as certain Thermador models, have been observed to correctly trigger a door alarm (`DoorAlarmRefrigerator`) while failing to update the actual door status (`DoorState`) in the API. This suggests a firmware limitation or a bug in the Home Connect cloud service rather than the plugin. The plugin can only reflect the data it receives from the official API.\n\nTo troubleshoot and potentially work around this:\n\n1.  **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g., `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.\n2.  **Enable debug logging**: Use the **Log Debug as Info** option or set the `DEBUG=*` environment variable to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.\n3.  **Contact Support**: If the raw API values are incorrect, the issue should be reported to Home Connect Developer Support as it likely requires a firmware fix on the appliance side."
                                 },
                                 {
-                                    "issue_number": 40,
-                                    "id": "issue-40-61af",
-                                    "question": "Why does the plugin report that my appliance is offline even though I can control it via the Home Connect app?",
-                                    "answer": "The Home Connect mobile app is capable of communicating with appliances via two distinct paths:\n\n1.  **Local Network**: Direct communication over your home Wi-Fi when your phone and appliance are on the same network.\n2.  **Cloud API**: Communication via the Home Connect cloud servers.\n\nAll third-party integrations, including this plugin, are restricted to using the Home Connect Cloud API. If your appliance has a stable Wi-Fi connection but cannot reach the Home Connect cloud servers, it will appear as offline in Homebridge (often with an `Error: The appliance is offline` message in the logs) while still being controllable via the official app locally.\n\nTo verify your appliance's cloud connectivity, open the Home Connect app, navigate to the appliance settings, and locate the **Network** section. A fully functional connection is represented by three green lines connecting the phone, the cloud, and the appliance. If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.\n\nIf the cloud connection is missing:\n*   Ensure your network or firewall is not blocking outbound connections to Home Connect servers.\n*   Consult the official Home Connect troubleshooting checklist for your region.\n*   Contact Home Connect customer service if the appliance consistently fails to connect to the cloud despite a strong Wi-Fi signal."
+                                    "question": "Can I use data from the Home Connect status page for automations or scripts?",
+                                    "answer": "No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.",
+                                    "included_ids": [
+                                        "issue-306-65ff"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
