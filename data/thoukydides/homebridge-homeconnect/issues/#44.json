@@ -1,14 +1,12 @@
 {
     "issue_number": 44,
-    "updated_at": "2026-02-12T16:33:32.929Z",
+    "updated_at": "2026-03-10T15:44:13.460Z",
     "faq": [
         {
-            "question": "Why are some coffee machine programmes like Hot Water or Coffee Jug missing from HomeKit?",
-            "answer": "The absence of specific programmes, such as Hot Water or Coffee Jug, is due to limitations within the official Home Connect API. The plugin can only expose functionality that the API makes available for a specific appliance model. Many specialised programmes are currently excluded from the Home Connect API specification for coffee makers. You can verify the list of supported programmes in the [Home Connect developer documentation](https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options). If a feature available on your physical appliance is missing from the API, you may wish to contact Home Connect support directly to request its inclusion in future API updates.",
-            "semantic_abstract": "Home Connect API technical constraints prevent the exposure of specific coffee machine programmes such as Hot Water or Coffee Jug to HomeKit. These specialised functions are excluded from the official API specification for certain Siemens and Bosch models, meaning they cannot be mapped to HomeKit services by the plugin.",
-            "alternative_resolution": "The plugin documentation could be updated to include a section on API-level limitations, explaining that the available HomeKit programmes are strictly bound by the Home Connect API's supported feature list for each appliance category.",
-            "confidence": "high",
-            "hash": "70cc163449ea41a3bcc8231a56c87a308d2bbcd1dc62e9e79b28fae9134779a5"
+            "question": "Why are some coffee machine programmes like `Hot Water` or `Coffee Jug` missing?",
+            "answer": "Certain appliance functionalities are not exposed through the official Home Connect API. This plugin is limited by the capabilities provided by the API; if a programme or option is not supported by the Home Connect servers, it cannot be made available in HomeKit.\n\nSpecific examples for coffee makers that are often missing include `Hot Water` and `Coffee Jug`. You can verify which programmes are officially supported by checking the [Home Connect API documentation for coffee makers](https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options).\n\nIf you find a feature is missing, you may wish to contact Home Connect support directly to request its inclusion in the API, as the plugin can only implement functionality once it is officially documented and exposed.",
+            "semantic_abstract": "The Home Connect API limits available appliance programmes, which may result in specific functions such as coffee machine `Hot Water` or `Coffee Jug` cycles being unavailable in HomeKit. This occurs because the plugin is dependent on the API's published capabilities and cannot interact with appliance features that are not exposed via the manufacturer's cloud service.",
+            "hash": "1e1b26b9bbd6d669f45f7fa85b6a3add0d566052acce52e3b9f2f77997fedc47"
         }
     ]
 }
