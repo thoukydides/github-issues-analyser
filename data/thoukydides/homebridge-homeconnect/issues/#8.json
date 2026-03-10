@@ -1,22 +1,12 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 8,
-    "updated_at": "2026-02-12T09:13:04.148Z",
+    "updated_at": "2026-03-10T07:54:43.523Z",
     "faq": [
         {
-            "question": "Why can't I see the Pause or Resume options in the Apple Home app?",
-            "answer": "Experimental support for pausing and resuming appliance programs is implemented via the HomeKit `Active` characteristic. Apple's native Home app does not display this specific characteristic for most appliance types. To access these controls, you must use a third-party HomeKit app that supports a wider range of characteristics, such as Eve for HomeKit or Home+.",
-            "semantic_abstract": "Pause and resume functionality is mapped to the HomeKit `Active` characteristic, which is a standard characteristic often hidden by the official Apple Home app UI, requiring third-party clients for access.",
-            "confidence": "high",
-            "hash": "226b2cbfb4c0ba4a78294407de29f5556e50737a87550cd9e91dbb1b91cc27bb"
-        },
-        {
-            "question": "Why is the Pause/Resume support inconsistent between my Home Connect appliances?",
-            "answer": "Support for the `PauseProgram` and `ResumeProgram` commands varies significantly between different appliance types and firmware versions, often deviating from the official Home Connect API documentation. While the API documentation suggests broad support, the plugin has found that:\n\n1. Many appliances (including some Dishwashers and Ovens) do not support these commands via the public API despite documentation claims.\n2. Some appliances, such as certain Siemens Washers, may support `PauseProgram` but not `ResumeProgram`.\n3. The plugin (v0.19.0 and later) dynamically detects available commands for each appliance and only exposes supported functions. If the options are missing, your specific hardware or firmware likely does not support the feature via the Home Connect API.",
-            "semantic_abstract": "Inconsistencies in Pause/Resume support arise from discrepancies between the Home Connect API documentation and actual firmware implementations, where specific command keys like `BSH.Common.Command.PauseProgram` are often unsupported or only partially implemented on a per-device basis.",
-            "confidence": "high",
-            "hash": "5b9ea1c9a493f2f02323e33829e9c2a102ffe8200f19aae25b47a44e0fe7846f"
+            "question": "Why can't I pause or resume my Home Connect appliance programmes in the Home app?",
+            "answer": "The plugin implements program pause and resume functionality via the HomeKit `Active` characteristic. There are two primary reasons why these controls may not appear or function as expected:\n\n1. **Home App Limitations**: Apple's Home app does not display the `Active` characteristic for most appliance categories. To access pause and resume controls, you must use a third-party HomeKit app such as Eve, Home+, or Controller for HomeKit.\n2. **API and Firmware Support**: Support for `BSH.Common.Command.PauseProgram` and `BSH.Common.Command.ResumeProgram` varies significantly between models and manufacturers. In many cases, the physical appliance firmware or the Home Connect cloud API does not yet support these commands for specific devices, even if they are listed in the general API documentation. If the plugin logs `SDK.Error.UnsupportedCommand`, the functionality is not currently available for that specific appliance via the public API.\n\nWhen the plugin starts, it attempts to retrieve the list of supported commands from the API using `GET /homeappliances/{haid}/commands`. If an appliance reports that it supports these commands, the plugin will attempt to expose them; however, some appliances return an empty list or an error even when the documentation suggests they should be compatible.",
+            "semantic_abstract": "Home Connect appliance pause and resume functionality is mapped to the HomeKit `Active` characteristic, which is not natively rendered by the Apple Home app. Real-world API support for these commands frequently deviates from official Home Connect specifications, with many devices returning `SDK.Error.UnsupportedCommand` despite documented compatibility.",
+            "hash": "8852e03131a087e86ef36a4c686f1c51bc44372878fe4acffd2e1ba397e8e634"
         }
     ]
 }
