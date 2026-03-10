@@ -830,16 +830,16 @@
                                     "question": "How do I control my hood fan speed using Siri?",
                                     "answer": "Siri maps fan speeds to specific percentages:\n- **Low** is 25%\n- **Medium** is 50%\n- **High** is 100%\n\nThe plugin maps these percentages to the closest available physical fan settings of your hood. You can use commands like `Hey Siri, set the hood fan to medium` or `Hey Siri, set the hood fan to 100%`. Note that numeric settings like `set fan to 1` are not supported by Siri for HomeKit fan services.",
                                     "included_ids": []
+                                },
+                                {
+                                    "question": "Why does Siri fail to control my appliance when the Home app works correctly?",
+                                    "answer": "Siri behaves differently from the Home app because it has a stricter understanding of the semantics for specific device types supported by Apple. While the Home app provides a visual interface for various `Characteristics`, Siri requires them to be organised within `Services` in a way that matches its internal logic. Because Home Connect appliances often do not map perfectly to standard HomeKit device categories, Siri may occasionally fail to process commands for specific features like fan speeds or lighting.\n\nIf you encounter this behaviour, follow these steps to identify the root cause:\n\n1. **Check Homebridge logs**: If no activity appears in the plugin logs when you issue a Siri command, the request is not reaching the plugin.\n2. **Enable HomeKit debug logging**: Set the `DEBUG=*` environment variable before launching Homebridge. This allows you to see the raw communication between HomeKit and Homebridge, confirming whether Siri is successfully sending the request to the server.\n3. **Check for server instability**: Intermittent failures can also be caused by transient issues with the Home Connect API servers. These outages often result in delayed or failed responses that Siri may interpret as the device being unresponsive.\n\nIf the Home app works but Siri does not, the issue is likely related to how Siri interprets the HomeKit mapping rather than a bug in the plugin code.",
+                                    "included_ids": [
+                                        "issue-41-4190"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 41,
-                                    "id": "issue-41-4190",
-                                    "question": "Why does Siri fail to control my appliance when the Home app works correctly?",
-                                    "answer": "Siri behaves differently from the Home app because it has a stricter understanding of the semantics for specific device types supported by Apple. While the Home app provides a visual interface for various `Characteristics`, Siri requires them to be organised within `Services` in a way that matches its internal logic. Because Home Connect appliances often do not map perfectly to standard HomeKit device categories, Siri may occasionally fail to process commands for specific features like fan speeds or lighting.\n\nIf you encounter this behaviour, follow these steps to identify the root cause:\n\n1. **Check Homebridge logs**: If no activity appears in the plugin logs when you issue a Siri command, the request is not reaching the plugin.\n2. **Enable HomeKit debug logging**: Set the `DEBUG=*` environment variable before launching Homebridge. This allows you to see the raw communication between HomeKit and Homebridge, confirming whether Siri is successfully sending the request to the server.\n3. **Check for server instability**: Intermittent failures can also be caused by transient issues with the Home Connect API servers. These outages often result in delayed or failed responses that Siri may interpret as the device being unresponsive.\n\nIf the Home app works but Siri does not, the issue is likely related to how Siri interprets the HomeKit mapping rather than a bug in the plugin code."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

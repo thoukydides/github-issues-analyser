@@ -89,6 +89,7 @@
     - [Can I trigger HomeKit automations when my appliance door is opened?](#can-i-trigger-homekit-automations-when-my-appliance-door-is-opened)
   - **[Siri](#siri)**
     - [How do I control my hood fan speed using Siri?](#how-do-i-control-my-hood-fan-speed-using-siri)
+    - [Why does Siri fail to control my appliance when the Home app works correctly?](#why-does-siri-fail-to-control-my-appliance-when-the-home-app-works-correctly)
 - **[Compatibility and Integration](#compatibility-and-integration)**
   - **[Third-party Platforms](#third-party-platforms)**
     - [Is this plugin compatible with HOOBS?](#is-this-plugin-compatible-with-hoobs)
@@ -874,7 +875,7 @@ Siri maps fan speeds to specific percentages:
 
 The plugin maps these percentages to the closest available physical fan settings of your hood. You can use commands like `Hey Siri, set the hood fan to medium` or `Hey Siri, set the hood fan to 100%`. Note that numeric settings like `set fan to 1` are not supported by Siri for HomeKit fan services.
 
-#### 🚧 Why does Siri fail to control my appliance when the Home app works correctly? 🚧
+#### Why does Siri fail to control my appliance when the Home app works correctly?
 
 <!-- INCLUDES: issue-41-4190 -->
 Siri behaves differently from the Home app because it has a stricter understanding of the semantics for specific device types supported by Apple. While the Home app provides a visual interface for various `Characteristics`, Siri requires them to be organised within `Services` in a way that matches its internal logic. Because Home Connect appliances often do not map perfectly to standard HomeKit device categories, Siri may occasionally fail to process commands for specific features like fan speeds or lighting.
