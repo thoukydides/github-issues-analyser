@@ -70,6 +70,7 @@
     - [Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?](#why-can-i-not-hide-certain-switches-or-why-do-they-remain-visible-or-unresponsive-after-being-disabled)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
+    - [Why does my fridge-freezer only show a single door status for both compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-both-compartments)
     - [Why can I not set the alarm timer or `AlarmClock` setting on my appliance?](#why-can-i-not-set-the-alarm-timer-or-alarmclock-setting-on-my-appliance)
     - [Why do multiple program switches appear with identical names in the Home app?](#why-do-multiple-program-switches-appear-with-identical-names-in-the-home-app)
     - [Why can I not see or control the child lock for my appliance in the Apple Home app?](#why-can-i-not-see-or-control-the-child-lock-for-my-appliance-in-the-apple-home-app)
@@ -733,6 +734,13 @@ Because Apple Home categorises all `Door` services as security-related accessori
 1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.
 2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.
 
+#### Why does my fridge-freezer only show a single door status for both compartments?
+
+<!-- INCLUDES: issue-43-380f -->
+The Home Connect API for combined fridge-freezer appliances does not provide separate status streams for individual doors. Instead, it provides a single `BSH.Common.Status.DoorState` event that updates whenever either door (fridge or freezer) is moved.
+
+Consequently, the `Current Door State` characteristic in HomeKit reflects the state of whichever door was most recently opened or closed. This is a technical limitation of the manufacturer's API and cannot be resolved by the plugin.
+
 #### Why can I not set the alarm timer or `AlarmClock` setting on my appliance?
 
 <!-- INCLUDES: issue-77-7f97 -->
@@ -808,13 +816,6 @@ The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%`
 When creating automations in the Apple Home app, individual services (such as the power `Switch` or various program switches) may appear as generic toggles without clearly indicating which appliance they belong to. This is a limitation of the Apple Home app user interface and how it displays service names in the automation screen, rather than an issue with the plugin itself.
 
 To manage complex automations more easily, consider using third-party HomeKit applications which provide a clearer interface for selecting specific appliance services with their full context. Recommended alternatives include *Eve for HomeKit*, *Controller for HomeKit*, and *Home+*.
-
-#### 🚧 Why does my fridge-freezer only show a single door status for both the fridge and freezer compartments? 🚧
-
-<!-- INCLUDES: issue-43-380f -->
-The Home Connect API for combined fridge-freezer appliances does not provide separate status streams for individual doors. Instead, it provides a single `BSH.Common.Status.DoorState` event that updates whenever either door is moved. 
-
-Consequently, the `Current Door State` characteristic in HomeKit reflects the state of whichever door was most recently opened or closed. This is a technical limitation of the manufacturer's API and cannot be resolved by the plugin.
 
 ### Notifications & Events
 

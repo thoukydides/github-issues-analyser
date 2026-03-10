@@ -681,6 +681,13 @@
                                     ]
                                 },
                                 {
+                                    "question": "Why does my fridge-freezer only show a single door status for both compartments?",
+                                    "answer": "The Home Connect API for combined fridge-freezer appliances does not provide separate status streams for individual doors. Instead, it provides a single `BSH.Common.Status.DoorState` event that updates whenever either door (fridge or freezer) is moved.\n\nConsequently, the `Current Door State` characteristic in HomeKit reflects the state of whichever door was most recently opened or closed. This is a technical limitation of the manufacturer's API and cannot be resolved by the plugin.",
+                                    "included_ids": [
+                                        "issue-43-380f"
+                                    ]
+                                },
+                                {
                                     "question": "Why can I not set the alarm timer or `AlarmClock` setting on my appliance?",
                                     "answer": "HomeKit does not currently define services or characteristics with the correct semantics for a general-purpose appliance alarm timer. Mapping this functionality to existing, unrelated HomeKit services would result in incorrect behaviour and cause issues when using Siri. To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer.",
                                     "included_ids": [
@@ -752,14 +759,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 43,
-                                    "id": "issue-43-380f",
-                                    "question": "Why does my fridge-freezer only show a single door status for both the fridge and freezer compartments?",
-                                    "answer": "The Home Connect API for combined fridge-freezer appliances does not provide separate status streams for individual doors. Instead, it provides a single `BSH.Common.Status.DoorState` event that updates whenever either door is moved. \n\nConsequently, the `Current Door State` characteristic in HomeKit reflects the state of whichever door was most recently opened or closed. This is a technical limitation of the manufacturer's API and cannot be resolved by the plugin."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
