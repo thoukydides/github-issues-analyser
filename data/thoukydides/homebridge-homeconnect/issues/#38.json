@@ -1,16 +1,12 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 38,
-    "updated_at": "2026-02-12T11:13:01.084Z",
+    "updated_at": "2026-03-10T10:00:27.447Z",
     "faq": [
         {
-            "question": "Why doesn't the plugin provide a sensor for program finished notifications in HomeKit?",
-            "answer": "The HomeKit Accessory Protocol (HAP) does not support arbitrary notifications. In HomeKit, notifications are strictly tied to specific, pre-defined sensor types (such as motion, smoke, or contact sensors). \n\nImplementing a sensor to indicate that a program has finished would require mapping it to one of these existing types. This would result in a poor user experience, as the notifications would appear as \"Motion Detected\" or \"Contact Sensor Opened\" rather than \"Program Finished\". Due to these platform limitations, the plugin does not provide dedicated notification sensors. Users should continue to use the official Home Connect app for native appliance notifications.",
-            "semantic_abstract": "HomeKit Accessory Protocol constraints prevent the generation of arbitrary notifications, limiting them to specific pre-defined sensor types. Mapping Home Connect program completion events to unrelated sensor categories like motion or smoke would result in misleading notification text, leading to a design decision to rely on the native Home Connect app for these alerts.",
-            "alternative_resolution": "The plugin documentation could be updated to include a section on HomeKit platform limitations regarding custom notifications to help users understand why certain automation triggers are not exposed as sensors.",
-            "confidence": "high",
-            "hash": "9780e8239654bbc8ab475e96e062020eb22dea307a52e9c8641e69cabe546200"
+            "question": "Why doesn't the plugin provide a sensor for `Program Finished` notifications?",
+            "answer": "The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated programme finished sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`.\n\nImplementing a workaround by using these existing sensor types would result in a poor user experience. For example, a user would receive a \"motion detected\" or \"smoke detected\" alert when an appliance finishes its cycle, which is misleading and technically incorrect.\n\nUsers seeking notifications should use the official **Home Connect** app, which provides native support for programme completion alerts. Alternatively, automations can be created in HomeKit based on appliance state changes to trigger scenes or other devices, although this does not enable custom text notifications within the Apple Home app.",
+            "semantic_abstract": "HomeKit Accessory Protocol (HAP) constraints prevent the generation of arbitrary notifications, as HomeKit only supports notifications for a limited set of pre-defined sensor types. Mapping appliance programme states to unrelated HomeKit sensors like `MotionSensor` would result in misleading user alerts, making the native Home Connect app the only viable solution for cycle completion notifications.",
+            "hash": "03f38ef40fa3e54ba9992aa9eb2f4c56d037cc45e375e77939e4986e9328cbb3"
         }
     ]
 }
