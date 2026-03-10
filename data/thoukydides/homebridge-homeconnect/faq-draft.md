@@ -82,10 +82,11 @@
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
     - [Why are appliances or switches difficult to identify when creating automations in the Apple Home app?](#why-are-appliances-or-switches-difficult-to-identify-when-creating-automations-in-the-apple-home-app)
   - **[Notifications & Events](#notifications--events)**
-    - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
+    - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels like `BUTTON 1`?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels-like-button-1)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
-    - [How do I get appliance notifications?](#how-do-i-get-appliance-notifications)
+    - [How do I get notifications for events like a programme finishing?](#how-do-i-get-notifications-for-events-like-a-programme-finishing)
     - [How can I disable HomeKit notifications for door events?](#how-can-i-disable-homekit-notifications-for-door-events)
+    - [Can I trigger HomeKit automations when my appliance door is opened?](#can-i-trigger-homekit-automations-when-my-appliance-door-is-opened)
   - **[Siri](#siri)**
     - [How do I control my hood fan speed using Siri?](#how-do-i-control-my-hood-fan-speed-using-siri)
 - **[Compatibility and Integration](#compatibility-and-integration)**
@@ -819,12 +820,12 @@ To manage complex automations more easily, consider using third-party HomeKit ap
 
 ### Notifications & Events
 
-#### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
+#### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels like `BUTTON 1`?
 
-<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-45-fb59 issue-153-91f4 issue-323-9301 -->
-Home Connect communicates many appliance states as **transient events** (e.g. "Drip tray full" or "iDos fill level poor") rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so that they can be used as automation triggers. This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears. Consequently, these services do not show a continuous 'full' or 'active' state in the Home app.
+<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-43-3f35 issue-45-fb59 issue-153-91f4 issue-323-9301 -->
+Home Connect communicates many appliance states as **transient events** (e.g. "Drip tray full" or "iDos fill level poor") rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so that they can be used as automation triggers. This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears.
 
-The Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup or use a third-party app like *Eve* or *Home+* which can display descriptive labels. If you do not require these events for automations, you can disable them per-appliance in the plugin configuration to prevent them from appearing in the Home app.
+The Apple Home app only displays numeric labels (e.g. `BUTTON 1`, `BUTTON 2`) for these services. This is a design limitation of the Home app itself; while the HomeKit framework allows for descriptive labels (which are often visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup. If you do not require these events, you can disable them per-appliance in the plugin configuration.
 
 #### Why does the Home app show two (or more) tiles for one appliance?
 
@@ -833,12 +834,12 @@ This is standard Apple Home behaviour. To keep the interface organised, Apple se
 
 While you can toggle **Show as Separate Tiles** in the accessory settings, Apple does not currently allow these buttons to be merged into the primary appliance tile. If you do not use these events for automations, you can disable them in the plugin configuration to prevent them from appearing in the Home app.
 
-#### How do I get appliance notifications?
+#### How do I get notifications for events like a programme finishing?
 
-<!-- INCLUDES: issue-63-11e1 issue-124-8aea -->
-Apple Home only supports native push notifications for specific security-related sensors (Doors, Locks, Smoke, etc.). Most Home Connect events do not fit these categories; forcing them to do so would result in misleading notification text.
+<!-- INCLUDES: issue-38-03f3 issue-63-11e1 issue-124-8aea -->
+The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated "programme finished" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these existing types would result in a poor user experience; for example, a user would receive a "smoke detected" alert when a dishwasher finishes, which is misleading and technically incorrect.
 
-To receive notifications for other events, you have two main options:
+To receive notifications, you have two main options:
 
 - **The Official Home Connect App:** The most reliable way to get detailed, text-based push notifications.
 - **HomeKit Automations:** Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.
@@ -855,26 +856,12 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 
 Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
 
-#### 🚧 Why doesn't the plugin provide a sensor for `Program Finished` notifications? 🚧
-
-<!-- INCLUDES: issue-38-03f3 -->
-The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated programme finished sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`.
-
-Implementing a workaround by using these existing sensor types would result in a poor user experience. For example, a user would receive a "motion detected" or "smoke detected" alert when an appliance finishes its cycle, which is misleading and technically incorrect.
-
-Users seeking notifications should use the official **Home Connect** app, which provides native support for programme completion alerts. Alternatively, automations can be created in HomeKit based on appliance state changes to trigger scenes or other devices, although this does not enable custom text notifications within the Apple Home app.
-
-#### 🚧 Why are programmable switches for alarms named BUTTON 1, BUTTON 2, and BUTTON 3 in the Home app? 🚧
-
-<!-- INCLUDES: issue-43-3f35 -->
-This is a design limitation of the Apple Home app. While the HomeKit framework allows for descriptive labels on buttons within a `Programmable Switch` service, and these names are often displayed correctly in third-party apps like Eve, the Apple Home app defaults to generic numbering like `BUTTON 1`. There is no configuration or code change within the plugin that can override this behaviour, as it is controlled entirely by Apple's user interface design.
-
-#### 🚧 Can I trigger HomeKit automations when my fridge or oven door is opened? 🚧
+#### Can I trigger HomeKit automations when my appliance door is opened?
 
 <!-- INCLUDES: issue-43-682b -->
-Yes. The plugin exposes a `Current Door State` characteristic for appliances that report their door status. This characteristic can be used to trigger automations. 
+Yes. The plugin exposes a `Current Door State` characteristic for appliances that report their door status (such as fridges, freezers, or ovens). This characteristic can be used to trigger automations.
 
-Note that the Apple Home app may have limitations on which characteristics can be used as automation triggers. If the door state does not appear as a trigger option in the Home app, you can use a third-party HomeKit app such as Eve or Home+ to create the automation rule, which will then function across your HomeKit ecosystem.
+Note that the Apple Home app may have limitations on which characteristics can be used as automation triggers in its default interface. If the door state does not appear as a trigger option, you can use a third-party HomeKit app such as *Eve* or *Home+* to create the automation rule. Once created, these rules will function across your entire HomeKit ecosystem.
 
 ### Siri
 
