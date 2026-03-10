@@ -178,13 +178,17 @@ Note that the China Mainland server may use different login credentials, such as
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
 
-<!-- INCLUDES: issue-268-601f issue-269-720a issue-378-832c -->
+<!-- INCLUDES: issue-39-d44c issue-268-601f issue-269-720a issue-378-832c -->
 The Home Connect API enforces very strict [rate limits](https://api-docs.home-connect.com/general/?#rate-limiting). Exceeding any of these limits triggers a `429 Too Many Requests` error and a lockout for up to 24 hours. The plugin handles this by pausing all API requests until the `retry-after` time returned by the API, displaying a countdown in the logs (e.g. `Waiting 5 hours 23 minutes before issuing Home Connect API request`).
 
-Most of the limits reset after either 1 or 10 minutes, but there is also a daily quota of 1,000 requests. While the plugin manages requests efficiently, certain conditions can cause these limits to be reached rapidly:
+Most of the limits reset after either 1 or 10 minutes, but there is also a daily quota of 1,000 requests per client and user account. While the plugin manages requests efficiently, certain conditions can cause these limits to be reached rapidly:
 
-1. **Frequent Homebridge Restarts**: Each time the plugin starts, it must issue multiple API requests to discover the features, programs, and current state of every connected appliance. Frequent restarts during configuration or due to system instability will quickly consume the daily allowance. Check your Homebridge log for frequent restarts. If this is the issue then ensure Homebridge is stable, avoid unnecessary reboots, and (if possible) run this plugin in its own **child bridge**.
-2. **Unstable Appliance Connectivity**: When an appliance disconnects and reconnects to your Wi-Fi, the plugin must issue several API requests to re-synchronise its state. A single appliance with an unreliable network connection can trigger enough `CONNECTED` events to exhaust the quota. Check your logs for repeated `DISCONNECTED` or `CONNECTED` messages. If found, improve the Wi-Fi coverage for that specific appliance. Note that appliance Wi-Fi hardware is often lower quality than that found in smartphones or laptops.
+1. **Frequent Homebridge Restarts or Initial Setup**: Each time the plugin starts, it must issue multiple API requests to discover the features, programs, and current state of every connected appliance. Frequent restarts during configuration, or the initial discovery phase when first installed, will quickly consume the daily allowance. Ensure Homebridge is stable and consider running this plugin in its own **child bridge**.
+2. **Unstable Appliance Connectivity**: When an appliance disconnects and reconnects to your Wi-Fi, the plugin must issue several API requests to re-synchronise its state. A single appliance with an unreliable network connection can trigger enough `CONNECTED` events to exhaust the quota. Check your logs for repeated `DISCONNECTED` or `CONNECTED` messages and improve the Wi-Fi coverage for that specific appliance.
+3. **Multiple API Clients**: Using the same Home Connect developer account or Client ID across multiple Homebridge instances, or simultaneously with other third-party integrations, will share the 1,000-request daily limit.
+4. **High HomeKit Activity**: Automations that trigger rapid, repeated state changes or frequent manual control through HomeKit can contribute to hitting the limit.
+
+No manual intervention is required; the plugin will automatically resume communication once the Home Connect servers lift the block.
 
 #### Why does my appliance show a `409 Conflict` error?
 
@@ -298,19 +302,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name like `94a08da1...`). Deleting this will require you to re-authorise the plugin.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge**. The plugin will fetch fresh data from the Home Connect API.
-
-#### 🚧 Why do I see a `Too Many Requests` error and a long wait time in my logs? 🚧
-
-<!-- INCLUDES: issue-39-d44c -->
-The Home Connect API imposes a strict rate limit of **1000 requests per client and user account per day**. If this limit is exceeded, the API returns a `429 Too Many Requests` error and blocks further access, often for a period of 24 hours. The plugin will log a message such as `Waiting 86400 seconds before issuing Home Connect API request` when this occurs.
-
-Common reasons for exceeding this limit include:
-1. **Unstable network connection**: Frequent disconnections and reconnections force the plugin to re-synchronise appliance state, which consumes several API requests during each handshake.
-2. **Initial setup**: When the plugin is first installed or a new appliance is added, it must query the full details of all supported programmes, options, and settings.
-3. **High HomeKit activity**: Excessive manual control or rapid automation triggers through HomeKit.
-4. **Multiple API clients**: Using the same Home Connect developer account across multiple Homebridge instances or other third-party integrations simultaneously.
-
-The plugin is designed to handle this gracefully by waiting for the lockout period to expire before automatically re-establishing the connection. No manual intervention or restart is required; the connection will resume once the Home Connect servers lift the block. To avoid this, ensure your Homebridge server has a stable connection and avoid automations that trigger rapid, repeated state changes.
 
 ### Local/Remote Control
 
