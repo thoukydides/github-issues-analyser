@@ -1,24 +1,18 @@
 {
-    "owner": "thoukydides",
-    "repo": "homebridge-homeconnect",
     "issue_number": 42,
-    "updated_at": "2026-02-12T13:50:30.453Z",
+    "updated_at": "2026-03-10T11:47:23.519Z",
     "faq": [
         {
-            "question": "Why does the Homebridge UI state \"This appliance does not support any programs\"?",
-            "answer": "This message is displayed when the plugin is unable to retrieve a list of supported programs from the Home Connect API. This is typically caused by transient instability or temporary outages of the Home Connect servers. If you encounter this error: 1. Verify the status of the Home Connect API. 2. Restart Homebridge to trigger a new request for the appliance configuration. 3. Ensure the appliance is connected to Wi-Fi and reachable in the official Home Connect app. In most instances, this issue resolves itself once the API servers are responding correctly.",
-            "semantic_abstract": "Transient Home Connect API server instability can prevent the retrieval of supported program lists, leading to a status message indicating that no programs are supported for the appliance.",
-            "alternative_resolution": "The plugin could provide a more descriptive error message in the configuration UI when program retrieval fails, explicitly suggesting a server-side issue rather than a lack of appliance features.",
-            "confidence": "high",
-            "hash": "91626b2c9445d81f9f5fccdf10b0405babb33cded4a66a6e49fa7b456e5e66cf"
+            "question": "Why does my Home Connect appliance say `This appliance does not support any programs`?",
+            "answer": "This message is typically displayed when the plugin is unable to successfully retrieve the list of available programmes from the Home Connect servers during its initialisation phase. This behavior is usually the result of transient flakiness or temporary outages on the Home Connect API servers.\n\nTo resolve this:\n1. Restart Homebridge to trigger a fresh attempt to fetch the supported programmes.\n2. Ensure the appliance is powered on and correctly connected to the Home Connect cloud service via the official mobile app.\n3. Check the Homebridge logs for any specific API request errors (such as timeouts or server errors) occurring during the plugin's startup sequence.",
+            "semantic_abstract": "Transient Home Connect API server instability or communication failures can prevent the successful retrieval of available appliance programs during plugin initialisation, resulting in empty program lists in the Homebridge UI.",
+            "hash": "d406425207c10726a7dde4973430de4d23a13d89d4a12649e8ea6ad5e9433ec2"
         },
         {
-            "question": "Why is the ambient light on my dishwasher not supported by the plugin?",
-            "answer": "Although some dishwasher models feature physical ambient lighting, the Home Connect API currently only exposes control for ambient light on hood appliances. This is a limitation of the API provided by the manufacturer, not the plugin. Until Home Connect updates their API to include ambient light support for dishwashers, these features cannot be exposed to HomeKit.",
-            "semantic_abstract": "The Home Connect API limits ambient light control functionality to hood appliances, meaning that physical ambient lighting features on dishwashers cannot be controlled via the plugin due to API specification constraints.",
-            "alternative_resolution": "Update the plugin documentation or the \"Does not support Ambient Light\" log message to clarify that this is a specific API limitation for dishwashers to prevent repeated user queries.",
-            "confidence": "high",
-            "hash": "1683ac93ba52e19d8b6a37de86e624ae1c8e5d73ad0ac73aa67010c479523205"
+            "question": "Why can I not control the ambient light on my dishwasher?",
+            "answer": "Although many dishwasher models include hardware for internal or ambient lighting, the Home Connect API currently restricts control of this feature to Hood appliances. This is a technical limitation of the manufacturer's API specification rather than the plugin itself.\n\nEven if you can control the lighting via the physical buttons on the machine or the official Home Connect app, the third-party API used by this plugin does not yet expose these controls for the dishwasher category. Support will be added if and when the API specification is updated by the manufacturer to include this functionality for dishwashers.",
+            "semantic_abstract": "Home Connect API specification limitations restrict `Ambient Light` control functionality exclusively to Hood appliances, preventing the plugin from exposing hardware lighting features present on Dishwashers.",
+            "hash": "e5af4c4b2c00c13ccadd12814ff5aa188d404dde10046f28ff91506607872460"
         }
     ]
 }
