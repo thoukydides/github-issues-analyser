@@ -859,10 +859,11 @@
                             "entries": [
                                 {
                                     "question": "Is this plugin compatible with HOOBS?",
-                                    "answer": "Yes, but it is not officially supported.\n\nThis plugin is designed and tested for vanilla [Homebridge](https://github.com/homebridge/homebridge) with [Homebridge Config UI X](https://github.com/homebridge/homebridge-config-ui-x). If you choose to use HOOBS, you may encounter stability issues or broken features.\n\nSupport policy for HOOBS users:\n\n1. **Contact HOOBS Support:** Your first point of contact should be [HOOBS Support](https://support.hoobs.org/ticket) for platform-specific issues.\n2. **Verify on Vanilla Homebridge:** Before [opening an issue](https://github.com/thoukydides/homebridge-homeconnect/issues/new/choose), you must verify the problem persists on a standard Homebridge installation.\n3. **No HOOBS-Specific Fixes:** Bug reports or feature requests specifically for HOOBS compatibility will **not** be accepted.",
+                                    "answer": "Yes, but it is not officially supported.\n\nThis plugin is designed and tested for vanilla [Homebridge](https://github.com/homebridge/homebridge) with [Homebridge Config UI X](https://github.com/homebridge/homebridge-config-ui-x). If you choose to use HOOBS, you may encounter stability issues or broken features.\n\n**Configuration in HOOBS**\n\nThe `.homebridge-homeconnect-v1.schema.json` file is a metadata file used exclusively by `homebridge-config-ui-x` to generate its graphical configuration interface. It is not intended for manual editing and is not relevant for users of other platforms like HOOBS. To configure the plugin in HOOBS, you should modify the `config.json` file directly via the **Advanced** or **JSON Config** section in the HOOBS interface.\n\n**Support policy for HOOBS users**\n\n1. **Contact HOOBS Support:** Your first point of contact should be [HOOBS Support](https://support.hoobs.org/ticket) for platform-specific issues.\n2. **Verify on Vanilla Homebridge:** Before [opening an issue](https://github.com/thoukydides/homebridge-homeconnect/issues/new/choose), you must verify the problem persists on a standard Homebridge installation.\n3. **No HOOBS-Specific Fixes:** Bug reports or feature requests specifically for HOOBS compatibility will **not** be accepted.",
                                     "included_ids": [
                                         "issue-67-ea33",
-                                        "issue-76-b91b"
+                                        "issue-76-b91b",
+                                        "issue-37-a423"
                                     ]
                                 },
                                 {
@@ -881,14 +882,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 37,
-                                    "id": "issue-37-a423",
-                                    "question": "Where is the `.homebridge-homeconnect-v1.schema.json` file for configuration in HOOBS?",
-                                    "answer": "The `.homebridge-homeconnect-v1.schema.json` file is a metadata file used exclusively by `homebridge-config-ui-x` to generate its graphical configuration interface. It is not intended for manual editing and is not relevant for users of other platforms like HOOBS.\n\nTo configure the plugin in HOOBS, you should modify the `config.json` file directly:\n1. Open the HOOBS interface.\n2. Navigate to the plugin settings.\n3. Locate the **Advanced** or **JSON Config** section to edit the plugin configuration manually."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

@@ -894,12 +894,16 @@ If the Home app works but Siri does not, the issue is likely related to how Siri
 
 #### Is this plugin compatible with HOOBS?
 
-<!-- INCLUDES: issue-67-ea33 issue-76-b91b -->
+<!-- INCLUDES: issue-37-a423 issue-67-ea33 issue-76-b91b -->
 Yes, but it is not officially supported.
 
 This plugin is designed and tested for vanilla [Homebridge](https://github.com/homebridge/homebridge) with [Homebridge Config UI X](https://github.com/homebridge/homebridge-config-ui-x). If you choose to use HOOBS, you may encounter stability issues or broken features.
 
-Support policy for HOOBS users:
+**Configuration in HOOBS**
+
+The `.homebridge-homeconnect-v1.schema.json` file is a metadata file used exclusively by `homebridge-config-ui-x` to generate its graphical configuration interface. It is not intended for manual editing and is not relevant for users of other platforms like HOOBS. To configure the plugin in HOOBS, you should modify the `config.json` file directly via the **Advanced** or **JSON Config** section in the HOOBS interface.
+
+**Support policy for HOOBS users**
 
 1. **Contact HOOBS Support:** Your first point of contact should be [HOOBS Support](https://support.hoobs.org/ticket) for platform-specific issues.
 2. **Verify on Vanilla Homebridge:** Before [opening an issue](https://github.com/thoukydides/homebridge-homeconnect/issues/new/choose), you must verify the problem persists on a standard Homebridge installation.
@@ -931,16 +935,6 @@ Direct integration with IFTTT to bridge these gaps has been explicitly declined 
 - **Free Plan Limitations**: The IFTTT free tier supports a maximum of two applets, and some Home Connect features are only available via a "Pro+" plan, so most users would receive limited benefit.
 
 For users who require IFTTT-specific functionality, such as triggering automations from Hood Favourite button presses, it is recommended to use a dedicated plugin such as `homebridge-ifttt` alongside this one. This approach keeps the logic for different services separate and more manageable.
-
-#### 🚧 Where is the `.homebridge-homeconnect-v1.schema.json` file for configuration in HOOBS? 🚧
-
-<!-- INCLUDES: issue-37-a423 -->
-The `.homebridge-homeconnect-v1.schema.json` file is a metadata file used exclusively by `homebridge-config-ui-x` to generate its graphical configuration interface. It is not intended for manual editing and is not relevant for users of other platforms like HOOBS.
-
-To configure the plugin in HOOBS, you should modify the `config.json` file directly:
-1. Open the HOOBS interface.
-2. Navigate to the plugin settings.
-3. Locate the **Advanced** or **JSON Config** section to edit the plugin configuration manually.
 
 ### Plugin Installation and Configuration
 
