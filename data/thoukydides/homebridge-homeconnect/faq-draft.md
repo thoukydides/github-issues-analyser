@@ -178,7 +178,7 @@ Note that the China Mainland server may use different login credentials, such as
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
 
-<!-- INCLUDES: issue-39-aa6b issue-268-601f issue-269-720a issue-378-832c -->
+<!-- INCLUDES: issue-268-601f issue-269-720a issue-378-832c -->
 The Home Connect API enforces very strict [rate limits](https://api-docs.home-connect.com/general/?#rate-limiting). Exceeding any of these limits triggers a `429 Too Many Requests` error and a lockout for up to 24 hours. The plugin handles this by pausing all API requests until the `retry-after` time returned by the API, displaying a countdown in the logs (e.g. `Waiting 5 hours 23 minutes before issuing Home Connect API request`).
 
 Most of the limits reset after either 1 or 10 minutes, but there is also a daily quota of 1,000 requests. While the plugin manages requests efficiently, certain conditions can cause these limits to be reached rapidly:
@@ -188,7 +188,7 @@ Most of the limits reset after either 1 or 10 minutes, but there is also a daily
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-40-f8f5 issue-61-1c74 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-61-1c74 issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
 The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details of the specific reason. Some of the more common cases are:
 
 - `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
@@ -299,6 +299,19 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge**. The plugin will fetch fresh data from the Home Connect API.
 
+#### 🚧 Why do I see a `Too Many Requests` error and a long wait time in my logs? 🚧
+
+<!-- INCLUDES: issue-39-d44c -->
+The Home Connect API imposes a strict rate limit of **1000 requests per client and user account per day**. If this limit is exceeded, the API returns a `429 Too Many Requests` error and blocks further access, often for a period of 24 hours. The plugin will log a message such as `Waiting 86400 seconds before issuing Home Connect API request` when this occurs.
+
+Common reasons for exceeding this limit include:
+1. **Unstable network connection**: Frequent disconnections and reconnections force the plugin to re-synchronise appliance state, which consumes several API requests during each handshake.
+2. **Initial setup**: When the plugin is first installed or a new appliance is added, it must query the full details of all supported programmes, options, and settings.
+3. **High HomeKit activity**: Excessive manual control or rapid automation triggers through HomeKit.
+4. **Multiple API clients**: Using the same Home Connect developer account across multiple Homebridge instances or other third-party integrations simultaneously.
+
+The plugin is designed to handle this gracefully by waiting for the lockout period to expire before automatically re-establishing the connection. No manual intervention or restart is required; the connection will resume once the Home Connect servers lift the block. To avoid this, ensure your Homebridge server has a stable connection and avoid automations that trigger rapid, repeated state changes.
+
 ### Local/Remote Control
 
 #### Why does my appliance show `No Response` when I try to start a program?
@@ -381,7 +394,7 @@ Once these identifiers are added to the plugin, the warning will disappear and t
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-42-1683 issue-44-70cc issue-62-1f79 issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-62-1f79 issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
 There are several reasons why features may be missing from the plugin or appear as `currently unavailable` or `advertised by appliance currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature (e.g. certain coffee machine strength or volume settings) is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
@@ -410,7 +423,7 @@ In these cases, the messages are often cosmetic or indicate a limitation of the 
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-9162 issue-54-f83f issue-76-eaa5 issue-186-ee7e issue-201-3565 issue-273-c05e issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
+<!-- INCLUDES: issue-27-a038 issue-54-f83f issue-76-eaa5 issue-186-ee7e issue-201-3565 issue-273-c05e issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`. You may also see error codes such as `SDK.Error.UnsupportedSetting` (specifically for `PowerState`), `502 Proxy Error`, `ESOCKETTIMEDOUT`, or `SDK.Error.HomeAppliance.Connection.Initialization.Failed`.
 
 Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this:
@@ -431,7 +444,6 @@ The plugin attempts to mitigate this by providing dropdown menus or adding the r
 
 #### Why are Pause and Resume features missing or inconsistent?
 
-<!-- INCLUDES: issue-8-226b issue-8-5b9e -->
 Experimental support for pausing and resuming programs is implemented via the HomeKit `Active` characteristic, but there are several limitations:
 
 - **App Support**: Apple's native Home app does not display the pause/resume controls for most appliance types. You must use a third-party app like *Eve* or *Home+* to access these functions.
@@ -463,7 +475,6 @@ To ensure reliable automation, it is recommended to use the **specific named pro
 
 #### How can I trigger the Identify function in the Eve app?
 
-<!-- INCLUDES: issue-37-b6a0 -->
 To trigger the `Identify` mechanism within the Eve app:
 
 1. Navigate to the **Rooms** tab and locate the appliance.
@@ -574,6 +585,52 @@ To resolve this, the plugin attempts to automatically discover these capabilitie
 * Restart Homebridge to allow the plugin to re-scan the active settings.
 * If the issue persists, delete the plugin's cache file (excluding the authorisation file) and restart Homebridge while the light is on.
 
+#### 🚧 How do I trigger the `Identify` function for an appliance in the Eve app? 🚧
+
+<!-- INCLUDES: issue-37-73d3 -->
+The `Identify` function is a standard HomeKit feature used to locate a specific physical appliance. Although its visibility varies across different HomeKit applications, it can be triggered in the Eve app using the following steps:
+1. Open the Eve app and select the **Rooms** tab.
+2. Find the appliance and tap on its name (avoid tapping active controls like power switches).
+3. On the appliance detail screen, tap the appliance name/arrow located at the top of the screen (below the back and edit buttons).
+4. Two buttons will appear: a cog icon for settings and an **ID** button.
+5. Tap the **ID** button to trigger the appliance's identification mechanism.
+
+#### 🚧 Why does my Home Connect appliance say `This appliance does not support any programs`? 🚧
+
+<!-- INCLUDES: issue-42-d406 -->
+This message is typically displayed when the plugin is unable to successfully retrieve the list of available programmes from the Home Connect servers during its initialisation phase. This behavior is usually the result of transient flakiness or temporary outages on the Home Connect API servers.
+
+To resolve this:
+1. Restart Homebridge to trigger a fresh attempt to fetch the supported programmes.
+2. Ensure the appliance is powered on and correctly connected to the Home Connect cloud service via the official mobile app.
+3. Check the Homebridge logs for any specific API request errors (such as timeouts or server errors) occurring during the plugin's startup sequence.
+
+#### 🚧 Why can I not control the ambient light on my dishwasher? 🚧
+
+<!-- INCLUDES: issue-42-e5af -->
+Although many dishwasher models include hardware for internal or ambient lighting, the Home Connect API currently restricts control of this feature to Hood appliances. This is a technical limitation of the manufacturer's API specification rather than the plugin itself.
+
+Even if you can control the lighting via the physical buttons on the machine or the official Home Connect app, the third-party API used by this plugin does not yet expose these controls for the dishwasher category. Support will be added if and when the API specification is updated by the manufacturer to include this functionality for dishwashers.
+
+#### 🚧 Why are some coffee machine programmes like `Hot Water` or `Coffee Jug` missing? 🚧
+
+<!-- INCLUDES: issue-44-1e1b -->
+Certain appliance functionalities are not exposed through the official Home Connect API. This plugin is limited by the capabilities provided by the API; if a programme or option is not supported by the Home Connect servers, it cannot be made available in HomeKit.
+
+Specific examples for coffee makers that are often missing include `Hot Water` and `Coffee Jug`. You can verify which programmes are officially supported by checking the [Home Connect API documentation for coffee makers](https://developer.home-connect.com/docs/coffee-maker/supported_programs_and_options).
+
+If you find a feature is missing, you may wish to contact Home Connect support directly to request its inclusion in the API, as the plugin can only implement functionality once it is officially documented and exposed.
+
+#### 🚧 Why can't I pause or resume my Home Connect appliance programmes in the Home app? 🚧
+
+<!-- INCLUDES: issue-8-8852 -->
+The plugin implements program pause and resume functionality via the HomeKit `Active` characteristic. There are two primary reasons why these controls may not appear or function as expected:
+
+1. **Home App Limitations**: Apple's Home app does not display the `Active` characteristic for most appliance categories. To access pause and resume controls, you must use a third-party HomeKit app such as Eve, Home+, or Controller for HomeKit.
+2. **API and Firmware Support**: Support for `BSH.Common.Command.PauseProgram` and `BSH.Common.Command.ResumeProgram` varies significantly between models and manufacturers. In many cases, the physical appliance firmware or the Home Connect cloud API does not yet support these commands for specific devices, even if they are listed in the general API documentation. If the plugin logs `SDK.Error.UnsupportedCommand`, the functionality is not currently available for that specific appliance via the public API.
+
+When the plugin starts, it attempts to retrieve the list of supported commands from the API using `GET /homeappliances/{haid}/commands`. If an appliance reports that it supports these commands, the plugin will attempt to expose them; however, some appliances return an empty list or an error even when the documentation suggests they should be compatible.
+
 ### Appliance Status
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
@@ -653,6 +710,36 @@ Certain Home Connect appliances, such as the Siemens CoffeeMaker (E-Nr: TI9575X1
 This ambiguity prevents the plugin from directly knowing if the appliance is truly off or just in standby based on `PowerState` events alone. To address this, the plugin infers the standby state. When the appliance was previously active (`On`) and then reports `BSH.Common.EnumType.OperationState.Inactive`, the plugin interprets this as a transition to `Standby`.
 
 This behaviour was addressed in plugin version `v0.18.3` to ensure that the HomeKit accessory accurately reflects the coffee maker's power status after auto-standby.
+
+#### 🚧 Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed? 🚧
+
+<!-- INCLUDES: issue-382-7d17 -->
+According to the HomeKit Accessory Protocol Specification, a value of `0%` indicates a door is fully closed and `100%` indicates it is fully open. The plugin follows this standard. If an appliance is stuck showing as `Open` (`100%`), it is usually because the Home Connect API is reporting an incorrect state or failing to send update events.
+
+Some appliances, such as certain Thermador models, have been observed to correctly trigger a door alarm (`DoorAlarmRefrigerator`) while failing to update the actual door status (`DoorState`) in the API. This suggests a firmware limitation or a bug in the Home Connect cloud service rather than the plugin. The plugin can only reflect the data it receives from the official API.
+
+To troubleshoot and potentially work around this:
+
+1.  **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g., `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.
+2.  **Enable debug logging**: Use the **Log Debug as Info** option or set the `DEBUG=*` environment variable to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
+3.  **Contact Support**: If the raw API values are incorrect, the issue should be reported to Home Connect Developer Support as it likely requires a firmware fix on the appliance side.
+
+#### 🚧 Why does the plugin report that my appliance is offline even though I can control it via the Home Connect app? 🚧
+
+<!-- INCLUDES: issue-40-61af -->
+The Home Connect mobile app is capable of communicating with appliances via two distinct paths:
+
+1.  **Local Network**: Direct communication over your home Wi-Fi when your phone and appliance are on the same network.
+2.  **Cloud API**: Communication via the Home Connect cloud servers.
+
+All third-party integrations, including this plugin, are restricted to using the Home Connect Cloud API. If your appliance has a stable Wi-Fi connection but cannot reach the Home Connect cloud servers, it will appear as offline in Homebridge (often with an `Error: The appliance is offline` message in the logs) while still being controllable via the official app locally.
+
+To verify your appliance's cloud connectivity, open the Home Connect app, navigate to the appliance settings, and locate the **Network** section. A fully functional connection is represented by three green lines connecting the phone, the cloud, and the appliance. If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.
+
+If the cloud connection is missing:
+*   Ensure your network or firewall is not blocking outbound connections to Home Connect servers.
+*   Consult the official Home Connect troubleshooting checklist for your region.
+*   Contact Home Connect customer service if the appliance consistently fails to connect to the cloud despite a strong Wi-Fi signal.
 
 ## Apple HomeKit
 
@@ -787,11 +874,18 @@ When creating automations in the Apple Home app, individual services (such as th
 
 To manage complex automations more easily, consider using third-party HomeKit applications which provide a clearer interface for selecting specific appliance services with their full context. Recommended alternatives include *Eve for HomeKit*, *Controller for HomeKit*, and *Home+*.
 
+#### 🚧 Why does my fridge-freezer only show a single door status for both the fridge and freezer compartments? 🚧
+
+<!-- INCLUDES: issue-43-380f -->
+The Home Connect API for combined fridge-freezer appliances does not provide separate status streams for individual doors. Instead, it provides a single `BSH.Common.Status.DoorState` event that updates whenever either door is moved. 
+
+Consequently, the `Current Door State` characteristic in HomeKit reflects the state of whichever door was most recently opened or closed. This is a technical limitation of the manufacturer's API and cannot be resolved by the plugin.
+
 ### Notifications & Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
 
-<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-43-caee issue-45-fb59 issue-153-91f4 issue-323-9301 -->
+<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-45-fb59 issue-153-91f4 issue-323-9301 -->
 Home Connect communicates many appliance states as **transient events** (e.g. "Drip tray full" or "iDos fill level poor") rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so that they can be used as automation triggers. This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears. Consequently, these services do not show a continuous 'full' or 'active' state in the Home app.
 
 The Apple Home app only displays numeric labels (Button 1, Button 2) for these services. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup or use a third-party app like *Eve* or *Home+* which can display descriptive labels. If you do not require these events for automations, you can disable them per-appliance in the plugin configuration to prevent them from appearing in the Home app.
@@ -805,7 +899,7 @@ While you can toggle **Show as Separate Tiles** in the accessory settings, Apple
 
 #### How do I get appliance notifications?
 
-<!-- INCLUDES: issue-38-9780 issue-63-11e1 issue-124-8aea -->
+<!-- INCLUDES: issue-63-11e1 issue-124-8aea -->
 Apple Home only supports native push notifications for specific security-related sensors (Doors, Locks, Smoke, etc.). Most Home Connect events do not fit these categories; forcing them to do so would result in misleading notification text.
 
 To receive notifications for other events, you have two main options:
@@ -825,6 +919,27 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 
 Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
 
+#### 🚧 Why doesn't the plugin provide a sensor for `Program Finished` notifications? 🚧
+
+<!-- INCLUDES: issue-38-03f3 -->
+The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated programme finished sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`.
+
+Implementing a workaround by using these existing sensor types would result in a poor user experience. For example, a user would receive a "motion detected" or "smoke detected" alert when an appliance finishes its cycle, which is misleading and technically incorrect.
+
+Users seeking notifications should use the official **Home Connect** app, which provides native support for programme completion alerts. Alternatively, automations can be created in HomeKit based on appliance state changes to trigger scenes or other devices, although this does not enable custom text notifications within the Apple Home app.
+
+#### 🚧 Why are programmable switches for alarms named BUTTON 1, BUTTON 2, and BUTTON 3 in the Home app? 🚧
+
+<!-- INCLUDES: issue-43-3f35 -->
+This is a design limitation of the Apple Home app. While the HomeKit framework allows for descriptive labels on buttons within a `Programmable Switch` service, and these names are often displayed correctly in third-party apps like Eve, the Apple Home app defaults to generic numbering like `BUTTON 1`. There is no configuration or code change within the plugin that can override this behaviour, as it is controlled entirely by Apple's user interface design.
+
+#### 🚧 Can I trigger HomeKit automations when my fridge or oven door is opened? 🚧
+
+<!-- INCLUDES: issue-43-682b -->
+Yes. The plugin exposes a `Current Door State` characteristic for appliances that report their door status. This characteristic can be used to trigger automations. 
+
+Note that the Apple Home app may have limitations on which characteristics can be used as automation triggers. If the door state does not appear as a trigger option in the Home app, you can use a third-party HomeKit app such as Eve or Home+ to create the automation rule, which will then function across your HomeKit ecosystem.
+
 ### Siri
 
 #### How do I control my hood fan speed using Siri?
@@ -836,13 +951,26 @@ Siri maps fan speeds to specific percentages:
 
 The plugin maps these percentages to the closest available physical fan settings of your hood. You can use commands like `Hey Siri, set the hood fan to medium` or `Hey Siri, set the hood fan to 100%`. Note that numeric settings like `set fan to 1` are not supported by Siri for HomeKit fan services.
 
+#### 🚧 Why does Siri fail to control my appliance when the Home app works correctly? 🚧
+
+<!-- INCLUDES: issue-41-4190 -->
+Siri behaves differently from the Home app because it has a stricter understanding of the semantics for specific device types supported by Apple. While the Home app provides a visual interface for various `Characteristics`, Siri requires them to be organised within `Services` in a way that matches its internal logic. Because Home Connect appliances often do not map perfectly to standard HomeKit device categories, Siri may occasionally fail to process commands for specific features like fan speeds or lighting.
+
+If you encounter this behaviour, follow these steps to identify the root cause:
+
+1. **Check Homebridge logs**: If no activity appears in the plugin logs when you issue a Siri command, the request is not reaching the plugin.
+2. **Enable HomeKit debug logging**: Set the `DEBUG=*` environment variable before launching Homebridge. This allows you to see the raw communication between HomeKit and Homebridge, confirming whether Siri is successfully sending the request to the server.
+3. **Check for server instability**: Intermittent failures can also be caused by transient issues with the Home Connect API servers. These outages often result in delayed or failed responses that Siri may interpret as the device being unresponsive.
+
+If the Home app works but Siri does not, the issue is likely related to how Siri interprets the HomeKit mapping rather than a bug in the plugin code.
+
 ## Compatibility and Integration
 
 ### Third-party Platforms
 
 #### Is this plugin compatible with HOOBS?
 
-<!-- INCLUDES: issue-37-c1f5 issue-67-ea33 issue-76-b91b -->
+<!-- INCLUDES: issue-67-ea33 issue-76-b91b -->
 Yes, but it is not officially supported.
 
 This plugin is designed and tested for vanilla [Homebridge](https://github.com/homebridge/homebridge) with [Homebridge Config UI X](https://github.com/homebridge/homebridge-config-ui-x). If you choose to use HOOBS, you may encounter stability issues or broken features.
@@ -880,6 +1008,16 @@ Direct integration with IFTTT to bridge these gaps has been explicitly declined 
 
 For users who require IFTTT-specific functionality, such as triggering automations from Hood Favourite button presses, it is recommended to use a dedicated plugin such as `homebridge-ifttt` alongside this one. This approach keeps the logic for different services separate and more manageable.
 
+#### 🚧 Where is the `.homebridge-homeconnect-v1.schema.json` file for configuration in HOOBS? 🚧
+
+<!-- INCLUDES: issue-37-a423 -->
+The `.homebridge-homeconnect-v1.schema.json` file is a metadata file used exclusively by `homebridge-config-ui-x` to generate its graphical configuration interface. It is not intended for manual editing and is not relevant for users of other platforms like HOOBS.
+
+To configure the plugin in HOOBS, you should modify the `config.json` file directly:
+1. Open the HOOBS interface.
+2. Navigate to the plugin settings.
+3. Locate the **Advanced** or **JSON Config** section to edit the plugin configuration manually.
+
 ### Plugin Installation and Configuration
 
 #### Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?
@@ -896,4 +1034,4 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-41-6e02 issue-43-3166 issue-47-127f issue-56-ce35 issue-57-6cdc issue-65-324a issue-67-1639 issue-72-52a3 issue-77-48d3 issue-77-ea0e issue-78-26c0 issue-80-1fb6 issue-84-bee9 issue-85-0a95 issue-89-ea9b issue-91-e7db issue-93-7521 issue-97-c838 issue-108-a5c4 issue-116-e2ec issue-118-9a71 issue-141-5245 issue-144-f92c issue-145-8923 issue-164-bbc4 issue-181-e108 issue-190-235a issue-194-f6ee issue-195-84f2 issue-196-8511 issue-239-ce99 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-47-127f issue-56-ce35 issue-57-6cdc issue-65-324a issue-67-1639 issue-72-52a3 issue-77-48d3 issue-77-ea0e issue-78-26c0 issue-80-1fb6 issue-84-bee9 issue-85-0a95 issue-89-ea9b issue-91-e7db issue-93-7521 issue-97-c838 issue-108-a5c4 issue-116-e2ec issue-118-9a71 issue-141-5245 issue-144-f92c issue-145-8923 issue-164-bbc4 issue-181-e108 issue-190-235a issue-194-f6ee issue-195-84f2 issue-196-8511 issue-239-ce99 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
