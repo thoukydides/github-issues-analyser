@@ -1,14 +1,24 @@
 {
     "issue_number": 51,
-    "updated_at": "2026-02-13T13:43:07.719Z",
+    "updated_at": "2026-03-11T15:30:23.767Z",
     "faq": [
         {
-            "question": "What values should I use for Application ID and Redirect URI when registering the Home Connect application?",
-            "answer": "When registering your application on the Home Connect developer portal, ensure you configure the following settings:\n\n1. **OAuth Flow**: This **must** be set to `Device Flow`. This setting cannot be changed after the application is created. If you have an existing application set to a different flow, you must create a new one.\n2. **Application ID**: This is a friendly name for your reference only. You can enter anything here, such as `Homebridge`.\n3. **Redirect URI** (or Success Redirect): This field is mandatory in the form but is not used by the `Device Flow`. You can enter any valid URL, such as `https://localhost` or `https://google.com`.\n\nNote that the default `API Web Client ID` often visible in new accounts is reserved for the official Home Connect web-based API client and will not work with this plugin. You must create your own application to obtain a compatible Client ID.",
-            "semantic_abstract": "Home Connect API application registration requires the selection of the `Device Flow` OAuth grant type during creation to enable plugin authorisation. While the developer portal mandates an Application ID and Redirect URI, these fields serve only as identifiers and placeholders respectively, as the device flow does not utilise web-based redirection.",
-            "alternative_resolution": "Enhance the plugin's setup documentation to explicitly state that Application ID and Redirect URI are non-functional placeholders for the Device Flow to prevent user confusion during the developer portal registration process.",
-            "confidence": "high",
-            "hash": "db9a4af07e7d4f1dd6eea6a363ea81f1899c8818d355ce88e5a079a079b45759"
+            "question": "What should I enter for `Application ID` and `Redirect URI` when registering a new Home Connect application?",
+            "answer": "When registering a new application on the Home Connect Developer Portal for use with `homebridge-homeconnect`, you need to fill in the `Application ID` and `Redirect URI` fields.\n\n*   The `Application ID` is simply a friendly name for your application. You can enter anything you like here, such as `Homebridge HomeConnect` or `My Homebridge Plugin`.\n*   The `Redirect URI` (sometimes labelled `Success Redirect`) is also a field that does not affect the authorisation process for this plugin. You can enter any valid URL, for example, `https://localhost` or `https://example.com`.\n\nThe crucial setting is the `OAuth Flow`, which **must** be set to `Device Flow`. These other fields do not influence the device flow authorisation method used by the plugin.",
+            "semantic_abstract": "Home Connect application registration requires `Application ID` and `Redirect URI` fields to be populated; however, for `homebridge-homeconnect` using the `Device Flow` OAuth method, these values are arbitrary and do not affect the authentication process, primarily serving as labels or placeholders.",
+            "hash": "3a91a327c16f7bb8a7d9c52f881f27d8a68de49592bb3acf40ac2cd67d282e93"
+        },
+        {
+            "question": "Why do I see the error `Home Connect API error: Unable to authorise Home Connect application; client not authorized for this oauth flow (grant_type)`?",
+            "answer": "This error indicates that the Home Connect application you registered on the Home Connect Developer Portal is not configured to use the `Device Flow` OAuth method, which is required by the `homebridge-homeconnect` plugin.\n\nTo resolve this, you must:\n\n1.  Go to the [Home Connect Developer Portal](https://developer.home-connect.com/applications).\n2.  Locate the application you created for Homebridge.\n3.  If the `OAuth Flow` is not set to `Device Flow`, you will need to **delete the existing application** and create a new one. The `OAuth Flow` setting **cannot be changed** after an application has been created.\n4.  When creating a new application, ensure you select `Device Flow` for the `OAuth Flow` option.\n\nRemember that the `Application ID` and `Redirect URI` can be any valid values, as they do not affect the device flow authorisation used by the plugin.",
+            "semantic_abstract": "The `client not authorized for this oauth flow (grant_type)` error signifies a misconfiguration of the Home Connect application's OAuth flow on the developer portal; the `homebridge-homeconnect` plugin mandates `Device Flow`, and this setting must be correctly selected during application creation as it is immutable thereafter.",
+            "hash": "4991684e91bd283762a168e01526eeacea0afe1bdd2c8ad402fe24bcf215ae8b"
+        },
+        {
+            "question": "Can I use an existing `API Web Client ID` from the Home Connect Developer Portal with this plugin?",
+            "answer": "No, the `API Web Client ID` that might already exist on your Home Connect Developer Portal account is specifically designed for the web-based API client available at `https://apiclient.home-connect.com/`. It is not intended for general use with applications like `homebridge-homeconnect`.\n\nTo use `homebridge-homeconnect`, you **must register a new application** on the [Home Connect Developer Portal](https://developer.home-connect.com/applications) and ensure its `OAuth Flow` is explicitly set to `Device Flow`. This new application will generate a Client ID that is compatible with the plugin's authentication method.",
+            "semantic_abstract": "An existing `API Web Client ID` on the Home Connect Developer Portal is exclusively for the `apiclient.home-connect.com` interface and incompatible with `homebridge-homeconnect`, which requires a separately registered application configured with `Device Flow` for its authentication process.",
+            "hash": "60d6437a67d57022e411ed174372019faff64642f11e08b40f6c55a84a4f8289"
         }
     ]
 }
