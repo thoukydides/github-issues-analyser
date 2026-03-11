@@ -1,14 +1,12 @@
 {
     "issue_number": 53,
-    "updated_at": "2026-02-13T11:09:21.466Z",
+    "updated_at": "2026-03-11T13:38:13.897Z",
     "faq": [
         {
-            "question": "Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?",
-            "answer": "This is an error produced by the `npm` package manager rather than a fault within the plugin code. It typically occurs when `npm` attempts to rename or remove a directory during an update but fails because the target directory is not empty or a file is being held open by another process.\n\nTo resolve this issue:\n1. Stop the Homebridge service to ensure no processes are actively using the plugin files.\n2. Locate the temporary directory identified in the error log (for example, `/usr/local/lib/node_modules/.homebridge-homeconnect-XXXXXXXX`).\n3. Manually delete that temporary directory and the existing `homebridge-homeconnect` directory if necessary.\n4. Attempt to install the plugin again.\n\nThis error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI X interface.",
-            "semantic_abstract": "The `npm ERR! ENOTEMPTY` error indicates a failure by the `npm` package manager to rename or remove directories within `node_modules` during an installation or update. This file system conflict is external to the plugin code and usually requires manual deletion of temporary installation folders or ensuring no processes are locking the directory.",
-            "alternative_resolution": "Incorporate a troubleshooting section in the project documentation specifically for common `npm` environment errors, such as `ENOTEMPTY` and `EACCES`, to help users distinguish between infrastructure issues and plugin bugs.",
-            "confidence": "high",
-            "hash": "9275f4a72d71c29a1143b04207d4fe30410bb0ad2e1074a5412912797dd66a0c"
+            "question": "Why does the plugin update fail with an `ENOTEMPTY: directory not empty` error?",
+            "answer": "The `npm ERR! code ENOTEMPTY` error typically occurs during a plugin update when `npm` is unable to rename or move directories within the `node_modules` folder. This is a file system issue related to the `npm` package manager rather than a bug in the `homebridge-homeconnect` plugin itself. It often happens if a previous installation was interrupted or if there are permission issues.\n\nTo resolve this:\n1. Access your Homebridge server's command line.\n2. Identify the temporary directory mentioned in the error log (usually starting with a dot, e.g. `/usr/local/lib/node_modules/.homebridge-homeconnect-XXXXXXXX`).\n3. Delete that specific temporary directory.\n4. Attempt the update again via the Homebridge UI or the command line using `npm install -g homebridge-homeconnect@latest`.\n\nIn many cases, simply retrying the update a second time via the Homebridge Config UI-X will also resolve the issue if the file system lock has cleared.",
+            "semantic_abstract": "npm installation failures involving `ENOTEMPTY` errors occur when the package manager cannot complete directory rename operations in the `node_modules` folder. This transient file system state, often caused by interrupted updates or permission conflicts, requires manual deletion of residual temporary directories to allow subsequent installation attempts to succeed.",
+            "hash": "27e2d6f48883cafde2a1bddb65b13acc916a2ae76e68d0a3ffd5b84fd039e626"
         }
     ]
 }
