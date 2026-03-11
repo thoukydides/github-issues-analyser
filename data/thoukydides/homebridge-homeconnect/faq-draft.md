@@ -995,33 +995,19 @@ For users who require IFTTT-specific functionality, such as triggering automatio
 
 ### Plugin Installation and Configuration
 
-<!-- PARTITION: New subcategory -->
-
 #### Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?
 
-This is an error produced by the `npm` package manager rather than a fault within the plugin code. It typically occurs when `npm` attempts to rename or remove a directory during an update but fails because the target directory is not empty or a file is being held open by another process.
+<!-- INCLUDES: issue-53-27e2 -->
+This is an error produced by the `npm` package manager rather than a fault within the plugin code. It typically occurs when `npm` attempts to rename or remove a directory during an update but fails because the target directory is not empty, a file is being held open by another process, or there are permission issues.
 
 To resolve this issue:
 
 1. Stop the Homebridge service to ensure no processes are actively using the plugin files.
 2. Locate the temporary directory identified in the error log (for example, `/usr/local/lib/node_modules/.homebridge-homeconnect-XXXXXXXX`).
 3. Manually delete that temporary directory and the existing `homebridge-homeconnect` directory if necessary.
-4. Attempt to install the plugin again.
+4. Attempt to install the plugin again using the Homebridge Config UI or the command `npm install -g homebridge-homeconnect@latest`.
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
-
-#### 🚧 Why does the plugin update fail with an `ENOTEMPTY: directory not empty` error? 🚧
-
-<!-- INCLUDES: issue-53-27e2 -->
-The `npm ERR! code ENOTEMPTY` error typically occurs during a plugin update when `npm` is unable to rename or move directories within the `node_modules` folder. This is a file system issue related to the `npm` package manager rather than a bug in the `homebridge-homeconnect` plugin itself. It often happens if a previous installation was interrupted or if there are permission issues.
-
-To resolve this:
-1. Access your Homebridge server's command line.
-2. Identify the temporary directory mentioned in the error log (usually starting with a dot, e.g. `/usr/local/lib/node_modules/.homebridge-homeconnect-XXXXXXXX`).
-3. Delete that specific temporary directory.
-4. Attempt the update again via the Homebridge UI or the command line using `npm install -g homebridge-homeconnect@latest`.
-
-In many cases, simply retrying the update a second time via the Homebridge Config UI-X will also resolve the issue if the file system lock has cleared.
 
 <!-- PARTITION: Plugin Storage and Persistence Issues -->
 
