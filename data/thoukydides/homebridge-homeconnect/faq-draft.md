@@ -182,7 +182,7 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
-<!-- PARTITION -->
+<!-- PARTITION: Home Connect Developer Portal Configuration -->
 
 #### How should the application be configured in the Home Connect Developer Portal?
 
