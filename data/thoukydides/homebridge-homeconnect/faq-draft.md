@@ -714,7 +714,7 @@ This behaviour was addressed in plugin version `v0.18.3` to ensure that the Home
 <!-- INCLUDES: issue-306-65ff -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
 
-<!-- PARTITION -->
+<!-- PARTITION: Missing or Recreated Accessories -->
 
 #### Why do Home Connect appliances disappear or lose their Favourites status in the Home app?
 
