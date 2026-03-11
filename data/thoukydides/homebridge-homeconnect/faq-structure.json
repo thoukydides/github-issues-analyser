@@ -405,11 +405,12 @@
                                 },
                                 {
                                     "question": "Why does the log say a selected program is not supported by the Home Connect API?",
-                                    "answer": "This warning typically occurs in two different contexts:\n\n- **Monitor-Only Programs**: Some appliances support maintenance cycles (such as rinsing, drum cleaning, or descaling) and user-configured favourites that the API allows the plugin to monitor but not control remotely. The plugin logs these when they are detected but cannot be started via HomeKit.\n- **Startup Timing**: You may see a transient warning during Homebridge startup or after clearing the cache. This happens if an appliance reports a program selection event before the plugin has finished loading the full list of supported programs from the API.\n\nIn these cases, the messages are often cosmetic or indicate a limitation of the Home Connect service rather than a fault with the plugin. The plugin will automatically fetch or refresh necessary details once initialisation is complete.",
+                                    "answer": "This warning typically occurs in two different contexts:\n\n- **Monitor-Only Programs**: Some appliances support maintenance cycles (such as rinsing, drum cleaning, or descaling) and user-configured favourites that the API allows the plugin to monitor but not control remotely. The plugin logs these when they are detected but cannot be started via HomeKit.\n- **Startup Timing**: You may see a transient warning during Homebridge startup or after clearing the cache. This happens if an appliance reports a program selection event before the plugin has finished loading the full list of supported programs from the API.\n\nThis is often a known inconsistency in the Home Connect API's behaviour, frequently seen with internal cycles such as `ApplianceOffRinsing` on coffee makers. When the plugin identifies this discrepancy, it deliberately avoids querying the API for further details to prevent invalid requests that would unnecessarily consume your daily API rate limit quota. In these cases, the messages are often cosmetic and the plugin will automatically refresh necessary details once initialisation is complete.",
                                     "included_ids": [
                                         "issue-78-c9c7",
                                         "issue-288-9266",
-                                        "issue-328-99fc"
+                                        "issue-328-99fc",
+                                        "issue-50-7106"
                                     ]
                                 },
                                 {
@@ -488,8 +489,10 @@
                                 },
                                 {
                                     "question": "Which settings are used for programs started without specific options?",
-                                    "answer": "If a program is started without custom options, the Home Connect server uses the **appliance defaults**. These are usually the factory defaults or the settings used the last time that program was run manually.\n\nTo view these default values, enable **Debug Logging** and use the **Identify** function. The plugin will output a detailed list of every default value currently reported by the API to the Homebridge log.",
-                                    "included_ids": []
+                                    "answer": "When a program is started without explicit option configuration, the plugin does not specify any parameters in the Home Connect API request. In these cases, the Home Connect servers or the appliance itself determines the values, typically defaulting to the factory settings or the last values used on the physical interface. This behaviour is intended to mirror selecting a program manually on the appliance without making adjustments.\n\nTo view the default values for each program option, enable **Debug Logging**, use the **Identify** function in the Homebridge UI or Eve app, and check the debug log. Specific options such as coffee strength or beverage volume can be customised in the plugin configuration, most easily through the `homebridge-config-ui-x` interface.",
+                                    "included_ids": [
+                                        "issue-46-d84f"
+                                    ]
                                 },
                                 {
                                     "question": "Why do my oven programs only run for one minute?",
@@ -508,9 +511,10 @@
                                 },
                                 {
                                     "question": "How can I reduce the number of switches created for appliance programs?",
-                                    "answer": "By default, the plugin creates individual `Switch` services for every supported program. To simplify the interface, change the **Program Switches** configuration for the appliance:\n\n- **No individual program switches**: Hide all program switches.\n- **A switch to start each appliance program** (default): Advertise all available programs to HomeKit using default options.\n- **Custom list of programs and options**: Explicitly define which programs appear in HomeKit, and the options to use with each.",
+                                    "answer": "By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via `homebridge-config-ui-x`:\n\n- **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.\n- **Custom list of programs and options**: Use this to manually define which specific programs appear in HomeKit, and the options to use with each.\n- **A switch to start each appliance program** (default): Advertise all available programs using default options.",
                                     "included_ids": [
-                                        "issue-368-4f23"
+                                        "issue-368-4f23",
+                                        "issue-49-35dc"
                                     ]
                                 },
                                 {
@@ -544,39 +548,15 @@
                                 },
                                 {
                                     "question": "Why are ambient light colour and brightness controls missing for my hood or dishwasher?",
-                                    "answer": "The Home Connect API often hides lighting settings if the light is off. Furthermore, the API implementation for ambient lighting involves several constraints:\n\n- **Device Category Restrictions**: In many dishwasher models, the Home Connect API restricts ambient light control to the Hood category only. Even if the machine has physical lighting controls, the public API used by this plugin may not expose them.\n- **Mutually Exclusive Modes**: The API uses two separate control modes. In **CustomColour** mode, brightness is integrated into the colour value and the separate brightness setting is ignored. In **Fixed colour** mode, brightness is controllable but custom colours are unavailable.\n\nTo resolve missing controls, ensure the light is manually switched on using the official app and set to a custom colour, then restart Homebridge to allow the plugin to re-scan. If issues persist, delete the plugin's cache file (excluding the authorisation file) while the light is active.",
+                                    "answer": "Some appliances only report settings like `BSH.Common.Setting.AmbientLightColor` when the light is on. The plugin attempts to toggle the light during its initial discovery process, but this can fail due to technical constraints:\n\n- **Remote Control Lockout**: If the appliance is being used manually or via the official app during Homebridge startup, the API may block the plugin from toggling the light.\n- **API Latency**: The appliance may take longer to report capabilities than the plugin's timeout allowed.\n- **Cached Capabilities**: The plugin caches capabilities for 24 hours. If discovery failed once, the limited feature set will be remembered until the cache is cleared.\n- **Device Category Restrictions**: Some dishwashers restrict ambient light control to the Hood category in the API, even if physically present.\n\nTo resolve this and force a re-discovery:\n1. Ensure the light is manually switched on and set to a custom colour in the official app.\n2. Stop Homebridge and delete the appliance's cache file (an MD5 hash of the name followed by `cache`) in `~/.homebridge/homebridge-homeconnect/persist`.\n3. Ensure the appliance is idle and restart Homebridge.",
                                     "included_ids": [
                                         "issue-24-8ee6",
-                                        "issue-42-e5af"
+                                        "issue-42-e5af",
+                                        "issue-54-196a"
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 46,
-                                    "id": "issue-46-d84f",
-                                    "question": "What default settings are used when starting a program through a switch?",
-                                    "answer": "When a program is started without explicit option configuration, the plugin does not specify any parameters in the Home Connect API request. In these cases, the Home Connect servers or the appliance itself determines the values, typically defaulting to the program factory settings or the last values used on the physical interface. This behaviour is intended to mirror selecting a program manually on the appliance without making adjustments.\n\nTo see the default values for each program option, use the Homebridge **Identify** function on the appliance and check the debug log.\n\nSpecific options such as coffee strength or beverage volume can be customised in the plugin configuration, most easily through the `homebridge-config-ui-x` interface."
-                                },
-                                {
-                                    "issue_number": 49,
-                                    "id": "issue-49-35dc",
-                                    "question": "How can I hide the individual program switches for my Home Connect appliance in HomeKit?",
-                                    "answer": "By default, the plugin exposes every available program for an appliance as an individual `Switch` service in HomeKit. For complex appliances such as washers, dryers, or dishwashers, this can result in a large number of switches that may clutter the HomeKit interface.\n\nTo hide these program switches:\n1. Open the plugin configuration in `homebridge-config-ui-x`.\n2. Locate the configuration section for the appliance.\n3. Enable the option labelled `No individual program switches`.\n\nOnce this option is enabled, the individual program switches will be removed from HomeKit. This does not affect core functionality, such as the ability to monitor the current state, view the remaining time, or use basic power controls. For more granular control, the `programs` configuration block can be used to manually include or exclude specific programs instead of hiding all of them."
-                                },
-                                {
-                                    "issue_number": 50,
-                                    "id": "issue-50-7106",
-                                    "question": "Why does the log show `Selected program ... is not supported by the Home Connect API`?",
-                                    "answer": "This log message occurs when the Home Connect API reports that an appliance is running a program—such as `ApplianceOffRinsing` on a coffee maker—that the API simultaneously excludes from the appliance's list of supported programs. \n\nThis is a known inconsistency in the Home Connect API's behaviour. When the plugin identifies this discrepancy, it deliberately avoids querying the API for further details about the unsupported program. This logic is an intentional design choice to prevent invalid API requests that would unnecessarily consume your daily API rate limit quota."
-                                },
-                                {
-                                    "issue_number": 54,
-                                    "id": "issue-54-196a",
-                                    "question": "Why does my Home Connect appliance ambient light only show on/off but not colour in HomeKit?",
-                                    "answer": "Some Home Connect appliances only report specific settings, such as `BSH.Common.Setting.AmbientLightColor`, when the ambient light is currently switched on. To handle this, the plugin attempts to temporarily switch the light on during its initial discovery process to detect all available features.\n\nIf the colour control is missing despite the appliance supporting it in the official Home Connect app, it is usually because this discovery process was interrupted. Common causes include:\n1.  **Remote Control Lockout**: If the appliance was being operated manually or via the official app during Homebridge startup, the API may have temporarily blocked the plugin from switching the light on.\n2.  **API Latency**: The appliance may take longer to report its new capabilities than the plugin's timeout allowed during the initial check.\n3.  **Cached Capabilities**: The plugin caches the appliance's capabilities for 24 hours. If discovery failed once, the limited feature set will be remembered until the cache expires or is manually cleared.\n\nTo resolve this and force a re-discovery:\n1.  Stop Homebridge.\n2.  Locate the `persist` directory (typically `~/.homebridge/homebridge-homeconnect/persist`).\n3.  Identify the cache file for your appliance. The filename is an MD5 hash of the appliance's name followed by the word `cache` (e.g., `a7ea3482f629...`).\n4.  Delete this cache file.\n5.  Ensure the appliance is not being used, then restart Homebridge. The plugin will attempt to re-detect the ambient light capabilities."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
