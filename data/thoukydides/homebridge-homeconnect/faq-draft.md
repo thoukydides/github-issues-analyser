@@ -10,6 +10,8 @@
     - [Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?](#why-does-authorisation-fail-with-access_denied-device-authorization-session-has-expired-or-login-session-expired)
     - [Why does authorisation fail with a `403 Forbidden` error?](#why-does-authorisation-fail-with-a-403-forbidden-error)
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
+    - [How should the application be configured in the Home Connect Developer Portal?](#how-should-the-application-be-configured-in-the-home-connect-developer-portal)
+    - [Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?](#why-does-authorisation-fail-with-the-error-client-not-authorized-for-this-oauth-flow-grant_type)
   - **[Home Connect API Errors](#home-connect-api-errors)**
     - [Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?](#why-does-the-log-show-429-too-many-requests-1000-calls-in-1-day-reached-or-a-message-like-waiting--before-issuing-home-connect-api-request)
     - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
@@ -180,38 +182,27 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
-<!-- PARTITION: Home Connect Developer Portal Configuration -->
+<!-- PARTITION -->
 
-#### 🚧 What should I enter for `Application ID` and `Redirect URI` when registering a new Home Connect application? 🚧
+#### How should the application be configured in the Home Connect Developer Portal?
 
-<!-- INCLUDES: issue-51-3a91 -->
-When registering a new application on the Home Connect Developer Portal for use with `homebridge-homeconnect`, you need to fill in the `Application ID` and `Redirect URI` fields.
+<!-- INCLUDES: issue-51-3a91 issue-51-60d6 -->
+To use this plugin, you must register a new application on the [Home Connect Developer Portal](https://developer.home-connect.com/applications). You cannot use the default `API Web Client ID`, as it is restricted to the official web-based client.
 
-*   The `Application ID` is simply a friendly name for your application. You can enter anything you like here, such as `Homebridge HomeConnect` or `My Homebridge Plugin`.
-*   The `Redirect URI` (sometimes labelled `Success Redirect`) is also a field that does not affect the authorisation process for this plugin. You can enter any valid URL, for example, `https://localhost` or `https://example.com`.
+Use the following settings for the new application:
 
-The crucial setting is the `OAuth Flow`, which **must** be set to `Device Flow`. These other fields do not influence the device flow authorisation method used by the plugin.
+1. **Application ID**: Any friendly name (e.g. `Homebridge`).
+2. **OAuth Flow**: This **must** be set to `Device Flow`. This setting is critical and cannot be changed after the application is created.
+3. **Redirect URI**: Any valid URL (e.g. `https://localhost`). This is required by the portal but not used by the plugin's authorisation process.
 
-#### 🚧 Why do I see the error `Home Connect API error: Unable to authorise Home Connect application; client not authorized for this oauth flow (grant_type)`? 🚧
+The `Client ID` generated for this new application should then be used in the plugin configuration.
+
+#### Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?
 
 <!-- INCLUDES: issue-51-4991 -->
-This error indicates that the Home Connect application you registered on the Home Connect Developer Portal is not configured to use the `Device Flow` OAuth method, which is required by the `homebridge-homeconnect` plugin.
+This error indicates that the application registered in the Home Connect Developer Portal was not configured to use the `Device Flow` OAuth method.
 
-To resolve this, you must:
-
-1.  Go to the [Home Connect Developer Portal](https://developer.home-connect.com/applications).
-2.  Locate the application you created for Homebridge.
-3.  If the `OAuth Flow` is not set to `Device Flow`, you will need to **delete the existing application** and create a new one. The `OAuth Flow` setting **cannot be changed** after an application has been created.
-4.  When creating a new application, ensure you select `Device Flow` for the `OAuth Flow` option.
-
-Remember that the `Application ID` and `Redirect URI` can be any valid values, as they do not affect the device flow authorisation used by the plugin.
-
-#### 🚧 Can I use an existing `API Web Client ID` from the Home Connect Developer Portal with this plugin? 🚧
-
-<!-- INCLUDES: issue-51-60d6 -->
-No, the `API Web Client ID` that might already exist on your Home Connect Developer Portal account is specifically designed for the web-based API client available at `https://apiclient.home-connect.com/`. It is not intended for general use with applications like `homebridge-homeconnect`.
-
-To use `homebridge-homeconnect`, you **must register a new application** on the [Home Connect Developer Portal](https://developer.home-connect.com/applications) and ensure its `OAuth Flow` is explicitly set to `Device Flow`. This new application will generate a Client ID that is compatible with the plugin's authentication method.
+The `OAuth Flow` setting is fixed at the time of application creation. If it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one, ensuring that `Device Flow` is selected during the creation process.
 
 ### Home Connect API Errors
 

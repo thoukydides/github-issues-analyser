@@ -90,27 +90,24 @@
                             "preamble": "",
                             "partitions": [
                                 {
-                                    "entries": [],
-                                    "candidates": [
+                                    "entries": [
                                         {
-                                            "issue_number": 51,
-                                            "id": "issue-51-3a91",
-                                            "question": "What should I enter for `Application ID` and `Redirect URI` when registering a new Home Connect application?",
-                                            "answer": "When registering a new application on the Home Connect Developer Portal for use with `homebridge-homeconnect`, you need to fill in the `Application ID` and `Redirect URI` fields.\n\n*   The `Application ID` is simply a friendly name for your application. You can enter anything you like here, such as `Homebridge HomeConnect` or `My Homebridge Plugin`.\n*   The `Redirect URI` (sometimes labelled `Success Redirect`) is also a field that does not affect the authorisation process for this plugin. You can enter any valid URL, for example, `https://localhost` or `https://example.com`.\n\nThe crucial setting is the `OAuth Flow`, which **must** be set to `Device Flow`. These other fields do not influence the device flow authorisation method used by the plugin."
+                                            "question": "How should the application be configured in the Home Connect Developer Portal?",
+                                            "answer": "To use this plugin, you must register a new application on the [Home Connect Developer Portal](https://developer.home-connect.com/applications). You cannot use the default `API Web Client ID`, as it is restricted to the official web-based client.\n\nUse the following settings for the new application:\n\n1. **Application ID**: Any friendly name (e.g. `Homebridge`).\n2. **OAuth Flow**: This **must** be set to `Device Flow`. This setting is critical and cannot be changed after the application is created.\n3. **Redirect URI**: Any valid URL (e.g. `https://localhost`). This is required by the portal but not used by the plugin's authorisation process.\n\nThe `Client ID` generated for this new application should then be used in the plugin configuration.",
+                                            "included_ids": [
+                                                "issue-51-3a91",
+                                                "issue-51-60d6"
+                                            ]
                                         },
                                         {
-                                            "issue_number": 51,
-                                            "id": "issue-51-4991",
-                                            "question": "Why do I see the error `Home Connect API error: Unable to authorise Home Connect application; client not authorized for this oauth flow (grant_type)`?",
-                                            "answer": "This error indicates that the Home Connect application you registered on the Home Connect Developer Portal is not configured to use the `Device Flow` OAuth method, which is required by the `homebridge-homeconnect` plugin.\n\nTo resolve this, you must:\n\n1.  Go to the [Home Connect Developer Portal](https://developer.home-connect.com/applications).\n2.  Locate the application you created for Homebridge.\n3.  If the `OAuth Flow` is not set to `Device Flow`, you will need to **delete the existing application** and create a new one. The `OAuth Flow` setting **cannot be changed** after an application has been created.\n4.  When creating a new application, ensure you select `Device Flow` for the `OAuth Flow` option.\n\nRemember that the `Application ID` and `Redirect URI` can be any valid values, as they do not affect the device flow authorisation used by the plugin."
-                                        },
-                                        {
-                                            "issue_number": 51,
-                                            "id": "issue-51-60d6",
-                                            "question": "Can I use an existing `API Web Client ID` from the Home Connect Developer Portal with this plugin?",
-                                            "answer": "No, the `API Web Client ID` that might already exist on your Home Connect Developer Portal account is specifically designed for the web-based API client available at `https://apiclient.home-connect.com/`. It is not intended for general use with applications like `homebridge-homeconnect`.\n\nTo use `homebridge-homeconnect`, you **must register a new application** on the [Home Connect Developer Portal](https://developer.home-connect.com/applications) and ensure its `OAuth Flow` is explicitly set to `Device Flow`. This new application will generate a Client ID that is compatible with the plugin's authentication method."
+                                            "question": "Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?",
+                                            "answer": "This error indicates that the application registered in the Home Connect Developer Portal was not configured to use the `Device Flow` OAuth method.\n\nThe `OAuth Flow` setting is fixed at the time of application creation. If it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one, ensuring that `Device Flow` is selected during the creation process.",
+                                            "included_ids": [
+                                                "issue-51-4991"
+                                            ]
                                         }
-                                    ]
+                                    ],
+                                    "candidates": []
                                 }
                             ],
                             "subcategories": []
