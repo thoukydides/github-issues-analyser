@@ -661,15 +661,16 @@
                             "preamble": "",
                             "partitions": [
                                 {
-                                    "entries": [],
-                                    "candidates": [
+                                    "entries": [
                                         {
-                                            "issue_number": 52,
-                                            "id": "issue-52-1e99",
                                             "question": "Why do Home Connect appliances disappear or lose their Favourites status in the Home app?",
-                                            "answer": "The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.\n\nIf accessories spontaneously disappear, reappear, or lose their **Favourites** status and room assignments, it is usually due to one of the following:\n\n1.  **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations—such as room assignments, custom names, and **Favourite** status—are lost.\n2.  **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.\n\nTo resolve these issues:\n\n-   Check the Home Connect API status to rule out cloud service disruptions.\n-   If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing."
+                                            "answer": "The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.\n\nIf accessories spontaneously disappear, reappear, or lose their **Favourites** status and room assignments, it is usually due to one of the following:\n\n1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations—such as room assignments, custom names, and **Favourite** status—are lost.\n2. **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.\n\nTo resolve these issues:\n\n- Check the Home Connect API status to rule out cloud service disruptions.\n- If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.",
+                                            "included_ids": [
+                                                "issue-52-1e99"
+                                            ]
                                         }
-                                    ]
+                                    ],
+                                    "candidates": []
                                 }
                             ],
                             "subcategories": []
