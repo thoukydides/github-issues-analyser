@@ -87,7 +87,7 @@
   - **[Notifications & Events](#notifications--events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels like `BUTTON 1`?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels-like-button-1)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
-    - [How do I get notifications for events like a programme finishing?](#how-do-i-get-notifications-for-events-like-a-programme-finishing)
+    - [How do I get notifications for events like a program finishing?](#how-do-i-get-notifications-for-events-like-a-program-finishing)
     - [How can I disable HomeKit notifications for door events?](#how-can-i-disable-homekit-notifications-for-door-events)
     - [Can I trigger HomeKit automations when my appliance door is opened?](#can-i-trigger-homekit-automations-when-my-appliance-door-is-opened)
   - **[Siri](#siri)**
@@ -875,10 +875,15 @@ To manage complex automations more easily, consider using third-party HomeKit ap
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels like `BUTTON 1`?
 
-<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-43-3f35 issue-153-91f4 issue-323-9301 -->
-Home Connect communicates many appliance states as **transient events** (e.g. "Drip tray full" or "iDos fill level poor") rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so that they can be used as automation triggers. This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears.
+<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-43-3f35 issue-45-b6c3 issue-153-91f4 issue-323-9301 -->
+Home Connect communicates many appliance states (such as a coffee maker's "Drip tray full" or a washing machine's "iDos fill level poor") as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous "Single Press" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.
 
-The Apple Home app only displays numeric labels (e.g. `BUTTON 1`, `BUTTON 2`) for these services. This is a design limitation of the Home app itself; while the HomeKit framework allows for descriptive labels (which are often visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup. If you do not require these events, you can disable them per-appliance in the plugin configuration.
+This design is necessary for two main reasons:
+
+1. **API Limitations**: The Home Connect API does not allow the plugin to poll the current state of these alerts (e.g. after a reboot or reconnection). Because the actual state cannot be reliably determined at startup, using a persistent sensor (like a `Contact Sensor`) could lead to incorrect status displays if a "cleared" event was missed while the plugin was offline.
+2. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines sensors like `Contact Sensor` or `Occupancy Sensor` for continuous states. Mapping a momentary event to these services is technically incorrect.
+
+The Apple Home app only displays numeric labels (e.g. `BUTTON 1`) for these services. This is a design limitation of the Home app; while the HomeKit framework allows for descriptive labels (visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents, check the **Homebridge logs** during startup. These events can be disabled per-appliance in the plugin configuration if they are not required.
 
 #### Why does the Home app show two (or more) tiles for one appliance?
 
@@ -887,15 +892,15 @@ This is standard Apple Home behaviour. To keep the interface organised, Apple se
 
 While you can toggle **Show as Separate Tiles** in the accessory settings, Apple does not currently allow these buttons to be merged into the primary appliance tile. If you do not use these events for automations, you can disable them in the plugin configuration to prevent them from appearing in the Home app.
 
-#### How do I get notifications for events like a programme finishing?
+#### How do I get notifications for events like a program finishing?
 
 <!-- INCLUDES: issue-38-03f3 issue-63-11e1 issue-124-8aea -->
-The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated "programme finished" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these existing types would result in a poor user experience; for example, a user would receive a "smoke detected" alert when a dishwasher finishes, which is misleading and technically incorrect.
+The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated "program finished" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these existing types would result in a poor user experience; for example, a user would receive a "smoke detected" alert when a dishwasher finishes, which is misleading and technically incorrect.
 
 To receive notifications, you have two main options:
 
-- **The Official Home Connect App:** The most reliable way to get detailed, text-based push notifications.
-- **HomeKit Automations:** Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.
+- **The Official Home Connect App**: The most reliable way to get detailed, text-based push notifications.
+- **HomeKit Automations**: Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.
 
 #### How can I disable HomeKit notifications for door events?
 
@@ -915,19 +920,6 @@ Note that this setting must be configured separately on each iPhone or iPad wher
 Yes. The plugin exposes a `Current Door State` characteristic for appliances that report their door status (such as fridges, freezers, or ovens). This characteristic can be used to trigger automations.
 
 Note that the Apple Home app may have limitations on which characteristics can be used as automation triggers in its default interface. If the door state does not appear as a trigger option, you can use a third-party HomeKit app such as *Eve* or *Home+* to create the automation rule. Once created, these rules will function across your entire HomeKit ecosystem.
-
-#### 🚧 Why does the coffee maker use a `Stateless Programmable Switch` for alerts like `water empty` or `drip tray full`? 🚧
-
-<!-- INCLUDES: issue-45-b6c3 -->
-The Home Connect API for coffee makers communicates status changes for the bean container, water tank, and drip tray as discrete events rather than continuous states. Because the API does not allow the plugin to determine the current state of these components when the plugin starts or when a connection is established, it is not possible to accurately represent them as persistent sensors.
-
-To handle these events, the plugin maps them to a `Stateless Programmable Switch`. When an event occurs (such as the water tank becoming empty), it triggers an instantaneous "Single Press" on the corresponding switch. 
-
-While some users might prefer a `Contact Sensor` to receive native HomeKit notifications, this mapping is avoided for several reasons:
-1. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines `Contact Sensor` for continuous states (detected/not detected). Mapping a transient event to this service would be technically incorrect.
-2. **State Reliability**: Since the actual state cannot be polled, a sensor could easily display an incorrect status (e.g., showing "Empty" when it has already been refilled) if the plugin missed the corresponding "Full" event while offline.
-
-To receive notifications for these alerts, you can create a HomeKit automation triggered by the switch press to send a message or activate a virtual accessory that supports native notifications.
 
 ### Siri
 

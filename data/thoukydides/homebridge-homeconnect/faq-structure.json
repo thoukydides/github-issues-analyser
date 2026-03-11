@@ -829,14 +829,15 @@
                             "entries": [
                                 {
                                     "question": "Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels like `BUTTON 1`?",
-                                    "answer": "Home Connect communicates many appliance states as **transient events** (e.g. \"Drip tray full\" or \"iDos fill level poor\") rather than persistent, queryable states. The plugin maps these events to `Stateless Programmable Switch` services so that they can be used as automation triggers. This design is necessary because the Home Connect API does not allow the plugin to poll the current state (e.g. after a reboot), and many appliances do not reliably generate events when a condition clears.\n\nThe Apple Home app only displays numeric labels (e.g. `BUTTON 1`, `BUTTON 2`) for these services. This is a design limitation of the Home app itself; while the HomeKit framework allows for descriptive labels (which are often visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents for your specific appliance, check the **Homebridge logs** during startup. If you do not require these events, you can disable them per-appliance in the plugin configuration.",
+                                    "answer": "Home Connect communicates many appliance states (such as a coffee maker's \"Drip tray full\" or a washing machine's \"iDos fill level poor\") as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous \"Single Press\" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.\n\nThis design is necessary for two main reasons:\n\n1. **API Limitations**: The Home Connect API does not allow the plugin to poll the current state of these alerts (e.g. after a reboot or reconnection). Because the actual state cannot be reliably determined at startup, using a persistent sensor (like a `Contact Sensor`) could lead to incorrect status displays if a \"cleared\" event was missed while the plugin was offline.\n2. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines sensors like `Contact Sensor` or `Occupancy Sensor` for continuous states. Mapping a momentary event to these services is technically incorrect.\n\nThe Apple Home app only displays numeric labels (e.g. `BUTTON 1`) for these services. This is a design limitation of the Home app; while the HomeKit framework allows for descriptive labels (visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents, check the **Homebridge logs** during startup. These events can be disabled per-appliance in the plugin configuration if they are not required.",
                                     "included_ids": [
                                         "issue-1-c1c9",
                                         "issue-2-aadc",
                                         "issue-31-241e",
                                         "issue-153-91f4",
                                         "issue-323-9301",
-                                        "issue-43-3f35"
+                                        "issue-43-3f35",
+                                        "issue-45-b6c3"
                                     ]
                                 },
                                 {
@@ -847,8 +848,8 @@
                                     ]
                                 },
                                 {
-                                    "question": "How do I get notifications for events like a programme finishing?",
-                                    "answer": "The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated \"programme finished\" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these existing types would result in a poor user experience; for example, a user would receive a \"smoke detected\" alert when a dishwasher finishes, which is misleading and technically incorrect.\n\nTo receive notifications, you have two main options:\n\n- **The Official Home Connect App:** The most reliable way to get detailed, text-based push notifications.\n- **HomeKit Automations:** Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.",
+                                    "question": "How do I get notifications for events like a program finishing?",
+                                    "answer": "The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated \"program finished\" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these existing types would result in a poor user experience; for example, a user would receive a \"smoke detected\" alert when a dishwasher finishes, which is misleading and technically incorrect.\n\nTo receive notifications, you have two main options:\n\n- **The Official Home Connect App**: The most reliable way to get detailed, text-based push notifications.\n- **HomeKit Automations**: Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.",
                                     "included_ids": [
                                         "issue-63-11e1",
                                         "issue-124-8aea",
@@ -871,14 +872,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 45,
-                                    "id": "issue-45-b6c3",
-                                    "question": "Why does the coffee maker use a `Stateless Programmable Switch` for alerts like `water empty` or `drip tray full`?",
-                                    "answer": "The Home Connect API for coffee makers communicates status changes for the bean container, water tank, and drip tray as discrete events rather than continuous states. Because the API does not allow the plugin to determine the current state of these components when the plugin starts or when a connection is established, it is not possible to accurately represent them as persistent sensors.\n\nTo handle these events, the plugin maps them to a `Stateless Programmable Switch`. When an event occurs (such as the water tank becoming empty), it triggers an instantaneous \"Single Press\" on the corresponding switch. \n\nWhile some users might prefer a `Contact Sensor` to receive native HomeKit notifications, this mapping is avoided for several reasons:\n1. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines `Contact Sensor` for continuous states (detected/not detected). Mapping a transient event to this service would be technically incorrect.\n2. **State Reliability**: Since the actual state cannot be polled, a sensor could easily display an incorrect status (e.g., showing \"Empty\" when it has already been refilled) if the plugin missed the corresponding \"Full\" event while offline.\n\nTo receive notifications for these alerts, you can create a HomeKit automation triggered by the switch press to send a message or activate a virtual accessory that supports native notifications."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
