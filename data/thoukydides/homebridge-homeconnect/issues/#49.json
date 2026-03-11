@@ -1,14 +1,12 @@
 {
     "issue_number": 49,
-    "updated_at": "2026-02-13T05:10:29.940Z",
+    "updated_at": "2026-03-11T09:00:13.080Z",
     "faq": [
         {
-            "question": "How can I reduce the number of switches created for appliance programs?",
-            "answer": "By default, the plugin creates individual switches for every supported program of an appliance. For devices with many cycles, such as washers or dryers, this can result in dozens of switches cluttering the HomeKit interface. \n\nTo hide these switches and simplify the interface:\n1. Access the plugin configuration via `homebridge-config-ui-x`.\n2. Locate the settings for the specific appliance or the global plugin settings.\n3. Enable the option **No individual program switches**.\n\nThis configuration suppresses the individual cycle switches while maintaining core functionality such as status monitoring, timers, and power controls. This is often preferred as program switches are typically only functional when the appliance is in a specific state (e.g. powered on but not yet running).",
-            "semantic_abstract": "Appliances with numerous supported cycles can generate excessive HomeKit `Switch` services, leading to interface clutter. The plugin includes a configuration toggle to suppress these individual program switches, restricting the exposed services to essential status and timer controls.",
-            "alternative_resolution": "Ensure the 'No individual program switches' option is prominently highlighted in the configuration documentation and the Homebridge Config UI X schema to improve discoverability for users with complex appliances.",
-            "confidence": "high",
-            "hash": "3c910253da6544cbc77be0a2c0cfee9d2abafbfd9fa497232b17492961ba2dfd"
+            "question": "How can I hide the individual program switches for my Home Connect appliance in HomeKit?",
+            "answer": "By default, the plugin exposes every available program for an appliance as an individual `Switch` service in HomeKit. For complex appliances such as washers, dryers, or dishwashers, this can result in a large number of switches that may clutter the HomeKit interface.\n\nTo hide these program switches:\n1. Open the plugin configuration in `homebridge-config-ui-x`.\n2. Locate the configuration section for the appliance.\n3. Enable the option labelled `No individual program switches`.\n\nOnce this option is enabled, the individual program switches will be removed from HomeKit. This does not affect core functionality, such as the ability to monitor the current state, view the remaining time, or use basic power controls. For more granular control, the `programs` configuration block can be used to manually include or exclude specific programs instead of hiding all of them.",
+            "semantic_abstract": "Home Connect appliances with numerous operating programs default to exposing each as a separate HomeKit `Switch` service, which can lead to interface clutter. The `No individual program switches` configuration option allows users to suppress these additional services while maintaining primary appliance controls and status monitoring. This provides a mechanism to customise the HomeKit service mapping for appliances with extensive program lists.",
+            "hash": "35dc6aa0ad52e75a6229ca1e6e36b75bbc02d750b758076d7454131369a4ca30"
         }
     ]
 }
