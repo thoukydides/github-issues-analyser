@@ -181,11 +181,12 @@
                                 },
                                 {
                                     "question": "Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?",
-                                    "answer": "These are all standard networking errors indicating a DNS name resolution failure. This means your local system or Homebridge host is unable to resolve the IP address for the Home Connect API servers (`api.home-connect.com`). This is usually caused by a transient loss of internet connectivity, a local router performing a reboot, or network misconfiguration.\n\nTo resolve this issue, ensure your Homebridge server has a stable internet connection and check the following:\n\n1. **Diagnostic Commands**: Test DNS resolution from a shell on the same system using `dig api.home-connect.com` or `nslookup api.home-connect.com`.\n2. **DNS Provider**: If your system is configured to use your router as its DNS server via DHCP, try manually setting a public DNS provider (such as Google's `8.8.8.8` or Cloudflare's `1.1.1.1`) in your operating system's network configuration.\n3. **Network Filtering**: Verify if any local firewall or DNS filtering (like Pi-hole or AdGuard Home) is blocking requests to `api.home-connect.com` or its underlying Amazon Web Services (AWS) endpoints.\n\nIf you are using a Docker container then perform these diagnostics within the container environment, and additionally try:\n\n1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try disabling IPv6 for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or forcing a specific DNS provider using `--dns 1.1.1.1`.\n2. **Network Mode**: Consider switching the container to `host` network mode to bypass Docker's internal bridge networking if issues persist.\n\nThe plugin will automatically attempt to reconnect once the network connection is restored.",
+                                    "answer": "These are all standard networking errors indicating a DNS name resolution failure. This means your local system or Homebridge host is unable to resolve the IP address for the Home Connect API servers (`api.home-connect.com`). This is usually caused by a transient loss of internet connectivity, a local router performing a reboot, or network misconfiguration. If these errors occur at a consistent time each day, check for scheduled maintenance or automated reboots of your networking hardware.\n\nTo resolve this issue, ensure your Homebridge server has a stable internet connection and check the following:\n\n1. **Diagnostic Commands**: Test DNS resolution from a shell on the same system using `dig api.home-connect.com` or `nslookup api.home-connect.com`.\n2. **DNS Provider**: If your system is configured to use your router as its DNS server via DHCP, try manually setting a public DNS provider (such as Google's `8.8.8.8` or Cloudflare's `1.1.1.1`) in your operating system's network configuration.\n3. **Network Filtering**: Verify if any local firewall or DNS filtering (like Pi-hole or AdGuard Home) is blocking requests to `api.home-connect.com` or its underlying Amazon Web Services (AWS) endpoints.\n\nIf you are using a Docker container then perform these diagnostics within the container environment, and additionally try:\n\n1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try disabling IPv6 for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or forcing a specific DNS provider using `--dns 1.1.1.1`.\n2. **Network Mode**: Consider switching the container to `host` network mode to bypass Docker's internal bridge networking if issues persist.\n\nThe plugin will automatically attempt to reconnect once the network connection is restored.",
                                     "included_ids": [
                                         "issue-137-6081",
                                         "issue-276-cc5b",
-                                        "issue-351-80b2"
+                                        "issue-351-80b2",
+                                        "issue-50-4e01"
                                     ]
                                 },
                                 {
@@ -215,14 +216,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 50,
-                                    "id": "issue-50-4e01",
-                                    "question": "What does the error `getaddrinfo EAI_AGAIN api.home-connect.com` mean?",
-                                    "answer": "The `getaddrinfo EAI_AGAIN` error indicates a DNS resolution failure, meaning the system running Homebridge was unable to resolve the Home Connect API hostname. This is typically caused by external network environment factors rather than the plugin itself.\n\nCommon causes include:\n* Scheduled reboots of routers or network infrastructure.\n* Temporary outages or timeouts from the configured DNS provider.\n* Intermittent local network connectivity issues.\n\nIf these errors occur at a consistent time each day, check for scheduled maintenance or automated reboots of your networking hardware."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

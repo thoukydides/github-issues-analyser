@@ -276,8 +276,8 @@ The error `Home Connect API error: Home Connect subsystem not available [503]` i
 
 #### Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?
 
-<!-- INCLUDES: issue-137-6081 issue-276-cc5b issue-351-80b2 -->
-These are all standard networking errors indicating a DNS name resolution failure. This means your local system or Homebridge host is unable to resolve the IP address for the Home Connect API servers (`api.home-connect.com`). This is usually caused by a transient loss of internet connectivity, a local router performing a reboot, or network misconfiguration.
+<!-- INCLUDES: issue-50-4e01 issue-137-6081 issue-276-cc5b issue-351-80b2 -->
+These are all standard networking errors indicating a DNS name resolution failure. This means your local system or Homebridge host is unable to resolve the IP address for the Home Connect API servers (`api.home-connect.com`). This is usually caused by a transient loss of internet connectivity, a local router performing a reboot, or network misconfiguration. If these errors occur at a consistent time each day, check for scheduled maintenance or automated reboots of your networking hardware.
 
 To resolve this issue, ensure your Homebridge server has a stable internet connection and check the following:
 
@@ -332,18 +332,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name like `94a08da1...`). Deleting this will require you to re-authorise the plugin.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge**. The plugin will fetch fresh data from the Home Connect API.
-
-#### 🚧 What does the error `getaddrinfo EAI_AGAIN api.home-connect.com` mean? 🚧
-
-<!-- INCLUDES: issue-50-4e01 -->
-The `getaddrinfo EAI_AGAIN` error indicates a DNS resolution failure, meaning the system running Homebridge was unable to resolve the Home Connect API hostname. This is typically caused by external network environment factors rather than the plugin itself.
-
-Common causes include:
-* Scheduled reboots of routers or network infrastructure.
-* Temporary outages or timeouts from the configured DNS provider.
-* Intermittent local network connectivity issues.
-
-If these errors occur at a consistent time each day, check for scheduled maintenance or automated reboots of your networking hardware.
 
 ### Local/Remote Control
 
