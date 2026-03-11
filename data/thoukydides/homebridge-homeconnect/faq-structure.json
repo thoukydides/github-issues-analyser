@@ -245,9 +245,10 @@
                                 },
                                 {
                                     "question": "Why does my appliance report `Control scope has not been authorised` or `insufficient_scope`?",
-                                    "answer": "This error occurs because the Home Connect API requires specific authorisation scopes to control **Oven** or **Hob** programs. While these were previously restricted, they were made available to independent developers in March 2021. If you authorised the plugin's connection to Home Connect prior to this, you must force a re-authorisation:\n\n1. Stop Homebridge.\n2. Delete the cached token file in the plugin's persistent storage directory (usually `~/.homebridge/homebridge-homeconnect/persist/94a08da1fecbb6e8b46990538c7b50b2`).\n3. Restart Homebridge.\n4. Follow the authorisation link provided in the logs or Homebridge UI to sign in again.\n\nNote that `FridgeFreezer-Images` scope remains restricted to approved business partners and is not supported by this plugin. The Home Connect API documentation describes it as requiring an \"Additional Partner Agreement\".",
+                                    "answer": "This error occurs because the Home Connect API requires specific authorisation scopes (such as `Oven-Control`) to control **Oven** or **Hob** programs. While these were previously restricted to business partners, they were made available to independent developers in March 2021. If you authorised the plugin's connection to Home Connect prior to this, your token will not include the necessary permissions.\n\nTo resolve this, you must force a re-authorisation:\n\n1. Stop Homebridge.\n2. Delete the cached token file in the plugin's persistent storage directory (usually `~/.homebridge/homebridge-homeconnect/persist/94a08da1fecbb6e8b46990538c7b50b2`).\n3. Restart Homebridge.\n4. Follow the authorisation link provided in the logs or Homebridge UI to sign in again.\n\nNote that the `FridgeFreezer-Images` scope remains restricted to approved business partners and is not supported by this plugin. The Home Connect API documentation describes it as requiring an \"Additional Partner Agreement\".",
                                     "included_ids": [
-                                        "issue-5-3245"
+                                        "issue-5-3245",
+                                        "issue-30-449e"
                                     ]
                                 },
                                 {
@@ -272,14 +273,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 30,
-                                    "id": "issue-30-449e",
-                                    "question": "Why does my oven show a `Control scope has not been authorised` error when trying to start a program?",
-                                    "answer": "Historically, the Home Connect API restricted the `Oven-Control` scope to business partners only, which prevented third-party integrations from starting or stopping oven programs. This restriction was lifted by Home Connect in March 2021.\n\nIf you are seeing this error, it is because your current authorisation token was issued before this scope became available to individual developer accounts and does not include the necessary permissions. To resolve this, you must force the plugin to re-authorise with the Home Connect API servers:\n\n1. Stop Homebridge.\n2. Delete the persistence file located at `~/.homebridge/homebridge-homeconnect/persist/94a08da1fecbb6e8b46990538c7b50b2`.\n3. Restart Homebridge.\n4. Check the logs for a new authorisation URL and follow the instructions to link your account again.\n\nThis process refreshes the OAuth token and includes the `Control` scope required for all supported appliance types."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

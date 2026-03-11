@@ -355,15 +355,17 @@ This plugin exposes the appliance's Local Control status via the `Program Mode` 
 
 #### Why does my appliance report `Control scope has not been authorised` or `insufficient_scope`?
 
-<!-- INCLUDES: issue-5-3245 -->
-This error occurs because the Home Connect API requires specific authorisation scopes to control **Oven** or **Hob** programs. While these were previously restricted, they were made available to independent developers in March 2021. If you authorised the plugin's connection to Home Connect prior to this, you must force a re-authorisation:
+<!-- INCLUDES: issue-5-3245 issue-30-449e -->
+This error occurs because the Home Connect API requires specific authorisation scopes (such as `Oven-Control`) to control **Oven** or **Hob** programs. While these were previously restricted to business partners, they were made available to independent developers in March 2021. If you authorised the plugin's connection to Home Connect prior to this, your token will not include the necessary permissions.
+
+To resolve this, you must force a re-authorisation:
 
 1. Stop Homebridge.
 2. Delete the cached token file in the plugin's persistent storage directory (usually `~/.homebridge/homebridge-homeconnect/persist/94a08da1fecbb6e8b46990538c7b50b2`).
 3. Restart Homebridge.
 4. Follow the authorisation link provided in the logs or Homebridge UI to sign in again.
 
-Note that `FridgeFreezer-Images` scope remains restricted to approved business partners and is not supported by this plugin. The Home Connect API documentation describes it as requiring an "Additional Partner Agreement".
+Note that the `FridgeFreezer-Images` scope remains restricted to approved business partners and is not supported by this plugin. The Home Connect API documentation describes it as requiring an "Additional Partner Agreement".
 
 #### Why is there a delay when controlling appliances via HomeKit?
 
@@ -395,20 +397,6 @@ Frequent transitions between `Connected` and `Disconnected` states usually indic
 - **Local Network**: Weak Wi-Fi signals or intermittent internet drops can cause the appliance to lose its cloud heartbeat.
 
 When these disconnections occur, the plugin logs the event and updates the HomeKit status to reflect that the device is unreachable. This is a reporting of the appliance's actual cloud state and cannot be resolved via plugin code changes.
-
-#### 🚧 Why does my oven show a `Control scope has not been authorised` error when trying to start a program? 🚧
-
-<!-- INCLUDES: issue-30-449e -->
-Historically, the Home Connect API restricted the `Oven-Control` scope to business partners only, which prevented third-party integrations from starting or stopping oven programs. This restriction was lifted by Home Connect in March 2021.
-
-If you are seeing this error, it is because your current authorisation token was issued before this scope became available to individual developer accounts and does not include the necessary permissions. To resolve this, you must force the plugin to re-authorise with the Home Connect API servers:
-
-1. Stop Homebridge.
-2. Delete the persistence file located at `~/.homebridge/homebridge-homeconnect/persist/94a08da1fecbb6e8b46990538c7b50b2`.
-3. Restart Homebridge.
-4. Check the logs for a new authorisation URL and follow the instructions to link your account again.
-
-This process refreshes the OAuth token and includes the `Control` scope required for all supported appliance types.
 
 ### Programs and Options
 
