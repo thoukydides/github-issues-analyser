@@ -1012,7 +1012,7 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- PARTITION -->
+<!-- PARTITION: Plugin Storage and Persistence -->
 
 #### Why does the log show a `node-persist` error stating a file `does not look like a valid storage file`?
 
