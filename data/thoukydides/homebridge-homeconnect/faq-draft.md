@@ -100,6 +100,7 @@
     - [Why are features available in IFTTT or the official app missing from this plugin?](#why-are-features-available-in-ifttt-or-the-official-app-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
+    - [Why does the log show a `node-persist` error stating a file `does not look like a valid storage file`?](#why-does-the-log-show-a-node-persist-error-stating-a-file-does-not-look-like-a-valid-storage-file)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -1011,21 +1012,22 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- PARTITION: Plugin Storage and Persistence Issues -->
+<!-- PARTITION -->
 
-#### 🚧 Why does the log show a `node-persist` error stating a file `does not look like a valid storage file`? 🚧
+#### Why does the log show a `node-persist` error stating a file `does not look like a valid storage file`?
 
 <!-- INCLUDES: issue-47-ce58 -->
 This error indicates that a file in the plugin's persistent cache has become corrupted. Corruption typically occurs if the Homebridge process was terminated abruptly while the plugin was writing to the cache, or if multiple instances of Homebridge are running concurrently and incorrectly sharing the same `--user-storage-path`.
 
 The plugin is designed to handle this automatically by treating a corrupted cache file as missing and re-acquiring the necessary data from the Home Connect API. However, if the corrupted file contains your OAuth tokens, you will be required to re-authorise the plugin with your Home Connect account.
 
-If the error persists and causes stability issues, you can manually clear the cache:
+If the error persists or causes stability issues, you can manually clear the cache:
+
 1. Stop Homebridge.
 2. Locate the `persist` directory within your Homebridge storage (typically `/var/lib/homebridge/homebridge-homeconnect/persist/`).
 3. Delete the specific file mentioned in the error log.
 4. Restart Homebridge.
 
-Please note that deleting the file `94a08da1fecbb6e8b46990538c7b50b2` specifically will always require the plugin to be re-authorised with the Home Connect servers.
+Please note that deleting the file `94a08da1fecbb6e8b46990538c7b50b2` will always require the plugin to be re-authorised with the Home Connect servers.
 
 <!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-56-ce35 issue-57-6cdc issue-65-324a issue-67-1639 issue-72-52a3 issue-77-48d3 issue-77-ea0e issue-78-26c0 issue-80-1fb6 issue-84-bee9 issue-85-0a95 issue-89-ea9b issue-91-e7db issue-93-7521 issue-97-c838 issue-108-a5c4 issue-116-e2ec issue-118-9a71 issue-141-5245 issue-144-f92c issue-145-8923 issue-164-bbc4 issue-181-e108 issue-190-235a issue-194-f6ee issue-195-84f2 issue-196-8511 issue-239-ce99 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
