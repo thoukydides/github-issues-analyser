@@ -54,11 +54,11 @@
     - [Why are ambient light colour or brightness controls missing or restricted?](#why-are-ambient-light-colour-or-brightness-controls-missing-or-restricted)
   - **[Appliance Status](#appliance-status)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
-    - [Why is my appliance unresponsive in Homebridge but working in the Home Connect app?](#why-is-my-appliance-unresponsive-in-homebridge-but-working-in-the-home-connect-app)
+    - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
     - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
     - [Why does my dishwasher trigger a Program Finished event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
-    - [Why is my Homebridge log filling up with oven `Event STATUS` temperature messages?](#why-is-my-homebridge-log-filling-up-with-oven-event-status-temperature-messages)
+    - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
@@ -612,18 +612,18 @@ To troubleshoot:
 2. Restart Homebridge to force the plugin to subscribe to a fresh event stream.
 3. Ensure your network configuration does not prematurely terminate long-lived TCP connections.
 
-#### Why is my appliance unresponsive in Homebridge but working in the Home Connect app?
+#### Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?
 
-<!-- INCLUDES: issue-40-61af issue-41-4190 issue-71-a9f3 -->
+<!-- INCLUDES: issue-40-61af issue-41-4190 issue-61-67ee issue-71-a9f3 -->
 The official Home Connect mobile app can communicate with appliances via two distinct paths: a local network connection (when your phone and appliance are on the same Wi-Fi) and a private interface to the Home Connect cloud servers. All third-party integrations, including this plugin, are restricted to using the public cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection.
 
-To diagnose this, check the appliance's cloud connectivity in the official app:
+When the plugin logs `The appliance is offline`, it is reporting the status received directly from the Home Connect API servers. To diagnose this, check the appliance's cloud connectivity in the official app:
 
 1. Open the Home Connect app and navigate to the appliance settings.
-2. Locate the **Network** section. A fully functional connection is shown by three green lines between the phone, the cloud, and the appliance. If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.
+2. Locate the **Network** section. Ensure that all three connection stages (**appliance-app**, **appliance-cloud**, and **app-cloud**) are reported as active (typically shown by three green lines). If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.
 3. Alternatively, disable Wi-Fi on your mobile device to force the app to use cellular data. If the appliance becomes unresponsive in the app, the issue is with its connection to the Home Connect servers.
 
-You can often resolve this by power cycling the appliance. If problems persist, check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages or ensure your network is not blocking outbound connections.
+You can often resolve this by power cycling the appliance at the mains. If problems persist, check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages. Most connectivity issues are transient and will resolve themselves once the appliance reconnects to the servers or the cloud service stabilises.
 
 #### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
@@ -649,11 +649,18 @@ This is a transient server-side or firmware issue that cannot be corrected by th
 <!-- INCLUDES: issue-66-f64f -->
 Some Bosch dishwasher models appear to re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a connection to the Home Connect cloud after being offline. The plugin maps events from the API directly to HomeKit triggers; therefore, these re-broadcasts are passed through as button presses or notifications. This is a quirk of the appliance firmware or API event handling rather than a defect in the plugin itself.
 
-#### Why is my Homebridge log filling up with oven `Event STATUS` temperature messages?
+#### Why is the log filling up with oven `Event STATUS` temperature messages?
 
-These events are generated whenever the Home Connect servers report a change in the appliance's internal temperature. Most ovens remain in a standby state after use where they continue to monitor and report cooling progress.
+<!-- INCLUDES: issue-64-c039 -->
+These events are generated whenever the Home Connect servers report a change in the appliance's internal temperature. Home Connect appliances, such as ovens, typically remain in a standby state rather than being fully powered off unless disconnected from the mains. In this state, the appliance continues to monitor internal sensors and communicates changes to the Home Connect servers.
 
-The plugin logs all status information reported by the API. To prevent these messages from cluttering your main logs, it is recommended to run the plugin in a separate Homebridge **Child Bridge**. This isolates the plugin's output and ensures that high-volume events do not obscure logs from other plugins.
+Several factors can increase the frequency of these log entries:
+
+* **Temperature Units**: Using Fahrenheit (°F) instead of Celsius (°C) effectively doubles the reporting sensitivity, as smaller numerical increments in temperature change trigger updates more frequently.
+* **Environmental Factors**: Residual heat cooling down after use, or fluctuations caused by the oven door being left open.
+* **Sensor Characteristics**: Some appliance models may have more sensitive or noisy temperature sensors than others.
+
+There is no configuration option within the plugin to suppress these specific status messages. To prevent them from cluttering your main logs, it is recommended to run the plugin in a separate Homebridge **Child Bridge**. This isolates the plugin's output and ensures that high-volume events do not obscure logs from other plugins.
 
 #### Why does the log periodically show `Found X appliances (0 added, 0 removed)`?
 
@@ -688,7 +695,7 @@ No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk
 <!-- INCLUDES: issue-52-1e99 -->
 The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.
 
-If accessories spontaneously disappear, reappear, or lose their HomeKit configuration(e.g. room assignments, custom names, scenes, or automations) it is usually due to one of the following:
+If accessories spontaneously disappear, reappear, or lose their HomeKit configuration (e.g. room assignments, custom names, scenes, or automations) it is usually due to one of the following:
 
 1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations are lost.
 2. **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.
@@ -697,31 +704,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why is my appliance reported as offline even though the official Home Connect app works? 🚧
-
-<!-- INCLUDES: issue-61-67ee -->
-When the plugin logs `The appliance is offline`, it is reporting the status received directly from the Home Connect API servers. An appliance may appear functional in the official Home Connect app while remaining unreachable via the API because the app often uses a direct local connection to the appliance when on the same Wi-Fi network, whereas the plugin must communicate via the cloud.
-
-If you encounter persistent offline errors, follow these steps to diagnose the connection:
-
-*   Check the [Home Connect Service Status](https://www.thouky.co.uk/homeconnect.html) to see if there are known issues with the Home Connect API servers.
-*   Verify the cloud connection in the official Home Connect app by turning off Wi-Fi on your mobile device. If the app cannot control the appliance over a cellular/mobile data connection, the issue lies with the appliance's connection to the Home Connect cloud.
-*   In the Home Connect app, navigate to the appliance settings and locate the **Network** section. Ensure that all three connection stages (**appliance-app**, **appliance-cloud**, and **app-cloud**) are reported as active.
-
-In most cases, these connectivity issues are transient and will resolve themselves without user intervention once the appliance reconnects to the servers or the cloud service stabilises.
-
-#### 🚧 Why are my logs filled with `[Oven] Event STATUS` messages when the oven is not in use? 🚧
-
-<!-- INCLUDES: issue-64-c039 -->
-Home Connect appliances, such as ovens, typically remain in a **Standby** state rather than being fully powered off unless disconnected from the mains. In this state, the appliance continues to monitor internal sensors and communicates changes to the Home Connect servers. The plugin logs these `STATUS` events as they are received from the API to ensure the state in HomeKit remains synchronised.
-
-Several factors can increase the frequency of these log entries:
-1. **Temperature Units**: Using Fahrenheit (°F) instead of Celsius (°C) effectively doubles the reporting sensitivity, as smaller numerical increments in temperature change trigger updates more frequently.
-2. **Environmental Factors**: Residual heat cooling down after use, or fluctuations caused by the oven door being left open.
-3. **Sensor Characteristics**: Some appliance models may have more sensitive or noisy temperature sensors than others.
-
-There is no configuration option within the plugin to disable specific appliances or suppress these status messages. If the log volume is problematic, the recommended approach is to run the plugin as a **Child Bridge** within Homebridge or in a separate Homebridge instance. This isolates the logs and prevents them from cluttering the output of other plugins.
 
 ## Apple HomeKit
 
