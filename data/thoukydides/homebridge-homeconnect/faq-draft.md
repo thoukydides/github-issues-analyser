@@ -854,9 +854,15 @@ The Apple Home app only displays numeric labels (e.g. "Button 1") for these serv
 
 #### Why does the Home app show two (or more) tiles for one appliance?
 
-This is standard Apple Home behaviour. To keep the interface organised, Apple separates different service types into distinct tiles. Specifically, a separate tile is created for the `Stateless Programmable Switch` services used for event triggers.
+<!-- INCLUDES: issue-59-cd94 -->
+This is a characteristic of how the Apple Home app handles different types of HomeKit services. Each Home Connect appliance is exposed as a single HomeKit **Accessory**, but that accessory contains multiple **Services** to provide different functionality:
 
-While you can toggle **Show as Separate Tiles** in the accessory settings, Apple does not currently allow these buttons to be merged into the primary appliance tile. If you do not use these events for automations, you can disable them in the plugin configuration to prevent them from appearing in the Home app.
+- **Functional Services**: `Switch` services are used to control power and start/stop specific programs.
+- **Notification Services**: `Stateless Programmable Switch` services are used to report appliance events, such as alarms or program completion.
+
+The Apple Home app (from iOS 14 onwards) defaults to grouping most service types onto a single tile, but it typically places `Stateless Programmable Switch` services on a separate second tile. While you can toggle **Show as Separate Tiles** in the accessory settings to split them further, the Home app currently does not provide a way to merge these notification switches into the primary appliance tile.
+
+Note that this is purely a user interface display characteristic. Other HomeKit apps, such as *Eve* or *Home+*, may group these services differently. This grouping also has no effect on Siri voice control, which interacts with the underlying services directly. If you do not use these events for automations, you can disable them in the plugin configuration to prevent the extra tile from appearing.
 
 #### How do I get notifications for events like a program finishing?
 
@@ -879,22 +885,6 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
 Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
-
-#### 🚧 Why does my Home Connect appliance appear as two separate tiles in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-59-cd94 -->
-This behaviour is a design choice of the Apple Home app and does not indicate that your appliance is duplicated in the plugin or Homebridge.
-
-Each Home Connect appliance is exposed as a single HomeKit **Accessory**. This accessory contains several **Services** to provide different functionality:
-1. **Functional Services**: `Switch` services are used to control power and start/stop specific programs.
-2. **Notification Services**: `Stateless Programmable Switch` services are used to report appliance events, such as alarms or program completion.
-
-The Apple Home app (from iOS 14 onwards) defaults to grouping most service types onto a single tile, but it typically places `Stateless Programmable Switch` services on a separate second tile. While you can select the **Show as Separate Tiles** option in the accessory settings to split them further, the Home app currently does not provide a way to merge the notification switches into the primary appliance tile.
-
-It is important to note:
-- This is purely a user interface display characteristic of the Apple Home app. Other HomeKit apps, such as Eve, may group these services differently.
-- This display grouping has no effect on Siri voice control. Siri interacts with the underlying services directly, regardless of how they are tiled in the app.
-- If you prefer a different layout, you may wish to explore third-party HomeKit apps that offer more customisation over service presentation.
 
 ### Siri
 

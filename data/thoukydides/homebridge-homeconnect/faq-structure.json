@@ -785,8 +785,10 @@
                                 },
                                 {
                                     "question": "Why does the Home app show two (or more) tiles for one appliance?",
-                                    "answer": "This is standard Apple Home behaviour. To keep the interface organised, Apple separates different service types into distinct tiles. Specifically, a separate tile is created for the `Stateless Programmable Switch` services used for event triggers.\n\nWhile you can toggle **Show as Separate Tiles** in the accessory settings, Apple does not currently allow these buttons to be merged into the primary appliance tile. If you do not use these events for automations, you can disable them in the plugin configuration to prevent them from appearing in the Home app.",
-                                    "included_ids": []
+                                    "answer": "This is a characteristic of how the Apple Home app handles different types of HomeKit services. Each Home Connect appliance is exposed as a single HomeKit **Accessory**, but that accessory contains multiple **Services** to provide different functionality:\n\n- **Functional Services**: `Switch` services are used to control power and start/stop specific programs.\n- **Notification Services**: `Stateless Programmable Switch` services are used to report appliance events, such as alarms or program completion.\n\nThe Apple Home app (from iOS 14 onwards) defaults to grouping most service types onto a single tile, but it typically places `Stateless Programmable Switch` services on a separate second tile. While you can toggle **Show as Separate Tiles** in the accessory settings to split them further, the Home app currently does not provide a way to merge these notification switches into the primary appliance tile.\n\nNote that this is purely a user interface display characteristic. Other HomeKit apps, such as *Eve* or *Home+*, may group these services differently. This grouping also has no effect on Siri voice control, which interacts with the underlying services directly. If you do not use these events for automations, you can disable them in the plugin configuration to prevent the extra tile from appearing.",
+                                    "included_ids": [
+                                        "issue-59-cd94"
+                                    ]
                                 },
                                 {
                                     "question": "How do I get notifications for events like a program finishing?",
@@ -807,14 +809,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 59,
-                                    "id": "issue-59-cd94",
-                                    "question": "Why does my Home Connect appliance appear as two separate tiles in the Apple Home app?",
-                                    "answer": "This behaviour is a design choice of the Apple Home app and does not indicate that your appliance is duplicated in the plugin or Homebridge.\n\nEach Home Connect appliance is exposed as a single HomeKit **Accessory**. This accessory contains several **Services** to provide different functionality:\n1. **Functional Services**: `Switch` services are used to control power and start/stop specific programs.\n2. **Notification Services**: `Stateless Programmable Switch` services are used to report appliance events, such as alarms or program completion.\n\nThe Apple Home app (from iOS 14 onwards) defaults to grouping most service types onto a single tile, but it typically places `Stateless Programmable Switch` services on a separate second tile. While you can select the **Show as Separate Tiles** option in the accessory settings to split them further, the Home app currently does not provide a way to merge the notification switches into the primary appliance tile.\n\nIt is important to note:\n- This is purely a user interface display characteristic of the Apple Home app. Other HomeKit apps, such as Eve, may group these services differently.\n- This display grouping has no effect on Siri voice control. Siri interacts with the underlying services directly, regardless of how they are tiled in the app.\n- If you prefer a different layout, you may wish to explore third-party HomeKit apps that offer more customisation over service presentation."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
