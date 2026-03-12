@@ -1,14 +1,12 @@
 {
     "issue_number": 48,
-    "updated_at": "2026-02-14T04:56:17.905Z",
+    "updated_at": "2026-03-12T13:36:31.181Z",
     "faq": [
         {
-            "question": "Can I see the remaining time of an appliance programme in HomeKit?",
-            "answer": "Yes, the remaining duration is available, but there are limitations on how it is displayed within HomeKit apps:\n\n1. The remaining time is exposed via the `RemainingTime` characteristic on the main `Active Program` switch service.\n2. Apple's Home app generally only displays the `Remaining Duration` characteristic for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` accessories. As appliances do not fall into these categories, the value will not be visible in the native Home app.\n3. To view the remaining time or use it to trigger automations, you must use a third-party HomeKit app (such as Controller for HomeKit or Eve) that supports displaying non-standard characteristics for appliance services.\n\nFor more details on which characteristics are mapped to HomeKit, refer to the plugin's documentation on HomeKit mapping and recommended third-party apps.",
-            "semantic_abstract": "Home Connect appliance remaining program duration is mapped to the standard HomeKit `RemainingTime` characteristic on the `Active Program` switch service. Apple's Home app restricts the display of this characteristic to specific service types like irrigation and valves, necessitating third-party HomeKit applications for visibility or automation integration.",
-            "alternative_resolution": "Update the plugin's documentation or configuration UI to explicitly flag characteristics that are known to be invisible within the native Apple Home app to better manage user expectations.",
-            "confidence": "high",
-            "hash": "237cf4a1eafe280298e8183afd242ab24eb3f3eb96e316be164993517dda35c2"
+            "question": "Why is the remaining time for my appliance not visible in the Apple Home app?",
+            "answer": "The plugin exposes the `RemainingTime` characteristic on the main `Active Program` switch service for appliances such as washers, dryers, and dishwashers. However, this information is not displayed within Apple's Home app due to limitations in the HomeKit Accessory Protocol (HAP) specification and Apple's implementation.\n\nApple's Home app generally only displays the remaining duration for specific accessory categories, primarily `Irrigation System` and `Valve` services. Since home appliances do not fit these categories, Apple chooses to hide the characteristic even though the data is present in the HomeKit database.\n\nTo view the remaining time or use it as a trigger for automations, you must use a third-party HomeKit app that supports a broader range of characteristics. These apps can access and display the `RemainingTime` value provided by the plugin.",
+            "semantic_abstract": "The Apple Home app restricts the display of the `Remaining Duration` characteristic to specific accessory types defined in the HAP Specification, such as irrigation systems. Because the Home Connect plugin maps appliance progress to the `RemainingTime` characteristic on a `Switch` service, this data is suppressed by the native Home app while remaining accessible to third-party HomeKit clients.",
+            "hash": "b565b3524654c1e51b8e896f1826515fc56d9c064a5d7023d31993b4215cb1e0"
         }
     ]
 }
