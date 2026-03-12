@@ -44,13 +44,14 @@
     - [How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?](#how-can-i-enable-dishwasher-options-like-half-load-extra-dry-or-efficient-dry-in-homekit)
     - [Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?](#why-does-my-appliance-turn-on-automatically-switch-off-immediately-or-homebridge-startup-stall)
     - [Which settings are used for programs started without specific options?](#which-settings-are-used-for-programs-started-without-specific-options)
-    - [Why do my oven programs only run for one minute?](#why-do-my-oven-programs-only-run-for-one-minute)
+    - [How can I change the default duration or temperature for oven programs?](#how-can-i-change-the-default-duration-or-temperature-for-oven-programs)
     - [Why is the scheduled start time for my appliance program not being honoured?](#why-is-the-scheduled-start-time-for-my-appliance-program-not-being-honoured)
     - [How can I reduce the number of switches created for appliance programs?](#how-can-i-reduce-the-number-of-switches-created-for-appliance-programs)
     - [What does the log message `Using expired cache result` mean?](#what-does-the-log-message-using-expired-cache-result-mean)
     - [Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?](#why-does-setting-my-hood-fan-to-auto-in-the-home-app-not-immediately-turn-it-on)
     - [Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?](#why-does-the-plugin-log-unrecognised-powerstate-values-like-undefined-or-mainsoff)
     - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
+    - [Why are ambient light colour or brightness controls missing or restricted?](#why-are-ambient-light-colour-or-brightness-controls-missing-or-restricted)
   - **[Appliance Status](#appliance-status)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive in Homebridge but working in the Home Connect app?](#why-is-my-appliance-unresponsive-in-homebridge-but-working-in-the-home-connect-app)
@@ -397,15 +398,15 @@ Once these identifiers are added to the plugin, the warning will disappear and t
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-42-d406 issue-44-1e1b issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
-There are several reasons why features may be missing from the plugin or appear as `currently unavailable`, `advertised by appliance currently unavailable`, or `This appliance does not support any programs` in the logs:
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-42-d406 issue-44-1e1b issue-62-bd95 issue-67-1639 issue-75-7835 issue-94-e55f issue-122-9466 issue-157-61a1 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+There are several reasons why features (such as coffee temperature or beverage quantity) may be missing from the plugin or appear as `currently unavailable`, `advertised by appliance currently unavailable`, or `This appliance does not support any programs` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
 - **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.
 
-If a program is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
+If a program or option is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
 
 #### Why are fan controls missing for my integrated venting hob?
 
@@ -516,11 +517,18 @@ When a program is started without explicit option configuration, the plugin does
 
 To view the default values for each program option, enable **Debug Logging**, use the HomeKit **Identify** function, and check the debug log. Specific options such as coffee strength or beverage volume can be customised in the plugin configuration, most easily through the Homebridge UI interface.
 
-#### Why do my oven programs only run for one minute?
+#### How can I change the default duration or temperature for oven programs?
 
-When started remotely via the API, oven programs **must** have a defined duration. If no duration is provided by the plugin, the Home Connect API typically defaults to a value of 60 seconds.
+<!-- INCLUDES: issue-55-16dd issue-70-9b78 -->
+When started remotely via the API, oven programs **must** have a defined duration. If no duration is provided, the Home Connect API typically defaults to 60 seconds. The API does not currently support starting an oven program without a duration or with a value representing infinity.
 
-To resolve this, use the **Custom list of programs and options** in the plugin settings to explicitly set a `Duration` (for example, `3600` seconds) for your oven switches. This ensures the oven remains on until the timer expires or you manually stop it.
+To customise the default duration or temperature, you must define the programs explicitly within the plugin settings using the **Custom list of programs and options**. For example, to set a one-hour duration and a specific temperature:
+
+1. Enable **Add programs** and select **Custom list**.
+2. Define the program key (e.g. `Cooking.Oven.Program.HeatingMode.HotAir`).
+3. In the options, set `BSH.Common.Option.Duration` to `3600` (in seconds) and `Cooking.Oven.Option.SetpointTemperature` to your desired value.
+
+Using a configuration editor like the Homebridge UI interface is recommended to ensure the JSON structure is correct and to assist in selecting the appropriate program keys for your specific model.
 
 #### Why is the scheduled start time for my appliance program not being honoured?
 
@@ -575,110 +583,19 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
-#### 🚧 Why are ambient light colour and brightness controls missing for my hood or dishwasher? 🚧
+#### Why are ambient light colour or brightness controls missing or restricted?
 
-<!-- INCLUDES: issue-24-8ee6 -->
-The Home Connect API often omits certain settings, such as `BSH.Common.Setting.AmbientLightBrightness` and `BSH.Common.Setting.AmbientLightCustomColor`, from its responses if the appliance or the light itself is switched off. Furthermore, the API implements two mutually exclusive control modes for ambient lighting:
+<!-- INCLUDES: issue-24-8ee6 issue-42-e5af issue-54-196a -->
+The Home Connect API often omits ambient light settings from its responses if the appliance or the light itself is switched off. Furthermore, the API implements two mutually exclusive control modes for ambient lighting:
 
-1. `CustomColor` mode: The brightness is integrated into the `BSH.Common.Setting.AmbientLightCustomColor` value. The separate `BSH.Common.Setting.AmbientLightBrightness` setting is typically unavailable or ignored by the API in this mode.
-2. Fixed colour mode: The light uses one of the predefined colours (1-99). In this mode, `BSH.Common.Setting.AmbientLightBrightness` is used to control intensity, but `BSH.Common.Setting.AmbientLightCustomColor` is unavailable.
+1. `CustomColor` mode: Brightness is integrated into the `BSH.Common.Setting.AmbientLightCustomColor` value. The separate `BSH.Common.Setting.AmbientLightBrightness` setting is typically unavailable or ignored by the API in this mode.
+2. Fixed colour mode: The light uses predefined colours. In this mode, `BSH.Common.Setting.AmbientLightBrightness` controls intensity, but `BSH.Common.Setting.AmbientLightCustomColor` is unavailable.
 
-To resolve this and properly expose all characteristics to HomeKit, the plugin attempts to automatically discover these capabilities during its first run. If the ambient light is off, the plugin will briefly switch it on to query the supported settings and colour ranges before restoring the original power state. Once discovered, these capabilities are stored in the plugin's cache. If you still encounter missing controls, you can try the following:
+Additionally, some appliance categories have specific restrictions. For instance, while many dishwasher models include internal lighting hardware, the public Home Connect API has historically restricted lighting control to Hood appliances. 
 
-* Manually switch on the ambient light and set it to a custom colour using the official Home Connect app.
-* Restart Homebridge to allow the plugin to re-scan the active settings.
-* If the issue persists, deleting the plugin's cache file (excluding the file containing OAuth tokens) and restarting Homebridge while the light is on will force a clean rediscovery.
-
-#### 🚧 Why can I not control the ambient light on my dishwasher? 🚧
-
-<!-- INCLUDES: issue-42-e5af -->
-Although many dishwasher models include hardware for internal or ambient lighting, the Home Connect API currently restricts control of this feature to Hood appliances. This is a technical limitation of the manufacturer's API specification rather than the plugin itself.
-
-Even if you can control the lighting via the physical buttons on the machine or the official Home Connect app, the third-party API used by this plugin does not yet expose these controls for the dishwasher category. Support will be added if and when the API specification is updated by the manufacturer to include this functionality for dishwashers.
-
-#### 🚧 Why does my Home Connect appliance ambient light only show on/off but not colour in HomeKit? 🚧
-
-<!-- INCLUDES: issue-54-196a -->
-Some Home Connect appliances only report specific settings, such as `BSH.Common.Setting.AmbientLightColor`, when the ambient light is currently switched on. To handle this, the plugin attempts to temporarily switch the light on during its initial discovery process to detect all available features.
-
-If the colour control is missing despite the appliance supporting it in the official Home Connect app, it is usually because this discovery process was interrupted. Common causes include:
-1.  **Remote Control Lockout**: If the appliance was being operated manually or via the official app during Homebridge startup, the API may have temporarily blocked the plugin from switching the light on.
-2.  **API Latency**: The appliance may take longer to report its new capabilities than the plugin's timeout allowed during the initial check.
-3.  **Cached Capabilities**: The plugin caches the appliance's capabilities for 24 hours. If discovery failed once, the limited feature set will be remembered until the cache expires or is manually cleared.
-
-To resolve this and force a re-discovery:
-1.  Stop Homebridge.
-2.  Locate the `persist` directory (typically `~/.homebridge/homebridge-homeconnect/persist`).
-3.  Identify the cache file for your appliance. The filename is an MD5 hash of the appliance's name followed by the word `cache` (e.g., `a7ea3482f629...`).
-4.  Delete this cache file.
-5.  Ensure the appliance is not being used, then restart Homebridge. The plugin will attempt to re-detect the ambient light capabilities.
-
-#### 🚧 How can I change the default duration or temperature for oven programs? 🚧
-
-<!-- INCLUDES: issue-55-16dd -->
-By default, oven programs may start with minimum or pre-defined durations (such as 60 seconds) that do not meet your requirements. To customise these values, you must define the programs explicitly within your `config.json` using the `custom` programs configuration.
-
-To configure custom program settings:
-
-1. Locate the configuration section for your specific appliance using its identifier.
-2. Set the `addprograms` property to `custom`.
-3. Define a `programs` array containing the specific modes you wish to use.
-4. Within each program object, use the `options` block to specify technical keys such as `BSH.Common.Option.Duration` (defined in seconds) and `Cooking.Oven.Option.SetpointTemperature`.
-
-Example configuration for an oven:
-
-```json
-{
-    "SIEMENS-HB678GBS6B-XXXX": {
-        "addprograms": "custom",
-        "programs": [
-            {
-                "name": "Preheat",
-                "key": "Cooking.Oven.Program.HeatingMode.HotAir",
-                "selectonly": false,
-                "options": {
-                    "Cooking.Oven.Option.SetpointTemperature": 200,
-                    "BSH.Common.Option.Duration": 3600,
-                    "Cooking.Oven.Option.FastPreHeat": true
-                }
-            },
-            {
-                "name": "Pizza",
-                "key": "Cooking.Oven.Program.HeatingMode.PizzaSetting",
-                "selectonly": false,
-                "options": {
-                    "Cooking.Oven.Option.SetpointTemperature": 275,
-                    "BSH.Common.Option.Duration": 3600
-                }
-            }
-        ]
-    }
-}
-```
-
-You should use a configuration editor like `homebridge-config-ui-x` to ensure the JSON structure is valid and to help select the correct program keys for your specific appliance model.
-
-#### 🚧 Why are some coffee machine programs or options like temperature or strength missing? 🚧
-
-<!-- INCLUDES: issue-62-bd95 -->
-The plugin dynamically populates the list of programs and options (such as temperature, quantity, or bean strength) based on the data returned by the Home Connect API for your specific appliance. If certain settings are available on the physical appliance but do not appear in the Homebridge configuration menus, it is typically because the Home Connect API or the appliance firmware does not expose them for remote control.
-
-The plugin cannot add options that are not supported by the API. To verify exactly what your appliance is reporting to the plugin, you can perform the following steps:
-
-1. Open the Home app on your Apple device.
-2. Find the appliance and trigger the **Identify** function.
-3. Examine the Homebridge logs for the output generated by the identification process.
-
-These logs will contain a comprehensive list of all programs and options that the Home Connect API makes available for your model. If an option is missing from these logs, it is an API-level limitation and cannot be addressed within the plugin.
-
-#### 🚧 Why do my oven programmes only run for one minute when started via Homebridge? 🚧
-
-<!-- INCLUDES: issue-70-9b78 -->
-This is a limitation of the Home Connect API and how it interacts with appliance firmware. All oven programmes require a `BSH.Common.Option.Duration` value to be specified. If a duration is not explicitly provided when starting a programme via the API, the appliance applies its own internal default, which is typically 60 seconds.
-
-The Home Connect API does not currently support starting an oven programme without a duration or with a value representing infinity. This behaviour is also observed in the official Home Connect app; programmes with no set duration can only be started using the physical controls on the appliance itself.
-
-To ensure your oven stays on for the required time (for example, when pre-heating), you should explicitly configure a sufficiently long duration in your scene or automation, such as 3600 seconds (one hour).
+To properly expose all supported characteristics to HomeKit, the plugin attempts to automatically discover these capabilities during its first run by briefly switching the light on. If controls are missing:
+1. Ensure the appliance is not being operated manually and restart Homebridge to allow the plugin to re-scan active settings.
+2. If the issue persists, stop Homebridge and delete the appliance's cache file (not the authorisation file) in the `persist` directory, then restart Homebridge while the appliance is online.
 
 ### Appliance Status
 
