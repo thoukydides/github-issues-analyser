@@ -886,16 +886,16 @@
                                     "included_ids": [
                                         "issue-53-27e2"
                                     ]
+                                },
+                                {
+                                    "question": "Are there specific operating system requirements for the plugin?",
+                                    "answer": "The `homebridge-homeconnect` plugin is designed to be platform-agnostic and does not have any external dependencies beyond `homebridge` and `Node.js`. It should function correctly on any operating system that supports these two components, including various versions of Raspberry Pi OS.\n\nWhen upgrading your operating system, such as moving between Raspberry Pi OS releases, keep the following in mind:\n\n* **Node.js Compatibility**: The most significant risk during an OS upgrade is a change to the major version of `Node.js`. Ensure that the `Node.js` version provided by your new OS is compatible with both `homebridge` and the latest version of this plugin.\n* **Standard Tools**: Using standard management tools like `homebridge-config-ui-x` for installation and configuration is recommended to ensure a consistent environment.\n* **Isolation of Issues**: If problems arise after an OS update, verify that `homebridge` and other plugins are working correctly to determine if the issue is specific to this plugin or the broader environment.",
+                                    "included_ids": [
+                                        "issue-65-719f"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 65,
-                                    "id": "issue-65-719f",
-                                    "question": "Are there specific operating system requirements for the homebridge-homeconnect plugin?",
-                                    "answer": "The `homebridge-homeconnect` plugin is designed to be platform-agnostic and does not have any external dependencies beyond `homebridge` and `Node.js`. It should function correctly on any operating system that supports these two components, including various versions of Raspberry Pi OS (formerly Raspbian).\n\nWhen upgrading your operating system, such as moving between Raspberry Pi OS releases, keep the following in mind:\n* **Node.js Compatibility**: The most significant risk during an OS upgrade is a change to the major version of `Node.js`. Ensure that the `Node.js` version provided by your new OS is compatible with both `homebridge` and the latest version of this plugin.\n* **Standard Tools**: Using standard management tools like `homebridge-config-ui-x` for installation and configuration is recommended to ensure a consistent environment.\n* **Isolation of Issues**: If problems arise after an OS update, verify that `homebridge` and other plugins are working correctly to determine if the issue is specific to this plugin or the broader environment."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

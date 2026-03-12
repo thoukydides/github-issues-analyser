@@ -95,6 +95,7 @@
     - [Why are features available in IFTTT or the official app missing from this plugin?](#why-are-features-available-in-ifttt-or-the-official-app-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
+    - [Are there specific operating system requirements for the plugin?](#are-there-specific-operating-system-requirements-for-the-plugin)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -951,12 +952,13 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-#### 🚧 Are there specific operating system requirements for the homebridge-homeconnect plugin? 🚧
+#### Are there specific operating system requirements for the plugin?
 
 <!-- INCLUDES: issue-65-719f -->
-The `homebridge-homeconnect` plugin is designed to be platform-agnostic and does not have any external dependencies beyond `homebridge` and `Node.js`. It should function correctly on any operating system that supports these two components, including various versions of Raspberry Pi OS (formerly Raspbian).
+The `homebridge-homeconnect` plugin is designed to be platform-agnostic and does not have any external dependencies beyond `homebridge` and `Node.js`. It should function correctly on any operating system that supports these two components, including various versions of Raspberry Pi OS.
 
 When upgrading your operating system, such as moving between Raspberry Pi OS releases, keep the following in mind:
+
 * **Node.js Compatibility**: The most significant risk during an OS upgrade is a change to the major version of `Node.js`. Ensure that the `Node.js` version provided by your new OS is compatible with both `homebridge` and the latest version of this plugin.
 * **Standard Tools**: Using standard management tools like `homebridge-config-ui-x` for installation and configuration is recommended to ensure a consistent environment.
 * **Isolation of Issues**: If problems arise after an OS update, verify that `homebridge` and other plugins are working correctly to determine if the issue is specific to this plugin or the broader environment.
