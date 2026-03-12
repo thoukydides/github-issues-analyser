@@ -1,14 +1,12 @@
 {
     "issue_number": 70,
-    "updated_at": "2026-02-14T07:10:52.536Z",
+    "updated_at": "2026-03-12T15:40:38.940Z",
     "faq": [
         {
-            "question": "Why does my oven pre-heating program only run for one minute when no duration is specified?",
-            "answer": "This behaviour is a limitation of the Home Connect API rather than the plugin. All oven appliance programs require the `BSH.Common.Option.Duration` option to be specified. If a value is not provided via the API, the appliance or API defaults it to a minimum value, which is typically 60 seconds (1 minute). The Home Connect API does not currently support starting an oven program with an infinite duration or without this option. This same restriction is present in the official Home Connect mobile application; only starting a program manually on the appliance itself allows for an undefined duration. To work around this, it is recommended to configure a nominal duration that exceeds your typical pre-heating needs, such as 3600 seconds (1 hour).",
-            "semantic_abstract": "The Home Connect API requires a mandatory `BSH.Common.Option.Duration` for all oven programs, defaulting to 1 minute if unspecified. This API constraint prevents starting oven programs with an infinite run time, requiring users to set a large nominal duration for tasks like pre-heating.",
-            "alternative_resolution": "The plugin configuration UI could be updated to include a tooltip or validation hint for oven programs, explaining that the Home Connect API requires a duration and suggesting a default like 3600 seconds to prevent the 1-minute timeout.",
-            "confidence": "high",
-            "hash": "5614d688ca1f4b278c1fd3909904cbf01388a2171e7fa4ff6d6f8e44a2cce264"
+            "question": "Why do my oven programmes only run for one minute when started via Homebridge?",
+            "answer": "This is a limitation of the Home Connect API and how it interacts with appliance firmware. All oven programmes require a `BSH.Common.Option.Duration` value to be specified. If a duration is not explicitly provided when starting a programme via the API, the appliance applies its own internal default, which is typically 60 seconds.\n\nThe Home Connect API does not currently support starting an oven programme without a duration or with a value representing infinity. This behaviour is also observed in the official Home Connect app; programmes with no set duration can only be started using the physical controls on the appliance itself.\n\nTo ensure your oven stays on for the required time (for example, when pre-heating), you should explicitly configure a sufficiently long duration in your scene or automation, such as 3600 seconds (one hour).",
+            "semantic_abstract": "Home Connect oven programmes require a mandatory `BSH.Common.Option.Duration` value when initiated via the API, defaulting to 60 seconds if not provided. The API specification does not support infinite durations or the omission of the duration parameter for these appliances, a constraint that mirrors the official Home Connect app and distinguishes API-initiated programmes from those started via physical appliance controls.",
+            "hash": "9b78f0d49111392602243da593afa4bd5165ffe7fef64a093af09d580b766931"
         }
     ]
 }
