@@ -711,10 +711,12 @@ To resolve these issues:
 
 #### Why does the Apple Home app not show the remaining time or detailed status for my appliance?
 
-<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-114-0f03 issue-124-9bb6 issue-225-731f issue-230-03a5 -->
-The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. These services are semantically inappropriate for most Home Connect appliances, and the plugin's design intentionally avoids creating additional services purely for displaying minor characteristics in Apple's Home app to prevent cluttering the interface and breaking the architectural model.
+<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-0f03 issue-124-9bb6 issue-225-731f issue-230-03a5 -->
+The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services.
 
-To view the remaining time, or use other characteristics that the Apple Home app hides, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support displaying the full range of standard HomeKit characteristics and allow them to be used in automations.
+While a `Valve` service might appear applicable to "wet" appliances like dishwashers or washing machines, it is semantically inappropriate for many other Home Connect types that also report remaining time, such as ovens, dryers, or coffee machines. To maintain a consistent architectural model and avoid interface clutter, the plugin does not create these extra services purely for display in the Apple Home app.
+
+To view the remaining time, or use other characteristics that the Apple Home app hides, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support the full range of standard HomeKit characteristics and allow them to be used in automations.
 
 #### Why are the power and program switches for my appliance in a random order in HomeKit?
 
@@ -743,13 +745,14 @@ If services remain visible in HomeKit (often appearing as "unresponsive") after 
 
 #### Why is temperature control not supported for fridges, freezers, or ovens?
 
-The HomeKit Accessory Protocol (HAP) only defines standard temperature services (`Heater Cooler`, `Temperature Sensor`, and `Thermostat`) for environmental climate control. Using these for appliances introduces several issues with Siri voice control:
+<!-- INCLUDES: issue-58-7df2 -->
+The HomeKit Accessory Protocol (HAP) only defines standard temperature services (`Heater Cooler`, `Temperature Sensor`, and `Thermostat`) for environmental climate control. Using these for appliances introduces significant issues with Siri voice control and HomeKit logic:
 
 - **Siri confusion**: Siri may conflate the appliance's internal temperature with the ambient room temperature.
-- **Incorrect voice responses**: Asking "what is the temperature in the kitchen?" might report the fridge's internal setting instead of the room temperature.
-- **Unintended control**: Commands to adjust the room temperature might inadvertently change the appliance settings.
+- **Incorrect voice responses**: Asking "what is the temperature in the kitchen?" might report the freezer's -18°C setpoint instead of the room temperature, or incorrectly incorporate it into a reported range.
+- **Unintended control**: A command to "set the kitchen to 21 degrees" might inadvertently attempt to adjust the appliance settings.
 
-To maintain the integrity of voice control, this plugin exposes fridge and freezer modes (such as Super, Eco, Vacation, and Fresh modes) as individual `Switch` services instead of temperature controls.
+To maintain the integrity of voice control, this plugin exposes fridge and freezer modes (such as Super, Eco, Vacation, and Fresh modes) as individual `Switch` services instead of temperature controls. The plugin will only adopt new HomeKit services if Apple introduces specific appliance-grade definitions that do not conflict with ambient climate controls.
 
 #### Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?
 
@@ -834,35 +837,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why is the remaining time for my appliance not visible in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-48-b565 -->
-The plugin exposes the `RemainingTime` characteristic on the main `Active Program` switch service for appliances such as washers, dryers, and dishwashers. However, this information is not displayed within Apple's Home app due to limitations in the HomeKit Accessory Protocol (HAP) specification and Apple's implementation.
-
-Apple's Home app generally only displays the remaining duration for specific accessory categories, primarily `Irrigation System` and `Valve` services. Since home appliances do not fit these categories, Apple chooses to hide the characteristic even though the data is present in the HomeKit database.
-
-To view the remaining time or use it as a trigger for automations, you must use a third-party HomeKit app that supports a broader range of characteristics. These apps can access and display the `RemainingTime` value provided by the plugin.
-
-#### 🚧 Why can I not set the temperature for my fridge or freezer using a thermostat or heater/cooler control? 🚧
-
-<!-- INCLUDES: issue-58-7df2 -->
-The plugin deliberately avoids using `HeaterCooler` or `Thermostat` services for appliances such as fridges, freezers, or ovens to maintain the integrity of Siri voice control and HomeKit semantics. These services are specifically designed for ambient room temperature control. Mapping an appliance to these services would cause Siri to include the appliance's internal setpoint when calculating or setting the temperature for a room. For example, asking "What is the temperature in the kitchen?" would incorrectly incorporate a freezer's -18&deg;C setpoint into the reported range, or a command to "Set the kitchen to 21 degrees" might attempt to adjust the appliance temperature.
-
-To provide control without breaking HomeKit logic:
-
-*   Specific appliance modes (such as Fridge/Freezer Super mode, Eco mode, Vacation mode, and Fresh mode) are exposed as individual `Switch` services.
-*   This approach ensures that appliance features are accessible and automatable while preserving the correct behaviour of HomeKit's climate control system and voice interactions.
-*   The plugin will only adopt new HomeKit services if Apple introduces specific appliance-grade definitions that do not conflict with ambient climate controls.
-
-#### 🚧 Why isn't remaining program time exposed as a HomeKit `Valve` service for my Home Connect appliance? 🚧
-
-<!-- INCLUDES: issue-68-c09d -->
-The `RemainingProgramTime` from Home Connect appliances is not exposed via a HomeKit `Valve` service due to design considerations for broad appliance compatibility.
-
-While a `Valve` service might seem vaguely applicable to certain wet appliances like dishwashers or washing machines, it is entirely inappropriate for many other Home Connect appliance types that also report remaining program time, such as ovens, dryers, cook processors, or hoods.
-
-To maintain consistency and ensure functionality across all supported appliances, the `RemainingDuration` characteristic is instead added to the `Active Program Switch`. This characteristic is visible in third-party HomeKit applications and can be used to trigger automations based on the time remaining for an active programme. This approach was chosen to provide a consistent and broadly applicable method for accessing remaining time information.
 
 ### Notifications & Events
 

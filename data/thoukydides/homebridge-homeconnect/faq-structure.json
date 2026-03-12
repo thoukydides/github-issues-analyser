@@ -642,7 +642,7 @@
                             "entries": [
                                 {
                                     "question": "Why does the Apple Home app not show the remaining time or detailed status for my appliance?",
-                                    "answer": "The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. These services are semantically inappropriate for most Home Connect appliances, and the plugin's design intentionally avoids creating additional services purely for displaying minor characteristics in Apple's Home app to prevent cluttering the interface and breaking the architectural model.\n\nTo view the remaining time, or use other characteristics that the Apple Home app hides, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support displaying the full range of standard HomeKit characteristics and allow them to be used in automations.",
+                                    "answer": "The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services.\n\nWhile a `Valve` service might appear applicable to \"wet\" appliances like dishwashers or washing machines, it is semantically inappropriate for many other Home Connect types that also report remaining time, such as ovens, dryers, or coffee machines. To maintain a consistent architectural model and avoid interface clutter, the plugin does not create these extra services purely for display in the Apple Home app.\n\nTo view the remaining time, or use other characteristics that the Apple Home app hides, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support the full range of standard HomeKit characteristics and allow them to be used in automations.",
                                     "included_ids": [
                                         "issue-2-4fcb",
                                         "issue-3-a6f3",
@@ -650,7 +650,9 @@
                                         "issue-114-0f03",
                                         "issue-124-9bb6",
                                         "issue-225-731f",
-                                        "issue-230-03a5"
+                                        "issue-230-03a5",
+                                        "issue-48-b565",
+                                        "issue-68-c09d"
                                     ]
                                 },
                                 {
@@ -671,8 +673,10 @@
                                 },
                                 {
                                     "question": "Why is temperature control not supported for fridges, freezers, or ovens?",
-                                    "answer": "The HomeKit Accessory Protocol (HAP) only defines standard temperature services (`Heater Cooler`, `Temperature Sensor`, and `Thermostat`) for environmental climate control. Using these for appliances introduces several issues with Siri voice control:\n\n- **Siri confusion**: Siri may conflate the appliance's internal temperature with the ambient room temperature.\n- **Incorrect voice responses**: Asking \"what is the temperature in the kitchen?\" might report the fridge's internal setting instead of the room temperature.\n- **Unintended control**: Commands to adjust the room temperature might inadvertently change the appliance settings.\n\nTo maintain the integrity of voice control, this plugin exposes fridge and freezer modes (such as Super, Eco, Vacation, and Fresh modes) as individual `Switch` services instead of temperature controls.",
-                                    "included_ids": []
+                                    "answer": "The HomeKit Accessory Protocol (HAP) only defines standard temperature services (`Heater Cooler`, `Temperature Sensor`, and `Thermostat`) for environmental climate control. Using these for appliances introduces significant issues with Siri voice control and HomeKit logic:\n\n- **Siri confusion**: Siri may conflate the appliance's internal temperature with the ambient room temperature.\n- **Incorrect voice responses**: Asking \"what is the temperature in the kitchen?\" might report the freezer's -18°C setpoint instead of the room temperature, or incorrectly incorporate it into a reported range.\n- **Unintended control**: A command to \"set the kitchen to 21 degrees\" might inadvertently attempt to adjust the appliance settings.\n\nTo maintain the integrity of voice control, this plugin exposes fridge and freezer modes (such as Super, Eco, Vacation, and Fresh modes) as individual `Switch` services instead of temperature controls. The plugin will only adopt new HomeKit services if Apple introduces specific appliance-grade definitions that do not conflict with ambient climate controls.",
+                                    "included_ids": [
+                                        "issue-58-7df2"
+                                    ]
                                 },
                                 {
                                     "question": "Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?",
@@ -755,26 +759,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 48,
-                                    "id": "issue-48-b565",
-                                    "question": "Why is the remaining time for my appliance not visible in the Apple Home app?",
-                                    "answer": "The plugin exposes the `RemainingTime` characteristic on the main `Active Program` switch service for appliances such as washers, dryers, and dishwashers. However, this information is not displayed within Apple's Home app due to limitations in the HomeKit Accessory Protocol (HAP) specification and Apple's implementation.\n\nApple's Home app generally only displays the remaining duration for specific accessory categories, primarily `Irrigation System` and `Valve` services. Since home appliances do not fit these categories, Apple chooses to hide the characteristic even though the data is present in the HomeKit database.\n\nTo view the remaining time or use it as a trigger for automations, you must use a third-party HomeKit app that supports a broader range of characteristics. These apps can access and display the `RemainingTime` value provided by the plugin."
-                                },
-                                {
-                                    "issue_number": 58,
-                                    "id": "issue-58-7df2",
-                                    "question": "Why can I not set the temperature for my fridge or freezer using a thermostat or heater/cooler control?",
-                                    "answer": "The plugin deliberately avoids using `HeaterCooler` or `Thermostat` services for appliances such as fridges, freezers, or ovens to maintain the integrity of Siri voice control and HomeKit semantics. These services are specifically designed for ambient room temperature control. Mapping an appliance to these services would cause Siri to include the appliance's internal setpoint when calculating or setting the temperature for a room. For example, asking \"What is the temperature in the kitchen?\" would incorrectly incorporate a freezer's -18&deg;C setpoint into the reported range, or a command to \"Set the kitchen to 21 degrees\" might attempt to adjust the appliance temperature.\n\nTo provide control without breaking HomeKit logic:\n\n*   Specific appliance modes (such as Fridge/Freezer Super mode, Eco mode, Vacation mode, and Fresh mode) are exposed as individual `Switch` services.\n*   This approach ensures that appliance features are accessible and automatable while preserving the correct behaviour of HomeKit's climate control system and voice interactions.\n*   The plugin will only adopt new HomeKit services if Apple introduces specific appliance-grade definitions that do not conflict with ambient climate controls."
-                                },
-                                {
-                                    "issue_number": 68,
-                                    "id": "issue-68-c09d",
-                                    "question": "Why isn't remaining program time exposed as a HomeKit `Valve` service for my Home Connect appliance?",
-                                    "answer": "The `RemainingProgramTime` from Home Connect appliances is not exposed via a HomeKit `Valve` service due to design considerations for broad appliance compatibility.\n\nWhile a `Valve` service might seem vaguely applicable to certain wet appliances like dishwashers or washing machines, it is entirely inappropriate for many other Home Connect appliance types that also report remaining program time, such as ovens, dryers, cook processors, or hoods.\n\nTo maintain consistency and ensure functionality across all supported appliances, the `RemainingDuration` characteristic is instead added to the `Active Program Switch`. This characteristic is visible in third-party HomeKit applications and can be used to trigger automations based on the time remaining for an active programme. This approach was chosen to provide a consistent and broadly applicable method for accessing remaining time information."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
