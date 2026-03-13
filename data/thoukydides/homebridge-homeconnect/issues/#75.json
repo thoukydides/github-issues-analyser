@@ -1,14 +1,12 @@
 {
     "issue_number": 75,
-    "updated_at": "2026-02-14T11:46:29.559Z",
+    "updated_at": "2026-03-13T09:56:12.346Z",
     "faq": [
         {
-            "question": "Why is a specific appliance feature, like Intelligent Dry, missing from Homebridge?",
-            "answer": "The plugin does not hardcode appliance programs or options. Instead, it dynamically queries the Home Connect API to determine the capabilities and available programs for each connected appliance. If a specific feature, such as Intelligent Dry (intellidry transfer), is not appearing in HomeKit, it is because the Home Connect API does not expose that functionality for your specific model.\n\nYou can verify which features are officially supported by the API in the [Home Connect programs and options documentation](https://api-docs.home-connect.com/programs-and-options). If a feature is documented but missing for your appliance, or is missing from the API documentation entirely, you can contact [Home Connect developer support](https://developer.home-connect.com/support/contact) to request its addition to their API.",
-            "semantic_abstract": "The homebridge-homeconnect plugin dynamically retrieves appliance program options from the Home Connect API rather than using static definitions. Features like Intelligent Dry (intellidry) are unavailable in HomeKit if they are not exposed through the underlying Home Connect API endpoints for the specific appliance model.",
-            "alternative_resolution": "Ensure the plugin documentation clearly states that program options are dynamic and provides links to the official Home Connect API documentation for users to verify hardware/API support.",
-            "confidence": "high",
-            "hash": "7835f324bd73f06250c61121cf69e74540abdf8773bc07c6c78f117d72a9acbf"
+            "question": "Why is a specific program option or feature missing for my appliance?",
+            "answer": "The plugin does not have appliance program options or specific features hardcoded into its logic. Instead, it dynamically discovers the capabilities of each appliance by querying the Home Connect API.\n\nIf a feature, such as a specific program option or transfer function, is not visible in Homebridge, it is usually due to one of the following reasons:\n1. The feature is not currently supported by the Home Connect API for that appliance category.\n2. The specific appliance model or firmware version does not expose that feature via the API.\n\nUsers can verify the expected capabilities for their appliance type in the [Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options). If a feature is listed in the documentation but missing for a specific appliance, or if you wish to request a new feature be added to the API, you should contact the Home Connect developer support team directly. The plugin will automatically surface any new functionality once it is made available via the official API.",
+            "semantic_abstract": "The homebridge-homeconnect plugin dynamically discovers appliance programs and options via the Home Connect API rather than using hardcoded definitions. Feature availability is constrained by the API's exposure of specific appliance capabilities, meaning missing functionality typically requires updates to the Home Connect API or appliance firmware.",
+            "hash": "349edad0babd425730db4ec1f9c4c7987cb6218a035f3a08b5bccf0d174e9e31"
         }
     ]
 }
