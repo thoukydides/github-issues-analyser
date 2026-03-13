@@ -939,16 +939,17 @@ The plugin maps these percentages to the closest available physical fan settings
 
 #### Is this plugin compatible with HOOBS?
 
-<!-- INCLUDES: issue-37-a423 -->
-Probably, but it is not officially supported. Some features may not operate correctly.
+<!-- INCLUDES: issue-37-a423 issue-67-ddaf -->
+This plugin is designed and tested for vanilla [Homebridge](https://github.com/homebridge/homebridge) with [Homebridge Config UI X](https://github.com/homebridge/homebridge-config-ui-x). While it may function on HOOBS, it is not officially supported and users may encounter several limitations:
 
-This plugin is designed and tested for vanilla [Homebridge](https://github.com/homebridge/homebridge) with [Homebridge Config UI X](https://github.com/homebridge/homebridge-config-ui-x). If you choose to use HOOBS, you may encounter stability issues or broken features.
+- **Configuration**: HOOBS does not support the `homebridge-ui-x` configuration schemas. The graphical configuration editor will not function, and all settings must be configured by manually editing the `config.json` file.
+- **Stability**: Some users have reported appliances appearing stuck in an `UPDATING` status within the Apple Home app when using HOOBS. This is often due to communication discrepancies between the HOOBS environment and iOS.
 
 Support policy for HOOBS users:
 
-1. **Contact HOOBS Support:** Your first point of contact should be [HOOBS Support](https://support.hoobs.org/ticket) for platform-specific issues.
-2. **Verify on Vanilla Homebridge:** Before [opening an issue](https://github.com/thoukydides/homebridge-homeconnect/issues/new/choose), you must verify the problem persists on a standard Homebridge installation.
-3. **No HOOBS-Specific Fixes:** Bug reports or feature requests specifically for HOOBS compatibility will **not** be accepted.
+1. **Contact HOOBS Support**: Your first point of contact should be [HOOBS Support](https://support.hoobs.org/ticket) for platform-specific issues.
+2. **Verify on Vanilla Homebridge**: Before [opening an issue](https://github.com/thoukydides/homebridge-homeconnect/issues/new/choose), you must verify that the problem persists on a standard Homebridge installation.
+3. **No HOOBS-Specific Fixes**: Bug reports or feature requests specifically for HOOBS compatibility or its configuration interface will **not** be accepted.
 
 #### Will there be a Home Assistant version of this plugin?
 
@@ -959,38 +960,17 @@ For Home Assistant users, there are alternative community-maintained integration
 
 #### Why are features available in IFTTT or the official app missing from this plugin?
 
-<!-- INCLUDES: issue-23-272e issue-188-cb08 -->
-This plugin is restricted by the capabilities of the public Home Connect API. Certain features are available to official partners like IFTTT via private API integrations but are not exposed to third-party developers. If a specific program or option is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options/), it cannot be supported by this plugin. If you require these features, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) directly to request their addition to the public API.
+<!-- INCLUDES: issue-23-272e issue-67-20e5 issue-188-cb08 -->
+This plugin is restricted by the capabilities of the public Home Connect API. The official Home Connect app often uses private APIs to provide functionality—such as specific eco modes or ironing reduction for dryers—that is not exposed to third-party developers. If a specific program or option is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options/), it cannot be supported by this plugin.
 
-Direct integration with IFTTT to bridge these gaps has been explicitly declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes several key technical and design constraints:
+Availability of features is also dependent on:
+- The specific appliance model and its hardware capabilities
+- The firmware version installed on the appliance
+- Regional differences in API feature sets
 
-- **Complexity and Maintenance**: Implementing a hybrid control system where some actions use the Home Connect API and others use IFTTT would create significant code complexity and "feature creep".
-- **User Configuration Burden**: Direct integration would rely on users manually creating appropriate IFTTT applets and then precisely configuring this plugin to match, which is prone to user error.
-- **Interface Clutter**: Adding additional manual switches for IFTTT actions would further clutter the HomeKit interface, making the existing list of program switches more difficult to navigate.
-- **Free Plan Limitations**: The IFTTT free tier supports a maximum of two applets, and some Home Connect features are only available via a "Pro+" plan, so most users would receive limited benefit.
+To verify if a feature is supported by the public API for your specific device, you can use the `Identify` routine or inspect the generated schema file. If a feature is missing from the API, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) to request its addition.
 
-For users who require IFTTT-specific functionality, such as triggering automations from Hood Favourite button presses, it is recommended to use a dedicated plugin such as `homebridge-ifttt` alongside this one. This approach keeps the logic for different services separate and more manageable.
-
-#### 🚧 Does this plugin support HOOBS? 🚧
-
-<!-- INCLUDES: issue-67-ddaf -->
-While the plugin is functional on HOOBS, it is primarily developed and tested for Homebridge. There are several known limitations and considerations when using HOOBS:
-
-1.  **Configuration**: HOOBS does not support the `homebridge-ui-x` configuration schemas used by this plugin. This means you cannot use the graphical configuration editor; all settings must be configured by manually editing the `config.json` file.
-2.  **Compatibility**: Some users have reported issues where appliances appear stuck in an `UPDATING` status within the Apple Home app while using HOOBS. These issues are often related to communication discrepancies between the bridge environment and iOS, and are typically resolved by migrating to a standard Homebridge installation.
-3.  **Support**: The plugin maintainer does not officially support HOOBS-specific issues and recommends reporting compatibility problems to the HOOBS developers.
-
-#### 🚧 Why are some features in the official Home Connect app not available in HomeKit? 🚧
-
-<!-- INCLUDES: issue-67-20e5 -->
-The official Home Connect app uses private APIs that provide access to functionality not exposed through the public API used by this plugin. If a specific setting—such as ironing reduction for dryers or specific eco modes—is not available in the [Home Connect public API documentation](https://api-docs.home-connect.com/programs-and-options), it cannot be controlled via HomeKit.
-
-Furthermore, the availability of options is highly dependent on:
-*   The specific appliance model and its hardware capabilities
-*   The firmware version installed on the appliance
-*   Regional differences in API feature sets
-
-If you find a feature in the official app that is missing from the plugin, you can check if it is supported by the public API by using the `Identify` routine or inspecting the generated schema file.
+Direct integration with IFTTT to bridge these gaps has been explicitly declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes technical constraints such as increased code complexity, the user burden of manually creating IFTTT applets, and interface clutter in HomeKit. For users requiring IFTTT-specific functionality, such as triggering automations from Hood Favourite buttons, it is recommended to use a dedicated plugin like `homebridge-ifttt` alongside this one.
 
 ### Plugin Installation and Configuration
 
