@@ -58,6 +58,7 @@
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
     - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
+    - [Why does my appliance stay On in the Home app after I turn it off?](#why-does-my-appliance-stay-on-in-the-home-app-after-i-turn-it-off)
     - [Why does my dishwasher trigger a Program Finished event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
     - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
@@ -631,16 +632,17 @@ To troubleshoot:
 
 #### Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?
 
-<!-- INCLUDES: issue-40-61af issue-41-4190 issue-61-67ee -->
+<!-- INCLUDES: issue-40-61af issue-41-4190 issue-61-67ee issue-71-ad07 -->
 The official Home Connect mobile app can communicate with appliances via two distinct paths: a local network connection (when your phone and appliance are on the same Wi-Fi) and a private interface to the Home Connect cloud servers. All third-party integrations, including this plugin, are restricted to using the public cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection.
 
-When the plugin logs `The appliance is offline`, it is reporting the status received directly from the Home Connect API servers. To diagnose this, check the appliance's cloud connectivity in the official app:
+When the plugin logs `The appliance is offline`, it is reporting the status received directly from the Home Connect API servers. To diagnose and resolve this:
 
-1. Open the Home Connect app and navigate to the appliance settings.
-2. Locate the **Network** section. Ensure that all three connection stages (**appliance-app**, **appliance-cloud**, and **app-cloud**) are reported as active (typically shown by three green lines). If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.
-3. Alternatively, disable Wi-Fi on your mobile device to force the app to use cellular data. If the appliance becomes unresponsive in the app, the issue is with its connection to the Home Connect servers.
+1. **Test Cellular Connection**: Disable Wi-Fi on your mobile device to force the official app to use cellular data. If the appliance becomes unresponsive in the app, the issue is with its connection to the Home Connect servers.
+2. **Verify Network Stages**: In the official app, navigate to the appliance settings and locate the **Network** section. Ensure that all three connection stages (**appliance-app**, **appliance-cloud**, and **app-cloud**) are active (typically shown by three green lines). If the line between the appliance and the cloud is red, the device is not communicating with the manufacturer's servers.
+3. **Refresh Connection**: You can often force the appliance to re-establish its handshake with the cloud by toggling the **Connection to server** or **Remote Control** setting off and then back on within the appliance's settings menu in the official app.
+4. **Power Cycle**: If software toggles fail, power cycle the appliance at the mains.
 
-You can often resolve this by power cycling the appliance at the mains. If problems persist, check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages. Most connectivity issues are transient and will resolve themselves once the appliance reconnects to the servers or the cloud service stabilises.
+Most connectivity issues are transient and will resolve themselves once the appliance reconnects to the servers or the cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.
 
 #### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
@@ -661,9 +663,23 @@ To resolve this, try the following:
 
 This is a transient server-side or firmware issue that cannot be corrected by the plugin itself.
 
+#### Why does my appliance stay On in the Home app after I turn it off?
+
+<!-- INCLUDES: issue-72-dd80 -->
+Many Home Connect appliances, particularly washers and dryers, do not support a software-controlled `Off` state via the official API. For these devices, the API documentation specifies that the `BSH.Common.Setting.PowerState` can only be set to `BSH.Common.EnumType.PowerState.On`. When the physical power button is pressed, the appliance's Wi-Fi module simply disconnects from the network.
+
+To provide a better user experience, the plugin simulates an `Off` state by monitoring the appliance's connection status. Recent versions of the plugin (since v0.23.6) include logic to ensure synchronisation by:
+
+* Using the initial connection status from the discovery list to set the power state if the appliance is offline during Homebridge startup.
+* Ensuring that a `DISCONNECTED` status always overrides reported `PowerState` values until the appliance reconnects.
+* Using short update delays to prevent race conditions when the API returns inconsistent connection and power information simultaneously.
+
 #### Why does my dishwasher trigger a Program Finished event when it reconnects?
 
-Some Bosch dishwasher models appear to re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a connection to the Home Connect cloud after being offline. The plugin maps events from the API directly to HomeKit triggers; therefore, these re-broadcasts are passed through as button presses or notifications. This is a quirk of the appliance firmware or API event handling rather than a defect in the plugin itself.
+<!-- INCLUDES: issue-66-dad9 -->
+Some Bosch dishwasher models appear to re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a connection to the Home Connect cloud after being offline. Specifically, they may report the event state as `BSH.Common.EnumType.EventPresentState.Present` immediately upon reconnecting.
+
+The plugin maps events from the API directly to HomeKit `ProgrammableSwitchEvent` characteristics; therefore, these re-broadcasts are passed through as button presses or notifications. This is a quirk of the appliance firmware or API event handling rather than a defect in the plugin logic.
 
 #### Why is the log filling up with oven `Event STATUS` temperature messages?
 
@@ -720,37 +736,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why is the Program Finished button or event triggered when the plugin reconnects to the Home Connect cloud? 🚧
-
-<!-- INCLUDES: issue-66-dad9 -->
-This behaviour is typically caused by the Home Connect appliance or server sending a `BSH.Common.Event.ProgramFinished` event immediately after a connection is re-established. The plugin does not generate these events internally; it maps HomeKit `ProgrammableSwitchEvent` characteristics directly to events received from the Home Connect API.
-
-If the appliance (for example, certain Bosch dishwasher models) reports `BSH.Common.Event.ProgramFinished = BSH.Common.EnumType.EventPresentState.Present` upon reconnecting, the plugin will log `Event Program Finished` and trigger any associated HomeKit notifications or automations. This appears to be a firmware or server-side quirk specific to certain appliance models and is not a logic error within the plugin itself.
-
-#### 🚧 Why does my Home Connect appliance appear offline in Homebridge but work in the official app? 🚧
-
-<!-- INCLUDES: issue-71-ad07 -->
-The official Home Connect app often communicates directly with appliances via your local Wi-Fi network when your phone is on the same network. In contrast, this plugin (and other third-party integrations) must use the official Home Connect Cloud API. This means an appliance can appear responsive in the app while its cloud connection is actually broken.
-
-To diagnose this, follow these steps:
-1. Disable Wi-Fi on your mobile device to force the Home Connect app to use a cellular (4G/5G) connection.
-2. Attempt to control the appliance. If it fails or shows as offline, the issue lies with the appliance's connection to the Home Connect servers, not the plugin.
-3. In the Home Connect app, navigate to the appliance settings and check the **Network** section. Ensure all three connection lines (appliance to cloud, cloud to phone) are green.
-
-If the appliance is unreachable via cellular data, you can often resolve the connection by toggling the **Connection to server** or **Remote Control** setting off and then back on within the appliance's settings menu in the official app. This forces the appliance to re-establish its handshake with the cloud servers.
-
-#### 🚧 Why does my Home Connect appliance stay On in the Home app after I turn it off? 🚧
-
-<!-- INCLUDES: issue-72-dd80 -->
-Many Home Connect appliances, particularly washers and dryers, do not support a software-controlled `Off` state via the official API. For these devices, the API documentation specifies that the `BSH.Common.Setting.PowerState` can only be set to `BSH.Common.EnumType.PowerState.On`. When the physical power button is pressed, the appliance's Wi-Fi module simply disconnects from the network.
-
-To provide a better user experience, this plugin simulates an `Off` state by monitoring the appliance's connection status to the Home Connect servers. When a `DISCONNECTED` event is detected or if the appliance is reported as unreachable during startup, the plugin manually sets the HomeKit power switch to the off position. 
-
-If you find your appliance state is out of sync, ensure you are running the latest version of the plugin. Improvements in version 0.23.6 and later specifically address synchronisation issues by:
-* Using the initial connection status from the appliance discovery list to set the power state if the appliance is offline during Homebridge startup.
-* Ensuring that a `DISCONNECTED` status always overrides reported `PowerState` values until the appliance reconnects.
-* Introducing a short delay in updates to prevent race conditions when the API returns inconsistent connection and power information simultaneously.
 
 ## Apple HomeKit
 
