@@ -348,7 +348,7 @@
                                 },
                                 {
                                     "question": "Why are some appliance features, programs, or options missing or unavailable?",
-                                    "answer": "There are several reasons why features (such as coffee temperature or beverage quantity) may be missing from the plugin or appear as `currently unavailable`, `advertised by appliance currently unavailable`, or `This appliance does not support any programs` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or other feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.\n\nIf a program or option is unexpectedly missing, try powering the appliance on, manually selecting the affected program on the physical control panel, and leaving it idle for one minute. Then, trigger the plugin to re-read the details by using the HomeKit **Identify** method or restarting Homebridge. If the API continues to refuse access, you can request inclusion via [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
+                                    "answer": "The plugin does not have appliance programs or features hardcoded; it dynamically discovers the capabilities of each appliance by querying the Home Connect API. There are several reasons why features (such as coffee temperature or beverage quantity) may be missing or appear as `currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app uses a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Manual Configuration**: If you manually configure a program key that the API does not report as supported for your specific model or firmware version, the plugin will log `Invalid program configuration ignored`.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing.\n- **Platform Limitations**: Third-party platforms like HOOBS may have UI limitations that prevent some discovered options from appearing correctly in the graphical configuration editor.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
                                     "included_ids": [
                                         "issue-1-d662",
                                         "issue-17-56af",
@@ -365,7 +365,10 @@
                                         "issue-316-e6c5",
                                         "issue-368-b5fa",
                                         "issue-380-03ac",
-                                        "issue-62-bd95"
+                                        "issue-62-bd95",
+                                        "issue-75-349e",
+                                        "issue-76-7959",
+                                        "issue-77-6bec"
                                     ]
                                 },
                                 {
@@ -377,11 +380,12 @@
                                 },
                                 {
                                     "question": "Why does the log say a selected program is not supported by the Home Connect API?",
-                                    "answer": "This warning typically occurs in two different contexts:\n\n- **Monitor-Only Programs**: Some appliances support maintenance cycles (such as rinsing, drum cleaning, or descaling) and user-configured favourites that the API allows the plugin to monitor but not control remotely. The plugin logs these when they are detected but cannot be started via HomeKit.\n- **Startup Timing**: You may see a transient warning during Homebridge startup or after clearing the cache. This happens if an appliance reports a program selection event before the plugin has finished loading the full list of supported programs from the API.\n\nThis is often a known inconsistency in the Home Connect API's behaviour. When the plugin identifies this discrepancy, it deliberately avoids querying the API for further details to prevent invalid requests that would unnecessarily consume your daily API rate limit quota. In these cases, the messages are often cosmetic and the plugin will automatically refresh necessary details once initialisation is complete.",
+                                    "answer": "This warning typically occurs in two different contexts:\n\n- **Startup Timing**: This is a temporary status indicator that occurs if the Home Connect API broadcasts a `BSH.Common.Root.SelectedProgram` event before the plugin has finished building its internal list of supported programs for that specific model. Once discovery is complete, the program will be recognised correctly.\n- **Monitor-Only Programs**: Some appliances support maintenance cycles (such as rinsing or descaling) and user-configured favourites that the API allows the plugin to monitor but not control remotely. The plugin logs these when they are detected but cannot be started via HomeKit.\n\nThis is often a known inconsistency in the Home Connect API's behaviour. When the plugin identifies this discrepancy, it deliberately avoids querying the API for further details to prevent invalid requests that would unnecessarily consume your daily API rate limit quota.",
                                     "included_ids": [
                                         "issue-50-7106",
                                         "issue-288-9266",
-                                        "issue-328-99fc"
+                                        "issue-328-99fc",
+                                        "issue-78-6bc5"
                                     ]
                                 },
                                 {
@@ -448,12 +452,13 @@
                                 },
                                 {
                                     "question": "Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?",
-                                    "answer": "To identify an appliance's specific programs and valid option ranges, the plugin must occasionally perform a discovery routine. Many appliances only report this data via the API when they are powered on and the specific program is selected.\n\nDuring this process, you may observe the following:\n\n1. **Power On**: The appliance switches on automatically. If it has an automatic rinsing cycle (common with coffee machines), the plugin will wait up to two minutes for it to finish.\n2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options. These selections may appear on the appliance's display.\n3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).\n\nThis typically happens only once during initial setup or after a cache deletion. Results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open. If no cache exists and the appliance is offline, startup will stall until a connection is established.",
+                                    "answer": "To identify an appliance's specific programs and valid option ranges, the plugin must perform a discovery routine. Many appliances only report this data via the API when they are powered on and the specific program is selected.\n\nThis discovery phase typically occurs upon the first successful authorisation of the plugin, after manually deleting persistent cache files, or when the **Identify** mechanism is triggered. During this process:\n\n1. **Power On**: The appliance switches on automatically. If it has an automatic rinsing cycle (common with coffee machines), the plugin will wait up to two minutes for it to finish.\n2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options.\n3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).\n\nIf this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy, the door was open, or consumables (water, coffee beans) were missing.",
                                     "included_ids": [
                                         "issue-19-c2a7",
                                         "issue-20-397f",
                                         "issue-32-acbc",
-                                        "issue-201-3565"
+                                        "issue-201-3565",
+                                        "issue-78-1a42"
                                     ]
                                 },
                                 {
@@ -523,46 +528,16 @@
                                         "issue-42-e5af",
                                         "issue-54-196a"
                                     ]
+                                },
+                                {
+                                    "question": "How can I see which program options and values are supported by my appliance?",
+                                    "answer": "To determine the specific program keys, options, and valid ranges supported by your appliance, you can use the following methods:\n\n1. **Check the generated schema**: The plugin writes a file named `.homebridge-homeconnect-v1.schema.json` to your Homebridge storage directory (where `config.json` resides). This file contains a technical dump of all programs and options discovered for your linked appliances.\n2. **Use the Identify routine**: Trigger the `Identify` function (see the relevant FAQ entry for instructions). The plugin will output a complete list of supported programs, options, and their valid enumeration values to the Homebridge logs.\n\nThis information is essential when configuring a **Custom list of programs and options** or manually editing the `programs` section of your `config.json`.",
+                                    "included_ids": [
+                                        "issue-67-487c"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 67,
-                                    "id": "issue-67-487c",
-                                    "question": "How can I see which program options and values are supported by my appliance?",
-                                    "answer": "You can determine the specific program keys and options supported by your appliance using the following methods:\n\n*   **Check the generated schema**: Look for a file named `.homebridge-homeconnect-v1.schema.json` in your Homebridge storage directory (the same folder where `config.json` is located). This file contains a technical dump of all programs and options that the plugin has discovered for your linked appliances.\n*   **Use the Identify routine**: Trigger the `Identify` routine for the appliance using a third-party HomeKit app (such as Eve). \n    1.  In the Eve app, tap one of the appliance's controls.\n    2.  Expand the details for the appliance (often an arrow next to the name).\n    3.  Select **ID** or **Identify**.\n    4.  Check your Homebridge logs. The plugin will output a complete list of supported programs, options, and their valid enumeration values.\n\nThis information is essential for configuring custom program switches via the `addprograms` setting."
-                                },
-                                {
-                                    "issue_number": 75,
-                                    "id": "issue-75-349e",
-                                    "question": "Why is a specific program option or feature missing for my appliance?",
-                                    "answer": "The plugin does not have appliance program options or specific features hardcoded into its logic. Instead, it dynamically discovers the capabilities of each appliance by querying the Home Connect API.\n\nIf a feature, such as a specific program option or transfer function, is not visible in Homebridge, it is usually due to one of the following reasons:\n1. The feature is not currently supported by the Home Connect API for that appliance category.\n2. The specific appliance model or firmware version does not expose that feature via the API.\n\nUsers can verify the expected capabilities for their appliance type in the [Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options). If a feature is listed in the documentation but missing for a specific appliance, or if you wish to request a new feature be added to the API, you should contact the Home Connect developer support team directly. The plugin will automatically surface any new functionality once it is made available via the official API."
-                                },
-                                {
-                                    "issue_number": 76,
-                                    "id": "issue-76-7959",
-                                    "question": "Why are some coffee maker programs missing options in the Homebridge configuration?",
-                                    "answer": "Missing options for coffee makers are typically caused by one of the following factors:\n\n1.  **Home Connect API Constraints**: The public Home Connect API often provides a subset of the functionality available in the official Home Connect app. Certain programs or specific options may simply not be exposed to third-party integrations by the manufacturer.\n2.  **Discovery Process Requirements**: To identify supported programs and options, the plugin must cycle through them when Homebridge starts. This requires the appliance to be switched on and in a state where programs can be selected. Discovery may fail if the appliance is unplugged, currently operated manually, or if consumables (such as water or coffee beans) are missing. Check the Homebridge logs for errors during the startup sequence.\n3.  **Platform Limitations**: The plugin graphical configuration editor is designed for Homebridge. Users of platforms like HOOBS may find that the editor does not operate correctly or fails to display available options due to compatibility issues.\n\nIf you identify specific option keys that are missing from the user interface but are supported by the API, you can manually add them to the `programs` section of your `config.json` to enable them."
-                                },
-                                {
-                                    "issue_number": 77,
-                                    "id": "issue-77-6bec",
-                                    "question": "Why does the plugin report that a specific oven program is not supported by my appliance?",
-                                    "answer": "This plugin dynamically retrieves available programs and options directly from the Home Connect API for each specific appliance. It does not hardcode or filter the list of supported programs.\n\nIf you receive an error stating `Invalid program configuration ignored: Program key '...' is not supported by the appliance`, it indicates that the Home Connect API has reported that the program is not available for your specific model or current firmware version. \n\nEven if a program appears in the official Home Connect app, it may not be exposed via the API for third-party integrations. For issues regarding API support for specific models, you should contact the Home Connect developer support team."
-                                },
-                                {
-                                    "issue_number": 78,
-                                    "id": "issue-78-1a42",
-                                    "question": "Why does my appliance turn on, off, or change programs automatically during initial setup?",
-                                    "answer": "To accurately map an appliance's features to HomeKit, the plugin must discover the full list of supported programs and their specific options (such as temperature ranges or duration). The Home Connect API restricts access to this information; it can only be retrieved when the appliance is powered on and the specific program is selected.\n\nDuring its initial discovery phase, the plugin will:\n1. Switch the appliance on if it is currently off.\n2. Sequentially select each available program to query its supported options.\n3. Attempt to restore the appliance to its original power and program state.\n\nThis process occurs automatically:\n* Upon the first successful authorisation of the plugin.\n* After manually deleting the plugin's persistent cache files.\n* When the `Identify` mechanism is triggered for the appliance within HomeKit.\n\nUsers should avoid manually operating the appliance during this brief window to prevent race conditions or the appliance being left in an incorrect state. For dishwashers, the plugin includes specific logic to avoid interrupting active cycles, but discovery is best performed while the appliance is idle."
-                                },
-                                {
-                                    "issue_number": 78,
-                                    "id": "issue-78-6bc5",
-                                    "question": "Why do the logs state `Selected program ... is not supported by the Home Connect API`?",
-                                    "answer": "This message is a temporary status indicator and does not represent a fault. It occurs when the Home Connect API broadcasts a `BSH.Common.Root.SelectedProgram` event before the plugin has finished building its internal list of all programs supported by that specific appliance model.\n\nBecause the plugin does not yet have the validated list of programs for your device, it cannot verify the options for the newly selected program and logs this message. This typically happens:\n* Immediately after the plugin starts or the appliance connects to the network.\n* Before the plugin has finished its initial discovery and caching of program details.\n\nOnce discovery is complete, the plugin will recognise the program correctly. This is safe, expected behaviour and requires no user action. If you need to force the plugin to re-read these capabilities, you can stop Homebridge and delete the files inside `~/.homebridge/homebridge-homeconnect/persist/` (excluding the file containing your OAuth token)."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
