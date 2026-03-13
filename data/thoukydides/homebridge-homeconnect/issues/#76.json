@@ -1,22 +1,12 @@
 {
     "issue_number": 76,
-    "updated_at": "2026-02-14T14:00:42.508Z",
+    "updated_at": "2026-03-13T11:45:51.197Z",
     "faq": [
         {
-            "question": "Why are some Coffee Maker programme options missing or disappearing from the configuration?",
-            "answer": "The plugin discovers available programmes and their options by querying the Home Connect API during Homebridge startup. This discovery process requires the plugin to simulate the selection of each programme to retrieve its specific valid options. This may fail if:\n\n1. The appliance is powered off or unplugged.\n2. The appliance is currently being controlled locally.\n3. Required consumables (such as water or coffee beans) are low or missing.\n4. The appliance is in a state that prevents programme selection.\n\nIf discovery fails, the plugin may fall back to a previously cached or incomplete state. Check the Homebridge logs during startup (using the `-D` debug option) for messages indicating why discovery might have been skipped or failed. Additionally, please note that the public Home Connect API used by this plugin often provides fewer options than the official Home Connect app, which uses private interfaces.",
-            "semantic_abstract": "Coffee Maker programme options are dynamically discovered via the Home Connect API at startup, requiring the appliance to be in an idle and ready state to permit programme selection. Discrepancies between the plugin and the official app are typically due to limitations of the public API or failed discovery cycles caused by appliance unavailability or low consumables.",
-            "alternative_resolution": "The plugin could potentially log a more prominent warning when a programme discovery cycle fails to complete due to the appliance being in a non-idle state, advising the user to ensure the device is ready and restart Homebridge.",
-            "confidence": "high",
-            "hash": "eaa576a2ccba8b773b33d69ad4c64572041b16f37bbb5251d6e8cca4d72832fe"
-        },
-        {
-            "question": "Why do programme options not appear when using the HOOBS graphical editor?",
-            "answer": "This plugin is designed specifically for Homebridge and its dynamic configuration schema is not compatible with the HOOBS graphical editor. HOOBS does not operate correctly with the way this plugin presents settings, which can result in missing options or interface errors. If you are using HOOBS, you must either configure the plugin manually via the `config.json` file or report the interface compatibility issues to the HOOBS developers. Full functionality of the graphical settings editor is only supported in Homebridge environments such as Homebridge Config UI X.",
-            "semantic_abstract": "The Home Connect plugin utilises a dynamic schema for its configuration interface that is incompatible with the HOOBS graphical editor, leading to missing or incorrectly displayed programme options. Technical support for graphical configuration is limited to Homebridge-native environments.",
-            "alternative_resolution": "A note could be added to the documentation explicitly stating that the dynamic configuration schema is incompatible with HOOBS to prevent user confusion.",
-            "confidence": "high",
-            "hash": "b91b02be7a2f741f0a192d570ab63d4e3e29c07e4ef36188a9636263567519b7"
+            "question": "Why are some coffee maker programs missing options in the Homebridge configuration?",
+            "answer": "Missing options for coffee makers are typically caused by one of the following factors:\n\n1.  **Home Connect API Constraints**: The public Home Connect API often provides a subset of the functionality available in the official Home Connect app. Certain programs or specific options may simply not be exposed to third-party integrations by the manufacturer.\n2.  **Discovery Process Requirements**: To identify supported programs and options, the plugin must cycle through them when Homebridge starts. This requires the appliance to be switched on and in a state where programs can be selected. Discovery may fail if the appliance is unplugged, currently operated manually, or if consumables (such as water or coffee beans) are missing. Check the Homebridge logs for errors during the startup sequence.\n3.  **Platform Limitations**: The plugin graphical configuration editor is designed for Homebridge. Users of platforms like HOOBS may find that the editor does not operate correctly or fails to display available options due to compatibility issues.\n\nIf you identify specific option keys that are missing from the user interface but are supported by the API, you can manually add them to the `programs` section of your `config.json` to enable them.",
+            "semantic_abstract": "Home Connect API constraints often result in fewer program options being available to third-party plugins compared to the official mobile application, particularly for coffee makers. The plugin automated discovery of these options requires the appliance to be active and ready at startup; failures in this process or platform-specific incompatibilities with graphical editors may require manual configuration within `config.json`.",
+            "hash": "795991a0e12d3ac579cf857db83d1abef42d4fbf797f1334a15c5783b3ec571d"
         }
     ]
 }
