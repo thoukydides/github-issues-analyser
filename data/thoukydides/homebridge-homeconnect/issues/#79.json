@@ -1,14 +1,12 @@
 {
     "issue_number": 79,
-    "updated_at": "2026-02-14T14:53:50.413Z",
+    "updated_at": "2026-03-13T13:33:52.654Z",
     "faq": [
         {
-            "question": "Why does my appliance show `No Response` when I try to start a programme via HomeKit?",
-            "answer": "The plugin is designed to report an error back to HomeKit if an appliance fails to execute a command. A common cause for this is attempting to start a programme when Remote Start is not enabled on the physical appliance. If the plugin were to report success instead, you would receive no notification that the appliance failed to start, which could lead to unexpected results (e.g. an oven not heating up).\n\nTo prevent automations from failing with `No Response`, you should check the Remote Start status before sending a start command. This status is exposed via the `ProgramMode` characteristic on the appliance's main Power `Switch` service. Because the Apple Home app does not display non-standard characteristics, you must use a third-party HomeKit app (such as Eve) to create automations that include a condition checking the `ProgramMode` value. This ensures the start command is only sent when the appliance is ready to receive it.",
-            "semantic_abstract": "Home Connect appliances require Remote Start to be physically enabled for API-initiated programme execution; attempting to start a programme without this results in a command failure which the plugin correctly reports to HomeKit as an error. To avoid Home app 'No Response' states in automations, the `ProgramMode` characteristic on the Power service can be used within third-party HomeKit apps to provide conditional checks for Remote Start readiness.",
-            "alternative_resolution": "The documentation for the Power Switch service could be updated to explicitly mention that checking the `ProgramMode` characteristic is the recommended way to avoid 'No Response' errors in solar or time-based automations.",
-            "confidence": "high",
-            "hash": "56b4ff43cd692cb81f20bc137531d9f2cc91f66ab5a32681c2c5d2cb3b1f16e8"
+            "question": "Why does my appliance show an error or No Response in HomeKit when I try to start a program?",
+            "answer": "When the plugin is unable to set a characteristic to a requested state—such as trying to start an appliance when Remote Start is not enabled—it explicitly returns an error status to HomeKit. This is a deliberate design choice to ensure that users receive accurate feedback. If the plugin were to report success when the appliance failed to start, Siri and the Home app would incorrectly indicate that the appliance is running.\n\nTo avoid these errors in automations, you can check the Remote Start status before attempting to trigger a program. The plugin exposes this via the `ProgramMode` characteristic on the appliance main power `Switch` service:\n\n1. Use a third-party HomeKit app (such as Eve or Controller for HomeKit) to view the `ProgramMode` characteristic, as the standard Apple Home app does not display it.\n2. In your automation logic, add a condition to check that `ProgramMode` is active (indicating Remote Start is enabled on the physical appliance) before sending the start command.\n3. This ensures the automation only runs when the appliance is in a state where it can successfully receive commands, preventing the 'No Response' or greyed-out status in the Home app.",
+            "semantic_abstract": "The plugin reports API errors to HomeKit when appliance commands fail (e.g., Remote Start not enabled) to maintain operational transparency and Siri feedback accuracy. Remote Start status is exposed via the `ProgramMode` characteristic on the power `Switch` service, which can be used as an automation condition in third-party HomeKit apps to prevent execution failures.",
+            "hash": "4e74f7201feceec70bde3bcd173a2111f6b024b7780f8213b4a16794e5181546"
         }
     ]
 }
