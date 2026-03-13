@@ -319,12 +319,16 @@ If an appliance program stops responding, fails to start, or reflects outdated c
 
 #### Why does my appliance show `No Response` when I try to start a program?
 
-<!-- INCLUDES: issue-3-e7f1 -->
+<!-- INCLUDES: issue-3-e7f1 issue-79-4e74 -->
 To protect your safety and prevent your appliance from starting unexpectedly, **Remote Start must be physically enabled** on the appliance itself before remote control is permitted. This is a security-related hardware restriction that cannot be activated or overridden via the Home Connect API or this plugin.
 
-Most appliances require you to press a physical button to enable this mode. The activation typically remains valid for a limited period or until the appliance door is opened. If you attempt to start a program via HomeKit when Remote Start is disabled, the plugin intentionally reports an error to HomeKit, which the Apple Home app displays as `No Response`. Reporting "Success" instead would be misleading, as the appliance would not actually start.
+Most appliances require you to press a physical button to enable this mode. The activation typically remains valid for a limited period or until the appliance door is opened. If you attempt to start a program via HomeKit when Remote Start is disabled, the plugin intentionally reports an error to HomeKit, which the Apple Home app displays as `No Response`. This is a deliberate design choice; reporting "Success" instead would be misleading, as the appliance would not actually start, and Siri or the Home app would incorrectly indicate that the appliance is running.
 
-This plugin exposes the appliance's Remote Start status via the `Program Mode` characteristic on the power `Switch` service. It is not shown in the Home app, but can be viewed or used to gate automations in third-party apps like *Eve*.
+To avoid these errors in automations, you can check the Remote Start status before attempting to trigger a program. This plugin exposes the status via the `Program Mode` characteristic on the power `Switch` service:
+
+1. Use a third-party HomeKit app (such as *Eve* or *Controller for HomeKit*) to view or automate based on the `Program Mode` characteristic, as the standard Apple Home app does not display it.
+2. In your automation logic, add a condition to check that `Program Mode` is active before sending the start command.
+3. This ensures the automation only runs when the appliance is in a state where it can successfully receive commands, preventing "No Response" or greyed-out status in the Home app.
 
 #### What does `LockedByLocalControl` or "Local Intervention" mean?
 
@@ -379,17 +383,6 @@ Frequent transitions between `Connected` and `Disconnected` states usually indic
 - **Local Network**: Weak Wi-Fi signals or intermittent internet drops can cause the appliance to lose its cloud heartbeat.
 
 When these disconnections occur, the plugin logs the event and updates the HomeKit status to reflect that the device is unreachable. This is a reporting of the appliance's actual cloud state and cannot be resolved via plugin code changes.
-
-#### 🚧 Why does my appliance show an error or No Response in HomeKit when I try to start a program? 🚧
-
-<!-- INCLUDES: issue-79-4e74 -->
-When the plugin is unable to set a characteristic to a requested state—such as trying to start an appliance when Remote Start is not enabled—it explicitly returns an error status to HomeKit. This is a deliberate design choice to ensure that users receive accurate feedback. If the plugin were to report success when the appliance failed to start, Siri and the Home app would incorrectly indicate that the appliance is running.
-
-To avoid these errors in automations, you can check the Remote Start status before attempting to trigger a program. The plugin exposes this via the `ProgramMode` characteristic on the appliance main power `Switch` service:
-
-1. Use a third-party HomeKit app (such as Eve or Controller for HomeKit) to view the `ProgramMode` characteristic, as the standard Apple Home app does not display it.
-2. In your automation logic, add a condition to check that `ProgramMode` is active (indicating Remote Start is enabled on the physical appliance) before sending the start command.
-3. This ensures the automation only runs when the appliance is in a state where it can successfully receive commands, preventing the 'No Response' or greyed-out status in the Home app.
 
 ### Programs and Options
 
