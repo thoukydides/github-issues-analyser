@@ -1,29 +1,24 @@
 {
     "issue_number": 77,
-    "updated_at": "2026-02-14T13:26:32.685Z",
+    "updated_at": "2026-03-13T10:56:54.397Z",
     "faq": [
         {
-            "question": "Why can't I set the alarm timer or `AlarmClock` setting on my appliance?",
-            "answer": "HomeKit does not currently define services or characteristics with the correct semantics for a general-purpose appliance alarm timer. Mapping this functionality to existing, unrelated HomeKit services would result in incorrect behaviour and cause issues when using Siri. To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer.",
-            "semantic_abstract": "HomeKit lack of appropriate services and characteristics for appliance alarm timers prevents the implementation of the `BSH.Common.Setting.AlarmClock` setting, as mapping it to existing types would degrade Siri integration.",
-            "alternative_resolution": "The documentation could benefit from a 'Limitations' section explicitly listing Home Connect features (like general-purpose timers) that cannot be mapped to HomeKit due to platform constraints.",
-            "confidence": "high",
-            "hash": "7f97f88c2710c148577e8a2381525bc225c3bb6c91cf8beffed710d163a5c9c6"
+            "question": "Why can I not set the appliance alarm timer via HomeKit?",
+            "answer": "The Home Connect `BSH.Common.Setting.AlarmClock` setting is not currently exposed because HomeKit does not provide services or characteristics with the appropriate semantics for an appliance alarm timer. \n\nMapping this functionality to existing HomeKit types—such as a generic switch or a duration characteristic—would cause issues with Siri voice commands and create a poor user experience. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers.",
+            "semantic_abstract": "Home Connect `BSH.Common.Setting.AlarmClock` functionality is omitted because HomeKit lacks services with appropriate semantics. Mapping to existing types is avoided to prevent Siri integration issues and maintain semantic integrity.",
+            "hash": "93f55ce5a4ebc18f11854e101fa3b283310bbf0b50032d24631fe9463746202e"
         },
         {
-            "question": "Can I hide or disable specific switches like Sabbath Mode in HomeKit?",
-            "answer": "No, the plugin does not provide configuration options to hide or disable specific appliance settings or switches. The design philosophy of the plugin is to expose all functionality supported by the Home Connect API where a suitable HomeKit mapping exists. There are no plans to add per-feature visibility toggles for settings like Sabbath Mode.",
-            "semantic_abstract": "Maintainer design choice to exclude granular configuration for hiding specific appliance switches or settings to maintain plugin simplicity and follow the principle of exposing all API-supported features.",
-            "confidence": "high",
-            "hash": "ea0e6ebc41f7f4be15dfe803c15d1274a7af50d3ad2bff32c17c42a9bf4ed729"
+            "question": "Can I prevent specific settings like Sabbath Mode from appearing as switches in HomeKit?",
+            "answer": "No, the plugin does not provide configuration options to hide or disable specific settings or switches, such as Sabbath Mode. \n\nTo maintain a consistent and manageable codebase, the maintainer does not add granular configuration for individual appliance features. If a setting is exposed by the Home Connect API as a toggleable option, it will be automatically represented as a switch in HomeKit.",
+            "semantic_abstract": "The plugin maintains a policy against granular configuration for hiding individual appliance settings, such as Sabbath Mode switches. This design choice ensures codebase maintainability and consistent mapping of API-exposed settings to HomeKit.",
+            "hash": "e34216140f460b6d4e5df242c88cb8eca95b2e1993047281b71def63ae020ce4"
         },
         {
-            "question": "Why do some oven programs result in an `Invalid program configuration ignored` error?",
-            "answer": "This error occurs when the Home Connect API indicates that a specific program key is not supported by the connected appliance or its current firmware. The plugin does not hardcode or filter available programs; instead, it dynamically queries the Home Connect API for the programs supported by your specific model. If a program like `GrillSmallArea` or a specific steam program is rejected, it is because the appliance is not reporting support for that feature to the API. You can verify available programs in the official Home Connect app or contact Home Connect support if a feature appears to be missing from the API.",
-            "semantic_abstract": "Oven program availability is determined dynamically via the Home Connect API rather than plugin-side hardcoding, meaning 'invalid program' errors reflect appliance or firmware-level limitations in the API response.",
-            "alternative_resolution": "Enhance the log message for 'Invalid program configuration' to explicitly suggest that the user should verify the program's availability in the official Home Connect app to confirm it is supported by their specific firmware.",
-            "confidence": "high",
-            "hash": "48d3403e646113c0094aff23a6fc17a837ef16ccc9926588273b370dc876ffcd"
+            "question": "Why does the plugin report that a specific oven program is not supported by my appliance?",
+            "answer": "This plugin dynamically retrieves available programs and options directly from the Home Connect API for each specific appliance. It does not hardcode or filter the list of supported programs.\n\nIf you receive an error stating `Invalid program configuration ignored: Program key '...' is not supported by the appliance`, it indicates that the Home Connect API has reported that the program is not available for your specific model or current firmware version. \n\nEven if a program appears in the official Home Connect app, it may not be exposed via the API for third-party integrations. For issues regarding API support for specific models, you should contact the Home Connect developer support team.",
+            "semantic_abstract": "Oven programs and options are dynamically discovered via the Home Connect API, meaning any unsupported errors originate from API or firmware constraints. Mismatches between the official app and the API result in specific program keys being rejected for certain appliance models.",
+            "hash": "6bec4e488bde01c11194ae07ade9a96f67d759c670a483dc7f0deb2797b9f62f"
         }
     ]
 }
