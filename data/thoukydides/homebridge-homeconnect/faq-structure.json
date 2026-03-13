@@ -678,11 +678,12 @@
                                 },
                                 {
                                     "question": "Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?",
-                                    "answer": "The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled. Most other services can be individually enabled or disabled for each appliance within the plugin configuration. This includes the `Active Program` switch, though disabling it removes other functionality that may not be obvious:\n\n1. **Status Indicators**: The `On`, `Status Active`, and `Status Fault` characteristics which indicate the current operational state.\n2. **Program Control**: The ability to start, stop, pause, and resume the active program.\n3. **Time Remaining**: The `Remaining Duration` characteristic.\n\nIf services remain visible in HomeKit (often appearing as \"unresponsive\") after you have configured them to be hidden, it is likely due to HomeKit's internal caching and synchronisation mechanisms rather than the plugin itself. When a feature is disabled, the plugin removes the service from the accessory definition, but HomeKit may retain a stale cached version across multiple hubs or iCloud-synced devices. To resolve persistent stale entries, try these steps in order:\n\n- **Check the logs**: Verify the plugin is removing the service. You may see a message such as `Removing obsolete service \"Internal Light\"` if the service was restored from the Homebridge cache but is now disabled.\n- **Restart Homebridge**: This triggers a fresh configuration update to HomeKit.\n- **Wait**: Allow several hours for iCloud synchronisation to reconcile the state across all your devices.\n- **Reboot the Home Hub**: Restart your primary Apple TV or HomePod.\n- **Reset iCloud**: Sign out of iCloud on the Home Hub and sign back in.\n- **Remove the bridge**: As a last resort, remove the Homebridge bridge from HomeKit and re-add it.",
+                                    "answer": "The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled. Similarly, the plugin does not provide granular configuration to hide or disable specific settings or features, such as Sabbath Mode. To maintain a consistent and manageable codebase, the plugin automatically exposes toggleable settings as switches rather than offering individual configuration for every possible appliance feature. If you wish to hide these specific switches in the Apple Home app, it is recommended to move them to a different room within the app.\n\nMost other primary services can be individually enabled or disabled for each appliance within the plugin configuration. This includes the `Active Program` switch, though disabling it removes other functionality:\n\n1. **Status Indicators**: The `On`, `Status Active`, and `Status Fault` characteristics which indicate the current operational state.\n2. **Program Control**: The ability to start, stop, pause, and resume the active program.\n3. **Time Remaining**: The `Remaining Duration` characteristic.\n\nIf services remain visible in HomeKit (often appearing as \"unresponsive\") after you have configured them to be hidden, it is likely due to HomeKit's internal caching and synchronisation mechanisms rather than the plugin itself. When a feature is disabled, the plugin removes the service from the accessory definition, but HomeKit may retain a stale cached version across multiple hubs or iCloud-synced devices. To resolve persistent stale entries, try these steps in order:\n\n- **Check the logs**: Verify the plugin is removing the service. You may see a message such as `Removing obsolete service \"Internal Light\"` if the service was restored from the Homebridge cache but is now disabled.\n- **Restart Homebridge**: This triggers a fresh configuration update to HomeKit.\n- **Wait**: Allow several hours for iCloud synchronisation to reconcile the state across all your devices.\n- **Reboot the Home Hub**: Restart your primary Apple TV or HomePod.\n- **Reset iCloud**: Sign out of iCloud on the Home Hub and sign back in.\n- **Remove the bridge**: As a last resort, remove the Homebridge bridge from HomeKit and re-add it.",
                                     "included_ids": [
                                         "issue-124-2e72",
                                         "issue-240-ed8f",
-                                        "issue-364-a64b"
+                                        "issue-364-a64b",
+                                        "issue-77-e342"
                                     ]
                                 },
                                 {
@@ -710,8 +711,10 @@
                                 },
                                 {
                                     "question": "Why can I not set the alarm timer or `AlarmClock` setting on my appliance?",
-                                    "answer": "HomeKit does not currently define services or characteristics with the correct semantics for a general-purpose appliance alarm timer. Mapping this functionality to existing, unrelated HomeKit services would result in incorrect behaviour and cause issues when using Siri. To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer.",
-                                    "included_ids": []
+                                    "answer": "HomeKit does not currently define services or characteristics with the correct semantics for a general-purpose appliance alarm timer. Mapping this functionality to existing, unrelated HomeKit services or characteristics—such as a generic switch or duration characteristic—would result in incorrect behaviour and cause issues when using Siri.\n\nTo maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers.",
+                                    "included_ids": [
+                                        "issue-77-93f5"
+                                    ]
                                 },
                                 {
                                     "question": "Why do multiple program switches appear with identical names in the Home app?",
@@ -771,20 +774,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 77,
-                                    "id": "issue-77-93f5",
-                                    "question": "Why can I not set the appliance alarm timer via HomeKit?",
-                                    "answer": "The Home Connect `BSH.Common.Setting.AlarmClock` setting is not currently exposed because HomeKit does not provide services or characteristics with the appropriate semantics for an appliance alarm timer. \n\nMapping this functionality to existing HomeKit types—such as a generic switch or a duration characteristic—would cause issues with Siri voice commands and create a poor user experience. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers."
-                                },
-                                {
-                                    "issue_number": 77,
-                                    "id": "issue-77-e342",
-                                    "question": "Can I prevent specific settings like Sabbath Mode from appearing as switches in HomeKit?",
-                                    "answer": "No, the plugin does not provide configuration options to hide or disable specific settings or switches, such as Sabbath Mode. \n\nTo maintain a consistent and manageable codebase, the maintainer does not add granular configuration for individual appliance features. If a setting is exposed by the Home Connect API as a toggleable option, it will be automatically represented as a switch in HomeKit."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

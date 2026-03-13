@@ -759,8 +759,10 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?
 
-<!-- INCLUDES: issue-124-2e72 issue-240-ed8f issue-364-a64b -->
-The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled. Most other services can be individually enabled or disabled for each appliance within the plugin configuration. This includes the `Active Program` switch, though disabling it removes other functionality that may not be obvious:
+<!-- INCLUDES: issue-77-e342 issue-124-2e72 issue-240-ed8f issue-364-a64b -->
+The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled. Similarly, the plugin does not provide granular configuration to hide or disable specific settings or features, such as Sabbath Mode. To maintain a consistent and manageable codebase, the plugin automatically exposes toggleable settings as switches rather than offering individual configuration for every possible appliance feature. If you wish to hide these specific switches in the Apple Home app, it is recommended to move them to a different room within the app.
+
+Most other primary services can be individually enabled or disabled for each appliance within the plugin configuration. This includes the `Active Program` switch, though disabling it removes other functionality:
 
 1. **Status Indicators**: The `On`, `Status Active`, and `Status Fault` characteristics which indicate the current operational state.
 2. **Program Control**: The ability to start, stop, pause, and resume the active program.
@@ -803,7 +805,10 @@ The Home Connect API originally only provided a single combined door status for 
 
 #### Why can I not set the alarm timer or `AlarmClock` setting on my appliance?
 
-HomeKit does not currently define services or characteristics with the correct semantics for a general-purpose appliance alarm timer. Mapping this functionality to existing, unrelated HomeKit services would result in incorrect behaviour and cause issues when using Siri. To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer.
+<!-- INCLUDES: issue-77-93f5 -->
+HomeKit does not currently define services or characteristics with the correct semantics for a general-purpose appliance alarm timer. Mapping this functionality to existing, unrelated HomeKit services or characteristics—such as a generic switch or duration characteristic—would result in incorrect behaviour and cause issues when using Siri.
+
+To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers.
 
 #### Why do multiple program switches appear with identical names in the Home app?
 
@@ -868,20 +873,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why can I not set the appliance alarm timer via HomeKit? 🚧
-
-<!-- INCLUDES: issue-77-93f5 -->
-The Home Connect `BSH.Common.Setting.AlarmClock` setting is not currently exposed because HomeKit does not provide services or characteristics with the appropriate semantics for an appliance alarm timer. 
-
-Mapping this functionality to existing HomeKit types—such as a generic switch or a duration characteristic—would cause issues with Siri voice commands and create a poor user experience. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers.
-
-#### 🚧 Can I prevent specific settings like Sabbath Mode from appearing as switches in HomeKit? 🚧
-
-<!-- INCLUDES: issue-77-e342 -->
-No, the plugin does not provide configuration options to hide or disable specific settings or switches, such as Sabbath Mode. 
-
-To maintain a consistent and manageable codebase, the maintainer does not add granular configuration for individual appliance features. If a setting is exposed by the Home Connect API as a toggleable option, it will be automatically represented as a switch in HomeKit.
 
 ### Notifications & Events
 
