@@ -908,16 +908,16 @@
                                     "included_ids": [
                                         "issue-65-719f"
                                     ]
+                                },
+                                {
+                                    "question": "Why does the plugin fail with `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?",
+                                    "answer": "This error indicates that the plugin is running on a version of Node.js older than 16.14.0. The plugin uses the native `AbortSignal.timeout()` method to manage request timeouts for the Home Connect API, which was introduced in Node.js version 16.14.0.\n\nTo resolve this, you must update your Node.js runtime to version 16.14.0 or later. Current versions of the plugin include a startup check that will explicitly warn you if your Node.js environment is insufficient.",
+                                    "included_ids": [
+                                        "issue-80-403c"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 80,
-                                    "id": "issue-80-403c",
-                                    "question": "Why does the plugin fail with `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?",
-                                    "answer": "This error indicates that the plugin is running on a version of Node.js older than 16.14.0. The plugin uses the native `AbortSignal.timeout()` method to manage request timeouts for the Home Connect API, a feature that was introduced in Node.js version 16.14.0.\n\nTo resolve this, you must update your Node.js runtime to version 16.14.0 or later. Current versions of the plugin include a startup check that will explicitly warn you if your Node.js environment is insufficient."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

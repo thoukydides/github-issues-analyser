@@ -98,6 +98,7 @@
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
     - [Are there specific operating system requirements for the plugin?](#are-there-specific-operating-system-requirements-for-the-plugin)
+    - [Why does the plugin fail with `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?](#why-does-the-plugin-fail-with-typeerror-home-connect-api-error-abortsignaltimeout-is-not-a-function)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -999,10 +1000,10 @@ When upgrading your operating system, such as moving between Raspberry Pi OS rel
 * **Standard Tools**: Using standard management tools like `homebridge-config-ui-x` for installation and configuration is recommended to ensure a consistent environment.
 * **Isolation of Issues**: If problems arise after an OS update, verify that `homebridge` and other plugins are working correctly to determine if the issue is specific to this plugin or the broader environment.
 
-#### 🚧 Why does the plugin fail with `TypeError: Home Connect API error: AbortSignal.timeout is not a function`? 🚧
+#### Why does the plugin fail with `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?
 
 <!-- INCLUDES: issue-80-403c -->
-This error indicates that the plugin is running on a version of Node.js older than 16.14.0. The plugin uses the native `AbortSignal.timeout()` method to manage request timeouts for the Home Connect API, a feature that was introduced in Node.js version 16.14.0.
+This error indicates that the plugin is running on a version of Node.js older than 16.14.0. The plugin uses the native `AbortSignal.timeout()` method to manage request timeouts for the Home Connect API, which was introduced in Node.js version 16.14.0.
 
 To resolve this, you must update your Node.js runtime to version 16.14.0 or later. Current versions of the plugin include a startup check that will explicitly warn you if your Node.js environment is insufficient.
 
