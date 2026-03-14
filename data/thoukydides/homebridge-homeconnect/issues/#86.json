@@ -1,14 +1,12 @@
 {
     "issue_number": 86,
-    "updated_at": "2026-02-15T05:09:47.878Z",
+    "updated_at": "2026-03-14T08:52:26.831Z",
     "faq": [
         {
-            "question": "Why does the authorisation fail with an `invalid_request` or `invalid content type` error?",
-            "answer": "These errors are returned by the Home Connect API when an authorisation request is malformed or uses invalid credentials. If you encounter this during initial setup, check the following:\n\n1.  **Client ID Format**: The `clientid` in your `config.json` must be exactly 64 hexadecimal characters (digits `0`-`9` and letters `A`-`F`). Ensure no extra spaces, quotes, or hidden characters were included when copying the ID from the developer portal.\n2.  **Production vs. Simulator Credentials**: The default \"API Web Client\" credentials provided in the Home Connect Developer portal are for the appliance simulator only. If you are connecting physical appliances, you must create a new application in the developer portal to obtain a production Client ID. If you are intentionally using the simulator, ensure `",
-            "semantic_abstract": "Home Connect API authentication requires a strictly formatted `clientid` consisting of 64 hexadecimal characters. The use of 'API Web Client' credentials from the developer portal is restricted to the appliance simulator, while physical appliances require a dedicated application registration. Authorisation failures can also occur if the request lacks the required `Content-Type: application/x-www-form-urlencoded` header, a requirement addressed in plugin version 0.24.3.",
-            "alternative_resolution": "Implement client-side validation for the `clientid` field in the plugin configuration to verify it matches the 64-character hexadecimal pattern before attempting authorisation, providing a descriptive error message if it fails.",
-            "confidence": "high",
-            "hash": "3b75284df4c58c12d56a56233d0ff04c8f6b7570c9e945ddc911577d9d59b70c"
+            "question": "Why does the Home Connect API return `invalid_request` or `invalid content type` during authorisation?",
+            "answer": "This error occurs during the initial authorisation process (Device Flow) and indicates that the Home Connect API has rejected the request. This is usually caused by configuration errors or the use of incorrect credentials:\n\n* **Client ID Format**: The `clientid` in your `config.json` must be exactly 64 hexadecimal characters (composed of `0`-`9` and `A`-`F`). Check for any accidental characters, spaces, or truncation.\n* **Production vs Simulator Credentials**: The default \"API Web Client\" credentials found in the Home Connect Developer Portal are exclusively for use with the appliance simulator. They will not work with physical appliances. For real appliances, you must create a separate application in the developer portal and use its unique Client ID.\n* **Simulator Configuration**: If you intend to use the \"API Web Client\" credentials for testing, you must set `\"simulator\": true` in your configuration. Without this, the plugin attempts to connect to the production API, which does not recognise these credentials.\n\nIf your configuration is verified and correct, ensure you are running the latest version of the plugin. Historical versions had compatibility issues with mandatory `Content-Type` headers that could trigger this specific error.",
+            "semantic_abstract": "OAuth `invalid_request` errors during the Home Connect Device Flow typically result from malformed `clientid` strings or the use of simulator-specific credentials for production appliances. The Home Connect API enforces a 64-character hexadecimal Client ID format and requires specific `application/x-www-form-urlencoded` headers for successful authorisation.",
+            "hash": "1379f980aaa229e1ce811ad2210ca786a63fce6b94ac5214d082c4cf59fec6f6"
         }
     ]
 }
