@@ -117,7 +117,7 @@ First, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect pla
 
 #### Why does authorisation fail with `invalid_request` or `request rejected by client authorization authority`?
 
-<!-- INCLUDES: issue-82-05c8 issue-86-3b75 issue-117-1a0f -->
+<!-- INCLUDES: issue-82-05c8 issue-117-1a0f -->
 These errors are returned when the provided `Client ID` is not recognised or is improperly formatted. Check the following:
 
 - **Incorrect Format**: The `Client ID` must be exactly 64 hexadecimal characters. Ensure no extra spaces, quotes, or hidden characters were included when copying the ID from the developer portal.
@@ -141,7 +141,7 @@ If the configuration is correct but errors persist, try deleting and recreating 
 
 #### Why does the authorisation link expire or fail with an `expired_token` error?
 
-<!-- INCLUDES: issue-97-1958 issue-125-9208 issue-151-9c3a -->
+<!-- INCLUDES: issue-125-9208 issue-151-9c3a -->
 Authorisation links and their associated device codes are only valid for a limited time. If this window is exceeded, or if a link is used more than once, the Home Connect API will return `expired_token` or `the code entered is invalid or has expired`.
 
 If the authorisation fails:
@@ -187,6 +187,24 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
+#### 🚧 Why does the Home Connect API return `invalid_request` or `invalid content type` during authorisation? 🚧
+
+<!-- INCLUDES: issue-86-1379 -->
+This error occurs during the initial authorisation process (Device Flow) and indicates that the Home Connect API has rejected the request. This is usually caused by configuration errors or the use of incorrect credentials:
+
+* **Client ID Format**: The `clientid` in your `config.json` must be exactly 64 hexadecimal characters (composed of `0`-`9` and `A`-`F`). Check for any accidental characters, spaces, or truncation.
+* **Production vs Simulator Credentials**: The default "API Web Client" credentials found in the Home Connect Developer Portal are exclusively for use with the appliance simulator. They will not work with physical appliances. For real appliances, you must create a separate application in the developer portal and use its unique Client ID.
+* **Simulator Configuration**: If you intend to use the "API Web Client" credentials for testing, you must set `"simulator": true` in your configuration. Without this, the plugin attempts to connect to the production API, which does not recognise these credentials.
+
+If your configuration is verified and correct, ensure you are running the latest version of the plugin. Historical versions had compatibility issues with mandatory `Content-Type` headers that could trigger this specific error.
+
+#### 🚧 Why does the log show `Home Connect API error: Device authorization session not found, expired or blocked [expired_token]`? 🚧
+
+<!-- INCLUDES: issue-97-4efe -->
+This error is returned by the Home Connect API during the OAuth Device Flow authorisation process. It indicates that the device code has either expired or has already been used. The Home Connect API allows a 10-minute window for the user to visit the authorisation URL and approve the connection. If the process is not completed within this time, the session is invalidated.
+
+The plugin handles this error gracefully by waiting 60 seconds before automatically attempting to start a new authorisation session. To resolve this, monitor the Homebridge logs for a new authorisation URL and complete the browser-based verification steps promptly once the link is generated.
+
 ### Home Connect API Errors
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
@@ -205,7 +223,7 @@ No manual intervention is required; the plugin will automatically resume communi
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-83-53f1 issue-99-fe79 issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-d74c issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
 The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details of the specific reason. Some of the more common cases are:
 
 - `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
@@ -317,6 +335,43 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name like `94a08da1...`). Deleting this will require you to re-authorise the plugin.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge**. The plugin will fetch fresh data from the Home Connect API.
+
+#### 🚧 Why does the log show `Home Connect API error: Too Many Requests` when starting the event stream? 🚧
+
+<!-- INCLUDES: issue-74-f147 -->
+The Home Connect API enforces a strict limit of 10 concurrent event monitoring channels per user account. Reaching this limit will cause the API to reject new connection attempts with a `429 Too Many Requests` error.
+
+This typically occurs under the following conditions:
+1.  **Homebridge Crash Loops**: If the plugin or Homebridge is restarting frequently (e.g., every few minutes) due to a configuration error or a crash in another plugin, the previous event stream connections may not be closed properly on the Home Connect servers.
+2.  **Multiple API Clients**: If you are running multiple instances of Homebridge or other third-party integrations (like Home Assistant or custom scripts) using the same Home Connect account, the cumulative number of active streams might exceed 10.
+
+To resolve this, ensure your Homebridge instance is stable and not restarting. If you have recently experienced a crash loop, you may need to wait for several minutes for the stale connections to time out on the Home Connect backend before a new stream can be established successfully.
+
+#### 🚧 Why does my fridge, freezer, or hob have a power switch that does not work? 🚧
+
+<!-- INCLUDES: issue-83-6a23 -->
+This plugin creates a HomeKit `Switch` service for every appliance to display its current power state. The functionality of this switch—specifically whether it can be toggled or is read-only—is determined by the capabilities reported by the Home Connect API.
+
+If your appliance shows a switch that can be turned off, but doing so results in an error such as `BSH.Common.Setting.PowerState currently not available or writable [SDK.Error.InvalidSettingState]`, this is due to an inaccuracy in the Home Connect API. In these cases, the API incorrectly informs the plugin that the appliance supports being switched `Off` or put into `Standby`, but then rejects the command when it is actually sent.
+
+* **Cooling appliances**: Most fridges and freezers only support the `On` state via the API. If they appear toggleable in HomeKit, it is because the Home Connect servers are returning incorrect constraints for that specific model.
+* **Hobs and cooktops**: The plugin does not hardcode these as read-only because the Home Connect API documentation has indicated that remote power and program control may be enabled for these devices. The plugin exposes the control if the API claims it is supported.
+
+This behaviour is a limitation of the data provided by the Home Connect servers. If your hardware does not support remote power control but shows a toggleable switch, you should treat it as a read-only status indicator.
+
+#### 🚧 Why can I see the power status of my appliance but not control it via the power switch? 🚧
+
+<!-- INCLUDES: issue-99-2377 -->
+This behaviour is typically caused by a bug in the Home Connect API where an appliance incorrectly reports its supported power states. Specifically, some appliances (often Siemens ovens) claim to support both `BSH.Common.EnumType.PowerState.Off` and `BSH.Common.EnumType.PowerState.Standby` simultaneously.
+
+According to the Home Connect API specification, an appliance should support either `Off` or `Standby`, but never both. Because the plugin cannot determine which command is valid for your specific hardware, it treats the power state as read-only. This safeguard prevents the plugin from sending invalid commands that could lead to your account being temporarily blocked by the Home Connect servers due to excessive errors. If your logs contain the message `Claims can be both switched off and placed in standby; treating as cannot be switched off`, your appliance is affected by this API reporting error.
+
+**How the plugin handles turning switches off:**
+1. **Power switch**: If the API correctly reports either `Off` or `Standby`, the plugin will use that state. If reporting is ambiguous, control is disabled.
+2. **Active program switch**: If the appliance supports pausing, turning this switch off will `Pause` the program. If not supported, it will `Stop` the program.
+3. **Specific program switch**: If the switch was used to start a program, turning it off will `Stop` the active program.
+
+Control will be restored automatically if and when the Home Connect API correctly identifies the supported power states for your specific appliance model.
 
 ### Local/Remote Control
 
@@ -620,7 +675,7 @@ This information is essential when configuring a **Custom list of programs and o
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
 
-<!-- INCLUDES: issue-15-1a1d issue-74-d6d6 issue-170-3230 -->
+<!-- INCLUDES: issue-15-1a1d issue-170-3230 -->
 The plugin relies on a real-time Server Sent Events (SSE) stream from the Home Connect API to receive status updates. If this stream is interrupted or the backend stops sending events, the plugin cannot update HomeKit.
 
 The API sends a `KEEP-ALIVE` event approximately every 55 seconds; if the plugin detects no activity for 120 seconds, it will automatically re-establish the stream. In some cases, the connection may remain technically active while the Home Connect backend stops distributing actual state change events, either due to events not being received from the appliance or internal errors within the cloud infrastructure.
@@ -737,6 +792,17 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
+#### 🚧 Why do appliance status updates stop appearing until Homebridge is restarted? 🚧
+
+<!-- INCLUDES: issue-74-dd76 -->
+The plugin receives real-time updates from Home Connect using a long-lived Server-Sent Events (SSE) stream. This connection depends on both the Home Connect backend and your local network stability.
+
+*   **How it works**: The Home Connect server is designed to send a `KEEP-ALIVE` event every 55 seconds. The plugin monitors this and will automatically attempt to tear down and restart the connection if no activity is detected for 120 seconds.
+*   **Symptoms of a stall**: If you notice that status changes (like a dishwasher finishing or a door opening) are not appearing in HomeKit, but the log does not show any errors, the stream may have stalled. You can verify if the plugin is still attempting to recover by looking for `Terminated events stream ... ESOCKETTIMEDOUT` in the logs.
+*   **Root causes**: Historically, Home Connect has experienced backend issues where they stop distributing events to established streams even while continuing to send heartbeats. Alternatively, network equipment (like routers or firewalls) with aggressive TCP idle timeouts may silently drop the connection. Most consumer routers have a default TCP idle timeout of 300 seconds; if yours is set lower than 60 seconds, it may interfere with the stream.
+
+If updates stop but a network trace shows periodic 55-second heartbeats arriving at your Homebridge server, the issue is likely within the Home Connect infrastructure. In such cases, restarting Homebridge forces a new connection which typically restores functionality.
 
 ## Apple HomeKit
 
@@ -875,6 +941,17 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
+#### 🚧 Why does my hood light produce a `Brightness` characteristic warning in the logs? 🚧
+
+<!-- INCLUDES: issue-84-6da7 -->
+A warning stating that the `Brightness` characteristic was supplied an illegal value (e.g. `number 0 exceeded minimum of 10` or `25`) often occurs during the initialisation of hood appliances. 
+
+This happens because many Home Connect hoods define a specific range for their lighting brightness via the API, typically between 10% and 100%. When Homebridge first creates the `Brightness` characteristic, it may default to a value of `0`. If the plugin subsequently applies the API-mandated minimum (such as 10%) while the current value is still `0`, Homebridge logs a warning because the value is now outside the permitted range.
+
+In some cases, users have reported the log incorrectly identifying the minimum as `25`. This appears to be a quirk in how specific versions of Homebridge or the underlying HAP-NodeJS library handle characteristic ranges for certain device types. 
+
+This is a non-functional warning that occurs during the setup or status retrieval process (`handleGetRequest`) and does not affect the actual operation of the hood's lighting. It can safely be ignored as the plugin will synchronise the correct brightness value from the appliance shortly after initialisation.
+
 ### Notifications & Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
@@ -1007,4 +1084,30 @@ This error indicates that the plugin is running on a version of Node.js older th
 
 To resolve this, you must update your Node.js runtime to version 16.14.0 or later. Current versions of the plugin include a startup check that will explicitly warn you if your Node.js environment is insufficient.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-56-ce35 issue-57-6cdc issue-84-bee9 issue-85-0a95 issue-89-ea9b issue-91-e7db issue-93-7521 issue-97-c838 issue-108-a5c4 issue-116-e2ec issue-118-9a71 issue-141-5245 issue-144-f92c issue-145-8923 issue-164-bbc4 issue-181-e108 issue-190-235a issue-194-f6ee issue-195-84f2 issue-196-8511 issue-239-ce99 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
+#### 🚧 Why does the log show `ExperimentalWarning: buffer.Blob is an experimental feature`? 🚧
+
+<!-- INCLUDES: issue-85-5365 -->
+The `ExperimentalWarning: buffer.Blob is an experimental feature` message is a diagnostic warning issued by the Node.js runtime. It appears because the plugin uses the `undici` library for network requests, which relies on the `buffer.Blob` class. This library was introduced to replace deprecated HTTP client dependencies. This warning is safe to ignore and has no impact on the plugin's operation. It will likely be removed in future Node.js releases as the `Blob` API reaches stability.
+
+#### 🚧 Why does the log show `TypeError: Home Connect API error: AbortSignal.timeout is not a function`? 🚧
+
+<!-- INCLUDES: issue-89-4014 -->
+This error occurs when the plugin is running on a version of Node.js that lacks support for the `AbortSignal.timeout` method. This static method was introduced in Node.js versions v16.14.0 and v17.3.0.
+
+While the plugin specifies a minimum requirement of v16.14.0 in its `package.json` file, some deployment environments—such as Docker containers on Synology NAS—may not strictly enforce these version constraints during installation. This allows the plugin to attempt to execute on an incompatible Node.js runtime, leading to a `TypeError` during appliance discovery or other API-related tasks.
+
+To resolve this issue:
+1. Verify your current Node.js version by running `node -v` in the environment where Homebridge is running.
+2. Update your Node.js runtime to at least v16.14.0, though using the latest stable LTS version (such as v18 or v20) is recommended.
+3. If you are using Docker on a Synology NAS, recreate the container to ensure it pulls an updated image with a supported Node.js version.
+
+#### 🚧 Why does the plugin fail with a `fetch failed` or `TypeError` mentioning `undici` or `timeoutType`? 🚧
+
+<!-- INCLUDES: issue-93-57c0 -->
+These errors typically indicate a corrupted installation or a version mismatch with the `undici` library, which is a third-party dependency used by the plugin for network communication with the Home Connect API.
+
+To resolve this, first verify that your environment meets the plugin's requirements by reviewing the startup logs. Recent versions of the plugin automatically log the current versions of Node.js, Homebridge, and the Homebridge API during initialisation. If these versions satisfy the requirements but the error persists, use the command `npm list` in the plugin's installation directory to inspect the installed version of `undici` and other dependencies.
+
+In most cases, these errors are resolved by performing a clean reinstallation. Uninstall the plugin, clear the npm cache, and then reinstall the plugin to ensure all dependencies are correctly downloaded and linked.
+
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-56-ce35 issue-57-6cdc issue-108-a5c4 issue-116-e2ec issue-118-9a71 issue-141-5245 issue-144-f92c issue-145-8923 issue-164-bbc4 issue-181-e108 issue-190-235a issue-194-f6ee issue-195-84f2 issue-196-8511 issue-239-ce99 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
