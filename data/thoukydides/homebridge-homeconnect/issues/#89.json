@@ -1,14 +1,12 @@
 {
     "issue_number": 89,
-    "updated_at": "2026-02-15T07:13:30.828Z",
+    "updated_at": "2026-03-14T10:46:37.396Z",
     "faq": [
         {
-            "question": "Why does the error `TypeError: Home Connect API error: AbortSignal.timeout is not a function` occur?",
-            "answer": "This error occurs when the version of Node.js being used to run Homebridge is older than the plugin's minimum requirements. The `AbortSignal.timeout` static method was introduced in Node.js **v16.14.0** and **v17.3.0**.\n\nTo resolve this issue, you must update your Node.js environment:\n\n1. Check your current Node.js version by running `node -v` in your terminal.\n2. Ensure you are running at least Node.js **v16.14.0** (or a later major version like v18 or v20).\n3. If you are using Homebridge in a Docker container (common on platforms like Synology NAS), you may need to recreate the container or update the image to ensure the internal Node.js version is updated.\n\nNote that even if your host system has a newer version of Node.js installed, Homebridge might be configured to use a different, older version. Always verify the version reported in the Homebridge logs during startup.",
-            "semantic_abstract": "Node.js runtime versions older than v16.14.0 or v17.3.0 lack the `AbortSignal.timeout` method required by the plugin's API communication layer. This mismatch between the plugin's minimum version specification and the actual execution environment leads to a `TypeError` during appliance discovery.",
-            "alternative_resolution": "The plugin could implement an explicit runtime check for the existence of `AbortSignal.timeout` during initialisation, providing a more descriptive error message that identifies the Node.js version requirement if the method is missing.",
-            "confidence": "high",
-            "hash": "ea9b872ff6083626945f3f02f7ac521207645929aa0656ba5a6d1cfca11c6946"
+            "question": "Why does the log show `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?",
+            "answer": "This error occurs when the plugin is running on a version of Node.js that lacks support for the `AbortSignal.timeout` method. This static method was introduced in Node.js versions v16.14.0 and v17.3.0.\n\nWhile the plugin specifies a minimum requirement of v16.14.0 in its `package.json` file, some deployment environments—such as Docker containers on Synology NAS—may not strictly enforce these version constraints during installation. This allows the plugin to attempt to execute on an incompatible Node.js runtime, leading to a `TypeError` during appliance discovery or other API-related tasks.\n\nTo resolve this issue:\n1. Verify your current Node.js version by running `node -v` in the environment where Homebridge is running.\n2. Update your Node.js runtime to at least v16.14.0, though using the latest stable LTS version (such as v18 or v20) is recommended.\n3. If you are using Docker on a Synology NAS, recreate the container to ensure it pulls an updated image with a supported Node.js version.",
+            "semantic_abstract": "The plugin's internal API handling relies on the `AbortSignal.timeout` method, which requires Node.js v16.14.0+ or v17.3.0+. Certain deployment environments, including Docker on Synology NAS, may fail to enforce the `engines` requirement specified in the plugin's configuration, leading to runtime failures if the underlying Node.js version is incompatible.",
+            "hash": "40144d6b63407b608367721c39aa0af0c5bc0bb9ba12bba57d9853f8d2da4ef6"
         }
     ]
 }
