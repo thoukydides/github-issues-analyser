@@ -913,32 +913,28 @@
                                 },
                                 {
                                     "question": "Why does the plugin fail with `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?",
-                                    "answer": "This error indicates that the plugin is running on a version of Node.js older than 16.14.0. The plugin uses the native `AbortSignal.timeout()` method to manage request timeouts for the Home Connect API, which was introduced in Node.js version 16.14.0.\n\nTo resolve this, you must update your Node.js runtime to version 16.14.0 or later. Current versions of the plugin include a startup check that will explicitly warn you if your Node.js environment is insufficient.",
+                                    "answer": "This error indicates that the plugin is running on a version of Node.js older than 16.14.0. The plugin uses the native `AbortSignal.timeout()` method to manage request timeouts for the Home Connect API, which was introduced in Node.js version 16.14.0 (and 17.3.0). While the plugin specifies this requirement in its configuration, some environments—particularly Docker containers on Synology NAS—may bypass these version constraints during installation, allowing the plugin to run on an incompatible runtime.\n\nTo resolve this issue:\n\n1. Verify your current Node.js version by running `node -v` in the environment where Homebridge is active.\n2. Update your Node.js runtime to at least v16.14.0. It is highly recommended to use the latest stable LTS version (such as v18 or v20).\n3. If using Docker, ensure the container image is updated to include a supported Node.js version.\n\nCurrent versions of the plugin include a startup check that will explicitly warn if the Node.js environment is insufficient.",
                                     "included_ids": [
-                                        "issue-80-403c"
+                                        "issue-80-403c",
+                                        "issue-89-4014"
+                                    ]
+                                },
+                                {
+                                    "question": "Why does the log show `ExperimentalWarning: buffer.Blob is an experimental feature`?",
+                                    "answer": "The `ExperimentalWarning: buffer.Blob is an experimental feature` message is a diagnostic warning issued by the Node.js runtime. It occurs because the plugin utilises the `undici` library for network requests, which in turn relies on the `buffer.Blob` class. This library was introduced to replace older HTTP client dependencies. This warning is safe to ignore and does not affect the plugin's functionality. It is expected to be removed in future Node.js releases as the `Blob` API reaches stability.",
+                                    "included_ids": [
+                                        "issue-85-5365"
+                                    ]
+                                },
+                                {
+                                    "question": "Why does the plugin fail with a `fetch failed` or `TypeError` mentioning `undici` or `timeoutType`?",
+                                    "answer": "These errors usually indicate a corrupted installation or a version mismatch within the `undici` library, a third-party dependency used for communication with the Home Connect API.\n\nTo resolve this:\n\n1. Review the startup logs to ensure your environment (Node.js, Homebridge, and Homebridge API) meets the plugin's requirements.\n2. If the environment is correct, use the command `npm list` in the plugin's installation directory to check for dependency conflicts.\n3. Perform a clean reinstallation: uninstall the plugin, clear the `npm` cache, and then reinstall the plugin to ensure all dependencies are correctly downloaded and linked.",
+                                    "included_ids": [
+                                        "issue-93-57c0"
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 85,
-                                    "id": "issue-85-5365",
-                                    "question": "Why does the log show `ExperimentalWarning: buffer.Blob is an experimental feature`?",
-                                    "answer": "The `ExperimentalWarning: buffer.Blob is an experimental feature` message is a diagnostic warning issued by the Node.js runtime. It appears because the plugin uses the `undici` library for network requests, which relies on the `buffer.Blob` class. This library was introduced to replace deprecated HTTP client dependencies. This warning is safe to ignore and has no impact on the plugin's operation. It will likely be removed in future Node.js releases as the `Blob` API reaches stability."
-                                },
-                                {
-                                    "issue_number": 89,
-                                    "id": "issue-89-4014",
-                                    "question": "Why does the log show `TypeError: Home Connect API error: AbortSignal.timeout is not a function`?",
-                                    "answer": "This error occurs when the plugin is running on a version of Node.js that lacks support for the `AbortSignal.timeout` method. This static method was introduced in Node.js versions v16.14.0 and v17.3.0.\n\nWhile the plugin specifies a minimum requirement of v16.14.0 in its `package.json` file, some deployment environments—such as Docker containers on Synology NAS—may not strictly enforce these version constraints during installation. This allows the plugin to attempt to execute on an incompatible Node.js runtime, leading to a `TypeError` during appliance discovery or other API-related tasks.\n\nTo resolve this issue:\n1. Verify your current Node.js version by running `node -v` in the environment where Homebridge is running.\n2. Update your Node.js runtime to at least v16.14.0, though using the latest stable LTS version (such as v18 or v20) is recommended.\n3. If you are using Docker on a Synology NAS, recreate the container to ensure it pulls an updated image with a supported Node.js version."
-                                },
-                                {
-                                    "issue_number": 93,
-                                    "id": "issue-93-57c0",
-                                    "question": "Why does the plugin fail with a `fetch failed` or `TypeError` mentioning `undici` or `timeoutType`?",
-                                    "answer": "These errors typically indicate a corrupted installation or a version mismatch with the `undici` library, which is a third-party dependency used by the plugin for network communication with the Home Connect API.\n\nTo resolve this, first verify that your environment meets the plugin's requirements by reviewing the startup logs. Recent versions of the plugin automatically log the current versions of Node.js, Homebridge, and the Homebridge API during initialisation. If these versions satisfy the requirements but the error persists, use the command `npm list` in the plugin's installation directory to inspect the installed version of `undici` and other dependencies.\n\nIn most cases, these errors are resolved by performing a clean reinstallation. Uninstall the plugin, clear the npm cache, and then reinstall the plugin to ensure all dependencies are correctly downloaded and linked."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
