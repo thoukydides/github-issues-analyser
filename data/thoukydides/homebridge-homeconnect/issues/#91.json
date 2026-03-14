@@ -1,14 +1,5 @@
 {
     "issue_number": 91,
-    "updated_at": "2026-02-15T08:58:45.979Z",
-    "faq": [
-        {
-            "question": "Why does the plugin fail with \"Error: Cannot find module 'stream/promises'\"?",
-            "answer": "The error `Error: Cannot find module 'stream/promises'` occurs when the plugin is running on an outdated version of Node.js that does not support modern JavaScript streaming APIs.\n\nThe `stream/promises` module was introduced in Node.js v15.0.0. This plugin requires **Node.js v16.14.0 or later** to operate correctly. To resolve this issue, you must update your Node.js runtime to a supported version, preferably the current Long Term Support (LTS) version recommended by the Homebridge project.\n\nAfter updating Node.js, it is often necessary to restart Homebridge and potentially reinstall the plugin to ensure all dependencies are correctly linked to the new runtime.",
-            "semantic_abstract": "Node.js runtime versions older than v15.0.0 lack the internal `stream/promises` module, causing a fatal error during plugin initialization. The plugin requires a minimum of Node.js v16.14.0 to support modern asynchronous stream handling used in the Home Connect API implementation.",
-            "alternative_resolution": "Ensure the `engines` field in `package.json` strictly defines the minimum Node.js version and consider adding a runtime version check in the plugin entry point to provide a more user-friendly error message before dependency loading fails.",
-            "confidence": "high",
-            "hash": "e7dbbd6a1ca42c8a41783c6c65a1031359b9499e20d16e7c39e5d0819cc536f8"
-        }
-    ]
+    "updated_at": "2026-03-14T11:56:36.150Z",
+    "faq": []
 }
