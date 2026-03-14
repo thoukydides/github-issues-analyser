@@ -613,16 +613,17 @@ This information is essential when configuring a **Custom list of programs and o
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
 
-<!-- INCLUDES: issue-15-1a1d issue-170-3230 -->
-The plugin relies on a real-time Server Sent Events (SSE) stream from the Home Connect API to receive status updates. If this stream is interrupted or the backend stops sending events, the plugin cannot update HomeKit.
+<!-- INCLUDES: issue-15-1a1d issue-74-dd76 issue-170-3230 -->
+The plugin relies on a real-time Server-Sent Events (SSE) stream from the Home Connect API to receive status updates. This connection depends on both the Home Connect backend and your local network stability.
 
-The API sends a `KEEP-ALIVE` event approximately every 55 seconds; if the plugin detects no activity for 120 seconds, it will automatically re-establish the stream. In some cases, the connection may remain technically active while the Home Connect backend stops distributing actual state change events, either due to events not being received from the appliance or internal errors within the cloud infrastructure.
+The API sends a `KEEP-ALIVE` event approximately every 55 seconds. The plugin monitors this and will automatically re-establish the stream if no activity is detected for 120 seconds. If you notice that status changes (like a dishwasher finishing or a door opening) are not appearing in HomeKit, but the log does not show any errors, the stream may have stalled.
 
-To troubleshoot:
+To troubleshoot and identify the root cause:
 
-1. Enable the **Log Debug as Info** plugin option to see all raw events received from the API. If no events are logged when you interact with the appliance, the issue resides with the Home Connect platform or appliance.
-2. Restart Homebridge to force the plugin to subscribe to a fresh event stream.
-3. Ensure your network configuration does not prematurely terminate long-lived TCP connections.
+1. **Check for Timeout Logs**: Look for `Terminated events stream ... ESOCKETTIMEDOUT` in the logs. This indicates the plugin is attempting to recover a failed connection.
+2. **Enable Debugging**: Enable the **Log Debug as Info** plugin option to see all raw events. If the log shows 55-second heartbeats arriving but no state changes when you interact with the appliance, the issue is likely within the Home Connect infrastructure.
+3. **Verify Network Configuration**: Ensure your network equipment (routers or firewalls) does not prematurely terminate long-lived TCP connections. While most consumer routers have a default TCP idle timeout of 300 seconds, if yours is configured for less than 60 seconds, it may interfere with the stream.
+4. **Restart Homebridge**: Forcing a restart will establish a fresh event stream, which typically restores functionality if the previous connection was stalled.
 
 #### Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?
 
@@ -730,17 +731,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why do appliance status updates stop appearing until Homebridge is restarted? 🚧
-
-<!-- INCLUDES: issue-74-dd76 -->
-The plugin receives real-time updates from Home Connect using a long-lived Server-Sent Events (SSE) stream. This connection depends on both the Home Connect backend and your local network stability.
-
-*   **How it works**: The Home Connect server is designed to send a `KEEP-ALIVE` event every 55 seconds. The plugin monitors this and will automatically attempt to tear down and restart the connection if no activity is detected for 120 seconds.
-*   **Symptoms of a stall**: If you notice that status changes (like a dishwasher finishing or a door opening) are not appearing in HomeKit, but the log does not show any errors, the stream may have stalled. You can verify if the plugin is still attempting to recover by looking for `Terminated events stream ... ESOCKETTIMEDOUT` in the logs.
-*   **Root causes**: Historically, Home Connect has experienced backend issues where they stop distributing events to established streams even while continuing to send heartbeats. Alternatively, network equipment (like routers or firewalls) with aggressive TCP idle timeouts may silently drop the connection. Most consumer routers have a default TCP idle timeout of 300 seconds; if yours is set lower than 60 seconds, it may interfere with the stream.
-
-If updates stop but a network trace shows periodic 55-second heartbeats arriving at your Homebridge server, the issue is likely within the Home Connect infrastructure. In such cases, restarting Homebridge forces a new connection which typically restores functionality.
 
 ## Apple HomeKit
 
