@@ -1,22 +1,12 @@
 {
     "issue_number": 97,
-    "updated_at": "2026-02-15T10:54:56.643Z",
+    "updated_at": "2026-03-14T14:05:07.830Z",
     "faq": [
         {
-            "question": "Why do I see `Home Connect API error: Device authorization session not found, expired or blocked [expired_token]` during setup?",
-            "answer": "This error occurs during the initial authorisation process if the device code expires or is used more than once. The Home Connect API provides a limited window, typically 10 minutes, for you to visit the authorisation URL provided in the Homebridge logs and complete the login process. If this time limit is exceeded, or if the URL is accessed multiple times, the session becomes invalid.\n\nThe plugin handles this error gracefully by waiting 60 seconds before automatically starting a new authorisation attempt. To resolve the issue, check the Homebridge logs for a fresh authorisation URL and complete the verification process promptly within the 10-minute window.",
-            "semantic_abstract": "OAuth 2.0 Device Flow authorisation sessions expire if the user does not complete the web-based verification within the 10-minute timeout window defined by the Home Connect API. This leads to an `expired_token` error, necessitating a new authorisation request and fresh user verification.",
-            "alternative_resolution": "The plugin's logs could explicitly mention the 10-minute timeout window when the authorisation URL is first printed to set user expectations and reduce session expirations.",
-            "confidence": "high",
-            "hash": "19582132bed946fcb41f4ff2657b77fde9bb540a3e604829a322131053e8f12c"
-        },
-        {
-            "question": "Why does the plugin fail with `TypeError: AbortSignal.timeout is not a function`?",
-            "answer": "This error indicates that the plugin is running on an unsupported version of Node.js. The plugin requires features like `AbortSignal.timeout` which were introduced in Node.js v17.3.0.\n\nTo resolve this, you must update Node.js to a supported version, ideally the latest Long Term Support (LTS) release. Using an outdated version of Node.js prevents the plugin from correctly managing API request timeouts, leading to this specific crash when attempting to communicate with Home Connect servers.",
-            "semantic_abstract": "The plugin utilises the `AbortSignal.timeout` API for request lifecycle management, which is absent in older Node.js runtimes (pre-v17.3.0). This mismatch results in a fatal `TypeError` during API communication attempts.",
-            "alternative_resolution": "Implement a startup check for the Node.js version and log a clear, human-readable warning or error if the environment does not meet the minimum version requirement for `AbortSignal.timeout`.",
-            "confidence": "high",
-            "hash": "c838fdbb4b7150663500b02c97d0e9e05c8e5cae4d5c8f8c154d9891b53bb7ae"
+            "question": "Why does the log show `Home Connect API error: Device authorization session not found, expired or blocked [expired_token]`?",
+            "answer": "This error is returned by the Home Connect API during the OAuth Device Flow authorisation process. It indicates that the device code has either expired or has already been used. The Home Connect API allows a 10-minute window for the user to visit the authorisation URL and approve the connection. If the process is not completed within this time, the session is invalidated.\n\nThe plugin handles this error gracefully by waiting 60 seconds before automatically attempting to start a new authorisation session. To resolve this, monitor the Homebridge logs for a new authorisation URL and complete the browser-based verification steps promptly once the link is generated.",
+            "semantic_abstract": "The Home Connect API OAuth Device Flow enforces a 10-minute expiration on authorisation codes, leading to `expired_token` errors if user verification is delayed. The plugin manages these timeouts by automatically restarting the authentication flow after a one-minute cooldown period.",
+            "hash": "4efea27cce7212532eb15e667e1d225db1736a793bd5a4c1d0e17f080bae89b4"
         }
     ]
 }
