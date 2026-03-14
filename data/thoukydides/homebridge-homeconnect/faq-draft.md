@@ -4,7 +4,7 @@
 - **[Home Connect](#home-connect)**
   - **[Home Connect or SingleKey ID Authorisation Issues](#home-connect-or-singlekey-id-authorisation-issues)**
     - [Why is the plugin not starting or failing to show an authorisation URL?](#why-is-the-plugin-not-starting-or-failing-to-show-an-authorisation-url)
-    - [Why does authorisation fail with `invalid_request` or `request rejected by client authorization authority`?](#why-does-authorisation-fail-with-invalid_request-or-request-rejected-by-client-authorization-authority)
+    - [Why does authorisation fail with `invalid_request`, `invalid content type`, or `request rejected by client authorization authority`?](#why-does-authorisation-fail-with-invalid_request-invalid-content-type-or-request-rejected-by-client-authorization-authority)
     - [Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list - user not assigned to client`?](#why-does-authorisation-fail-with-invalid_client-grant_type-is-invalid-unauthorized_client-or-client-has-limited-user-list---user-not-assigned-to-client)
     - [Why does the authorisation link expire or fail with an `expired_token` error?](#why-does-the-authorisation-link-expire-or-fail-with-an-expired_token-error)
     - [Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?](#why-does-authorisation-fail-with-access_denied-device-authorization-session-has-expired-or-login-session-expired)
@@ -115,14 +115,15 @@ First, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect pla
 - **Missing Client ID**: The plugin requires the `clientid` property to be set. If missing, it will log an error and stop initialisation.
 - **Manual Editing Errors**: Structural JSON errors are common during manual editing. It is recommended to use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration.
 
-#### Why does authorisation fail with `invalid_request` or `request rejected by client authorization authority`?
+#### Why does authorisation fail with `invalid_request`, `invalid content type`, or `request rejected by client authorization authority`?
 
-<!-- INCLUDES: issue-82-05c8 issue-117-1a0f -->
+<!-- INCLUDES: issue-82-05c8 issue-86-1379 issue-117-1a0f -->
 These errors are returned when the provided `Client ID` is not recognised or is improperly formatted. Check the following:
 
 - **Incorrect Format**: The `Client ID` must be exactly 64 hexadecimal characters. Ensure no extra spaces, quotes, or hidden characters were included when copying the ID from the developer portal.
 - **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.
-- **Production Credentials**: The default "API Web Client" credentials provided in the portal are for the appliance simulator only. If you are connecting physical appliances, you must create a new application in the developer portal to obtain a production `Client ID`.
+- **Production vs Simulator Credentials**: The default "API Web Client" credentials provided in the portal are for the appliance simulator only. If you are using these for testing, you must set `"simulator": true` in your configuration. If you are connecting physical appliances, you must create a new application in the developer portal to obtain a production `Client ID`.
+- **Plugin Version**: Ensure you are running the latest version of the plugin, as older versions may lack mandatory headers required by the Home Connect API.
 
 #### Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list - user not assigned to client`?
 
@@ -141,8 +142,8 @@ If the configuration is correct but errors persist, try deleting and recreating 
 
 #### Why does the authorisation link expire or fail with an `expired_token` error?
 
-<!-- INCLUDES: issue-125-9208 issue-151-9c3a -->
-Authorisation links and their associated device codes are only valid for a limited time. If this window is exceeded, or if a link is used more than once, the Home Connect API will return `expired_token` or `the code entered is invalid or has expired`.
+<!-- INCLUDES: issue-97-4efe issue-125-9208 issue-151-9c3a -->
+Authorisation links and their associated device codes are only valid for a limited time (typically 10 minutes). If this window is exceeded, or if a link is used more than once, the Home Connect API will return `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found, expired or blocked`.
 
 If the authorisation fails:
 - **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.
@@ -186,24 +187,6 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 3. If you are configuring the plugin manually via `config.json`, add `"china": true` to the plugin configuration object.
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
-
-#### 🚧 Why does the Home Connect API return `invalid_request` or `invalid content type` during authorisation? 🚧
-
-<!-- INCLUDES: issue-86-1379 -->
-This error occurs during the initial authorisation process (Device Flow) and indicates that the Home Connect API has rejected the request. This is usually caused by configuration errors or the use of incorrect credentials:
-
-* **Client ID Format**: The `clientid` in your `config.json` must be exactly 64 hexadecimal characters (composed of `0`-`9` and `A`-`F`). Check for any accidental characters, spaces, or truncation.
-* **Production vs Simulator Credentials**: The default "API Web Client" credentials found in the Home Connect Developer Portal are exclusively for use with the appliance simulator. They will not work with physical appliances. For real appliances, you must create a separate application in the developer portal and use its unique Client ID.
-* **Simulator Configuration**: If you intend to use the "API Web Client" credentials for testing, you must set `"simulator": true` in your configuration. Without this, the plugin attempts to connect to the production API, which does not recognise these credentials.
-
-If your configuration is verified and correct, ensure you are running the latest version of the plugin. Historical versions had compatibility issues with mandatory `Content-Type` headers that could trigger this specific error.
-
-#### 🚧 Why does the log show `Home Connect API error: Device authorization session not found, expired or blocked [expired_token]`? 🚧
-
-<!-- INCLUDES: issue-97-4efe -->
-This error is returned by the Home Connect API during the OAuth Device Flow authorisation process. It indicates that the device code has either expired or has already been used. The Home Connect API allows a 10-minute window for the user to visit the authorisation URL and approve the connection. If the process is not completed within this time, the session is invalidated.
-
-The plugin handles this error gracefully by waiting 60 seconds before automatically attempting to start a new authorisation session. To resolve this, monitor the Homebridge logs for a new authorisation URL and complete the browser-based verification steps promptly once the link is generated.
 
 ### Home Connect API Errors
 
