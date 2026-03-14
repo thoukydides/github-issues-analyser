@@ -855,10 +855,13 @@ Consequently, the plugin exposes air conditioners as a power **Switch** (to togg
 
 #### Why are appliance lights mapped as lightbulbs instead of switches?
 
-<!-- INCLUDES: issue-2-bdbd issue-362-0e29 -->
-The Home Connect API defines appliance lights (such as internal refrigerator lights or hood lighting) as settings that often include more than just simple on/off functionality. These can support `Brightness`, `ColorTemperature`, or `Color` depending on the specific model and appliance type. The plugin uses the HomeKit `Lightbulb` service to allow for the full range of hardware capabilities, such as dimming, to be exposed to HomeKit.
+<!-- INCLUDES: issue-2-bdbd issue-84-6da7 issue-362-0e29 -->
+The Home Connect API defines appliance lights (such as internal refrigerator lights or hood lighting) as settings that often include more than just simple on/off functionality. These can support `Brightness`, `ColorTemperature`, or `Color` depending on the specific model. The plugin uses the HomeKit `Lightbulb` service to allow for the full range of hardware capabilities to be exposed to HomeKit.
 
-Note that many Home Connect models (particularly hoods) have a hardware-enforced minimum brightness of 10%. The Home Connect API reflects this limitation; dragging the brightness slider below this threshold in HomeKit will typically turn the light off entirely rather than dimming it further.
+Many models, particularly hoods, have a hardware-enforced minimum brightness (typically 10% or 25%). This leads to two specific behaviours:
+
+- **Log Warnings**: During initialisation or status retrieval (`handleGetRequest`), you may see a warning that the `Brightness` characteristic was supplied an illegal value (e.g. `number 0 exceeded minimum of 10` or `25`). This occurs because the characteristic defaults to `0` before the plugin synchronises the appliance's minimum value. This is a non-functional warning caused by Homebridge or HAP-NodeJS version quirks and can be safely ignored.
+- **Brightness Sliders**: Dragging the brightness slider below the hardware threshold in HomeKit will typically turn the light off entirely rather than dimming it further.
 
 A side effect of the lightbulb mapping is that Siri will include these appliance lights when you issue commands to turn off the lights in a specific room. If you do not want an appliance light to be controlled or grouped with your room lighting, you should disable that specific service in your Homebridge configuration.
 
@@ -868,17 +871,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why does my hood light produce a `Brightness` characteristic warning in the logs? 🚧
-
-<!-- INCLUDES: issue-84-6da7 -->
-A warning stating that the `Brightness` characteristic was supplied an illegal value (e.g. `number 0 exceeded minimum of 10` or `25`) often occurs during the initialisation of hood appliances. 
-
-This happens because many Home Connect hoods define a specific range for their lighting brightness via the API, typically between 10% and 100%. When Homebridge first creates the `Brightness` characteristic, it may default to a value of `0`. If the plugin subsequently applies the API-mandated minimum (such as 10%) while the current value is still `0`, Homebridge logs a warning because the value is now outside the permitted range.
-
-In some cases, users have reported the log incorrectly identifying the minimum as `25`. This appears to be a quirk in how specific versions of Homebridge or the underlying HAP-NodeJS library handle characteristic ranges for certain device types. 
-
-This is a non-functional warning that occurs during the setup or status retrieval process (`handleGetRequest`) and does not affect the actual operation of the hood's lighting. It can safely be ignored as the plugin will synchronise the correct brightness value from the appliance shortly after initialisation.
 
 ### Notifications & Events
 
