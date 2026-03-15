@@ -1,14 +1,12 @@
 {
     "issue_number": 108,
-    "updated_at": "2026-02-16T05:16:15.655Z",
+    "updated_at": "2026-03-15T13:16:31.188Z",
     "faq": [
         {
-            "question": "Why do all services for my appliance have the same name in the Home app since updating to iOS 16?",
-            "answer": "iOS 16 introduced changes to how the Home app displays names for accessories containing multiple services. In many cases, it defaults to showing the name of the parent accessory rather than the unique name of the individual service (such as specific buttons or sensors on a dishwasher). The plugin was updated in version 0.27.0 to include mitigations for this behaviour, such as better support for the `Configured Name` characteristic. To resolve this: \n\n1. Ensure you are running version 0.27.0 or later of the plugin.\n2. If names do not update automatically, you may need to manually rename the individual services within the Home app to restore your preferred labels.",
-            "semantic_abstract": "iOS 16 platform changes caused HomeKit to display the parent accessory name for all child services, obscuring unique service identifiers. Plugin version 0.27.0 implemented naming optimisations and `Configured Name` support to align with the revised Home app display logic for multi-service appliances.",
-            "alternative_resolution": "Provide a link in the plugin configuration UI to documentation explaining how iOS 16 handles service naming to help users who still see duplicate names after updating.",
-            "confidence": "high",
-            "hash": "a5c411436fd34af336a3f8ef41e58f575f457b9e5e0af27bf113ce86ae954c13"
+            "question": "Why do all services for my Home Connect appliance have the same name in iOS 16?",
+            "answer": "Since the release of iOS 16, Apple changed the logic used to display names for accessories that provide multiple services. This often results in the main appliance name being displayed for every individual service (such as different cleaning programmes or lights), rather than the specific name assigned to that service.\n\nImprovements were introduced in plugin version `v0.27.0` to mitigate this by better aligning with how HomeKit expects service names to be presented. If your services still appear with identical names, you may need to manually rename them within the Home app. HomeKit frequently caches the name a service had when it was first added to the home, so updates to the plugin may not automatically change names that have already been synchronised to your devices.",
+            "semantic_abstract": "HomeKit service naming logic in iOS 16 and later prioritises the accessory name over individual service names, causing multiple appliance controls to appear with identical labels. Adjustments to naming characteristics in the plugin improve compatibility, though HomeKit's caching of service names may require manual intervention in the Home app.",
+            "hash": "edb739793e8f46184f7601b714702e223056bf7137f3268a418f0bf466ecc16d"
         }
     ]
 }
