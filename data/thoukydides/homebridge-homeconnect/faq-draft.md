@@ -76,7 +76,7 @@
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
     - [Why can I not set the alarm timer or `AlarmClock` setting on my appliance?](#why-can-i-not-set-the-alarm-timer-or-alarmclock-setting-on-my-appliance)
-    - [Why do multiple program switches appear with identical names in the Home app?](#why-do-multiple-program-switches-appear-with-identical-names-in-the-home-app)
+    - [Why do multiple services or programs appear with identical names in the Apple Home app?](#why-do-multiple-services-or-programs-appear-with-identical-names-in-the-apple-home-app)
     - [Why can I not see or control the child lock for my appliance in the Apple Home app?](#why-can-i-not-see-or-control-the-child-lock-for-my-appliance-in-the-apple-home-app)
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
@@ -762,7 +762,7 @@ To resolve these issues:
 
 #### Why does the Apple Home app not show the remaining time or detailed status for my appliance?
 
-<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-124-9bb6 issue-225-731f issue-230-03a5 -->
+<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-eae0 issue-124-9bb6 issue-225-731f issue-230-03a5 -->
 The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services.
 
 While a `Valve` service might appear applicable to "wet" appliances like dishwashers or washing machines, it is semantically inappropriate for many other Home Connect types that also report remaining time, such as ovens, dryers, or coffee machines. To maintain a consistent architectural model and avoid interface clutter, the plugin does not create these extra services purely for display in the Apple Home app.
@@ -829,14 +829,19 @@ HomeKit does not currently define services or characteristics with the correct s
 
 To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers.
 
-#### Why do multiple program switches appear with identical names in the Home app?
+#### Why do multiple services or programs appear with identical names in the Apple Home app?
 
-<!-- INCLUDES: issue-230-3383 -->
-If multiple program switches appear with identical generic names (such as "Dryer"), this is typically caused by the Apple Home app's display logic rather than the plugin itself. To resolve this:
+<!-- INCLUDES: issue-108-edb7 issue-116-5ab3 issue-230-3383 -->
+Since the release of iOS 16, Apple changed how the Home app displays names for accessories with multiple services. This often causes the main appliance name to be displayed for every tile (e.g. different cleaning programmes or lights) instead of their specific names.
 
-1. Force-quit and restart the Apple Home app to see if the names refresh.
-2. If names remain identical, open the settings for an individual switch in the Home app and delete the prefix or appliance name from the name field. This action often reveals the unique program name (e.g. "Cotton Eco") that was previously hidden.
-3. Manually rename the switch to your preference if necessary.
+To mitigate this, plugin version `v0.27.0` introduced the `Configured Name` characteristic for `Switch`, `Stateless Programmable Switch`, and `Lightbulb` services. This allows the Home app to distinguish between multiple instances of the same service type. If you still encounter generic or identical names:
+
+1. Ensure you are using the latest version of the plugin.
+2. Force-quit and restart the Apple Home app.
+3. If names remain identical, open the settings for an individual tile in the Home app and delete the prefix or appliance name from the name field. This often reveals the unique name (e.g. "Cotton Eco") that was previously hidden.
+4. Manually rename the tile if necessary.
+
+Note that HomeKit frequently caches names from when a service was first added, so updates to the plugin or appliance configuration may not automatically apply to names already synchronised to your devices. Third-party apps like *Eve* or *Home+* may display these names differently or show the `Configured Name` as a separate field.
 
 #### Why can I not see or control the child lock for my appliance in the Apple Home app?
 
@@ -895,31 +900,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why do all services for my Home Connect appliance have the same name in iOS 16? 🚧
-
-<!-- INCLUDES: issue-108-edb7 -->
-Since the release of iOS 16, Apple changed the logic used to display names for accessories that provide multiple services. This often results in the main appliance name being displayed for every individual service (such as different cleaning programmes or lights), rather than the specific name assigned to that service.
-
-Improvements were introduced in plugin version `v0.27.0` to mitigate this by better aligning with how HomeKit expects service names to be presented. If your services still appear with identical names, you may need to manually rename them within the Home app. HomeKit frequently caches the name a service had when it was first added to the home, so updates to the plugin may not automatically change names that have already been synchronised to your devices.
-
-#### 🚧 Why does the Apple Home app not show the remaining time for my appliance? 🚧
-
-<!-- INCLUDES: issue-114-eae0 -->
-The plugin provides the standard HomeKit `Remaining Duration` characteristic for appliances that support it (such as washing machines and dishwashers). However, the Apple Home app currently only displays this characteristic for specific accessory types, primarily `Irrigation System` and `Valve` services.
-
-To view the remaining time for your Home Connect appliances, you can use a third-party HomeKit app (such as Eve, Home+, or Controller for HomeKit). These apps generally support displaying all available characteristics, regardless of the accessory category. The plugin does not map appliances to unsuitable categories like valves just to circumvent Apple's interface limitations, as this would compromise the accuracy of the HomeKit integration.
-
-#### 🚧 Why do all the switches or programs for my appliance have the same name in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-116-5ab3 -->
-Starting with iOS 16, the Apple Home app changed how it handles the display names of multiple services on a single accessory. Previously, the plugin could provide distinct names for each program or switch, but the updated HomeKit behaviour often defaults to showing the name of the main accessory for every tile.
-
-The plugin addresses this by implementing the `Configured Name` characteristic for `Switch`, `Stateless Programmable Switch`, and `Lightbulb` services. This allows the Home app to distinguish between multiple instances of the same service type on one appliance. If you encounter generic names:
-
-1. Ensure you are using the latest version of the plugin.
-2. In the Apple Home app, you may need to manually rename the tiles to match their specific functionality if they did not automatically update.
-3. Note that third-party HomeKit apps, such as Eve or Home+, may display these names differently or show the `Configured Name` as a separate field.
 
 ### Notifications & Events
 
