@@ -1,14 +1,12 @@
 {
     "issue_number": 114,
-    "updated_at": "2026-02-16T03:25:54.418Z",
+    "updated_at": "2026-03-15T11:57:35.551Z",
     "faq": [
         {
             "question": "Why does the Apple Home app not show the remaining time for my appliance?",
-            "answer": "The plugin exposes the `Remaining Duration` characteristic to HomeKit for all supported appliances. However, the official Apple Home app only displays this information for specific accessory types, such as `Irrigation System` and `Valve` services. It does not currently show this value for other appliance types like washing machines, dishwashers, or ovens.\n\nTo view the remaining time, you can use third-party HomeKit applications (such as Home+ or Controller for HomeKit), which support displaying a wider range of standard HomeKit characteristics that Apple's own app hides.",
-            "semantic_abstract": "Home Connect appliance program remaining duration is exposed using standard HomeKit characteristics, but the Apple Home app UI restricts its display to specific service types like Irrigation Systems and Valves. This limitation is a characteristic of the Apple Home app rather than the plugin or the Home Connect API.",
-            "alternative_resolution": "Update the documentation to explicitly mention that the `Remaining Duration` characteristic, while provided by the plugin, is not rendered by the official Apple Home app for most appliance categories.",
-            "confidence": "high",
-            "hash": "0f03fbb2e9a0ec2e7df8bb03894b278fbf8c1cd7224ff3fe55a493156300bcfb"
+            "answer": "The plugin provides the standard HomeKit `Remaining Duration` characteristic for appliances that support it (such as washing machines and dishwashers). However, the Apple Home app currently only displays this characteristic for specific accessory types, primarily `Irrigation System` and `Valve` services.\n\nTo view the remaining time for your Home Connect appliances, you can use a third-party HomeKit app (such as Eve, Home+, or Controller for HomeKit). These apps generally support displaying all available characteristics, regardless of the accessory category. The plugin does not map appliances to unsuitable categories like valves just to circumvent Apple's interface limitations, as this would compromise the accuracy of the HomeKit integration.",
+            "semantic_abstract": "Apple Home app UI limitations restrict the display of the standard `Remaining Duration` characteristic to specific accessory categories, such as irrigation systems and valves. While the plugin correctly exposes appliance program progress via this characteristic, third-party HomeKit clients are required to view this data for categories like washing machines or dishwashers.",
+            "hash": "eae010090fa7e7a963b0bd79189ff1bb472c671eb5357917b5b380919fd67225"
         }
     ]
 }
