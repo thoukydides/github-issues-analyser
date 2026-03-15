@@ -1,14 +1,12 @@
 {
     "issue_number": 112,
-    "updated_at": "2026-02-15T16:57:11.041Z",
+    "updated_at": "2026-03-15T08:54:29.368Z",
     "faq": [
         {
             "question": "Why does the power button for my oven not work?",
-            "answer": "Failure to power an oven on or off is frequently attributed to a bug in the Home Connect API. This is a known issue affecting specific appliance models where the power commands are either ignored or rejected by the Home Connect servers. If you experience this behaviour, please report it directly to [Home Connect Developer Support](https://developer.home-connect.com/support/contact). Include your appliance's part number (E-Nr) and details of the failure. This is an external platform limitation that cannot be resolved through plugin updates.",
-            "semantic_abstract": "Home Connect API server-side bugs prevent certain oven models from responding to power state commands. This external limitation results in unresponsive HomeKit power controls and requires reporting to the Home Connect support team for resolution.",
-            "alternative_resolution": "The plugin documentation could include a dedicated section for known Home Connect API issues, specifically mentioning oven power control limitations and providing the link to the official support contact form.",
-            "confidence": "high",
-            "hash": "6c3a416223bb9f3c25b716ca9a34c6c56c67fe2752e52e216f3bf3e93582bf50"
+            "answer": "Some appliances, specifically ovens, may experience issues where the power state cannot be changed or does not update correctly via HomeKit. This is typically a known limitation caused by bugs or constraints within the Home Connect API itself rather than the plugin. If the power control in HomeKit is unresponsive or out of sync with the physical appliance, the issue should be reported directly to Home Connect developer support.\n\nUsers should ensure that both Remote Control and Remote Start are enabled on the appliance's physical control panel, as these settings are frequently required for the API to permit power state changes. If the problem persists despite these settings being enabled, it confirms a limitation in the manufacturer's API for that specific model.",
+            "semantic_abstract": "Home Connect API constraints cause power state control failures for specific oven models, leading to non-functional power switches within HomeKit. This behaviour represents an external service limitation where the API fails to process power commands or update status correctly for certain appliance categories.",
+            "hash": "a111daa85befedcc5a65523e08acf7108b44fbe32535af71d03e6d7eb172a0e8"
         }
     ]
 }
