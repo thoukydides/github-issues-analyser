@@ -1,14 +1,12 @@
 {
     "issue_number": 113,
-    "updated_at": "2026-02-15T19:47:13.982Z",
+    "updated_at": "2026-03-15T11:39:02.598Z",
     "faq": [
         {
-            "question": "Why do I see the error `HomeAppliance connection initialization failed [SDK.Error.HomeAppliance.Connection.Initialization.Failed]`?",
-            "answer": "This error is returned by the Home Connect API and indicates that the cloud servers were unable to communicate with your appliance. It is not an authentication issue and cannot be resolved by regenerating tokens or re-authorising the plugin.\n\nAccording to the Home Connect API documentation, this error occurs when:\n1. The appliance is offline or powered down.\n2. The appliance failed to respond to connection requests within the required timeout.\n3. There are transient connectivity issues between the appliance, your local network, and the Home Connect servers.\n\nThis behaviour is frequently caused by flaky Home Connect server infrastructure or local Wi-Fi instability. If you encounter this error, verify if the appliance is controllable via the official Home Connect mobile app. Often, the issue is temporary and will resolve itself without intervention.",
-            "semantic_abstract": "The `SDK.Error.HomeAppliance.Connection.Initialization.Failed` error represents a communication timeout or disconnection between the Home Connect cloud and the physical appliance. This occurs due to appliance power states, local network instability, or manufacturer server latency, and is distinct from OAuth authentication failures.",
-            "alternative_resolution": "Enhance log output to explicitly translate common SDK error codes like `SDK.Error.HomeAppliance.Connection.Initialization.Failed` into human-readable explanations that clarify the appliance is unreachable via the cloud API.",
-            "confidence": "high",
-            "hash": "d74c2f8bda2a6bd8b664e4f4e6b35610e249ffed976eaf86594ff1dfdc3437ee"
+            "question": "Why does the error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` occur?",
+            "answer": "The error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` is returned by the Home Connect API when it cannot establish a connection with the appliance. This is typically not related to authentication, client tokens, or plugin configuration.\n\nAccording to the Home Connect API documentation, this error occurs when:\n- The appliance is offline or has lost its Wi-Fi connection.\n- The appliance did not respond to connection initialisation requests in time.\n- The Home Connect servers are experiencing transient issues or latency.\n\nThis error is often temporary and usually resolves itself once the appliance or the Home Connect servers become more responsive. If the error persists, check the appliance's connection to your local network and the internet. Because this error originates from the Home Connect servers' inability to communicate with the hardware, it cannot be resolved by changes within the plugin.",
+            "semantic_abstract": "The Home Connect API returns `SDK.Error.HomeAppliance.Connection.Initialization.Failed` when the cloud service cannot establish a timely connection with an appliance, often due to hardware being offline or server-side latency. This error represents a communication failure between the Home Connect infrastructure and the physical device rather than an issue with OAuth authentication or plugin logic.",
+            "hash": "94914de97c6f8fc029aa03dcdf3b12891edf84bccbaaffa13c8746b862a96746"
         }
     ]
 }
