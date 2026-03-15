@@ -819,10 +819,11 @@
                                 },
                                 {
                                     "question": "How do I get notifications for events like a program finishing?",
-                                    "answer": "The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated \"program finished\" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these existing types would result in a poor user experience; for example, a user would receive a \"smoke detected\" alert when a dishwasher finishes, which is misleading and technically incorrect.\n\nTo receive notifications, you have two main options:\n\n- **The Official Home Connect App**: The most reliable way to get detailed, text-based push notifications.\n- **HomeKit Automations**: Trigger an action via a `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) Contact Sensor, which *does* support native alerts.",
+                                    "answer": "The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated \"program finished\" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these types would result in a poor user experience; for example, a user might receive a \"smoke detected\" or \"door opened\" alert when a wash cycle finishes, which is misleading and technically incorrect.\n\nTo bridge this gap, the plugin maps specific appliance events to a `Stateless Programmable Switch` service. For appliances such as washers, dryers, and dishwashers, the button assignments are typically:\n1. **Button 1 (Single Press)**: Program Finished (`BSH.Common.Event.ProgramFinished`)\n2. **Button 2 (Single Press)**: Program Aborted (`BSH.Common.Event.ProgramAborted`)\n\nBecause these are button events, they can be used to trigger HomeKit automations (for example, turning on a light or playing a sound on a HomePod), but they cannot trigger a text notification directly within the Apple Home app. To receive text-based notifications, you have two main options:\n\n- **Official Home Connect App**: The most reliable way to get detailed, text-based push notifications.\n- **HomeKit Automations**: Trigger an action via the `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) accessory (such as a `Contact Sensor`) which *does* support native alerts.",
                                     "included_ids": [
                                         "issue-38-03f3",
-                                        "issue-124-8aea"
+                                        "issue-124-8aea",
+                                        "issue-63-3185"
                                     ]
                                 },
                                 {
@@ -835,14 +836,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 63,
-                                    "id": "issue-63-3185",
-                                    "question": "How can I get a HomeKit notification when a washing machine or dryer programme finishes?",
-                                    "answer": "Apple's Home app only generates native iOS notifications for a specific subset of service types, such as doors, windows, locks, and sensors (motion, smoke, etc.). It does not support notifications for appliance program status or the `StatelessProgrammableSwitch` service used by this plugin.\n\nFor appliances such as washers, dryers, and dishwashers, the plugin maps specific events to a `StatelessProgrammableSwitch` service with the following button assignments:\n1. **Button 1 (Single Press)**: Programme Finished (`BSH.Common.Event.ProgramFinished`)\n2. **Button 2 (Single Press)**: Programme Aborted (`BSH.Common.Event.ProgramAborted`)\n\nBecause these are button events, they can be used to trigger HomeKit automations (for example, turning on a light or playing a sound on a HomePod), but they cannot trigger a text notification directly within the Home app.\n\nTo receive text-based notifications, you have two main options:\n- **Official App**: Use the official Home Connect app, which provides native push notifications for these events.\n- **Automation Workaround**: Create a HomeKit automation triggered by the \"Program Finished\" button press that toggles a separate \"dummy\" accessory (such as a contact sensor or switch configured via a plugin like `homebridge-dummy`) that does support notifications.\n\nThe maintainer has opted not to map programme events to inappropriate service types (like `Door` or `ContactSensor`) to force notifications, as this would result in confusing or incorrect status messages in the Home app (e.g. reporting that a door has opened when a wash cycle finishes)."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
