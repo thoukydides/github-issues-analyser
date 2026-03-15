@@ -108,7 +108,7 @@
                                 },
                                 {
                                     "question": "Why does my appliance show a `409 Conflict` error?",
-                                    "answer": "The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details:\n\n- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: The appliance is not connected to the Home Connect cloud servers. Test this by disabling Wi-Fi on your phone and attempting to control the appliance via cellular data in the official app.\n- `SDK.Error.InvalidSettingState`: This occurs when a setting is read-only or unavailable. It is often caused by inconsistencies in the API regarding power state capabilities (common with fridges, freezers, and hobs). It can also indicate that **Remote Start** is disabled, or a maintenance message (e.g. \"Change water filter\") is displayed on the physical screen.\n- `SDK.Error.WrongOperationState`: The appliance is in an incorrect state, such as attempting to start a program while another is already running or performing a self-cleaning cycle.\n- `SDK.Error.ProgramNotAvailable`: The program is unavailable for remote execution due to safety features (e.g. local control active) or firmware constraints.\n- `BSH.Common.Error.400.BadRequest`: Frequently indicates an attempt to stop a program that is already stopped, often caused by grouping program switches in the Home app.\n\nRefer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation for more specific details.",
+                                    "answer": "The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details:\n\n- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: The Home Connect API cannot establish a connection with the appliance. This occurs if the appliance is offline, has lost its Wi-Fi connection, or did not respond to the cloud's connection initialisation requests in time. Test this by disabling Wi-Fi on your phone and attempting to control the appliance via cellular data in the official app.\n- `SDK.Error.InvalidSettingState`: This occurs when a setting is read-only or unavailable. It is often caused by inconsistencies in the API regarding power state capabilities (common with fridges, freezers, and hobs). It can also indicate that **Remote Start** is disabled, or a maintenance message (e.g. \"Change water filter\") is displayed on the physical screen.\n- `SDK.Error.WrongOperationState`: The appliance is in an incorrect state, such as attempting to start a program while another is already running or performing a self-cleaning cycle.\n- `SDK.Error.ProgramNotAvailable`: The program is unavailable for remote execution due to safety features (e.g. local control active) or firmware constraints.\n- `BSH.Common.Error.400.BadRequest`: Frequently indicates an attempt to stop a program that is already stopped, often caused by grouping program switches in the Home app.\n\nRefer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation for more specific details.",
                                     "included_ids": [
                                         "issue-1-2d19",
                                         "issue-22-defe",
@@ -117,15 +117,26 @@
                                         "issue-208-c4fd",
                                         "issue-325-3294",
                                         "issue-374-e780",
-                                        "issue-378-832c"
+                                        "issue-378-832c",
+                                        "issue-113-9491"
                                     ]
                                 },
                                 {
                                     "question": "Why is the power switch for my appliance read-only or failing to work?",
-                                    "answer": "The plugin creates a HomeKit `Switch` for every appliance, but its functionality is determined by the capabilities reported by the Home Connect API. Several factors can restrict control:\n\n1. **API Reporting Ambiguity**: Some appliances (particularly Siemens ovens) incorrectly claim to support both `Off` and `Standby` states. Since the API specification requires exactly one, the plugin treats the power state as read-only to avoid sending invalid commands. You may see the log message: `Claims can be both switched off and placed in standby; treating as cannot be switched off`.\n2. **Inaccurate Constraints**: For many fridges, freezers, and hobs, the API incorrectly indicates that the power state is writable. Toggling these often results in `SDK.Error.InvalidSettingState`. If your hardware does not support remote power control, the switch should be treated as a status indicator only.\n3. **Physical Interaction Required**: A `BSH.Common.Error.WriteRequest.Busy` error indicates the appliance cannot process the command because a manual action is needed (e.g. closing a door or filling a water tank).\n4. **Known Oven Bug**: Certain oven models have a platform-level limitation where power commands are rejected despite the appliance being ready. This should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance's E-Nr (part number).\n\nControl will be restored automatically if and when the Home Connect servers provide updated, accurate capabilities for your specific model.",
+                                    "answer": "The plugin creates a HomeKit `Switch` for every appliance, but its functionality is determined by the capabilities reported by the Home Connect API. Several factors can restrict control:\n\n1. **API Reporting Ambiguity**: Some appliances (particularly Siemens ovens) incorrectly claim to support both `Off` and `Standby` states. Since the API specification requires exactly one, the plugin treats the power state as read-only to avoid sending invalid commands.\n2. **Inaccurate Constraints**: For many fridges, freezers, and hobs, the API incorrectly indicates that the power state is writable. Toggling these often results in `SDK.Error.InvalidSettingState`. If your hardware does not support remote power control, the switch should be treated as a status indicator only.\n3. **Known Oven Bug**: Certain oven models have a platform-level limitation where power commands are rejected despite the appliance being ready. This should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance's E-Nr (part number).\n4. **Remote Start/Control Disabled**: Ensure that **Remote Control** and **Remote Start** are enabled on the physical control panel. Many appliances require these settings for the API to permit remote power state changes.\n\nControl will be restored automatically if and when the Home Connect servers provide updated, accurate capabilities for your specific model.",
                                     "included_ids": [
                                         "issue-83-6a23",
-                                        "issue-99-2377"
+                                        "issue-99-2377",
+                                        "issue-112-a111"
+                                    ]
+                                },
+                                {
+                                    "question": "What does the error `BSH.Common.Error.WriteRequest.Busy` mean?",
+                                    "answer": "The `BSH.Common.Error.WriteRequest.Busy` error is returned by the Home Connect cloud servers when a command is sent to an appliance that is currently unable to process it. This typically occurs in the following scenarios:\n\n1. **User Interaction Required**: The appliance has a message or warning on its physical display that must be cleared (e.g. 'Empty drip tray', 'Fill water tank', or 'Confirm program').\n2. **Physical Operation**: The machine is already performing a task or is in a state where it cannot accept new remote commands.\n3. **Cloud Congestion**: There is a transient issue with the Home Connect cloud infrastructure.\n\nCheck the physical display of your appliance for any required actions. If the machine is idle and clear of prompts, the error usually indicates a temporary platform issue that will resolve itself.",
+                                    "included_ids": [
+                                        "issue-83-6a23",
+                                        "issue-99-2377",
+                                        "issue-116-c4a9"
                                     ]
                                 },
                                 {
@@ -146,8 +157,10 @@
                                 },
                                 {
                                     "question": "Why does the log show `Home Connect subsystem not available` or a `503` error?",
-                                    "answer": "The error `Home Connect API error: Home Connect subsystem not available [503]` indicates a server-side maintenance issue or infrastructure outage. This is not a fault with the plugin or your local configuration. The issue is typically transient and is usually resolved by the Home Connect team within a few hours. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.",
-                                    "included_ids": []
+                                    "answer": "The error `Home Connect API error: Home Connect subsystem not available [503]` indicates a server-side maintenance issue or infrastructure outage. This is not a fault with the plugin or your local configuration. The issue is typically transient and is usually resolved by the Home Connect team within a few hours.\n\n**What you can do**:\n- Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.\n- Verify if the official Home Connect mobile app is functional; while outages often affect both, the app may sometimes remain functional due to using different internal API endpoints.\n- If the issue persists for an extended period, you may wish to contact [Home Connect support](https://developer.home-connect.com/support/contact) directly.",
+                                    "included_ids": [
+                                        "issue-73-b97c"
+                                    ]
                                 },
                                 {
                                     "question": "Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?",
@@ -186,32 +199,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 112,
-                                    "id": "issue-112-a111",
-                                    "question": "Why does the power button for my oven not work?",
-                                    "answer": "Some appliances, specifically ovens, may experience issues where the power state cannot be changed or does not update correctly via HomeKit. This is typically a known limitation caused by bugs or constraints within the Home Connect API itself rather than the plugin. If the power control in HomeKit is unresponsive or out of sync with the physical appliance, the issue should be reported directly to Home Connect developer support.\n\nUsers should ensure that both Remote Control and Remote Start are enabled on the appliance's physical control panel, as these settings are frequently required for the API to permit power state changes. If the problem persists despite these settings being enabled, it confirms a limitation in the manufacturer's API for that specific model."
-                                },
-                                {
-                                    "issue_number": 113,
-                                    "id": "issue-113-9491",
-                                    "question": "Why does the error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` occur?",
-                                    "answer": "The error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` is returned by the Home Connect API when it cannot establish a connection with the appliance. This is typically not related to authentication, client tokens, or plugin configuration.\n\nAccording to the Home Connect API documentation, this error occurs when:\n- The appliance is offline or has lost its Wi-Fi connection.\n- The appliance did not respond to connection initialisation requests in time.\n- The Home Connect servers are experiencing transient issues or latency.\n\nThis error is often temporary and usually resolves itself once the appliance or the Home Connect servers become more responsive. If the error persists, check the appliance's connection to your local network and the internet. Because this error originates from the Home Connect servers' inability to communicate with the hardware, it cannot be resolved by changes within the plugin."
-                                },
-                                {
-                                    "issue_number": 116,
-                                    "id": "issue-116-c4a9",
-                                    "question": "What does the error `BSH.Common.Error.WriteRequest.Busy` mean?",
-                                    "answer": "The `BSH.Common.Error.WriteRequest.Busy` error is returned by the Home Connect cloud servers when a command is sent to an appliance that is currently unable to process it. Although this error is not documented in the official Home Connect API specification, it typically occurs in the following scenarios:\n\n*   **User Interaction Required**: The appliance has a message or warning on its physical display that must be cleared (e.g. 'Empty drip tray', 'Fill water tank', or 'Confirm program').\n*   **Physical Operation**: The machine is already performing a task or is in a state where it cannot accept new remote commands.\n*   **Cloud Congestion**: There is a transient issue with the Home Connect cloud infrastructure.\n\nIf this error occurs, check the physical display of your appliance for any required actions. If the error persists despite the machine being idle and clear of prompts, it may indicate a temporary issue with the Home Connect service."
-                                },
-                                {
-                                    "issue_number": 73,
-                                    "id": "issue-73-b97c",
-                                    "question": "Why does the plugin report `Home Connect API error: Home Connect subsystem not available. Please try it again. [503]`?",
-                                    "answer": "The error message `Home Connect API error: Home Connect subsystem not available. Please try it again. [503]` is returned directly by the Home Connect servers. It indicates a service-side outage or maintenance that prevents the plugin from communicating with your appliances. This is a platform-level issue and cannot be resolved through plugin configuration or by regenerating client credentials.\n\nWhen this occurs, consider the following:\n1. Check the [plugin status page](https://www.thouky.co.uk/homeconnect.html) which provides independent monitoring of the Home Connect API functionality.\n2. Verify if the official Home Connect mobile app is functional; outages often affect both the API and the app simultaneously.\n3. Be aware that the [official Home Connect status page](https://www.home-connect.com/global/help-support/system-status) may occasionally report the system as operational even when specific API subsystems are experiencing significant failures.\n\nMost outages are transient and are typically resolved by the Home Connect team within a few hours or days. If the issue persists for an extended period, you may wish to contact [Home Connect support](https://developer.home-connect.com/support/contact) directly."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

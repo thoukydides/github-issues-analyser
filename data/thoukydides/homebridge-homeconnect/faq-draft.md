@@ -15,6 +15,7 @@
     - [Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?](#why-does-the-log-show-429-too-many-requests-1000-calls-in-1-day-reached-or-a-message-like-waiting--before-issuing-home-connect-api-request)
     - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
     - [Why is the power switch for my appliance read-only or failing to work?](#why-is-the-power-switch-for-my-appliance-read-only-or-failing-to-work)
+    - [What does the error `BSH.Common.Error.WriteRequest.Busy` mean?](#what-does-the-error-bshcommonerrorwriterequestbusy-mean)
     - [Why does my appliance show as `Not Responding` in the Home app when turned off?](#why-does-my-appliance-show-as-not-responding-in-the-home-app-when-turned-off)
     - [What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?](#what-do-gateway-timeout-proxy-error-or-timeout-on-home-connect-subsystem-messages-mean)
     - [Why does the log show `Home Connect subsystem not available` or a `503` error?](#why-does-the-log-show-home-connect-subsystem-not-available-or-a-503-error)
@@ -214,10 +215,10 @@ No manual intervention is required; the plugin will automatically resume communi
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-155-6e9f issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
 The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details:
 
-- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: The appliance is not connected to the Home Connect cloud servers. Test this by disabling Wi-Fi on your phone and attempting to control the appliance via cellular data in the official app.
+- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: The Home Connect API cannot establish a connection with the appliance. This occurs if the appliance is offline, has lost its Wi-Fi connection, or did not respond to the cloud's connection initialisation requests in time. Test this by disabling Wi-Fi on your phone and attempting to control the appliance via cellular data in the official app.
 - `SDK.Error.InvalidSettingState`: This occurs when a setting is read-only or unavailable. It is often caused by inconsistencies in the API regarding power state capabilities (common with fridges, freezers, and hobs). It can also indicate that **Remote Start** is disabled, or a maintenance message (e.g. "Change water filter") is displayed on the physical screen.
 - `SDK.Error.WrongOperationState`: The appliance is in an incorrect state, such as attempting to start a program while another is already running or performing a self-cleaning cycle.
 - `SDK.Error.ProgramNotAvailable`: The program is unavailable for remote execution due to safety features (e.g. local control active) or firmware constraints.
@@ -227,15 +228,26 @@ Refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general
 
 #### Why is the power switch for my appliance read-only or failing to work?
 
-<!-- INCLUDES: issue-83-6a23 issue-99-2377 -->
+<!-- INCLUDES: issue-83-6a23 issue-99-2377 issue-112-a111 -->
 The plugin creates a HomeKit `Switch` for every appliance, but its functionality is determined by the capabilities reported by the Home Connect API. Several factors can restrict control:
 
-1. **API Reporting Ambiguity**: Some appliances (particularly Siemens ovens) incorrectly claim to support both `Off` and `Standby` states. Since the API specification requires exactly one, the plugin treats the power state as read-only to avoid sending invalid commands. You may see the log message: `Claims can be both switched off and placed in standby; treating as cannot be switched off`.
+1. **API Reporting Ambiguity**: Some appliances (particularly Siemens ovens) incorrectly claim to support both `Off` and `Standby` states. Since the API specification requires exactly one, the plugin treats the power state as read-only to avoid sending invalid commands.
 2. **Inaccurate Constraints**: For many fridges, freezers, and hobs, the API incorrectly indicates that the power state is writable. Toggling these often results in `SDK.Error.InvalidSettingState`. If your hardware does not support remote power control, the switch should be treated as a status indicator only.
-3. **Physical Interaction Required**: A `BSH.Common.Error.WriteRequest.Busy` error indicates the appliance cannot process the command because a manual action is needed (e.g. closing a door or filling a water tank).
-4. **Known Oven Bug**: Certain oven models have a platform-level limitation where power commands are rejected despite the appliance being ready. This should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance's E-Nr (part number).
+3. **Known Oven Bug**: Certain oven models have a platform-level limitation where power commands are rejected despite the appliance being ready. This should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance's E-Nr (part number).
+4. **Remote Start/Control Disabled**: Ensure that **Remote Control** and **Remote Start** are enabled on the physical control panel. Many appliances require these settings for the API to permit remote power state changes.
 
 Control will be restored automatically if and when the Home Connect servers provide updated, accurate capabilities for your specific model.
+
+#### What does the error `BSH.Common.Error.WriteRequest.Busy` mean?
+
+<!-- INCLUDES: issue-83-6a23 issue-99-2377 issue-116-c4a9 -->
+The `BSH.Common.Error.WriteRequest.Busy` error is returned by the Home Connect cloud servers when a command is sent to an appliance that is currently unable to process it. This typically occurs in the following scenarios:
+
+1. **User Interaction Required**: The appliance has a message or warning on its physical display that must be cleared (e.g. 'Empty drip tray', 'Fill water tank', or 'Confirm program').
+2. **Physical Operation**: The machine is already performing a task or is in a state where it cannot accept new remote commands.
+3. **Cloud Congestion**: There is a transient issue with the Home Connect cloud infrastructure.
+
+Check the physical display of your appliance for any required actions. If the machine is idle and clear of prompts, the error usually indicates a temporary platform issue that will resolve itself.
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
@@ -260,7 +272,13 @@ These are server-side problems within the Home Connect infrastructure and cannot
 
 #### Why does the log show `Home Connect subsystem not available` or a `503` error?
 
-The error `Home Connect API error: Home Connect subsystem not available [503]` indicates a server-side maintenance issue or infrastructure outage. This is not a fault with the plugin or your local configuration. The issue is typically transient and is usually resolved by the Home Connect team within a few hours. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.
+<!-- INCLUDES: issue-73-b97c -->
+The error `Home Connect API error: Home Connect subsystem not available [503]` indicates a server-side maintenance issue or infrastructure outage. This is not a fault with the plugin or your local configuration. The issue is typically transient and is usually resolved by the Home Connect team within a few hours.
+
+**What you can do**:
+- Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for recent issues.
+- Verify if the official Home Connect mobile app is functional; while outages often affect both, the app may sometimes remain functional due to using different internal API endpoints.
+- If the issue persists for an extended period, you may wish to contact [Home Connect support](https://developer.home-connect.com/support/contact) directly.
 
 #### Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?
 
@@ -316,48 +334,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name). Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does the power button for my oven not work? 🚧
-
-<!-- INCLUDES: issue-112-a111 -->
-Some appliances, specifically ovens, may experience issues where the power state cannot be changed or does not update correctly via HomeKit. This is typically a known limitation caused by bugs or constraints within the Home Connect API itself rather than the plugin. If the power control in HomeKit is unresponsive or out of sync with the physical appliance, the issue should be reported directly to Home Connect developer support.
-
-Users should ensure that both Remote Control and Remote Start are enabled on the appliance's physical control panel, as these settings are frequently required for the API to permit power state changes. If the problem persists despite these settings being enabled, it confirms a limitation in the manufacturer's API for that specific model.
-
-#### 🚧 Why does the error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` occur? 🚧
-
-<!-- INCLUDES: issue-113-9491 -->
-The error `SDK.Error.HomeAppliance.Connection.Initialization.Failed` is returned by the Home Connect API when it cannot establish a connection with the appliance. This is typically not related to authentication, client tokens, or plugin configuration.
-
-According to the Home Connect API documentation, this error occurs when:
-- The appliance is offline or has lost its Wi-Fi connection.
-- The appliance did not respond to connection initialisation requests in time.
-- The Home Connect servers are experiencing transient issues or latency.
-
-This error is often temporary and usually resolves itself once the appliance or the Home Connect servers become more responsive. If the error persists, check the appliance's connection to your local network and the internet. Because this error originates from the Home Connect servers' inability to communicate with the hardware, it cannot be resolved by changes within the plugin.
-
-#### 🚧 What does the error `BSH.Common.Error.WriteRequest.Busy` mean? 🚧
-
-<!-- INCLUDES: issue-116-c4a9 -->
-The `BSH.Common.Error.WriteRequest.Busy` error is returned by the Home Connect cloud servers when a command is sent to an appliance that is currently unable to process it. Although this error is not documented in the official Home Connect API specification, it typically occurs in the following scenarios:
-
-*   **User Interaction Required**: The appliance has a message or warning on its physical display that must be cleared (e.g. 'Empty drip tray', 'Fill water tank', or 'Confirm program').
-*   **Physical Operation**: The machine is already performing a task or is in a state where it cannot accept new remote commands.
-*   **Cloud Congestion**: There is a transient issue with the Home Connect cloud infrastructure.
-
-If this error occurs, check the physical display of your appliance for any required actions. If the error persists despite the machine being idle and clear of prompts, it may indicate a temporary issue with the Home Connect service.
-
-#### 🚧 Why does the plugin report `Home Connect API error: Home Connect subsystem not available. Please try it again. [503]`? 🚧
-
-<!-- INCLUDES: issue-73-b97c -->
-The error message `Home Connect API error: Home Connect subsystem not available. Please try it again. [503]` is returned directly by the Home Connect servers. It indicates a service-side outage or maintenance that prevents the plugin from communicating with your appliances. This is a platform-level issue and cannot be resolved through plugin configuration or by regenerating client credentials.
-
-When this occurs, consider the following:
-1. Check the [plugin status page](https://www.thouky.co.uk/homeconnect.html) which provides independent monitoring of the Home Connect API functionality.
-2. Verify if the official Home Connect mobile app is functional; outages often affect both the API and the app simultaneously.
-3. Be aware that the [official Home Connect status page](https://www.home-connect.com/global/help-support/system-status) may occasionally report the system as operational even when specific API subsystems are experiencing significant failures.
-
-Most outages are transient and are typically resolved by the Home Connect team within a few hours or days. If the issue persists for an extended period, you may wish to contact [Home Connect support](https://developer.home-connect.com/support/contact) directly.
 
 ### Local/Remote Control
 
