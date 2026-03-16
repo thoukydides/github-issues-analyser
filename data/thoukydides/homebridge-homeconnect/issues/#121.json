@@ -1,14 +1,12 @@
 {
     "issue_number": 121,
-    "updated_at": "2026-02-16T10:30:49.026Z",
+    "updated_at": "2026-03-16T08:15:08.747Z",
     "faq": [
         {
-            "question": "Why do I get a `Device authorization session has expired` error during setup?",
-            "answer": "This error typically occurs when the SingleKey ID account used for authorisation is not fully configured or verified in the official mobile app. To resolve this:\n\n1. Open the official Home Connect app on your mobile device.\n2. Ensure you are logged in with the same SingleKey ID used for the Homebridge plugin.\n3. Verify that your account profile is complete and any pending email verifications or terms of service acceptances have been processed.\n4. Once the account is fully active and functional within the mobile app, restart the plugin and attempt the authorisation process again.",
-            "semantic_abstract": "OAuth authentication flow failures during Device Flow occur when the SingleKey ID account used for authorisation has an incomplete setup or verification status within the official Home Connect mobile application. This prevents the API from successfully linking the developer application to the user account, resulting in session expiry errors during the redirect process.",
-            "alternative_resolution": "Update the plugin's authorisation instructions to explicitly remind users to ensure their SingleKey ID account is fully verified and active in the official Home Connect app before attempting the Device Flow link.",
-            "confidence": "medium",
-            "hash": "ccc6581ef6d0f20c2c23e934a6144c2c972031a8df0859c3564f4d55e8654d98"
+            "question": "Why does the Home Connect authorisation link show a \"Device authorisation session has expired\" error?",
+            "answer": "This error typically occurs during the SingleKey ID login process if the account setup is incomplete or requires user intervention in the official Home Connect application. To resolve this, ensure that your account is fully configured:\n\n1. Open the official Home Connect app on your mobile device and ensure you are logged in.\n2. Complete any pending tasks, such as verifying your email address or migrating to a SingleKey ID.\n3. Accept any updated terms and conditions within the app.\n4. Confirm that the email address used for the app is also added to the **Home Connect user account for testing** list in the Home Connect Developer Portal for your specific application.\n\nOnce the account is in a fully active state in the official app, the authorisation link provided by the plugin should function correctly.",
+            "semantic_abstract": "Incomplete SingleKey ID account configuration or unaccepted terms in the official Home Connect mobile app can cause the OAuth device flow to fail with a session expiration error. The plugin requires a fully verified and active account, correctly registered as a test user in the Developer Portal, to successfully complete the authorisation handshake.",
+            "hash": "d03547947033a30d3b940561587f9930ff40523c4d3d8beb75129ff7c959f451"
         }
     ]
 }
