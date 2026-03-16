@@ -936,17 +936,24 @@ Note that this is purely a user interface display characteristic. Other HomeKit 
 
 #### How do I get notifications for events like a program finishing?
 
-<!-- INCLUDES: issue-38-03f3 issue-63-3185 -->
-The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated "program finished" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these types would result in a poor user experience; for example, a user might receive a "smoke detected" or "door opened" alert when a wash cycle finishes, which is misleading and technically incorrect.
+<!-- INCLUDES: issue-38-03f3 issue-63-3185 issue-124-6a18 -->
+The Apple Home app only generates native notifications for a limited set of device categories, primarily those related to security (such as doors, locks, and smoke sensors). It does not support native notifications for appliance events like a wash cycle finishing.
 
-To bridge this gap, the plugin maps specific appliance events to a `Stateless Programmable Switch` service. For appliances such as washers, dryers, and dishwashers, the button assignments are typically:
+To provide notification capabilities, the plugin maps specific appliance events to a `Stateless Programmable Switch` service. These can be used as HomeKit automation triggers. For most appliances, the button assignments are:
+
 1. **Button 1 (Single Press)**: Program Finished (`BSH.Common.Event.ProgramFinished`)
 2. **Button 2 (Single Press)**: Program Aborted (`BSH.Common.Event.ProgramAborted`)
 
-Because these are button events, they can be used to trigger HomeKit automations (for example, turning on a light or playing a sound on a HomePod), but they cannot trigger a text notification directly within the Apple Home app. To receive text-based notifications, you have two main options:
+Some appliances include additional events. For example, washers may report i-Dos level warnings:
 
-- **Official Home Connect App**: The most reliable way to get detailed, text-based push notifications.
-- **HomeKit Automations**: Trigger an action via the `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) accessory (such as a `Contact Sensor`) which *does* support native alerts.
+3. **Button 3 (Single Press)**: i-Dos 1 Fill Level Poor (`LaundryCare.Washer.Event.IDos1FillLevelPoor`)
+4. **Button 4 (Single Press)**: i-Dos 2 Fill Level Poor (`LaundryCare.Washer.Event.IDos2FillLevelPoor`)
+
+To receive text-based notifications on your mobile device, you have several options:
+
+- **Official Home Connect App**: This is the most reliable method for detailed, text-based push notifications.
+- **HomeKit Automations**: You can trigger a notification indirectly by having the button event toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) accessory (such as a `Contact Sensor`) which *does* support native alerts.
+- **Shortcuts**: Create an automation in the Apple Home app that runs a Shortcut to send a notification when the switch is pressed.
 
 #### How can I disable HomeKit notifications for door events?
 
@@ -959,18 +966,6 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
 Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
-
-#### 🚧 Why do I not receive notifications when my washer or dryer finishes a programme? 🚧
-
-<!-- INCLUDES: issue-124-6a18 -->
-The Apple Home app only generates native notifications for a very limited set of device categories, primarily those related to security, such as doors and locks. It does not support native notifications for appliance programme events.
-
-To receive notifications or trigger actions when a programme finishes, you can use the `Stateless Programmable Switch` services provided by the plugin. These are triggered by specific events from the appliance:
-
-*   **Dryers**: `BSH.Common.Event.ProgramFinished` and `BSH.Common.Event.ProgramAborted`.
-*   **Washers**: `BSH.Common.Event.ProgramFinished`, `BSH.Common.Event.ProgramAborted`, and i-Dos level warnings (`LaundryCare.Washer.Event.IDos1FillLevelPoor`).
-
-You can create HomeKit automations using these switches to send notifications (via Shortcuts) or control other HomeKit accessories when a cycle completes.
 
 ### Siri
 
