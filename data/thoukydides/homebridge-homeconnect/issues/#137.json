@@ -1,14 +1,12 @@
 {
     "issue_number": 137,
-    "updated_at": "2026-02-16T18:03:16.259Z",
+    "updated_at": "2026-03-16T13:54:09.501Z",
     "faq": [
         {
-            "question": "Why am I seeing `Home Connect API error: getaddrinfo EAI_AGAIN api.home-connect.com` in my logs?",
-            "answer": "The error `getaddrinfo EAI_AGAIN` is a standard networking error indicating a temporary failure in DNS name resolution. This means your local system or Homebridge host is unable to resolve the IP address for the Home Connect API servers. To resolve this issue:\n\n1. Check your local network's DNS settings and ensure your Homebridge server has a stable internet connection.\n2. Verify that your DNS provider is not experiencing outages or blocking requests to `api.home-connect.com`.\n3. If you are using a specific environment like HOOBS, ensure that the underlying operating system's networking stack is correctly configured, as this error typically originates from the host system rather than the plugin itself.\n\nThis is a local environment issue and cannot be resolved by changing the plugin's configuration.",
-            "semantic_abstract": "The `getaddrinfo EAI_AGAIN` error indicates a DNS resolution timeout occurring on the host system when attempting to reach the Home Connect API endpoint. This failure is typically caused by local network configuration issues, DNS server unavailability, or host-specific networking constraints in environments like HOOBS.",
-            "alternative_resolution": "Add a dedicated 'Troubleshooting Networking' section to the project documentation that explicitly defines common Node.js system errors like `EAI_AGAIN` and `ETIMEDOUT` to help users distinguish between plugin bugs and environment-level configuration issues.",
-            "confidence": "high",
-            "hash": "6081da5919fe7454971cd5daf61b7f4bd7811e1e4749e7d7d2ab388fe6c853c2"
+            "question": "Why does the plugin report the error `getaddrinfo EAI_AGAIN api.home-connect.com`?",
+            "answer": "The error `getaddrinfo EAI_AGAIN` signifies a timeout or temporary failure in the local system's ability to resolve the hostname `api.home-connect.com` to an IP address. This is a networking or environment issue external to the plugin itself.\n\nTo resolve this, verify the following:\n1. **DNS Configuration**: Ensure the DNS settings on your host system (e.g. Raspberry Pi, NAS, or server) are correct and can reach a reliable DNS provider.\n2. **Internet Connectivity**: Confirm that the host machine has a stable and active internet connection.\n3. **Platform-Specific Networking**: If you are using a management layer like HOOBS, check their specific documentation or support channels for network troubleshooting, as these environments may have unique networking configurations that interfere with standard DNS resolution.",
+            "semantic_abstract": "Local system DNS resolution failures for the `api.home-connect.com` endpoint result in `getaddrinfo EAI_AGAIN` errors, preventing the plugin from establishing a connection to the Home Connect API. These failures are typically caused by misconfigured host DNS settings, unreachable upstream DNS servers, or transient network connectivity issues on the underlying operating system.",
+            "hash": "3fe81a3947c11c27cb85f223110520e2240ff481ad40e69493f17467b860e919"
         }
     ]
 }
