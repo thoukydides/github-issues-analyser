@@ -1,14 +1,12 @@
 {
     "issue_number": 117,
-    "updated_at": "2026-02-16T09:29:39.553Z",
+    "updated_at": "2026-03-16T06:49:14.688Z",
     "faq": [
         {
-            "question": "Why does the plugin fail with `request rejected by client authorization authority (developer portal)`?",
-            "answer": "This error message is returned directly by the Home Connect API servers and indicates that the authorisation request was rejected before reaching the plugin. This is typically caused by a configuration mismatch between the plugin settings and the application registration in the Home Connect developer portal.\n\nTo resolve this issue, please verify the following in the [Home Connect Developer Portal](https://developer.home-connect.com/applications):\n\n1. **Client ID**: Ensure that the `Client ID` configured in the plugin exactly matches the one shown in your developer account. A single incorrect character will cause the authorisation to fail.\n2. **Success Redirect**: Ensure that a valid URL is entered in the **Success Redirect** field of your application configuration. If this field is empty or contains an invalid URI, the API will reject the request with a `400 unauthorized_client` error.\n\nIf you have confirmed both settings and the error persists, you may need to delete and recreate the application in the developer portal to reset its state.",
-            "semantic_abstract": "OAuth 2.0 authorisation failures specifically identified as `unauthorized_client` occur when the Home Connect API rejects requests due to an invalid `Client ID` or a missing/incorrect `Success Redirect URL` in the developer portal configuration. This server-side rejection prevents the plugin from establishing a connection to the Home Connect account.",
-            "alternative_resolution": "The plugin could detect this specific API error string and provide a contextual help link to the configuration guide or the Home Connect developer portal to streamline troubleshooting.",
-            "confidence": "high",
-            "hash": "1a0fb005afb0e443dfbb40444e01b47b0de80ac1e6b30b4d83f227dd4a0489ea"
+            "question": "Why does the plugin fail with the error `request rejected by client authorization authority (developer portal)`?",
+            "answer": "This error is returned by the Home Connect servers during the authorisation process and indicates that the request was rejected due to a configuration mismatch. It corresponds to an `unauthorized_client` error (HTTP 400).\n\nThere are two primary causes for this error:\n1. **Incorrect Client ID**: The `Client ID` entered in the plugin configuration does not match the one assigned to your application in the developer portal.\n2. **Invalid Redirect URI**: The **Success Redirect URL** configured for your application in the [Home Connect Developer Portal](https://developer.home-connect.com/applications) is either missing, incorrect, or does not match what the plugin expects.\n\nTo resolve this issue, verify that your application settings in the developer portal are correct and that the `Client ID` has been copied accurately into the plugin settings. If the configuration is correct but the error persists, you may need to contact Home Connect developer support as the issue resides on their authorisation servers.",
+            "semantic_abstract": "OAuth authentication failures occur when the Home Connect API authorisation server rejects a request due to a mismatch in client credentials or redirect configurations. This results in the error `request rejected by client authorization authority (developer portal)`, typically caused by an incorrect `Client ID` or misconfigured `Success Redirect URL` in the developer portal settings.",
+            "hash": "e569bd631367b707ee9f306cf18e81621237e7241159752111d367e67ed62793"
         }
     ]
 }
