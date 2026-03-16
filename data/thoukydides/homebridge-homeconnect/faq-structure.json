@@ -164,11 +164,12 @@
                                 },
                                 {
                                     "question": "Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?",
-                                    "answer": "These are standard networking errors indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com`.\n\nTo resolve this, ensure your Homebridge server has a stable internet connection and check the following:\n1. **Diagnostic Commands**: Test DNS resolution using `dig api.home-connect.com` or `nslookup api.home-connect.com` from the same system.\n2. **DNS Provider**: Try manually setting a public DNS provider (such as `1.1.1.1` or `8.8.8.8`) in your operating system settings.\n3. **Network Filtering**: Verify that local firewall or DNS filtering (like Pi-hole) is not blocking requests to the Home Connect API or AWS endpoints.\n\nIf using Docker:\n1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try disabling IPv6 for the container or forcing a specific DNS provider.\n2. **Network Mode**: Consider switching the container to `host` network mode to bypass Docker's internal bridge networking.\n\nThe plugin will automatically attempt to reconnect once the network connection is restored.",
+                                    "answer": "These are standard networking errors (often prefixed with `getaddrinfo`) indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com`.\n\nTo resolve this, ensure your Homebridge server has a stable internet connection and check the following:\n1. **Diagnostic Commands**: Test DNS resolution using `dig api.home-connect.com` or `nslookup api.home-connect.com` from the same system.\n2. **DNS Provider**: Try manually setting a public DNS provider (such as `1.1.1.1` or `8.8.8.8`) in your operating system settings.\n3. **Network Filtering**: Verify that local firewall or DNS filtering (like Pi-hole) is not blocking requests to the Home Connect API or AWS endpoints.\n4. **Management Platforms**: If using HOOBS or other management layers, consult their specific documentation as unique networking configurations can sometimes interfere with standard DNS resolution.\n\nIf using Docker:\n1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try disabling IPv6 for the container or forcing a specific DNS provider.\n2. **Network Mode**: Consider switching the container to `host` network mode to bypass Docker's internal bridge networking.\n\nThe plugin will automatically attempt to reconnect once the network connection is restored.",
                                     "included_ids": [
                                         "issue-50-4e01",
                                         "issue-276-cc5b",
-                                        "issue-351-80b2"
+                                        "issue-351-80b2",
+                                        "issue-137-3fe8"
                                     ]
                                 },
                                 {
@@ -198,14 +199,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 137,
-                                    "id": "issue-137-3fe8",
-                                    "question": "Why does the plugin report the error `getaddrinfo EAI_AGAIN api.home-connect.com`?",
-                                    "answer": "The error `getaddrinfo EAI_AGAIN` signifies a timeout or temporary failure in the local system's ability to resolve the hostname `api.home-connect.com` to an IP address. This is a networking or environment issue external to the plugin itself.\n\nTo resolve this, verify the following:\n1. **DNS Configuration**: Ensure the DNS settings on your host system (e.g. Raspberry Pi, NAS, or server) are correct and can reach a reliable DNS provider.\n2. **Internet Connectivity**: Confirm that the host machine has a stable and active internet connection.\n3. **Platform-Specific Networking**: If you are using a management layer like HOOBS, check their specific documentation or support channels for network troubleshooting, as these environments may have unique networking configurations that interfere with standard DNS resolution."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

@@ -283,13 +283,14 @@ The error `Home Connect API error: Home Connect subsystem not available [503]` i
 
 #### Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?
 
-<!-- INCLUDES: issue-50-4e01 issue-276-cc5b issue-351-80b2 -->
-These are standard networking errors indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com`.
+<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-276-cc5b issue-351-80b2 -->
+These are standard networking errors (often prefixed with `getaddrinfo`) indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com`.
 
 To resolve this, ensure your Homebridge server has a stable internet connection and check the following:
 1. **Diagnostic Commands**: Test DNS resolution using `dig api.home-connect.com` or `nslookup api.home-connect.com` from the same system.
 2. **DNS Provider**: Try manually setting a public DNS provider (such as `1.1.1.1` or `8.8.8.8`) in your operating system settings.
 3. **Network Filtering**: Verify that local firewall or DNS filtering (like Pi-hole) is not blocking requests to the Home Connect API or AWS endpoints.
+4. **Management Platforms**: If using HOOBS or other management layers, consult their specific documentation as unique networking configurations can sometimes interfere with standard DNS resolution.
 
 If using Docker:
 1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try disabling IPv6 for the container or forcing a specific DNS provider.
@@ -335,16 +336,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name). Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does the plugin report the error `getaddrinfo EAI_AGAIN api.home-connect.com`? 🚧
-
-<!-- INCLUDES: issue-137-3fe8 -->
-The error `getaddrinfo EAI_AGAIN` signifies a timeout or temporary failure in the local system's ability to resolve the hostname `api.home-connect.com` to an IP address. This is a networking or environment issue external to the plugin itself.
-
-To resolve this, verify the following:
-1. **DNS Configuration**: Ensure the DNS settings on your host system (e.g. Raspberry Pi, NAS, or server) are correct and can reach a reliable DNS provider.
-2. **Internet Connectivity**: Confirm that the host machine has a stable and active internet connection.
-3. **Platform-Specific Networking**: If you are using a management layer like HOOBS, check their specific documentation or support channels for network troubleshooting, as these environments may have unique networking configurations that interfere with standard DNS resolution.
 
 ### Local/Remote Control
 
