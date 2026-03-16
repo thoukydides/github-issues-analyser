@@ -69,7 +69,7 @@
     - [Why do Home Connect appliances disappear or lose their Favourites status in the Home app?](#why-do-home-connect-appliances-disappear-or-lose-their-favourites-status-in-the-home-app)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
-    - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
+    - [Why does the Apple Home app not show the remaining time or detailed program stages for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-program-stages-for-my-appliance)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
     - [Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?](#why-can-i-not-hide-certain-switches-or-why-do-they-remain-visible-or-unresponsive-after-being-disabled)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
@@ -765,12 +765,12 @@ To resolve these issues:
 
 ### HomeKit Accessories, Services, and Characteristics
 
-#### Why does the Apple Home app not show the remaining time or detailed status for my appliance?
+#### Why does the Apple Home app not show the remaining time or detailed program stages for my appliance?
 
-<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-eae0 issue-225-731f issue-230-03a5 -->
-The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service. However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services.
+<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-eae0 issue-124-ba42 issue-225-731f issue-230-03a5 -->
+The Home Connect API treats most programs as a single function and does not report discrete stages such as rinsing or spinning (with the exception of the Roxxter cleaning robot). It only provides elapsed time, remaining time, and percentage completion. The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service.
 
-While a `Valve` service might appear applicable to "wet" appliances like dishwashers or washing machines, it is semantically inappropriate for many other Home Connect types that also report remaining time, such as ovens, dryers, or coffee machines. To maintain a consistent architectural model and avoid interface clutter, the plugin does not create these extra services purely for display in the Apple Home app.
+However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. While a `Valve` service might appear applicable to "wet" appliances like dishwashers or washing machines, it is semantically inappropriate for many other Home Connect types that also report remaining time, such as ovens, dryers, or coffee machines. To maintain a consistent architectural model and avoid interface clutter, the plugin does not create these extra services purely for display in the Apple Home app.
 
 To view the remaining time, or use other characteristics that the Apple Home app hides, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support the full range of standard HomeKit characteristics and allow them to be used in automations.
 
@@ -783,8 +783,10 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?
 
-<!-- INCLUDES: issue-77-e342 issue-240-ed8f issue-364-a64b -->
+<!-- INCLUDES: issue-77-e342 issue-124-45f8 issue-240-ed8f issue-364-a64b -->
 The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled. Similarly, the plugin does not provide granular configuration to hide or disable specific settings or features, such as Sabbath Mode. To maintain a consistent and manageable codebase, the plugin automatically exposes toggleable settings as switches rather than offering individual configuration for every possible appliance feature. If you wish to hide these specific switches in the Apple Home app, it is recommended to move them to a different room within the app.
+
+You can control which `Switch` services are provided for starting specific programs using the `addprograms` option in the plugin configuration. This allows you to hide specific cycles you do not intend to trigger from HomeKit.
 
 Most other primary services can be individually enabled or disabled for each appliance within the plugin configuration. This includes the `Active Program` switch, though disabling it removes other functionality:
 
@@ -905,22 +907,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Can I disable specific switches or buttons for my Home Connect appliance? 🚧
-
-<!-- INCLUDES: issue-124-45f8 -->
-You can control which `Switch` services are provided for starting or stopping specific programmes using the `addprograms` option in the `config.json` file. This allows you to hide specific cycles you do not intend to trigger from HomeKit.
-
-However, the `Switch` characteristics for the appliance power state and the currently active programme are mandatory. These cannot be disabled as they are fundamental to the architecture of the plugin and how it tracks appliance status.
-
-#### 🚧 Why can I not see the current stage or remaining time of a programme in the Home app? 🚧
-
-<!-- INCLUDES: issue-124-ba42 -->
-The information available regarding programme progress is limited by both the Home Connect API and the Apple Home app:
-
-*   **Programme Stages**: For most appliances (except the Roxxter cleaning robot), the Home Connect API treats each programme as a single function. It does not report discrete stages such as rinsing or spinning; it only provides elapsed time, remaining time, and percentage completion.
-*   **Remaining Time**: The plugin exposes a `Remaining Program` characteristic on the active programme `Switch` service. However, Apple's official Home app does not support displaying this characteristic. To view the time remaining, you must use a third-party HomeKit app that supports a broader range of characteristics.
-*   **Active Status**: The `Switch` characteristic for the active programme will indicate when a cycle is running, which can be used to verify if the appliance is busy.
 
 ### Notifications & Events
 
