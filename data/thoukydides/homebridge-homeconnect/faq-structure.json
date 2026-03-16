@@ -25,7 +25,6 @@
                                     "question": "Why does authorisation fail with `invalid_request`, `invalid content type`, or `request rejected by client authorization authority`?",
                                     "answer": "These errors are returned when the provided `Client ID` is not recognised or is improperly formatted. Check the following:\n\n- **Incorrect Format**: The `Client ID` must be exactly 64 hexadecimal characters. Ensure no extra spaces, quotes, or hidden characters were included when copying the ID from the developer portal. Do not use the `Client Secret` or the ID from the default \"API Web Client\".\n- **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.\n- **Production vs Simulator Credentials**: The default \"API Web Client\" credentials provided in the portal are for the appliance simulator only. If you are using these for testing, you must set `\"simulator\": true` in your configuration. If you are connecting physical appliances, you must create a new application in the developer portal to obtain a production `Client ID`.\n- **Plugin Version**: Ensure you are running the latest version of the plugin, as older versions may lack mandatory headers required by the Home Connect API.",
                                     "included_ids": [
-                                        "issue-117-1a0f",
                                         "issue-86-1379",
                                         "issue-82-6191"
                                     ]
@@ -36,7 +35,6 @@
                                     "included_ids": [
                                         "issue-51-3a91",
                                         "issue-51-60d6",
-                                        "issue-117-1a0f",
                                         "issue-162-1a03",
                                         "issue-115-de4a",
                                         "issue-60-2ad5"
@@ -46,7 +44,6 @@
                                     "question": "Why does the authorisation link expire or fail with an `expired_token` error?",
                                     "answer": "Authorisation links and their associated device codes are only valid for a limited time (typically 10 minutes). If this window is exceeded, or if a link is used more than once, the Home Connect API will return `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found, expired or blocked`.\n\nIf the authorisation fails:\n\n- **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.\n- **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI.\n- **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt.\n- **Single Use**: The `device_code` is invalidated as soon as it is successfully used. Do not attempt to reuse old authorisation URLs.",
                                     "included_ids": [
-                                        "issue-125-9208",
                                         "issue-151-9c3a",
                                         "issue-97-4efe"
                                     ]
@@ -55,7 +52,6 @@
                                     "question": "How do I complete authorisation or resolve `access_denied` and `login session expired` errors?",
                                     "answer": "When the plugin requires new credentials, it uses the Home Connect **Device Flow**. These errors typically occur during the login process due to account verification issues or regional server quirks.\n\n### Completion Steps\n1. Locate the authorisation URL in the Homebridge logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).\n2. Open the full URL in a browser and sign in with the SingleKey ID (or Home Connect) account used in the official mobile app.\n3. Approve the request. The plugin will automatically detect completion and save the tokens.\n\n### Troubleshooting Login Failures\n- **Case Sensitivity**: The email address specified as the **Home Connect user account for testing** in the developer portal must be entered in **all lowercase**. The backend may fail to match accounts if capital letters are used.\n- **Email Constraints**: Avoid using email sub-addressing or \"plus\" addresses (e.g. `user+hc@domain.com`), as these are not consistently supported.\n- **Account Verification**: Log out of the official Home Connect mobile app and log back in to ensure you have accepted the latest terms of use.\n- **Internationalisation Bug**: If your browser's language is not English, the password prompt may fail to appear or return `login session expired`. Temporarily set your web browser's preferred language to English (`en`) and refresh the page to complete authorisation.",
                                     "included_ids": [
-                                        "issue-121-ccc6",
                                         "issue-295-521b",
                                         "issue-299-15d1",
                                         "issue-82-1bfb",
@@ -84,7 +80,26 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 117,
+                                    "id": "issue-117-e569",
+                                    "question": "Why does the plugin fail with the error `request rejected by client authorization authority (developer portal)`?",
+                                    "answer": "This error is returned by the Home Connect servers during the authorisation process and indicates that the request was rejected due to a configuration mismatch. It corresponds to an `unauthorized_client` error (HTTP 400).\n\nThere are two primary causes for this error:\n1. **Incorrect Client ID**: The `Client ID` entered in the plugin configuration does not match the one assigned to your application in the developer portal.\n2. **Invalid Redirect URI**: The **Success Redirect URL** configured for your application in the [Home Connect Developer Portal](https://developer.home-connect.com/applications) is either missing, incorrect, or does not match what the plugin expects.\n\nTo resolve this issue, verify that your application settings in the developer portal are correct and that the `Client ID` has been copied accurately into the plugin settings. If the configuration is correct but the error persists, you may need to contact Home Connect developer support as the issue resides on their authorisation servers."
+                                },
+                                {
+                                    "issue_number": 121,
+                                    "id": "issue-121-d035",
+                                    "question": "Why does the Home Connect authorisation link show a \"Device authorisation session has expired\" error?",
+                                    "answer": "This error typically occurs during the SingleKey ID login process if the account setup is incomplete or requires user intervention in the official Home Connect application. To resolve this, ensure that your account is fully configured:\n\n1. Open the official Home Connect app on your mobile device and ensure you are logged in.\n2. Complete any pending tasks, such as verifying your email address or migrating to a SingleKey ID.\n3. Accept any updated terms and conditions within the app.\n4. Confirm that the email address used for the app is also added to the **Home Connect user account for testing** list in the Home Connect Developer Portal for your specific application.\n\nOnce the account is in a fully active state in the official app, the authorisation link provided by the plugin should function correctly."
+                                },
+                                {
+                                    "issue_number": 125,
+                                    "id": "issue-125-fcc5",
+                                    "question": "Why do I get a `The code entered is invalid or has expired` error during authorisation?",
+                                    "answer": "This error typically occurs due to timing mismatches between the Home Connect developer portal and their authorisation servers, or because the verification code itself has timed out.\n\n1. **Propagation Delay**: When you create or modify an application in the Home Connect Developer Portal, it can take up to 15 minutes for these changes to be synchronised across their production authorisation servers. Attempting to authorise immediately after registration may result in the client being rejected.\n2. **Code Expiry**: The verification links and their associated codes are only valid for 10 minutes. If you use a link that was generated earlier, it will be rejected by the API.\n3. **Locating a Fresh Link**: The plugin generates a new authorisation URL every 10 minutes until the process is successful. You can find the most recent link in the Homebridge logs. If you are using the configuration interface (such as `homebridge-config-ui-x`), you must close and re-open the settings dialogue to refresh the displayed URL.\n\nIf you continue to experience issues after waiting 15 minutes and using a fresh link from the logs, please contact Home Connect support directly."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -167,7 +182,6 @@
                                     "answer": "These are standard networking errors indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com`.\n\nTo resolve this, ensure your Homebridge server has a stable internet connection and check the following:\n1. **Diagnostic Commands**: Test DNS resolution using `dig api.home-connect.com` or `nslookup api.home-connect.com` from the same system.\n2. **DNS Provider**: Try manually setting a public DNS provider (such as `1.1.1.1` or `8.8.8.8`) in your operating system settings.\n3. **Network Filtering**: Verify that local firewall or DNS filtering (like Pi-hole) is not blocking requests to the Home Connect API or AWS endpoints.\n\nIf using Docker:\n1. **Address DNS/IPv6**: Problems frequently arise when IPv6 is enabled but not correctly routed. Try disabling IPv6 for the container or forcing a specific DNS provider.\n2. **Network Mode**: Consider switching the container to `host` network mode to bypass Docker's internal bridge networking.\n\nThe plugin will automatically attempt to reconnect once the network connection is restored.",
                                     "included_ids": [
                                         "issue-50-4e01",
-                                        "issue-137-6081",
                                         "issue-276-cc5b",
                                         "issue-351-80b2"
                                     ]
@@ -199,7 +213,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 137,
+                                    "id": "issue-137-3fe8",
+                                    "question": "Why does the plugin report the error `getaddrinfo EAI_AGAIN api.home-connect.com`?",
+                                    "answer": "The error `getaddrinfo EAI_AGAIN` signifies a timeout or temporary failure in the local system's ability to resolve the hostname `api.home-connect.com` to an IP address. This is a networking or environment issue external to the plugin itself.\n\nTo resolve this, verify the following:\n1. **DNS Configuration**: Ensure the DNS settings on your host system (e.g. Raspberry Pi, NAS, or server) are correct and can reach a reliable DNS provider.\n2. **Internet Connectivity**: Confirm that the host machine has a stable and active internet connection.\n3. **Platform-Specific Networking**: If you are using a management layer like HOOBS, check their specific documentation or support channels for network troubleshooting, as these environments may have unique networking configurations that interfere with standard DNS resolution."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -365,7 +386,6 @@
                                         "issue-42-d406",
                                         "issue-44-1e1b",
                                         "issue-94-e55f",
-                                        "issue-122-9466",
                                         "issue-157-61a1",
                                         "issue-201-3565",
                                         "issue-202-4160",
@@ -455,7 +475,6 @@
                                     "question": "How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?",
                                     "answer": "Home Connect distinguishes between global [settings](https://api-docs.home-connect.com/settings/) (like Child Lock) and program-specific [options](https://api-docs.home-connect.com/programs-and-options/) (like `HalfLoad`, `ExtraDry`, or `EfficientDry` / `EcoDry`). \n\nBecause these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.",
                                     "included_ids": [
-                                        "issue-138-eb88",
                                         "issue-341-3673"
                                     ]
                                 },
@@ -546,7 +565,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 122,
+                                    "id": "issue-122-b195",
+                                    "question": "Why are certain programmes or beverages missing from my coffee machine?",
+                                    "answer": "This plugin does not maintain an internal list of supported programmes or beverages. Instead, it queries the Home Connect API to determine which programmes are supported by each specific appliance and makes them available in HomeKit. If a programme is missing, it is usually because the Home Connect API has not exposed it for that particular model or firmware version.\n\nTo ensure your appliance displays all available programmes:\n1. Check the official [Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options?#coffee-machine) to see if the specific programme (such as `CaffeGrande` or hot water) is supported by the platform.\n2. Restart Homebridge to trigger a re-read of all available programmes from the API. This is necessary because the plugin caches the list of supported programmes and options.\n\nIf a programme is documented in the API but still does not appear after a restart, it may not be enabled for your specific appliance model or firmware. In these instances, you should contact the [Home Connect developer support](https://developer.home-connect.com/support/contact) to request its inclusion for your appliance."
+                                },
+                                {
+                                    "issue_number": 138,
+                                    "id": "issue-138-5e6c",
+                                    "question": "How can I enable specific programme options, such as `Half Load` on a dishwasher, in HomeKit?",
+                                    "answer": "The Homebridge Home Connect plugin supports all programme options available via the Home Connect API. These options are not hardcoded; the plugin reads the available options for each programme directly from the appliance's firmware. \n\nBy default, the plugin uses the `\"auto\"` setting for programmes. This creates a single HomeKit switch for every programme supported by the appliance, using its default settings. To use specific options like `Half Load`, `Intensive`, or `Extra Dry`, you must manually configure the programme switches in your `config.json` file:\n\n1. Identify the available options for your appliance. These can be found in the Homebridge configuration UI or by reviewing the log output from the `Identify` routine.\n2. Manually define the programmes under the appliance configuration. Be aware that if you provide any manual programme configuration for an appliance, the `\"auto\"` discovery is disabled for that specific appliance. You must list every programme you want to appear in HomeKit.\n3. Specify the required options within each programme definition. You can create multiple HomeKit switches for the same programme with different option sets (for example, one switch for `Eco` and another for `Eco with Half Load`).\n\nIf an option described in the Home Connect API documentation does not appear in the plugin's logs or configuration UI, it usually indicates that the appliance's firmware does not expose that specific feature via the API."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -670,7 +702,6 @@
                                         "issue-2-4fcb",
                                         "issue-3-a6f3",
                                         "issue-36-ee06",
-                                        "issue-124-9bb6",
                                         "issue-225-731f",
                                         "issue-230-03a5",
                                         "issue-48-b565",
@@ -689,7 +720,6 @@
                                     "question": "Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?",
                                     "answer": "The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled. Similarly, the plugin does not provide granular configuration to hide or disable specific settings or features, such as Sabbath Mode. To maintain a consistent and manageable codebase, the plugin automatically exposes toggleable settings as switches rather than offering individual configuration for every possible appliance feature. If you wish to hide these specific switches in the Apple Home app, it is recommended to move them to a different room within the app.\n\nMost other primary services can be individually enabled or disabled for each appliance within the plugin configuration. This includes the `Active Program` switch, though disabling it removes other functionality:\n\n1. **Status Indicators**: The `On`, `Status Active`, and `Status Fault` characteristics which indicate the current operational state.\n2. **Program Control**: The ability to start, stop, pause, and resume the active program.\n3. **Time Remaining**: The `Remaining Duration` characteristic.\n\nIf services remain visible in HomeKit (often appearing as \"unresponsive\") after you have configured them to be hidden, it is likely due to HomeKit's internal caching and synchronisation mechanisms rather than the plugin itself. When a feature is disabled, the plugin removes the service from the accessory definition, but HomeKit may retain a stale cached version across multiple hubs or iCloud-synced devices. To resolve persistent stale entries, try these steps in order:\n\n- **Check the logs**: Verify the plugin is removing the service. You may see a message such as `Removing obsolete service \"Internal Light\"` if the service was restored from the Homebridge cache but is now disabled.\n- **Restart Homebridge**: This triggers a fresh configuration update to HomeKit.\n- **Wait**: Allow several hours for iCloud synchronisation to reconcile the state across all your devices.\n- **Reboot the Home Hub**: Restart your primary Apple TV or HomePod.\n- **Reset iCloud**: Sign out of iCloud on the Home Hub and sign back in.\n- **Remove the bridge**: As a last resort, remove the Homebridge bridge from HomeKit and re-add it.",
                                     "included_ids": [
-                                        "issue-124-2e72",
                                         "issue-240-ed8f",
                                         "issue-364-a64b",
                                         "issue-77-e342"
@@ -786,7 +816,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 124,
+                                    "id": "issue-124-45f8",
+                                    "question": "Can I disable specific switches or buttons for my Home Connect appliance?",
+                                    "answer": "You can control which `Switch` services are provided for starting or stopping specific programmes using the `addprograms` option in the `config.json` file. This allows you to hide specific cycles you do not intend to trigger from HomeKit.\n\nHowever, the `Switch` characteristics for the appliance power state and the currently active programme are mandatory. These cannot be disabled as they are fundamental to the architecture of the plugin and how it tracks appliance status."
+                                },
+                                {
+                                    "issue_number": 124,
+                                    "id": "issue-124-ba42",
+                                    "question": "Why can I not see the current stage or remaining time of a programme in the Home app?",
+                                    "answer": "The information available regarding programme progress is limited by both the Home Connect API and the Apple Home app:\n\n*   **Programme Stages**: For most appliances (except the Roxxter cleaning robot), the Home Connect API treats each programme as a single function. It does not report discrete stages such as rinsing or spinning; it only provides elapsed time, remaining time, and percentage completion.\n*   **Remaining Time**: The plugin exposes a `Remaining Program` characteristic on the active programme `Switch` service. However, Apple's official Home app does not support displaying this characteristic. To view the time remaining, you must use a third-party HomeKit app that supports a broader range of characteristics.\n*   **Active Status**: The `Switch` characteristic for the active programme will indicate when a cycle is running, which can be used to verify if the appliance is busy."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -822,7 +865,6 @@
                                     "answer": "The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated \"program finished\" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these types would result in a poor user experience; for example, a user might receive a \"smoke detected\" or \"door opened\" alert when a wash cycle finishes, which is misleading and technically incorrect.\n\nTo bridge this gap, the plugin maps specific appliance events to a `Stateless Programmable Switch` service. For appliances such as washers, dryers, and dishwashers, the button assignments are typically:\n1. **Button 1 (Single Press)**: Program Finished (`BSH.Common.Event.ProgramFinished`)\n2. **Button 2 (Single Press)**: Program Aborted (`BSH.Common.Event.ProgramAborted`)\n\nBecause these are button events, they can be used to trigger HomeKit automations (for example, turning on a light or playing a sound on a HomePod), but they cannot trigger a text notification directly within the Apple Home app. To receive text-based notifications, you have two main options:\n\n- **Official Home Connect App**: The most reliable way to get detailed, text-based push notifications.\n- **HomeKit Automations**: Trigger an action via the `Stateless Programmable Switch`. You can generate a HomeKit notification indirectly by having the automation toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) accessory (such as a `Contact Sensor`) which *does* support native alerts.",
                                     "included_ids": [
                                         "issue-38-03f3",
-                                        "issue-124-8aea",
                                         "issue-63-3185"
                                     ]
                                 },
@@ -836,7 +878,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 124,
+                                    "id": "issue-124-6a18",
+                                    "question": "Why do I not receive notifications when my washer or dryer finishes a programme?",
+                                    "answer": "The Apple Home app only generates native notifications for a very limited set of device categories, primarily those related to security, such as doors and locks. It does not support native notifications for appliance programme events.\n\nTo receive notifications or trigger actions when a programme finishes, you can use the `Stateless Programmable Switch` services provided by the plugin. These are triggered by specific events from the appliance:\n\n*   **Dryers**: `BSH.Common.Event.ProgramFinished` and `BSH.Common.Event.ProgramAborted`.\n*   **Washers**: `BSH.Common.Event.ProgramFinished`, `BSH.Common.Event.ProgramAborted`, and i-Dos level warnings (`LaundryCare.Washer.Event.IDos1FillLevelPoor`).\n\nYou can create HomeKit automations using these switches to send notifications (via Shortcuts) or control other HomeKit accessories when a cycle completes."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
