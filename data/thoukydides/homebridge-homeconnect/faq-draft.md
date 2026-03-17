@@ -217,13 +217,13 @@ No manual intervention is required; the plugin will automatically resume communi
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
 The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details:
 
-- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: The Home Connect API cannot establish a connection with the appliance. This occurs if the appliance is offline, has lost its Wi-Fi connection, or did not respond to the cloud's connection initialisation requests in time. Test this by disabling Wi-Fi on your phone and attempting to control the appliance via cellular data in the official app.
+- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: The Home Connect API cannot establish a connection with the appliance. This occurs if the appliance is offline, has lost its Wi-Fi connection, or did not respond to the cloud's connection initialisation requests in time. To troubleshoot, ensure the appliance shows a successful cloud connection in the official app (often indicated by three green lines in the Network section) and test control via cellular data with Wi-Fi disabled on your phone.
 - `SDK.Error.InvalidSettingState`: This occurs when a setting is read-only or unavailable. It is often caused by inconsistencies in the API regarding power state capabilities (common with fridges, freezers, and hobs). It can also indicate that **Remote Start** is disabled, or a maintenance message (e.g. "Change water filter") is displayed on the physical screen.
 - `SDK.Error.WrongOperationState`: The appliance is in an incorrect state, such as attempting to start a program while another is already running or performing a self-cleaning cycle.
-- `SDK.Error.ProgramNotAvailable`: The program is unavailable for remote execution due to safety features (e.g. local control active) or firmware constraints.
+- `SDK.Error.ProgramNotAvailable`: The program is unavailable for remote execution due to safety features (e.g. local control active), firmware constraints, or because the appliance is currently performing a task like an automatic rinse cycle.
 - `BSH.Common.Error.400.BadRequest`: Frequently indicates an attempt to stop a program that is already stopped, often caused by grouping program switches in the Home app.
 
 Refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation for more specific details.
@@ -337,30 +337,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file containing your authorisation token (a file with a long hexadecimal name). Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does the log show `[409 Conflict] Program currently not available` for my coffee machine? 🚧
-
-<!-- INCLUDES: issue-149-6678 -->
-The `[409 Conflict] Program currently not available` (`SDK.Error.ProgramNotAvailable`) error occurs when the plugin attempts to communicate with the Home Connect API to retrieve the list of supported programs, but the appliance is in a state where that information is inaccessible.
-
-This is expected behaviour in several scenarios:
-* The appliance is physically powered off or in standby.
-* The appliance is currently running a program.
-* The appliance is performing a mandatory maintenance task, such as an automatic rinse cycle.
-
-This log entry generally does not indicate a plugin bug or a configuration issue; it simply reflects that the Home Connect cloud cannot query program details from the hardware at that specific moment.
-
-#### 🚧 Why does my appliance return a `409 Conflict` error with `HomeAppliance connection initialization failed`? 🚧
-
-<!-- INCLUDES: issue-155-8156 -->
-The `409 Conflict` error, specifically the error code `SDK.Error.HomeAppliance.Connection.Initialization.Failed`, is returned by the Home Connect API when the cloud service is unable to communicate with your appliance. This typically indicates that the appliance is offline, or it has failed to respond to connection requests from the server in time.
-
-To troubleshoot this connectivity issue:
-1. Verify that the appliance is powered on and connected to your local network.
-2. In the official Home Connect app, check the appliance settings. The Network section should ideally show three green lines indicating a successful cloud connection.
-3. Test the cloud connection by **disabling Wi-Fi** on your mobile device and attempting to control the appliance using the official Home Connect app via cellular data. If the official app cannot control the appliance while your phone is on cellular data, then the appliance is not properly connected to the Home Connect servers.
-
-This error represents a communication failure between the physical appliance hardware and the Home Connect cloud platform. Because the plugin interacts with the cloud API rather than the appliance directly, it cannot resolve this underlying connectivity problem.
 
 ### Local/Remote Control
 
