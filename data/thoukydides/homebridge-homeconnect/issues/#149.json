@@ -1,14 +1,18 @@
 {
     "issue_number": 149,
-    "updated_at": "2026-02-17T10:12:58.621Z",
+    "updated_at": "2026-03-17T10:33:45.329Z",
     "faq": [
         {
-            "question": "Why does my coffee machine fail to start or show Not responding when using the switch in the Home app?",
-            "answer": "Coffee machine appliances often expose multiple `Switch` services to HomeKit, including: \n\n* **Power**: Controls the standby state of the machine.\n* **Active Program**: Starts or stops the currently selected program.\n* **Custom Program**: Specifically triggers a user-defined program (e.g. Ristretto).\n* **Cup Warmer**: (If supported) Controls the warming plate.\n\nBy default, the Apple Home app may group these separate services into a single tile. Toggling this combined tile attempts to activate all switches simultaneously. Because coffee machines require time to power on and initialise, attempting to start a program at the same time as the power switch will typically result in a failure or a `Not responding` status in the Home app.\n\nTo resolve this, you should configure the Home app to display these services individually:\n\n1. Open the **Home** app and find the coffee machine accessory tile.\n2. Long-press the tile and select **Accessory Details**.\n3. Scroll down and select **Show as Separate Tiles**.\n\nThis allows you to power on the machine first, wait for it to reach a ready state, and then trigger the specific program switch.",
-            "semantic_abstract": "HomeKit default grouping of multiple `Switch` services (Power, Active Program, Custom Programs) into a single tile causes simultaneous command execution that conflicts with the sequential operational requirements of coffee machines. This hardware-specific timing constraint often results in `Not responding` errors or API 409 Conflict errors when the power-on and program-start commands are sent concurrently.",
-            "alternative_resolution": "The plugin documentation could be updated to explicitly recommend the Show as Separate Tiles setting for coffee machines to prevent simultaneous command conflicts.",
-            "confidence": "high",
-            "hash": "a6ae07efdd052c1b52a10ec0f4ff3f0739695054ba80eda6a9f6cac1ef8e998e"
+            "question": "Why does my coffee machine show Not Responding when I try to start it from a single tile in the Home app?",
+            "answer": "Home Connect coffee machines expose multiple `Switch` services to HomeKit, typically including Power, Active Program, and specific custom programs (like Ristretto). By default, the Apple Home app often aggregates these separate switches into a single accessory tile.\n\nWhen you toggle this single aggregated tile, HomeKit attempts to set the state of all underlying switches simultaneously. This causes a conflict because coffee machines require a significant start-up time for heating and rinsing before they are ready to accept a program command. Sending a \"Power On\" command and a \"Start Program\" command at the same instant will usually result in an error from the appliance, which HomeKit then displays as Not Responding.\n\nTo resolve this, you should separate the controls in the Apple Home app:\n1. Open the accessory settings for the coffee machine in the Home app.\n2. Select Show as Separate Tiles.\n3. Control the Power switch first, wait for the machine to complete its start-up sequence, and then activate the desired program switch.",
+            "semantic_abstract": "Home Connect coffee machines expose multiple `Switch` services for power and programs, which are often aggregated into a single tile by the Apple Home app. This leads to simultaneous command delivery that fails because the appliance cannot accept program requests until its power-on and rinsing sequence is complete.",
+            "hash": "ae5e1f26af322ebc338df7fef9dcbbd0973e07e336dc71bba2c822a4271e561d"
+        },
+        {
+            "question": "Why does the log show `[409 Conflict] Program currently not available` for my coffee machine?",
+            "answer": "The `[409 Conflict] Program currently not available` (`SDK.Error.ProgramNotAvailable`) error occurs when the plugin attempts to communicate with the Home Connect API to retrieve the list of supported programs, but the appliance is in a state where that information is inaccessible.\n\nThis is expected behaviour in several scenarios:\n* The appliance is physically powered off or in standby.\n* The appliance is currently running a program.\n* The appliance is performing a mandatory maintenance task, such as an automatic rinse cycle.\n\nThis log entry generally does not indicate a plugin bug or a configuration issue; it simply reflects that the Home Connect cloud cannot query program details from the hardware at that specific moment.",
+            "semantic_abstract": "The Home Connect API returns a `409 Conflict` error with the `SDK.Error.ProgramNotAvailable` code when the appliance is powered off, busy, or rinsing, preventing the retrieval of available program lists via the API.",
+            "hash": "6678b86fdbb2a3badf93601d485551171a50405638c6fa531cbd9809e1a4cd3a"
         }
     ]
 }
