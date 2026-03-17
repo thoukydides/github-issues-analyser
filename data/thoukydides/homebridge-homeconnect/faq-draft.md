@@ -33,6 +33,7 @@
     - [Why does my appliance frequently show `Disconnected (setting On error status)`?](#why-does-my-appliance-frequently-show-disconnected-setting-on-error-status)
   - **[Programs and Options](#programs-and-options)**
     - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-code-blocks)
+    - [Why does the log show a `Home Connect API Validation Error` or `Structure validation failed`?](#why-does-the-log-show-a-home-connect-api-validation-error-or-structure-validation-failed)
     - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
     - [Why are fan controls missing for my integrated venting hob?](#why-are-fan-controls-missing-for-my-integrated-venting-hob)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
@@ -52,8 +53,9 @@
     - [Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?](#why-does-setting-my-hood-fan-to-auto-in-the-home-app-not-immediately-turn-it-on)
     - [Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?](#why-does-the-plugin-log-unrecognised-powerstate-values-like-undefined-or-mainsoff)
     - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
+    - [Why is the ice maker toggle missing for my fridge or freezer?](#why-is-the-ice-maker-toggle-missing-for-my-fridge-or-freezer)
     - [Why are ambient light colour or brightness controls missing or restricted?](#why-are-ambient-light-colour-or-brightness-controls-missing-or-restricted)
-    - [How can I see which program options and values are supported by my appliance?](#how-can-i-see-which-program-options-and-values-are-supported-by-my-appliance)
+    - [How can I see which program options, settings, or events are supported by my appliance?](#how-can-i-see-which-program-options-settings-or-events-are-supported-by-my-appliance)
   - **[Appliance Status](#appliance-status)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
@@ -408,18 +410,31 @@ When these disconnections occur, the plugin logs the event and updates the HomeK
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-175-e941 issue-189-35bc issue-198-658c issue-199-2e94 issue-200-9f7a issue-202-9963 issue-203-2ddc issue-204-2f61 issue-205-1db7 issue-206-cf42 issue-207-4f2c issue-209-d7db issue-210-cc8e issue-212-38c3 issue-213-c06c issue-216-fa69 issue-217-41c5 issue-220-c9a6 issue-221-f53a issue-222-611c issue-223-87a6 issue-228-c1b3 issue-231-e5d9 issue-233-f1a2 issue-235-b061 issue-236-11a6 issue-237-74bf issue-238-902b issue-243-afde issue-244-beeb issue-246-85c6 issue-247-ab8a issue-248-683b issue-254-ab2e issue-255-2835 issue-257-721b issue-258-d2a3 issue-262-4486 issue-265-872d issue-266-7e59 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin includes a diagnostic mechanism to identify data from the Home Connect API that it does not yet recognise. This frequently occurs because the API implementation deviates from official documentation, or because new appliance models or firmware introduce undocumented features, programs, or options.
+<!-- INCLUDES: issue-145-3b74 issue-175-e941 issue-189-35bc issue-198-658c issue-199-2e94 issue-200-9f7a issue-202-9963 issue-203-2ddc issue-204-2f61 issue-205-1db7 issue-206-cf42 issue-207-4f2c issue-209-d7db issue-210-cc8e issue-212-38c3 issue-213-c06c issue-216-fa69 issue-217-41c5 issue-220-c9a6 issue-221-f53a issue-222-611c issue-223-87a6 issue-228-c1b3 issue-231-e5d9 issue-233-f1a2 issue-235-b061 issue-236-11a6 issue-237-74bf issue-238-902b issue-243-afde issue-244-beeb issue-246-85c6 issue-247-ab8a issue-248-683b issue-254-ab2e issue-255-2835 issue-257-721b issue-258-d2a3 issue-262-4486 issue-265-872d issue-266-7e59 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+The plugin includes a diagnostic mechanism to identify data from the Home Connect API that it does not yet recognise. This frequently occurs because the API implementation deviates from official documentation, includes appliance-specific firmware metadata (such as `displayvalue` fields for selected programs), or because new appliance models or firmware introduce undocumented features.
 
-While unrecognised values usually do not prevent the plugin from functioning, the specific feature may be missing or unavailable in HomeKit until it is added to the plugin's internal schema. When this happens, the plugin generates a technical diagnostic block in the log file, delimited by lines of `=` characters and containing comments marked `// (unrecognised)`. This helps the maintainer update the plugin's definitions and map the missing information to HomeKit services.
+While unrecognised values or metadata fields usually do not prevent the plugin from functioning, the specific feature may be missing or unavailable in HomeKit until it is added to the plugin's internal schema. When this happens, the plugin generates a technical diagnostic block in the log file, delimited by lines of `=` characters and containing comments marked `// (unrecognised)`. This helps the maintainer update the plugin's definitions and map the missing information to HomeKit services.
 
 If you observe these messages:
 
-1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
+1. **Update the plugin**: Ensure you are running the latest version, as support for new values and metadata is added frequently.
 2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
 3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
 
 Once these identifiers are added to the plugin, the warning will disappear and the corresponding features will be correctly mapped to HomeKit.
+
+#### Why does the log show a `Home Connect API Validation Error` or `Structure validation failed`?
+
+<!-- INCLUDES: issue-144-5faf -->
+The plugin validates all messages received from the Home Connect API against the official technical specifications (OpenAPI/Swagger schema). This error indicates that an appliance sent data that deviates from those rules.
+
+While the Home Connect API has an official specification, physical appliances often exhibit quirks where their real-world behaviour differs from the documentation or the official API simulator. Common examples include:
+
+* Sending `null` instead of a string for an active program name when a cycle finishes.
+* Omitting mandatory data fields during `CONNECTED` or `DISCONNECTED` events.
+* Using data structures that are not defined in the public API schema.
+
+These validation checks were introduced to improve the reliability of the plugin by ensuring it only processes well-formed data. When a new hardware quirk is discovered, the plugin's internal rules are updated to accept the non-standard format. If the error occurs on the latest version, it likely represents a previously undocumented behaviour of a specific appliance model or firmware version.
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
@@ -612,6 +627,13 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
+#### Why is the ice maker toggle missing for my fridge or freezer?
+
+<!-- INCLUDES: issue-141-568b -->
+The plugin supports ice maker control by mapping the `Refrigeration.FridgeFreezer.Setting.Dispenser.Enabled` setting from the Home Connect API to a HomeKit switch.
+
+Availability of this feature is dependent on whether your specific appliance model exposes this capability through the Home Connect API. If the setting is not provided by the API for your device, the plugin cannot display the toggle in HomeKit.
+
 #### Why are ambient light colour or brightness controls missing or restricted?
 
 <!-- INCLUDES: issue-24-8ee6 issue-42-e5af issue-54-196a -->
@@ -626,63 +648,16 @@ To properly expose all supported characteristics to HomeKit, the plugin attempts
 1. Ensure the appliance is not being operated manually and restart Homebridge to allow the plugin to re-scan active settings.
 2. If the issue persists, stop Homebridge and delete the appliance's cache file (not the authorisation file) in the `persist` directory, then restart Homebridge while the appliance is online.
 
-#### How can I see which program options and values are supported by my appliance?
+#### How can I see which program options, settings, or events are supported by my appliance?
 
-<!-- INCLUDES: issue-67-487c -->
+<!-- INCLUDES: issue-67-487c issue-94-e57b -->
 To determine the specific program keys, options, and valid ranges supported by your appliance, you can use the following methods:
 
-1. **Check the generated schema**: The plugin writes a file named `.homebridge-homeconnect-v1.schema.json` to your Homebridge storage directory (where `config.json` resides). This file contains a technical dump of all programs and options discovered for your linked appliances.
-2. **Use the Identify routine**: Trigger the `Identify` function (see the relevant FAQ entry for instructions). The plugin will output a complete list of supported programs, options, and their valid enumeration values to the Homebridge logs.
+1. **Check the generated schema**: The plugin writes a file named `.homebridge-homeconnect-v1.schema.json` to your Homebridge storage directory. This file contains a technical dump of all programs and options discovered for your linked appliances.
+2. **Use the Identify routine**: Trigger the `Identify` function. The plugin will output a complete list of supported programs, options, and their valid enumeration values to the Homebridge logs.
+3. **Inspect the live event stream**: Run Homebridge with the `-D` command-line option to enable debug logging. Interact with your appliance (e.g. open a door or toggle a setting) and monitor the logs. If an action does not trigger a corresponding event in the log, then the Home Connect servers are not broadcasting that information.
 
-This information is essential when configuring a **Custom list of programs and options** or manually editing the `programs` section of your `config.json`.
-
-#### 🚧 Why is the ice maker toggle missing for my fridge or freezer? 🚧
-
-<!-- INCLUDES: issue-141-568b -->
-The plugin supports ice maker control by mapping the `Refrigeration.FridgeFreezer.Setting.Dispenser.Enabled` setting from the Home Connect API to a HomeKit switch.
-
-Availability of this feature is dependent on whether your specific appliance model exposes this capability through the Home Connect API. If the setting is not provided by the API for your device, the plugin cannot display the toggle in HomeKit.
-
-#### 🚧 Why does the log show a `Home Connect API Validation Error` or `Structure validation failed`? 🚧
-
-<!-- INCLUDES: issue-144-5faf -->
-The plugin validates all messages received from the Home Connect API against the official technical specifications (OpenAPI/Swagger schema). This error indicates that an appliance sent data that deviates from those rules.
-
-While the Home Connect API has an official specification, physical appliances often exhibit quirks where their real-world behaviour differs from the documentation or the official API simulator. Common examples include:
-
-* Sending `null` instead of a string for an active program name when a cycle finishes.
-* Omitting mandatory data fields during `CONNECTED` or `DISCONNECTED` events.
-* Using data structures that are not defined in the public API schema.
-
-These validation checks were introduced to improve the reliability of the plugin by ensuring it only processes well-formed data. When a new hardware quirk is discovered, the plugin's internal rules are updated to accept the non-standard format.
-
-If you see these errors:
-
-1. **Update the plugin**: Most common discrepancies have already been addressed in newer releases.
-2. **Monitor functionality**: Often, these validation errors are non-critical; the plugin will usually reconnect and continue to function correctly.
-3. **Report new cases**: If the error occurs on the latest version, it likely represents a previously undocumented behaviour of a specific appliance model or firmware version.
-
-#### 🚧 Why does the log show `Unexpected fields in Home Connect API response`? 🚧
-
-<!-- INCLUDES: issue-145-3b74 -->
-This warning indicates that an appliance has returned metadata via the Home Connect API that the plugin does not currently recognise in its internal data schema. It commonly occurs with fields like `displayvalue` within the `options` array for a selected or active program.
-
-These warnings are typically caused by:
-1. **Appliance-specific firmware**: Manufacturers (such as Bosch and Siemens) sometimes include extra information for specific models that is not part of the standard API specification.
-2. **Undocumented API changes**: The Home Connect service may be updated to provide additional context for certain states or settings.
-
-These messages are generally cosmetic and do not interfere with the operation of the appliance within HomeKit. The plugin is regularly updated to incorporate these new fields. If you see this warning, ensure you are running the latest version of the plugin. If it persists, it simply means a new, harmless field has been discovered that is not yet in the plugin's dictionary.
-
-#### 🚧 How can I determine if a specific appliance event or status is supported by the Home Connect API? 🚧
-
-<!-- INCLUDES: issue-94-e57b -->
-To verify whether the Home Connect API is transmitting specific data for your appliance, you can inspect the raw event stream by enabling debug logging:
-
-1. Run Homebridge with the `-D` command-line option.
-2. Interact with your appliance (e.g. open a door, toggle a setting, or start a programme).
-3. Check the Homebridge logs for any events received from the Home Connect servers.
-
-If an action or state change on the appliance does not trigger a corresponding event in the log, then the Home Connect servers are not sending that information. The plugin can only react to data that is explicitly broadcast by the Home Connect API servers.
+This information is essential when configuring a **Custom list of programs and options** or verifying if the Home Connect API supports specific data for your model.
 
 ### Appliance Status
 
