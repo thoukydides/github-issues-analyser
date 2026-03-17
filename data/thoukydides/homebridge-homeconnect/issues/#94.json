@@ -1,14 +1,18 @@
 {
     "issue_number": 94,
-    "updated_at": "2026-02-17T05:10:07.951Z",
+    "updated_at": "2026-03-17T07:31:23.667Z",
     "faq": [
         {
-            "question": "Why is my Bosch fridge freezer ice maker or dispenser not appearing in HomeKit?",
-            "answer": "Support for ice dispensers and ice makers depends entirely on whether the feature is exposed via the official Home Connect public API. Historically, this feature was unavailable to third-party integrations even if it appeared within the official Home Connect mobile app.\n\nControl for the ice dispenser (`Refrigeration.Common.Setting.Dispenser.Enabled`) was added to the plugin in version `v0.29.0` following an update to the Home Connect API in April 2023. To use this feature, ensure you meet the following requirements:\n\n*   Your plugin version is `v0.29.0` or higher.\n*   Your appliance firmware supports the `Refrigeration.Common.Setting.Dispenser.Enabled` setting via the public API.\n\nIf the ice maker still does not appear as a switch in HomeKit, you can verify API support by running Homebridge with debug logging enabled (using the `-D` flag). If the setting is not listed in the appliance details or event stream within the logs, it is not being sent by the Home Connect servers and cannot be supported by the plugin. In such cases, you may wish to contact Home Connect support to request they expose this setting in their public API.",
-            "semantic_abstract": "The availability of ice maker and dispenser controls in HomeKit is contingent upon the `Refrigeration.Common.Setting.Dispenser.Enabled` setting being exposed via the public Home Connect API. Discrepancies between the official mobile app and the plugin often arise because the mobile app utilizes private API features not yet accessible to third-party integrations.",
-            "alternative_resolution": "Include a section in the README or a dedicated 'API Limitations' document explaining that the official Home Connect app frequently uses private API endpoints, which explains why certain features (like ice makers prior to 2023) may be visible in the app but absent from the plugin.",
-            "confidence": "high",
-            "hash": "e55f6f3969bbe06a979b97e45d8a46b88f4b2638497a8387dd29af67cfe5664a"
+            "question": "Why does the official Home Connect app show more features than the Homebridge plugin?",
+            "answer": "The plugin is strictly limited by the capabilities provided by the public Home Connect API. The official mobile applications (Bosch, Siemens, etc.) often utilize internal or private API features that are not exposed to third-party developers. If a control, status, or event is not documented in the [Home Connect API specification](https://api-docs.home-connect.com/), the plugin cannot implement it.\n\nFor example, ice maker controls (the `Refrigeration.Common.Setting.Dispenser.Enabled` setting) were only added to the public API in April 2023, despite being available in the official app for longer. If you identify a feature missing from the plugin that is present in the official app, it is likely because the API does not yet support it. In such cases, you can request that the Home Connect team extend their public API via their [Contact form](https://developer.home-connect.com/support/contact).",
+            "semantic_abstract": "Discrepancies in feature availability between official Home Connect mobile applications and the plugin arise from limitations in the public Home Connect API. Technical parity is only possible when Home Connect exposes specific appliance settings and event streams to the third-party developer ecosystem, as seen with the historical absence and subsequent addition of ice dispenser controls.",
+            "hash": "b8d21c90428d7ec3b5178e03ab50fa159e04ac9f2ac9825e882daef21c73212b"
+        },
+        {
+            "question": "How can I determine if a specific appliance event or status is supported by the Home Connect API?",
+            "answer": "To verify whether the Home Connect API is transmitting specific data for your appliance, you can inspect the raw event stream by enabling debug logging:\n\n1. Run Homebridge with the `-D` command-line option.\n2. Interact with your appliance (e.g. open a door, toggle a setting, or start a programme).\n3. Check the Homebridge logs for any events received from the Home Connect servers.\n\nIf an action or state change on the appliance does not trigger a corresponding event in the log, then the Home Connect servers are not sending that information. The plugin can only react to data that is explicitly broadcast by the Home Connect API servers.",
+            "semantic_abstract": "Debug logging via the `-D` flag exposes the raw event stream from Home Connect servers, allowing for verification of whether specific appliance state changes are transmitted via the API. This procedure identifies whether a functional limitation originates from the plugin implementation or the third-party API event delivery service.",
+            "hash": "e57bc68f98db04b32813328da4a90e88afbef1560cbaa6b5c0cf2ad17e41c2ea"
         }
     ]
 }
