@@ -933,8 +933,8 @@ The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%`
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
 
-<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-43-3f35 issue-45-b6c3 issue-323-9301 -->
-Home Connect communicates many appliance states (such as a coffee maker's "Drip tray full" or a washing machine's "iDos fill level poor") as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous "Single Press" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.
+<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-241e issue-43-3f35 issue-45-b6c3 issue-153-2cda issue-323-9301 -->
+Home Connect communicates many appliance states (such as a coffee maker's "Drip tray full", a washing machine's "iDos fill level poor", or a dishwasher's "Salt low" alert) as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous "Single Press" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.
 
 This design is necessary for two main reasons:
 
@@ -957,18 +957,22 @@ Note that this is purely a user interface display characteristic. Other HomeKit 
 
 #### How do I get notifications for events like a program finishing?
 
-<!-- INCLUDES: issue-38-03f3 issue-63-3185 issue-124-6a18 -->
+<!-- INCLUDES: issue-38-03f3 issue-63-3185 issue-124-6a18 issue-153-2cda -->
 The Apple Home app only generates native notifications for a limited set of device categories, primarily those related to security (such as doors, locks, and smoke sensors). It does not support native notifications for appliance events like a wash cycle finishing.
 
-To provide notification capabilities, the plugin maps specific appliance events to a `Stateless Programmable Switch` service. These can be used as HomeKit automation triggers. For most appliances, the button assignments are:
+To provide notification capabilities, the plugin maps specific appliance events to a `Stateless Programmable Switch` service. These can be used as HomeKit automation triggers. For most appliances, the standard button assignments are:
 
-1. **Button 1 (Single Press)**: Program Finished (`BSH.Common.Event.ProgramFinished`)
-2. **Button 2 (Single Press)**: Program Aborted (`BSH.Common.Event.ProgramAborted`)
+- **Button 1 (Single Press)**: Program Finished (`BSH.Common.Event.ProgramFinished`)
+- **Button 2 (Single Press)**: Program Aborted (`BSH.Common.Event.ProgramAborted`)
 
-Some appliances include additional events. For example, washers may report i-Dos level warnings:
+Some appliance types include additional events:
 
-3. **Button 3 (Single Press)**: i-Dos 1 Fill Level Poor (`LaundryCare.Washer.Event.IDos1FillLevelPoor`)
-4. **Button 4 (Single Press)**: i-Dos 2 Fill Level Poor (`LaundryCare.Washer.Event.IDos2FillLevelPoor`)
+- **Dishwashers**:
+  - **Button 3 (Single Press)**: Salt Low (`Dishcare.Dishwasher.Event.SaltLack`)
+  - **Button 4 (Single Press)**: Rinse Aid Low (`Dishcare.Dishwasher.Event.RinseAidLack`)
+- **Washers (i-Dos)**:
+  - **Button 3 (Single Press)**: i-Dos 1 Fill Level Poor (`LaundryCare.Washer.Event.IDos1FillLevelPoor`)
+  - **Button 4 (Single Press)**: i-Dos 2 Fill Level Poor (`LaundryCare.Washer.Event.IDos2FillLevelPoor`)
 
 To receive text-based notifications on your mobile device, you have several options:
 
@@ -987,19 +991,6 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
 Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
-
-#### 🚧 Why do events like `Salt low`, `Rinse aid low`, or `Program Finished` appear only as numbered buttons in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-153-2cda -->
-Home Connect appliance events are presented to HomeKit using `Stateless Programmable Switch` services. While some third-party HomeKit apps can display descriptive labels for these triggers, the Apple Home app represents them as numbered buttons that support automations via their **Single Press** action.
-
-To use these in automations within the Apple Home app, you must identify the event by its button number. For dishwasher appliances, the standard mapping is:
-1.  **Program Finished**
-2.  **Program Aborted**
-3.  **Salt Low**
-4.  **Rinse Aid Low**
-
-You can find these buttons within the accessory settings for your appliance in the Home app, under the **Automations** section for the programmable switch service.
 
 ### Siri
 
