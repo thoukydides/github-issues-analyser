@@ -94,10 +94,10 @@
   - **[Siri](#siri)**
     - [How do I control my hood fan speed using Siri?](#how-do-i-control-my-hood-fan-speed-using-siri)
 - **[Compatibility and Integration](#compatibility-and-integration)**
-  - **[Third-party Platforms](#third-party-platforms)**
+  - **[Third-party Platforms and API Limitations](#third-party-platforms-and-api-limitations)**
     - [Is this plugin compatible with HOOBS?](#is-this-plugin-compatible-with-hoobs)
     - [Will there be a Home Assistant version of this plugin?](#will-there-be-a-home-assistant-version-of-this-plugin)
-    - [Why are features available in IFTTT or the official app missing from this plugin?](#why-are-features-available-in-ifttt-or-the-official-app-missing-from-this-plugin)
+    - [Why are features available in the official app or IFTTT missing from this plugin?](#why-are-features-available-in-the-official-app-or-ifttt-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
     - [Are there specific operating system requirements for the plugin?](#are-there-specific-operating-system-requirements-for-the-plugin)
@@ -1005,7 +1005,7 @@ The plugin maps these percentages to the closest available physical fan settings
 
 ## Compatibility and Integration
 
-### Third-party Platforms
+### Third-party Platforms and API Limitations
 
 #### Is this plugin compatible with HOOBS?
 
@@ -1028,26 +1028,19 @@ No. This plugin is specifically designed for Homebridge to provide HomeKit integ
 
 For Home Assistant users, there are alternative community-maintained integrations available for Home Connect appliances.
 
-#### Why are features available in IFTTT or the official app missing from this plugin?
+#### Why are features available in the official app or IFTTT missing from this plugin?
 
-<!-- INCLUDES: issue-23-272e issue-67-20e5 issue-188-cb08 -->
-This plugin is restricted by the capabilities of the public Home Connect API. The official Home Connect app often uses private APIs to provide functionality—such as specific eco modes or ironing reduction for dryers—that is not exposed to third-party developers. If a specific program or option is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options/), it cannot be supported by this plugin.
+<!-- INCLUDES: issue-23-272e issue-67-20e5 issue-94-b8d2 issue-188-cb08 -->
+This plugin is restricted by the capabilities of the public Home Connect API. The official Home Connect apps (e.g. Bosch, Siemens, Gaggenau) often utilise private or internal APIs to provide functionality that is not exposed to third-party developers. If a specific program, option, or setting is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/), it cannot be supported by this plugin.
 
-Availability of features is also dependent on:
-- The specific appliance model and its hardware capabilities
-- The firmware version installed on the appliance
-- Regional differences in API feature sets
+Examples of features that are (or were) missing from the public API include:
+- Specific eco modes or ironing reduction for dryers
+- Ice maker controls (the `Refrigeration.Common.Setting.Dispenser.Enabled` setting was only added to the public API in April 2023)
+- Detailed maintenance or diagnostic information
 
-To verify if a feature is supported by the public API for your specific device, you can use the `Identify` routine or inspect the generated schema file. If a feature is missing from the API, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) to request its addition.
+Availability is also dependent on the appliance model, firmware version, and regional API variations. To verify if a feature is supported for your specific device, you can use the `Identify` routine or inspect the generated schema file. If a feature is missing from the API, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) to request its addition.
 
-Direct integration with IFTTT to bridge these gaps has been explicitly declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes technical constraints such as increased code complexity, the user burden of manually creating IFTTT applets, and interface clutter in HomeKit. For users requiring IFTTT-specific functionality, such as triggering automations from Hood Favourite buttons, it is recommended to use a dedicated plugin like `homebridge-ifttt` alongside this one.
-
-#### 🚧 Why does the official Home Connect app show more features than the Homebridge plugin? 🚧
-
-<!-- INCLUDES: issue-94-b8d2 -->
-The plugin is strictly limited by the capabilities provided by the public Home Connect API. The official mobile applications (Bosch, Siemens, etc.) often utilize internal or private API features that are not exposed to third-party developers. If a control, status, or event is not documented in the [Home Connect API specification](https://api-docs.home-connect.com/), the plugin cannot implement it.
-
-For example, ice maker controls (the `Refrigeration.Common.Setting.Dispenser.Enabled` setting) were only added to the public API in April 2023, despite being available in the official app for longer. If you identify a feature missing from the plugin that is present in the official app, it is likely because the API does not yet support it. In such cases, you can request that the Home Connect team extend their public API via their [Contact form](https://developer.home-connect.com/support/contact).
+Direct integration with IFTTT to bridge these gaps has been declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes technical constraints such as increased code complexity, the user burden of manually creating IFTTT applets, and interface clutter in HomeKit. For users requiring IFTTT-specific functionality, such as triggering automations from Hood Favourite buttons, it is recommended to use a dedicated plugin like `homebridge-ifttt` alongside this one.
 
 ### Plugin Installation and Configuration
 
