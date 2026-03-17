@@ -1,14 +1,12 @@
 {
     "issue_number": 118,
-    "updated_at": "2026-02-17T11:13:47.060Z",
+    "updated_at": "2026-03-17T11:29:34.777Z",
     "faq": [
         {
-            "question": "Why does SingleKey ID show a session expired error or fail to redirect during authorisation?",
-            "answer": "Authorisation issues occurring after the plugin has provided the initial login URL are typically caused by the Home Connect or SingleKey ID services rather than the plugin itself. In some instances, the SingleKey ID website may fail to redirect back to the authorisation handler due to restrictive Content Security Policy (CSP) directives.\n\nIf you encounter a session expiry message or the page stalls after logging in, try the following workaround:\n1. Restart the authorisation process from the plugin configuration.\n2. On the SingleKey ID login screen, ensure you tick the **Stay logged in** option.\n3. If the page still fails to redirect automatically after signing in, open your browser's developer tools (usually `F12` or right-click and select **Inspect**).\n4. Look for the callback URL in the network logs or console and manually navigate to it to complete the process.",
-            "semantic_abstract": "SingleKey ID authentication flows may fail to redirect to the Home Connect callback URL due to restrictive Content Security Policy (CSP) headers on the provider's website. This results in session expiry errors or stalled login screens during the OAuth handshake, requiring manual intervention or persistent session cookies to bypass the redirection failure.",
-            "alternative_resolution": "Incorporate a troubleshooting note within the plugin's configuration UI or authorisation setup instructions specifically mentioning that redirection failures after SingleKey ID login may require 'Stay logged in' to be enabled or manual URL navigation via browser developer tools.",
-            "confidence": "medium",
-            "hash": "9a71fcc81588bac8ef87c36524896e1dd885edf1cde5699a84c1b1cb67b43297"
+            "question": "Why does the Home Connect authorisation session expire during SingleKey ID login?",
+            "answer": "Authorisation issues occurring after the plugin generates the initial URL are typically caused by the Home Connect or SingleKey ID services rather than the plugin itself. A known issue involves Content Security Policy (CSP) directives on the SingleKey ID website preventing the browser from automatically redirecting back to the plugin after a successful login, which can lead to a session expiry error.\n\nIf you encounter this behaviour, try the following workaround:\n1. When signing in to SingleKey ID, tick the **stay logged in** option.\n2. If the page fails to redirect after login, open your browser's developer tools (Inspect).\n3. Locate the callback URL within the network traffic or page source and manually navigate to it to complete the authorisation process.",
+            "semantic_abstract": "SingleKey ID authentication for Home Connect appliances can fail when Content Security Policy (CSP) directives on the provider's site prevent the browser from executing the redirect to the plugin callback URL. This platform-level restriction causes authorisation sessions to timeout, necessitating manual navigation to the callback URL via browser developer tools to complete the OAuth flow.",
+            "hash": "0a9eee35cac75430c7f5f42853d0aa63bcc1d07c7fdfdc176e154f6dfe359b10"
         }
     ]
 }
