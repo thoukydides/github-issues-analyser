@@ -1,14 +1,12 @@
 {
     "issue_number": 141,
-    "updated_at": "2026-02-16T19:54:11.740Z",
+    "updated_at": "2026-03-17T06:12:57.500Z",
     "faq": [
         {
-            "question": "Why does the ice maker toggle not appear for my Home Connect fridge?",
-            "answer": "The ability to control an ice maker depends on the appliance exposing the `Refrigeration.FridgeFreezer.Setting.DispenserEnabled` setting via the Home Connect API. This feature was implemented in the plugin starting with version 0.29.0.\n\nIf the control is missing in HomeKit, it indicates that the appliance firmware or the specific model does not support this setting through the API. The plugin can only expose functionality that the Home Connect API explicitly provides for a connected device; it cannot control features that are only available via the physical appliance buttons or the official Home Connect app if they are not also part of the public API.",
-            "semantic_abstract": "Home Connect API support for the `Refrigeration.FridgeFreezer.Setting.DispenserEnabled` setting determines the availability of ice maker toggles within HomeKit. Appliances that do not expose this specific setting via the API will not show ice maker controls, even if the feature is present in the manufacturer's proprietary app.",
-            "alternative_resolution": "The plugin could potentially log a list of detected but unsupported settings for an appliance when in debug mode, helping users confirm if specific features like `DispenserEnabled` are being withheld by the Home Connect API.",
-            "confidence": "high",
-            "hash": "52450c12af675864e9186bca9bb378e4278e8a3f7e87a6c2f82e1387789c6fb6"
+            "question": "Why is the ice maker toggle missing for my fridge or freezer?",
+            "answer": "The plugin supports ice maker control by mapping the `Refrigeration.FridgeFreezer.Setting.Dispenser.Enabled` setting from the Home Connect API to a HomeKit switch.\n\nAvailability of this feature is dependent on whether your specific appliance model exposes this capability through the Home Connect API. If the setting is not provided by the API for your device, the plugin cannot display the toggle in HomeKit.",
+            "semantic_abstract": "Home Connect appliance ice maker control relies on the `Refrigeration.FridgeFreezer.Setting.Dispenser.Enabled` setting within the Home Connect API. The plugin maps this to a HomeKit switch, but functionality is limited to models where the manufacturer exposes this specific setting via their API.",
+            "hash": "568bf5e1b00fb1bed424ac16debdf2312ebe0d37fbe51e3193faa190a71ea0dd"
         }
     ]
 }
