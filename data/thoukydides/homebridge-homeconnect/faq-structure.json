@@ -245,8 +245,10 @@
                                 },
                                 {
                                     "question": "Why does my appliance fail to start when using the switch in the Home app?",
-                                    "answer": "For most appliances this plugin exposes multiple `Switch` services to HomeKit, including:\n\n- **Power**: Controls the standby state of the machine.\n- **Active Program**: Starts or stops the currently selected program.\n- **Individual Programs**: Start (or select) a specific named program.\n- **Modes**: Any settings that the appliance supports, such as `SabbathMode` or `SuperModeFreezer`.\n\nBy default, the Apple Home app may group these separate services into a single tile. Toggling this combined tile attempts to activate all switches simultaneously, which results in conflicting requests. The plugin attempts to detect and ignore such invalid actions.\n\n**For example**: If your dishwasher has a Power switch, an Active Program switch, and three individual program switches (Eco, Intensive, Quick), toggling the combined tile tries to turn on power **and** start all three programs at once; an impossible operation.\n\nTo resolve this, you should configure the Home app to display these services individually using the Home app's **Show as Separate Tiles** option.",
-                                    "included_ids": []
+                                    "answer": "For most appliances this plugin exposes multiple `Switch` services to HomeKit, including Power, Active Program, and individual programs. By default, the Apple Home app often groups these separate services into a single accessory tile. Toggling this combined tile attempts to activate all underlying switches simultaneously, which results in conflicting requests and a `No Response` error.\n\nFor example, if a dishwasher tile is toggled, HomeKit might try to turn on power and start multiple programs at once. This is particularly problematic for **coffee machines**, which require significant start-up time for heating and rinsing; sending a \"Power On\" and \"Start Program\" command at the same instant will usually result in an error from the appliance as it is not yet ready.\n\nTo resolve this, you should configure the Home app to display these services individually:\n\n1. Open the accessory settings for the appliance in the Home app.\n2. Select **Show as Separate Tiles**.\n3. Control the Power switch first, wait for the machine to complete its start-up sequence (if applicable), and then activate the desired program switch.",
+                                    "included_ids": [
+                                        "issue-149-ae5e"
+                                    ]
                                 },
                                 {
                                     "question": "Why does my appliance frequently show `Disconnected (setting On error status)`?",
@@ -256,14 +258,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 149,
-                                    "id": "issue-149-ae5e",
-                                    "question": "Why does my coffee machine show Not Responding when I try to start it from a single tile in the Home app?",
-                                    "answer": "Home Connect coffee machines expose multiple `Switch` services to HomeKit, typically including Power, Active Program, and specific custom programs (like Ristretto). By default, the Apple Home app often aggregates these separate switches into a single accessory tile.\n\nWhen you toggle this single aggregated tile, HomeKit attempts to set the state of all underlying switches simultaneously. This causes a conflict because coffee machines require a significant start-up time for heating and rinsing before they are ready to accept a program command. Sending a \"Power On\" command and a \"Start Program\" command at the same instant will usually result in an error from the appliance, which HomeKit then displays as Not Responding.\n\nTo resolve this, you should separate the controls in the Apple Home app:\n1. Open the accessory settings for the coffee machine in the Home app.\n2. Select Show as Separate Tiles.\n3. Control the Power switch first, wait for the machine to complete its start-up sequence, and then activate the desired program switch."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
