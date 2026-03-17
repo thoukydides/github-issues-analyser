@@ -148,19 +148,19 @@ If the configuration is correct but errors persist, try deleting and recreating 
 
 #### Why does the authorisation link expire or fail with an `expired_token` or `The code entered is invalid or has expired` error?
 
-<!-- INCLUDES: issue-97-4efe issue-125-fcc5 -->
+<!-- INCLUDES: issue-97-4efe issue-125-fcc5 issue-151-2b8d -->
 Authorisation links and their associated device codes are only valid for a limited time (typically 10 minutes). If this window is exceeded, or if a link is used more than once, the Home Connect API will return `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found, expired or blocked`.
 
 If the authorisation fails:
 
 - **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Attempting to authorise immediately after registration may result in the client being rejected.
 - **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI. The plugin generates a new authorisation URL every 10 minutes until the process is successful.
-- **Refresh Configuration UI**: If you are using the Homebridge Config UI X, you must close and re-open the settings dialogue to see the updated authorisation URL.
+- **Refresh Configuration UI**: If you are using the Homebridge Config UI X, you must close and re-open the settings dialogue to see the updated authorisation URL. The configuration interface does not currently track the expiration status of the URI and may continue to display an old link after it has expired.
 - **Single Use**: The `device_code` is invalidated as soon as it is successfully used. Do not attempt to reuse old authorisation URLs.
 
 #### How do I complete authorisation or resolve `access_denied`, `login session expired`, or `Device authorisation session has expired` errors?
 
-<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-121-d035 issue-295-521b issue-299-15d1 -->
+<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 issue-295-521b issue-299-15d1 -->
 When the plugin requires new credentials, it uses the Home Connect **Device Flow**. These errors typically occur during the login process due to account verification issues or regional server quirks.
 
 ### Completion Steps
@@ -172,6 +172,7 @@ When the plugin requires new credentials, it uses the Home Connect **Device Flow
 - **Case Sensitivity**: The email address specified as the **Home Connect user account for testing** in the developer portal must be entered in **all lowercase**. The backend may fail to match accounts if capital letters are used.
 - **Account Status**: Ensure your account is fully active by logging into the official Home Connect mobile app. Complete any pending tasks such as email verification, migrating to a SingleKey ID, or accepting updated terms and conditions.
 - **Email Constraints**: Avoid using email sub-addressing or "plus" addresses (e.g. `user+hc@domain.com`), as these are not consistently supported.
+- **SingleKey ID Redirection**: Content Security Policy (CSP) directives on the SingleKey ID website can sometimes prevent the browser from automatically redirecting back to the plugin after a successful login. When signing in, tick the **stay logged in** option. If the page fails to redirect, you may need to locate the callback URL within the browser's developer tools (Network tab) and manually navigate to it.
 - **Internationalisation Bug**: If your browser's language is not English, the password prompt may fail to appear or return `login session expired`. Temporarily set your web browser's preferred language to English (`en`) and refresh the page to complete authorisation.
 
 #### Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?
@@ -196,29 +197,6 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 3. If you are configuring the plugin manually via `config.json`, add `"china": true` to the plugin configuration object.
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
-
-#### 🚧 Why does the Home Connect authorisation session expire during SingleKey ID login? 🚧
-
-<!-- INCLUDES: issue-118-0a9e -->
-Authorisation issues occurring after the plugin generates the initial URL are typically caused by the Home Connect or SingleKey ID services rather than the plugin itself. A known issue involves Content Security Policy (CSP) directives on the SingleKey ID website preventing the browser from automatically redirecting back to the plugin after a successful login, which can lead to a session expiry error.
-
-If you encounter this behaviour, try the following workaround:
-1. When signing in to SingleKey ID, tick the **stay logged in** option.
-2. If the page fails to redirect after login, open your browser's developer tools (Inspect).
-3. Locate the callback URL within the network traffic or page source and manually navigate to it to complete the authorisation process.
-
-#### 🚧 Why is the Home Connect authorisation link in the plugin settings invalid or expired? 🚧
-
-<!-- INCLUDES: issue-151-2b8d -->
-The authorisation links generated for the Home Connect API have a limited validity period, typically **30 minutes**. If the link is not used within this timeframe, the Home Connect authorisation server will reject the request.
-
-The plugin's configuration interface in `homebridge-config-ui-x` displays this link to facilitate the initial setup. However, because the interface does not currently track the expiration status of the URI, it may continue to show an old link after it has already expired. If you encounter an invalid link error or a timeout during the authorisation process, follow these steps:
-
-1. Close the plugin configuration window.
-2. Refresh the Homebridge UI page in your web browser.
-3. Re-open the Home Connect plugin settings to generate a new authorisation URI.
-
-Please note that the plugin is undergoing a significant architectural rewrite. Improvements to how the configuration UI handles authorisation, including more robust link management, are planned for future updates.
 
 ### Home Connect API Errors
 
