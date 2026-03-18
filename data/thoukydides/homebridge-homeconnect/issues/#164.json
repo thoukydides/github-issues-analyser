@@ -1,14 +1,5 @@
 {
     "issue_number": 164,
-    "updated_at": "2026-02-17T19:29:22.751Z",
-    "faq": [
-        {
-            "question": "Why do my other Homebridge plugins show No Response after installing the Home Connect plugin?",
-            "answer": "Homebridge plugins operate in isolation, meaning the Home Connect plugin cannot directly interfere with the operation of other plugins. If multiple unrelated plugins show a `No Response` status in the Apple Home app simultaneously, this typically indicates a problem at the Homebridge process level or with the HomeKit pairing state.\n\nTo troubleshoot this behaviour:\n1. Check the Homebridge logs to see if the entire process is crashing or restarting. A crash in one plugin can take down the whole bridge if they are not running in child bridges.\n2. Ensure that your environment (Node.js and `npm`) is updated to the latest recommended versions for Homebridge.\n3. If the issue persists, it may be due to HomeKit database inconsistencies. In some cases, removing and re-adding the Homebridge bridge to the Home app is required to restore communication.\n4. For detailed diagnostics, enable debug logging by starting Homebridge with the `-D` flag and setting the `DEBUG=*` environment variable to capture HAP (HomeKit Accessory Protocol) interactions.",
-            "semantic_abstract": "Homebridge plugin architecture ensures technical isolation, so 'No Response' errors affecting multiple plugins usually signify bridge-level crashes, environment instability, or HomeKit pairing corruption rather than a specific plugin conflict. Root cause analysis involves verifying process stability via debug logs and ensuring system dependencies like Node.js and NPM are current.",
-            "alternative_resolution": "The plugin documentation could include a troubleshooting section clarifying the isolation of plugins and advising users to check for bridge-level crashes or HomeKit pairing issues when multiple devices become unresponsive.",
-            "confidence": "medium",
-            "hash": "bbc4d16471ab93871d96a877d77d9eb4753594fc564266eb8c10b99b88bc3de5"
-        }
-    ]
+    "updated_at": "2026-03-18T08:28:44.873Z",
+    "faq": []
 }
