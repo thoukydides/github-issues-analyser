@@ -6,9 +6,8 @@
     - [Why is the plugin not starting or failing to show an authorisation URL?](#why-is-the-plugin-not-starting-or-failing-to-show-an-authorisation-url)
     - [Why does authorisation fail with `invalid_request`, `invalid content type`, or `request rejected by client authorization authority`?](#why-does-authorisation-fail-with-invalid_request-invalid-content-type-or-request-rejected-by-client-authorization-authority)
     - [Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?](#why-does-authorisation-fail-with-invalid_client-grant_type-is-invalid-unauthorized_client-or-client-has-limited-user-list)
-    - [Why does the authorisation link expire or fail with an `expired_token` error?](#why-does-the-authorisation-link-expire-or-fail-with-an-expired_token-error)
+    - [Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?](#why-does-the-authorisation-link-expire-or-fail-with-an-expired_token-or-invalid-code-error)
     - [Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?](#why-does-authorisation-fail-with-access_denied-device-authorization-session-has-expired-or-login-session-expired)
-    - [Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?](#why-does-authorisation-fail-with-the-error-client-not-authorized-for-this-oauth-flow-grant_type)
     - [Why does authorisation fail with a `403 Forbidden` error?](#why-does-authorisation-fail-with-a-403-forbidden-error)
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
   - **[Home Connect API Errors](#home-connect-api-errors)**
@@ -121,51 +120,45 @@ These errors are returned when the provided `Client ID` is not recognised or is 
 
 #### Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?
 
-<!-- INCLUDES: issue-51-3a91 issue-51-60d6 issue-60-2ad5 issue-115-de4a -->
-These errors are returned by the Home Connect API and indicate a configuration mismatch in the [Home Connect Developer Portal](https://developer.home-connect.com/):
+<!-- INCLUDES: issue-51-3a91 issue-51-4991 issue-51-60d6 issue-60-2ad5 issue-115-de4a issue-117-e569 issue-162-34c9 -->
+These errors are returned by the Home Connect API and indicate a configuration mismatch or synchronization delay in the [Home Connect Developer Portal](https://developer.home-connect.com/):
 
 Ensure the `Client ID` in your Homebridge configuration exactly matches the one in the portal, and that the application is configured as follows:
 
 - **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app. Check this in both your global profile's **Default Home Connect User Account for Testing** and within the specific application's settings.
-- **OAuth Flow**: Must be set to **Device Flow**. If your application is set to `Authorization Code Grant Flow`, you must create a new one.
-- **Success Redirect**: Leave blank (or set to a valid URL).
+- **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set to `Authorization Code Grant Flow`, you must create a new application.
+- **Success Redirect**: Leave blank or ensure it is a valid URL. Mismatches here can trigger `unauthorized_client` errors.
+- **Propagation Delay**: It can take up to 48 hours for a newly created application or modified user list to fully propagate across all Home Connect systems.
 - **One Time Token Mode**: Disabled.
 - **Proof Key for Code Exchange**: Disabled.
 - **Sync to China**: Disabled, unless you are using the Home Connect servers in China.
 
-If the configuration is correct but errors persist, try deleting and recreating the application in the developer portal to reset its state.
+If the configuration is correct but errors persist after 48 hours, try deleting and recreating the application in the developer portal to reset its state.
 
-#### Why does the authorisation link expire or fail with an `expired_token` error?
+#### Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?
 
-<!-- INCLUDES: issue-97-4efe -->
-Authorisation links and their associated device codes are only valid for a limited time. If this window is exceeded, or if a link is used more than once, the Home Connect API will return `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found, expired or blocked`.
+<!-- INCLUDES: issue-97-4efe issue-125-fcc5 issue-151-2b8d -->
+Authorisation links and their associated device codes have a limited validity period, typically between 10 and 30 minutes. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.
 
-If the authorisation fails:
-- **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.
-- **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI.
-- **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt.
-- **Single Use**: The `device_code` is invalidated as soon as it is successfully used. Do not attempt to reuse old authorisation URLs.
+To resolve these issues:
+- **Wait for Propagation**: New applications can take up to an hour to become active on production servers. Attempting to use a link before this may result in a rejection.
+- **Refresh the UI**: The plugin configuration interface (e.g. `homebridge-config-ui-x`) does not always refresh the displayed URL automatically. If you encounter an expiry error, close the settings dialogue, refresh the Homebridge web page, and re-open the settings to ensure you are using a fresh link.
+- **Check Logs for Fresh Links**: The plugin automatically retries every 60 seconds and logs new URLs. Always use the most recent link found in the Homebridge logs.
+- **Single Use**: A `device_code` is invalidated immediately upon successful use or if replaced by a newer attempt. Do not attempt to reuse old links.
 
 #### Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?
 
-<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-295-521b issue-299-15d1 -->
-These errors typically occur during the login process and can be caused by account verification issues or a known bug in the Home Connect authorisation servers:
+<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 issue-295-521b issue-299-15d1 -->
+These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:
 
-- **Account Verification**: Ensure your SingleKey ID account is fully configured. It is often necessary to log out of the official Home Connect mobile app and log back in to accept updated terms of use or verify the account, ensuring that you accept all necessary agreements.
-- **Internationalisation Bug**: A bug in the Home Connect and SingleKey ID servers can cause authorisation to fail if your browser's preferred language is set to a locale other than English. This often results in a `login session expired` error or prevents the password prompt from appearing after the username is entered. To resolve this set your web browser's preferred language to English (`en`). Refresh the page and attempt the authorisation again. You can revert these settings once the plugin has successfully obtained its tokens.
+- **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise.
+- **SingleKey ID Redirection Bug**: A known issue with Content Security Policy (CSP) headers on the SingleKey ID site can prevent the browser from redirecting back to the authorisation success page. When signing in, tick the **stay logged in** option. If the page hangs after login, check the browser's developer tools for the callback URL or try manually navigating to the verification link again while the session is active.
+- **Internationalisation Bug**: A server-side bug can cause authorisation to fail if your browser's preferred language is not English. This often prevents the password prompt from appearing. Set your web browser's preferred language to English (`en`), refresh, and attempt the authorisation again. You can revert this setting once the tokens are obtained.
 
-To complete the process once initialised:
-
-1. Find the URL in the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
-2. Open the full URL in a browser and sign in with the SingleKey ID account used in the official Home Connect mobile app.
-3. Approve the request. The plugin will automatically detect completion and save the tokens.
-
-#### Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?
-
-<!-- INCLUDES: issue-51-4991 -->
-This error indicates that the application registered in the Home Connect Developer Portal was not configured to use the `Device Flow` OAuth method.
-
-The `OAuth Flow` setting is fixed at the time of application creation. If it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one, ensuring that `Device Flow` is selected during the creation process.
+To complete the process:
+1. Obtain the URL from the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
+2. Open the URL in a browser and sign in with the account used in the official app.
+3. Approve the request. The plugin will detect completion and save the tokens automatically.
 
 #### Why does authorisation fail with a `403 Forbidden` error?
 
@@ -182,73 +175,6 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 3. If you are configuring the plugin manually via `config.json`, add `"china": true` to the plugin configuration object.
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
-
-#### 🚧 Why does the plugin fail with the error `request rejected by client authorization authority (developer portal)`? 🚧
-
-<!-- INCLUDES: issue-117-e569 -->
-This error is returned by the Home Connect servers during the authorisation process and indicates that the request was rejected due to a configuration mismatch. It corresponds to an `unauthorized_client` error (HTTP 400).
-
-There are two primary causes for this error:
-1. **Incorrect Client ID**: The `Client ID` entered in the plugin configuration does not match the one assigned to your application in the developer portal.
-2. **Invalid Redirect URI**: The **Success Redirect URL** configured for your application in the [Home Connect Developer Portal](https://developer.home-connect.com/applications) is either missing, incorrect, or does not match what the plugin expects.
-
-To resolve this issue, verify that your application settings in the developer portal are correct and that the `Client ID` has been copied accurately into the plugin settings. If the configuration is correct but the error persists, you may need to contact Home Connect developer support as the issue resides on their authorisation servers.
-
-#### 🚧 Why does the Home Connect authorisation session expire during SingleKey ID login? 🚧
-
-<!-- INCLUDES: issue-118-0a9e -->
-Authorisation issues occurring after the plugin generates the initial URL are typically caused by the Home Connect or SingleKey ID services rather than the plugin itself. A known issue involves Content Security Policy (CSP) directives on the SingleKey ID website preventing the browser from automatically redirecting back to the plugin after a successful login, which can lead to a session expiry error.
-
-If you encounter this behaviour, try the following workaround:
-1. When signing in to SingleKey ID, tick the **stay logged in** option.
-2. If the page fails to redirect after login, open your browser's developer tools (Inspect).
-3. Locate the callback URL within the network traffic or page source and manually navigate to it to complete the authorisation process.
-
-#### 🚧 Why does the Home Connect authorisation link show a "Device authorisation session has expired" error? 🚧
-
-<!-- INCLUDES: issue-121-d035 -->
-This error typically occurs during the SingleKey ID login process if the account setup is incomplete or requires user intervention in the official Home Connect application. To resolve this, ensure that your account is fully configured:
-
-1. Open the official Home Connect app on your mobile device and ensure you are logged in.
-2. Complete any pending tasks, such as verifying your email address or migrating to a SingleKey ID.
-3. Accept any updated terms and conditions within the app.
-4. Confirm that the email address used for the app is also added to the **Home Connect user account for testing** list in the Home Connect Developer Portal for your specific application.
-
-Once the account is in a fully active state in the official app, the authorisation link provided by the plugin should function correctly.
-
-#### 🚧 Why do I get a `The code entered is invalid or has expired` error during authorisation? 🚧
-
-<!-- INCLUDES: issue-125-fcc5 -->
-This error typically occurs due to timing mismatches between the Home Connect developer portal and their authorisation servers, or because the verification code itself has timed out.
-
-1. **Propagation Delay**: When you create or modify an application in the Home Connect Developer Portal, it can take up to 15 minutes for these changes to be synchronised across their production authorisation servers. Attempting to authorise immediately after registration may result in the client being rejected.
-2. **Code Expiry**: The verification links and their associated codes are only valid for 10 minutes. If you use a link that was generated earlier, it will be rejected by the API.
-3. **Locating a Fresh Link**: The plugin generates a new authorisation URL every 10 minutes until the process is successful. You can find the most recent link in the Homebridge logs. If you are using the configuration interface (such as `homebridge-config-ui-x`), you must close and re-open the settings dialogue to refresh the displayed URL.
-
-If you continue to experience issues after waiting 15 minutes and using a fresh link from the logs, please contact Home Connect support directly.
-
-#### 🚧 Why is the Home Connect authorisation link in the plugin settings invalid or expired? 🚧
-
-<!-- INCLUDES: issue-151-2b8d -->
-The authorisation links generated for the Home Connect API have a limited validity period, typically **30 minutes**. If the link is not used within this timeframe, the Home Connect authorisation server will reject the request.
-
-The plugin's configuration interface in `homebridge-config-ui-x` displays this link to facilitate the initial setup. However, because the interface does not currently track the expiration status of the URI, it may continue to show an old link after it has already expired. If you encounter an invalid link error or a timeout during the authorisation process, follow these steps:
-
-1. Close the plugin configuration window.
-2. Refresh the Homebridge UI page in your web browser.
-3. Re-open the Home Connect plugin settings to generate a new authorisation URI.
-
-Please note that the plugin is undergoing a significant architectural rewrite. Improvements to how the configuration UI handles authorisation, including more robust link management, are planned for future updates.
-
-#### 🚧 Why does the authorisation fail with `[401 Unauthorized] client has limited user list - user not assigned to client [invalid_client]`? 🚧
-
-<!-- INCLUDES: issue-162-34c9 -->
-This error is returned directly by the Home Connect servers and indicates a mismatch or propagation delay between the application created in the Home Connect Developer Portal and the user account being authorised. It commonly occurs in two scenarios:
-
-1. **Propagation delay**: It can take up to 48 hours for a newly created or modified application to become fully active across all Home Connect systems. If you have recently set up your developer account or application, please allow time for these changes to propagate before attempting authorisation again.
-2. **Configuration mismatch**: Ensure that the `clientid` configured in the plugin matches the Client ID provided in the Developer Portal exactly. Additionally, confirm that the email address used for authorisation (your SingleKey ID or Home Connect account) is the same one used to register the application in the portal.
-
-If the error persists after 48 hours, verify your application settings on the Home Connect Developer Portal and ensure the account status is active.
 
 ### Home Connect API Errors
 
