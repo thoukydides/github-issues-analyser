@@ -339,12 +339,13 @@
                                         "issue-373-0d05",
                                         "issue-377-3b83",
                                         "issue-379-2e76",
-                                        "issue-381-fa8e"
+                                        "issue-381-fa8e",
+                                        "issue-175-3d7e"
                                     ]
                                 },
                                 {
                                     "question": "Why are some appliance features, programs, or options missing or unavailable?",
-                                    "answer": "The plugin does not have appliance programs or features hardcoded; it dynamically discovers the capabilities of each appliance by querying the Home Connect API. There are several reasons why features \nmay be missing or appear as `currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
+                                    "answer": "The plugin does not have appliance programs or features hardcoded; it dynamically discovers the capabilities of each appliance by querying the Home Connect API. There are several reasons why features may be missing or appear as `currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it. Common examples include ice maker toggles for refrigerators and certain coffee machine options like milk percentage.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
                                     "included_ids": [
                                         "issue-1-d662",
                                         "issue-17-56af",
@@ -362,7 +363,18 @@
                                         "issue-303-9e0f",
                                         "issue-316-e6c5",
                                         "issue-368-b5fa",
-                                        "issue-380-03ac"
+                                        "issue-380-03ac",
+                                        "issue-141-568b",
+                                        "issue-157-6512"
+                                    ]
+                                },
+                                {
+                                    "question": "Why are ambient light colour and brightness controls missing or limited?",
+                                    "answer": "Ambient lighting functionality via the Home Connect API has several constraints and unique behaviours:\n\n- **Appliance Category Restrictions**: The API currently limits ambient light control to Hood appliances. While many dishwashers feature internal or ambient lighting, the public API does not yet expose these controls for the dishwasher category, even if they are available in the official app.\n- **Discovery and Power State**: The API often omits lighting settings if the appliance or the light itself is switched off. To detect these features, the plugin attempts to briefly switch the light on during its initial discovery phase. If this process is interrupted by manual operation or API latency, controls may be missing in HomeKit. This can usually be resolved by deleting the appliance's cache file in the `persist` directory and restarting Homebridge while the appliance is idle.\n- **Mutually Exclusive Modes**: The API uses two distinct modes. In `CustomColor` mode, brightness is typically integrated into the colour value and a separate brightness slider may be unavailable. In fixed colour mode (predefined presets 1-99), brightness control is available but custom colour selection is disabled.\n\nTo force a re-discovery, ensure the appliance is idle, delete the MD5-hashed cache file for that appliance, and restart Homebridge. The plugin will attempt to re-detect the ambient light capabilities during startup.",
+                                    "included_ids": [
+                                        "issue-24-8ee6",
+                                        "issue-42-e5af",
+                                        "issue-54-196a"
                                     ]
                                 },
                                 {
@@ -515,44 +527,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 141,
-                                    "id": "issue-141-568b",
-                                    "question": "Why is the ice maker toggle missing for my fridge or freezer?",
-                                    "answer": "The plugin supports ice maker control by mapping the `Refrigeration.FridgeFreezer.Setting.Dispenser.Enabled` setting from the Home Connect API to a HomeKit switch.\n\nAvailability of this feature is dependent on whether your specific appliance model exposes this capability through the Home Connect API. If the setting is not provided by the API for your device, the plugin cannot display the toggle in HomeKit."
-                                },
-                                {
-                                    "issue_number": 157,
-                                    "id": "issue-157-6512",
-                                    "question": "Why are some coffee maker options, such as milk percentage, missing from the plugin?",
-                                    "answer": "The plugin supports all program options exposed by the official Home Connect API. However, the API does not always provide the same level of control as the official Home Connect app. Features such as milk percentage are currently not available via the API for third-party developers.\n\nThe plugin automatically discovers and supports documented options, which typically include:\n- `BeanAmount` (coffee strength)\n- `FillQuantity` (beverage volume)\n- `CoffeeTemperature`\n- `BeanContainerSelection`\n- `FlowRate`\n- `MultipleBeverages`\n- `HotWaterTemperature` \n\nIf a specific setting is missing, it is due to a limitation in the Home Connect API rather than the plugin itself. If the Home Connect team adds these options to the API in the future, the plugin will support them automatically. To request additional API features, please contact the [Home Connect developer support team](https://developer.home-connect.com/support/contact)."
-                                },
-                                {
-                                    "issue_number": 175,
-                                    "id": "issue-175-3d7e",
-                                    "question": "Why does the log show `Unexpected fields in Home Connect API response`?",
-                                    "answer": "This warning indicates that the Home Connect API has returned data fields that the plugin was not expecting based on the official API specification. These messages are typically informational and do not impact the functionality of the plugin or your appliances.\n\n*   **Cause**: These warnings occur when BSH (the manufacturer) introduces new features or telemetry data to their API before updating the public developer documentation. The plugin logs these as `extraneous` because they are not yet part of its internal data schema.\n*   **Action**: Ensure you are running the latest version of the `homebridge-homeconnect` plugin. Support for new fields is added regularly as they are identified.\n*   **Impact**: If the warnings persist on the latest version, they can safely be ignored. The plugin is designed to continue operating normally while reporting that it has encountered unrecognised data."
-                                },
-                                {
-                                    "issue_number": 24,
-                                    "id": "issue-24-8ee6",
-                                    "question": "Why are ambient light colour and brightness controls missing for my hood or dishwasher?",
-                                    "answer": "The Home Connect API often omits certain settings, such as `BSH.Common.Setting.AmbientLightBrightness` and `BSH.Common.Setting.AmbientLightCustomColor`, from its responses if the appliance or the light itself is switched off. Furthermore, the API implements two mutually exclusive control modes for ambient lighting:\n\n1. `CustomColor` mode: The brightness is integrated into the `BSH.Common.Setting.AmbientLightCustomColor` value. The separate `BSH.Common.Setting.AmbientLightBrightness` setting is typically unavailable or ignored by the API in this mode.\n2. Fixed colour mode: The light uses one of the predefined colours (1-99). In this mode, `BSH.Common.Setting.AmbientLightBrightness` is used to control intensity, but `BSH.Common.Setting.AmbientLightCustomColor` is unavailable.\n\nTo resolve this and properly expose all characteristics to HomeKit, the plugin attempts to automatically discover these capabilities during its first run. If the ambient light is off, the plugin will briefly switch it on to query the supported settings and colour ranges before restoring the original power state. Once discovered, these capabilities are stored in the plugin's cache. If you still encounter missing controls, you can try the following:\n\n* Manually switch on the ambient light and set it to a custom colour using the official Home Connect app.\n* Restart Homebridge to allow the plugin to re-scan the active settings.\n* If the issue persists, deleting the plugin's cache file (excluding the file containing OAuth tokens) and restarting Homebridge while the light is on will force a clean rediscovery."
-                                },
-                                {
-                                    "issue_number": 42,
-                                    "id": "issue-42-e5af",
-                                    "question": "Why can I not control the ambient light on my dishwasher?",
-                                    "answer": "Although many dishwasher models include hardware for internal or ambient lighting, the Home Connect API currently restricts control of this feature to Hood appliances. This is a technical limitation of the manufacturer's API specification rather than the plugin itself.\n\nEven if you can control the lighting via the physical buttons on the machine or the official Home Connect app, the third-party API used by this plugin does not yet expose these controls for the dishwasher category. Support will be added if and when the API specification is updated by the manufacturer to include this functionality for dishwashers."
-                                },
-                                {
-                                    "issue_number": 54,
-                                    "id": "issue-54-196a",
-                                    "question": "Why does my Home Connect appliance ambient light only show on/off but not colour in HomeKit?",
-                                    "answer": "Some Home Connect appliances only report specific settings, such as `BSH.Common.Setting.AmbientLightColor`, when the ambient light is currently switched on. To handle this, the plugin attempts to temporarily switch the light on during its initial discovery process to detect all available features.\n\nIf the colour control is missing despite the appliance supporting it in the official Home Connect app, it is usually because this discovery process was interrupted. Common causes include:\n1.  **Remote Control Lockout**: If the appliance was being operated manually or via the official app during Homebridge startup, the API may have temporarily blocked the plugin from switching the light on.\n2.  **API Latency**: The appliance may take longer to report its new capabilities than the plugin's timeout allowed during the initial check.\n3.  **Cached Capabilities**: The plugin caches the appliance's capabilities for 24 hours. If discovery failed once, the limited feature set will be remembered until the cache expires or is manually cleared.\n\nTo resolve this and force a re-discovery:\n1.  Stop Homebridge.\n2.  Locate the `persist` directory (typically `~/.homebridge/homebridge-homeconnect/persist`).\n3.  Identify the cache file for your appliance. The filename is an MD5 hash of the appliance's name followed by the word `cache` (e.g., `a7ea3482f629...`).\n4.  Delete this cache file.\n5.  Ensure the appliance is not being used, then restart Homebridge. The plugin will attempt to re-detect the ambient light capabilities."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
