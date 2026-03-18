@@ -831,13 +831,18 @@ The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%`
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
 
-<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-43-3f35 issue-45-b6c3 issue-153-2cda issue-323-9301 -->
-Home Connect communicates many appliance states (such as a coffee maker's "Drip tray full", a washing machine's "iDos fill level poor", or a dishwasher's "Salt low" alert) as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous "Single Press" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.
+<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-aa32 issue-43-3f35 issue-45-b6c3 issue-56-1910 issue-132-49f7 issue-153-2cda issue-323-9301 -->
+Home Connect communicates many appliance states and alerts as **transient events** rather than persistent, queryable states. This mapping allows these events to be used as HomeKit automation triggers. Examples include:
 
-This design is necessary for two main reasons:
+- **Kitchen Appliances**: A dishwasher program finishing or being aborted; a hob reaching preheat temperature; an oven reaching its target temperature; or a toaster tray being released.
+- **Maintenance Alerts**: A coffee maker's drip tray being full; a washing machine's i-Dos level being low; or a dishwasher's salt level being low.
+- **Security & Safety**: Freezer door alarms or temperature alerts.
 
-1. **API Limitations**: The Home Connect API does not allow the plugin to poll the current state of these alerts (e.g. after a reboot or reconnection). Because the actual state cannot be reliably determined at startup, using a persistent sensor (like a `Contact Sensor`) could lead to incorrect status displays if a "cleared" event was missed while the plugin was offline.
-2. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines sensors like `Contact Sensor` or `Occupancy Sensor` for continuous states. Mapping a momentary event to these services is technically incorrect.
+This design is necessary for several reasons:
+
+1. **API Limitations**: The Home Connect API often does not allow the plugin to poll the current state of these alerts (e.g. after a reboot). Because the actual state cannot be reliably determined at startup, using a persistent sensor (like a `Contact Sensor`) could lead to incorrect status displays if a "cleared" event was missed while the plugin was offline.
+2. **Inconsistent Reporting**: The API does not consistently report when an event condition clears. While some appliances might send an 'off' status, others simply stop sending the 'present' event with no standard timeout defined.
+3. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines sensors like `Contact Sensor` for continuous states. Mapping a momentary event to these services is technically incorrect.
 
 The Apple Home app only displays numeric labels (e.g. "Button 1") for these services. This is a design limitation of the Home app; while the HomeKit framework allows for descriptive labels (visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents, check the **Homebridge logs** during startup. These events can be disabled per-appliance in the plugin configuration if they are not required.
 
@@ -862,7 +867,7 @@ To receive notifications, you have two main options:
 
 #### How can I disable HomeKit notifications for door events?
 
-<!-- INCLUDES: issue-43-682b -->
+<!-- INCLUDES: issue-43-682b issue-132-6b2c -->
 Door notifications for appliances like fridges or freezers are managed by the Apple Home app on a per-device basis. To disable them:
 
 1. Open the Apple **Home** app.
@@ -870,64 +875,9 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 3. Navigate to the **Doors** section.
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
-Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
+Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. These settings are independent of the manufacturer's official Home Connect app; disabling alerts in one does not automatically disable them in the other. 
 
-#### 🚧 Why does my Home Connect appliance have extra buttons with numeric labels in the Home app? 🚧
-
-<!-- INCLUDES: issue-31-aa32 -->
-These buttons represent `Stateless Programmable Switch` services created by the plugin to allow HomeKit automations to be triggered by appliance events. Depending on the appliance type, these may include:
-
-* **Hood**: Trigger for when a program has finished.
-* **Dishwasher**: Triggers for when a program has finished or been aborted.
-* **Hob**: Triggers for finished, timer finished, and preheat finished.
-* **Other appliances**: Triggers for events like a freezer door being left open or a coffee maker drip tray being full.
-
-Apple's Home app displays these services with numeric labels instead of their descriptive names. If you do not wish to use these for automations, they can be hidden using the per-appliance configuration options in the plugin settings. You can selectively disable:
-
-1. `Stateless Programmable Switch` services for appliance events.
-2. `Switch` services for appliance mode settings.
-3. `Door` services for appliance door status.
-
-Alternatively, some third-party HomeKit apps allow you to customise which services are visible in their interface without needing to disable them globally.
-
-#### 🚧 Why does my appliance have multiple `Stateless Programmable Switch` services with generic numeric labels? 🚧
-
-<!-- INCLUDES: issue-56-1910 -->
-These services represent specific appliance events transmitted by the Home Connect API, such as a programme finishing, a toaster tray being released, or an oven reaching its target temperature. They are exposed to HomeKit as stateless switches so they can be used as triggers for automations.
-
-Due to limitations in the Apple Home app, these event switches are often displayed with generic labels like `Button 1` or `Button 2` rather than descriptive names. This can lead to a cluttered and confusing user interface if the events are not being used for automations.
-
-You can selectively disable these services on a per-appliance basis within the plugin configuration. When disabled, the plugin automatically handles the removal of the cached services from Homebridge to prevent 'zombie' accessories from remaining in your HomeKit setup. Similar configuration options are also available for:
-
-*   Appliance mode settings (e.g. Sabbath Mode for ovens or various modes for fridge-freezers).
-*   The `Door` service for monitoring appliance door status.
-
-#### 🚧 Why are fridge door and temperature alarms mapped to `Stateless Programmable Switch` instead of the `Door` service? 🚧
-
-<!-- INCLUDES: issue-132-49f7 -->
-Home Connect events such as `DoorAlarmFreezer` or `TemperatureAlarmFreezer` are fundamentally stateless, which makes them unsuitable for mapping to stateful HomeKit services like `Door` for several reasons:
-
-- **Inconsistent reporting**: The Home Connect API does not consistently report when an event condition clears. While some appliances might send an 'off' status, others simply stop sending the 'present' event. The API documentation does not define a standard timeout or clearing signal for this behaviour.
-- **No queryable state**: There is no API endpoint to check if an alarm is currently active during plugin startup or after a connection interruption. This would lead to inaccurate status displays in HomeKit.
-- **Device parity**: The plugin maintains consistent logic across appliance types (such as Ovens and Dishwashers) where door events are treated as temporary status changes rather than persistent states.
-
-By mapping these to `Stateless Programmable Switch` services, the plugin allows you to trigger HomeKit automations when an alarm occurs without the risk of the Home app showing a permanent, incorrect state.
-
-#### 🚧 How can I stop receiving notifications every time my fridge or freezer door is opened? 🚧
-
-<!-- INCLUDES: issue-132-6b2c -->
-You have two ways to manage these notifications, depending on whether you want to keep the door status visible in HomeKit:
-
-1. **Disable notifications in the Apple Home app**: This is the best approach if you still want to see if the door is open but don't want the alerts. 
-   - Open the **Apple Home** app.
-   - Tap the `...` icon and select **Home Settings**.
-   - Go to **Doors**.
-   - Locate your appliance and toggle off **Activity Notifications**.
-   - *Note: This setting is per-device; it must be configured on each iPhone or iPad individually.*
-
-2. **Remove the Door service entirely**: If you do not require the door status at all, you can use the plugin configuration to remove the service for specific appliances. This will stop all door-related activity and remove the accessory from your Home.
-
-Be aware that the Apple Home app settings are separate from the manufacturer's Home Connect app settings; disabling alerts in one does not automatically disable them in the other.
+Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
 
 ### Siri
 
