@@ -52,17 +52,17 @@
     - [Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?](#why-does-the-plugin-log-unrecognised-powerstate-values-like-undefined-or-mainsoff)
     - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
   - **[Appliance Status](#appliance-status)**
-    - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
+    - [Why does my appliance status (such as door state) appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-such-as-door-state-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
-    - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
+    - [Why do my appliances remain visible in the Home app when they are offline, or why do they sometimes disappear?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-offline-or-why-do-they-sometimes-disappear)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
     - [Why does my dishwasher trigger a Program Finished event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
+    - [Why does my dishwasher show as ON in HomeKit after it has finished a program and powered itself off?](#why-does-my-dishwasher-show-as-on-in-homekit-after-it-has-finished-a-program-and-powered-itself-off)
     - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
     - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
-    - [Why do Home Connect appliances disappear or lose their Favourites status in the Home app?](#why-do-home-connect-appliances-disappear-or-lose-their-favourites-status-in-the-home-app)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
@@ -586,18 +586,19 @@ You can verify the capabilities of your specific appliance by checking the Homeb
 
 ### Appliance Status
 
-#### Why does my appliance status appear stuck or show as offline in HomeKit?
+#### Why does my appliance status (such as door state) appear stuck or show as offline in HomeKit?
 
-<!-- INCLUDES: issue-15-1a1d issue-74-dd76 -->
-The plugin relies on a real-time Server-Sent Events (SSE) stream from the Home Connect API to receive status updates. This connection depends on both the Home Connect backend and your local network stability.
+<!-- INCLUDES: issue-15-1a1d issue-74-dd76 issue-170-750c -->
+The plugin relies on a real-time Server-Sent Events (SSE) stream from the Home Connect API to receive status updates. Because the Home Connect API enforces extremely restrictive rate limits, the plugin does not perform regular polling; it only fetches the full status when it first starts or following a reconnection to the event stream.
 
-The API sends a `KEEP-ALIVE` event approximately every 55 seconds. The plugin monitors this and will automatically re-establish the stream if no activity is detected for 120 seconds. If you notice that status changes (like a dishwasher finishing or a door opening) are not appearing in HomeKit, but the log does not show any errors, the stream may have stalled.
+The API sends a `KEEP-ALIVE` event approximately every 55 seconds. The plugin monitors this and will automatically re-establish the stream if no activity is detected for 120 seconds. If status changes (like a dishwasher finishing or a door opening) are not appearing in HomeKit, the stream may have stalled.
 
-To troubleshoot and identify the root cause:
+To troubleshoot:
 
-1. Enable the **Log Debug as Info** plugin option to see all raw events received from the API. If no events are logged when you interact with the appliance, the issue resides with the Home Connect platform or appliance.
-2. Restart Homebridge to force the plugin to subscribe to a fresh event stream.
-3. Ensure your network configuration does not prematurely terminate long-lived TCP connections.
+1. Enable the **Log Debug as Info** plugin option to see all raw events. If no events (e.g. `BSH.Common.Status.DoorState`) are logged when you interact with the appliance, the issue resides with the Home Connect platform or appliance connectivity.
+2. Ensure the appliance has successfully reconnected to Wi-Fi after being powered on; many devices have a delay before they re-establish a cloud connection.
+3. Restart Homebridge to force the plugin to subscribe to a fresh event stream.
+4. Ensure your network configuration does not prematurely terminate long-lived TCP connections.
 
 #### Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?
 
@@ -612,11 +613,19 @@ To diagnose and resolve this:
 
 Most connectivity issues are transient and will resolve themselves once the appliance reconnects to the servers or the cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.
 
-#### Why do my appliances remain visible in the Home app when they are turned off or offline?
+#### Why do my appliances remain visible in the Home app when they are offline, or why do they sometimes disappear?
 
-The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as an appliance is associated with your account in the Home Connect API, it will persist in HomeKit. Being unreachable or powered off does not trigger the removal of the accessory from HomeKit, but the Home app will display it as **No Response**. Dynamically adding and removing appliances from HomeKit based on their connectivity would result in loss of user configuration, such as their name, location, scenes, and automations.
+<!-- INCLUDES: issue-52-1e99 -->
+The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. 
 
-If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing, this may be due to a synchronisation issue within HomeKit or the Homebridge cache. This can often be resolved by removing the bridge from the Home app, clearing the Homebridge cache files, and then re-adding the bridge.
+**Why they stay visible**: Accessories persist in HomeKit even when an appliance is unreachable or powered off (displaying as **No Response**). This prevents the loss of user configuration, such as custom names, room assignments, scenes, and automations.
+
+**Why they may disappear**: If the Home Connect API temporarily fails to report an appliance during a synchronisation check (due to cloud instability), the plugin may remove the accessory. When the API later reports the appliance again, the plugin recreates it as a brand-new accessory, which results in the loss of all previous HomeKit configurations.
+
+To resolve inconsistent behaviour:
+
+- Check the Home Connect API status to rule out cloud service disruptions.
+- If the issue is persistent, perform a clean reset by removing the bridge from the Home app, clearing the Homebridge `persist` and `accessories` cache files, and then re-adding the bridge.
 
 #### Why does the log show a program running or time remaining when my appliance is off?
 
@@ -635,6 +644,18 @@ This is a transient server-side or firmware issue that cannot be corrected by th
 
 <!-- INCLUDES: issue-66-dad9 -->
 Some Bosch dishwasher models appear to re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a connection to the Home Connect cloud after being offline. The plugin maps events from the API directly to HomeKit triggers; therefore, these re-broadcasts are passed through as button presses or notifications. This is a quirk of the appliance firmware or API event handling rather than a defect in the plugin itself.
+
+#### Why does my dishwasher show as ON in HomeKit after it has finished a program and powered itself off?
+
+<!-- INCLUDES: issue-181-6697 -->
+This is caused by a quirk in certain dishwashers using the **Auto Power Off** feature. When the appliance completes a cycle and powers down, it may send a `BSH.Common.Setting.PowerState=Off` notification followed almost immediately by a `BSH.Common.Status.OperationState=Ready` status. Because some appliances (like certain Coffee Makers) do not send explicit power events, the plugin uses the `Ready` state to infer that power is ON. In this scenario, the `Ready` event incorrectly overrides the `Off` event.
+
+This was addressed in version 0.30.2 and later:
+
+1. **Blackout Period**: The plugin now implements a 2-second blackout period after an explicit `PowerState` change, during which it ignores any power state inferences triggered by `OperationState` updates.
+2. **Explicit Polling**: The plugin ensures it reads the actual `PowerState` setting during startup or reconnection to verify the inferred state.
+
+If you encounter this, ensure you are running at least version 0.30.2 of the plugin.
 
 #### Why is the log filling up with oven `Event STATUS` temperature messages?
 
@@ -670,48 +691,6 @@ To troubleshoot and potentially work around this:
 
 <!-- INCLUDES: issue-306-65ff -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
-
-#### Why do Home Connect appliances disappear or lose their Favourites status in the Home app?
-
-<!-- INCLUDES: issue-52-1e99 -->
-The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.
-
-If accessories spontaneously disappear, reappear, or lose their HomeKit configuration (e.g. room assignments, custom names, scenes, or automations) it is usually due to one of the following:
-
-1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations are lost.
-2. **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.
-
-To resolve these issues:
-
-- Check the Home Connect API status to rule out cloud service disruptions.
-- If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why is my appliance door status stuck as closed or not updating in HomeKit? 🚧
-
-<!-- INCLUDES: issue-170-750c -->
-The plugin relies on a real-time event stream from the Home Connect API to update HomeKit when the state of an appliance changes. If the door status does not update, it typically indicates that the Home Connect servers are not issuing the necessary events.
-
-Key considerations for this behaviour include:
-
-*   **Event-based updates**: The plugin does not perform regular polling for status changes because the Home Connect API rate limits are extremely restrictive. It only polls for the current status when the plugin first starts or following a reconnection to the event stream.
-*   **Connectivity delays**: Many appliances disconnect from Wi-Fi when switched off. There may be a delay after powering the appliance on before it reconnects to the Home Connect cloud and begins reporting status changes.
-*   **Firmware or cloud issues**: If the appliance is powered on and connected to Wi-Fi but events (such as `BSH.Common.Status.DoorState`) are still not appearing in the logs during debug mode, the issue lies with the appliance firmware or the Home Connect cloud service. 
-
-If you confirm the status is also failing to update in the official Home Connect app, or if you have verified via debug logs that no events are being received, you should report the issue to [Home Connect Support](https://developer.home-connect.com/support/contact).
-
-#### 🚧 Why does my dishwasher show as ON in HomeKit after it has finished a program and powered itself off? 🚧
-
-<!-- INCLUDES: issue-181-6697 -->
-This behaviour is caused by a quirk in how certain Home Connect appliances, particularly dishwashers using the **Auto Power Off** feature, report their status via the API. 
-
-When the appliance completes a cycle and powers down, it may send a `BSH.Common.Setting.PowerState=Off` notification followed almost immediately (within milliseconds) by a `BSH.Common.Status.OperationState=Ready` status. According to the Home Connect API specification, the `Ready` state indicates that the appliance is switched on but no program is active. To support other appliances (such as specific Coffee Maker models) that fail to send explicit power events, the plugin uses the `Ready` state to infer that the power is ON. In this specific scenario, the buggy `Ready` event incorrectly overrides the `Off` event.
-
-This has been addressed in version 0.30.2 and later through the following logic:
-
-1.  **Blackout Period**: The plugin now implements a short (approx. 2-second) blackout period after an explicit `PowerState` change is received. During this window, the plugin ignores any power state inferences triggered by `OperationState` updates.
-2.  **Explicit Polling**: During startup or reconnection, the plugin ensures it reads the actual `PowerState` setting after the `OperationState` status. While this may cause a momentary flicker in the HomeKit UI as the states sync, the final reported state will be correct.
-
-If you are experiencing this issue, ensure you are running at least version 0.30.2 of the plugin.
 
 ## Apple HomeKit
 
