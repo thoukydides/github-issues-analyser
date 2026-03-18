@@ -1,14 +1,12 @@
 {
     "issue_number": 56,
-    "updated_at": "2026-02-18T11:12:51.853Z",
+    "updated_at": "2026-03-18T14:06:40.275Z",
     "faq": [
         {
-            "question": "Can I hide the event switches or mode switches to reduce clutter in the Home app?",
-            "answer": "Yes. From version `v0.32.0` onwards, the plugin provides per-appliance configuration options to selectively remove specific services. This is particularly useful for reducing the number of `Stateless Programmable Switch` services, which often appear with confusing numeric labels in the Home app due to platform limitations.\n\nYou can selectively enable or disable the following services for each appliance:\n- **Events**: `Stateless Programmable Switch` services triggered by appliance events.\n- **Modes**: `Switch` services for specific appliance settings (e.g. Sabbath Mode or Eco Mode).\n- **Door**: The `Door` service used for monitoring door status.\n\nTo adjust these settings, navigate to the plugin configuration in the Homebridge UI, find the settings section for your specific appliance, and toggle the visibility of these services. A restart of Homebridge is required to update the HomeKit accessory cache and remove the hidden services.",
-            "semantic_abstract": "Home Connect appliances expose multiple HomeKit services for events, modes, and door status which can lead to interface clutter and confusing numeric labels in the Home app. Per-appliance configuration allows these `Stateless Programmable Switch`, `Switch`, and `Door` services to be selectively disabled, streamlining the accessory's presentation in HomeKit.",
-            "alternative_resolution": "Ensure the plugin configuration UI includes clear tooltips explaining that disabling these services can resolve issues with 'confusing numeric labels' in HomeKit, as suggested by user feedback.",
-            "confidence": "high",
-            "hash": "ce3586c7808d7830b7e0df23dc845e9fb6f61683729ea00004ab3111d8ada451"
+            "question": "Why does my appliance have multiple `Stateless Programmable Switch` services with generic numeric labels?",
+            "answer": "These services represent specific appliance events transmitted by the Home Connect API, such as a programme finishing, a toaster tray being released, or an oven reaching its target temperature. They are exposed to HomeKit as stateless switches so they can be used as triggers for automations.\n\nDue to limitations in the Apple Home app, these event switches are often displayed with generic labels like `Button 1` or `Button 2` rather than descriptive names. This can lead to a cluttered and confusing user interface if the events are not being used for automations.\n\nYou can selectively disable these services on a per-appliance basis within the plugin configuration. When disabled, the plugin automatically handles the removal of the cached services from Homebridge to prevent 'zombie' accessories from remaining in your HomeKit setup. Similar configuration options are also available for:\n\n*   Appliance mode settings (e.g. Sabbath Mode for ovens or various modes for fridge-freezers).\n*   The `Door` service for monitoring appliance door status.",
+            "semantic_abstract": "Home Connect appliance events are mapped to HomeKit `Stateless Programmable Switch` services to provide automation triggers, though Home app limitations often result in generic numeric labels. These services, along with appliance mode switches and door status sensors, can be selectively disabled via per-appliance configuration to reduce UI clutter. The plugin manages the removal of these services from the Homebridge cache to prevent 'zombie' accessories after configuration changes.",
+            "hash": "191090e308cbcad215cda86af1e942db79b3d864e67121ff9a68712aed993179"
         }
     ]
 }
