@@ -194,7 +194,7 @@ No manual intervention is required; the plugin will automatically resume communi
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-186-6cfd issue-208-c4fd issue-325-3294 issue-374-e780 issue-378-832c -->
 The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details:
 
 - `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
@@ -207,18 +207,22 @@ The Home Connect API uses `409 Conflict` errors for a wide variety of failures t
 
 - `SDK.Error.WrongOperationState`: This indicates that the appliance is in an incorrect state for the requested operation, such as attempting to start a program while another is already running or if the appliance is currently performing a self-cleaning cycle.
 
-- `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program that the API considers unavailable for remote execution. This may be due to appliance settings, safety features (e.g. local control active), or firmware bugs.
+- `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program or retrieve the list of supported programs when the appliance is in a state where that information is inaccessible. This is common when:
+  1. The appliance is physically powered off or in standby.
+  2. The appliance is currently running a program.
+  3. The appliance is performing a mandatory maintenance task, such as an automatic rinse cycle (common with coffee machines).
+  4. Local control is active or there are firmware-specific constraints.
 
-- `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggle together.
+- `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggled together.
 
 For details of other `409` errors refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
 <!-- INCLUDES: issue-251-b8f0 -->
-The physical power button on some Home Connect appliances (mostly commonly washing machines and tumble dryers) also disconnects power from their internal Wi-Fi module. When this occurs, the Home Connect API cannot distinguish between the appliance being switched off, disconnected from the mains, or losing its internet connection.
+The physical power button on some Home Connect appliances (most commonly washing machines and tumble dryers) also disconnects power from their internal Wi-Fi module. When this occurs, the Home Connect API cannot distinguish between the appliance being switched off, disconnected from the mains, or losing its internet connection.
 
-The API does not provide any indication of whether an appliance supports a soft power off state that maintains a network connection. Hence, it is not possible for the plugin to identify whether an appliance that the API reports as `DISCONNECTED` has been intentionally switched off or has lost contact with the Home Connect servers for other reasons. The plugin prioritises technical accuracy, so reports this as  `SERVICE_COMMUNICATION_FAILURE` to HomeKit, which the Apple Home app displays as `Not Responding`.
+The API does not provide any indication of whether an appliance supports a soft power off state that maintains a network connection. Hence, it is not possible for the plugin to identify whether an appliance that the API reports as `DISCONNECTED` has been intentionally switched off or has lost contact with the Home Connect servers for other reasons. The plugin prioritises technical accuracy, so reports this as `SERVICE_COMMUNICATION_FAILURE` to HomeKit, which the Apple Home app displays as `Not Responding`.
 
 Faking a "Power Off" state when the appliance is unreachable would misrepresent the appliance's true status. If the appliance does actually have connectivity problems then it may be powered on. Most Home Connect appliances do maintain Wi-Fi connectivity when switched off, so reporting `SERVICE_COMMUNICATION_FAILURE` correctly distinguishes between power off and failure to connect to the Home Connect servers.
 
@@ -253,13 +257,14 @@ The error `Home Connect API error: Home Connect subsystem not available [503]` i
 
 #### Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?
 
-<!-- INCLUDES: issue-50-4e01 issue-276-cc5b issue-351-80b2 -->
+<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-276-cc5b issue-351-80b2 -->
 These are standard networking errors indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com` (or `api.home-connect.cn` for users in China).
 
 To resolve this, ensure your Homebridge server has a stable internet connection and check the following:
 1. **Diagnostic Commands**: Test DNS resolution using `dig api.home-connect.com` or `nslookup api.home-connect.com` from the same system.
 2. **DNS Provider**: Try manually setting a public DNS provider (such as Google's `8.8.8.8` or Cloudflare's `1.1.1.1`) in your operating system's network configuration.
 3. **Network Filtering**: Verify that local firewall or DNS filtering (like Pi-hole) is not blocking requests to the Home Connect API or AWS endpoints.
+4. **Management Layers**: If using HOOBS or similar management layers, check their documentation for network troubleshooting as they may have unique networking configurations.
 
 If using Docker:
 
@@ -306,40 +311,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does the plugin report the error `getaddrinfo EAI_AGAIN api.home-connect.com`? 🚧
-
-<!-- INCLUDES: issue-137-3fe8 -->
-The error `getaddrinfo EAI_AGAIN` signifies a timeout or temporary failure in the local system's ability to resolve the hostname `api.home-connect.com` to an IP address. This is a networking or environment issue external to the plugin itself.
-
-To resolve this, verify the following:
-1. **DNS Configuration**: Ensure the DNS settings on your host system (e.g. Raspberry Pi, NAS, or server) are correct and can reach a reliable DNS provider.
-2. **Internet Connectivity**: Confirm that the host machine has a stable and active internet connection.
-3. **Platform-Specific Networking**: If you are using a management layer like HOOBS, check their specific documentation or support channels for network troubleshooting, as these environments may have unique networking configurations that interfere with standard DNS resolution.
-
-#### 🚧 Why does the log show `[409 Conflict] Program currently not available` for my coffee machine? 🚧
-
-<!-- INCLUDES: issue-149-6678 -->
-The `[409 Conflict] Program currently not available` (`SDK.Error.ProgramNotAvailable`) error occurs when the plugin attempts to communicate with the Home Connect API to retrieve the list of supported programs, but the appliance is in a state where that information is inaccessible.
-
-This is expected behaviour in several scenarios:
-* The appliance is physically powered off or in standby.
-* The appliance is currently running a program.
-* The appliance is performing a mandatory maintenance task, such as an automatic rinse cycle.
-
-This log entry generally does not indicate a plugin bug or a configuration issue; it simply reflects that the Home Connect cloud cannot query program details from the hardware at that specific moment.
-
-#### 🚧 Why does my appliance return a `409 Conflict` error with `HomeAppliance connection initialization failed`? 🚧
-
-<!-- INCLUDES: issue-155-8156 -->
-The `409 Conflict` error, specifically the error code `SDK.Error.HomeAppliance.Connection.Initialization.Failed`, is returned by the Home Connect API when the cloud service is unable to communicate with your appliance. This typically indicates that the appliance is offline, or it has failed to respond to connection requests from the server in time.
-
-To troubleshoot this connectivity issue:
-1. Verify that the appliance is powered on and connected to your local network.
-2. In the official Home Connect app, check the appliance settings. The Network section should ideally show three green lines indicating a successful cloud connection.
-3. Test the cloud connection by **disabling Wi-Fi** on your mobile device and attempting to control the appliance using the official Home Connect app via cellular data. If the official app cannot control the appliance while your phone is on cellular data, then the appliance is not properly connected to the Home Connect servers.
-
-This error represents a communication failure between the physical appliance hardware and the Home Connect cloud platform. Because the plugin interacts with the cloud API rather than the appliance directly, it cannot resolve this underlying connectivity problem.
 
 ### Local/Remote Control
 
