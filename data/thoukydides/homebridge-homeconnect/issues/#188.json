@@ -1,14 +1,12 @@
 {
     "issue_number": 188,
-    "updated_at": "2026-02-18T19:29:14.107Z",
+    "updated_at": "2026-03-19T08:24:52.333Z",
     "faq": [
         {
-            "question": "Why are some features available in IFTTT or the official app missing from the plugin?",
-            "answer": "This plugin is limited by the capabilities of the public Home Connect API. Certain features, such as Dryer AutoSense (synchronising programs between a washing machine and dryer), are available to official partners like IFTTT via private API integrations but are not exposed to third-party developers. If a specific program or option (such as `dryer_select_connected_dry_program`) is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options/), it cannot be supported by this plugin. If you require these features, you should contact the Home Connect team directly to request their addition to the public API.",
-            "semantic_abstract": "The Home Connect public API excludes specific proprietary features and cross-appliance automation routines that are reserved for official partner integrations like IFTTT. This architectural limitation creates a feature disparity where certain 'Smart' functionality available in the official ecosystem cannot be replicated by third-party plugins due to restricted API access.",
-            "alternative_resolution": "The plugin documentation could be updated to explicitly state that feature parity with IFTTT or official voice assistants is not always possible due to public API constraints, providing a link to the official API documentation for users to verify supported features.",
-            "confidence": "high",
-            "hash": "cb08f50329c9a87856f45aa31da4c1d9c429b0c52bdc1a4c7a7ee2f5ca60b7c0"
+            "question": "Why are some features like Dryer AutoSense available in IFTTT but not in this plugin?",
+            "answer": "This plugin is built upon the public Home Connect API, which does not always have feature parity with other integrations. Platforms such as IFTTT may use private API interfaces or special partnerships that provide access to features not available to third-party developers.\n\nSpecific features like **Dryer AutoSense** (also known as Smart Dry) are currently not exposed via the public Home Connect API. If a program or option is not included in the official [Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options/), it cannot be supported by this plugin.\n\nIf you find a feature missing that is available in the official Home Connect app or IFTTT, you can request that the Home Connect team add it to the public API via their [support contact form](https://developer.home-connect.com/support/contact).",
+            "semantic_abstract": "The Home Connect public API lacks functional parity with private integrations used by platforms like IFTTT, resulting in specific appliance features such as Dryer AutoSense being unavailable to third-party plugins. Implementation is limited by the official API specification, and features exclusive to private interfaces require the manufacturer to expose them publicly before they can be mapped to HomeKit services.",
+            "hash": "d1f4740d3c23c1fac785cc4f2008b2627d1f4a5c1346de28bfb8b307800bb0e8"
         }
     ]
 }
