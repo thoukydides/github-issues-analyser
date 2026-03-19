@@ -30,8 +30,8 @@
     - [Why does my appliance fail to start when using the switch in the Home app?](#why-does-my-appliance-fail-to-start-when-using-the-switch-in-the-home-app)
     - [Why does my appliance frequently show `Disconnected (setting On error status)`?](#why-does-my-appliance-frequently-show-disconnected-setting-on-error-status)
   - **[Programs and Options](#programs-and-options)**
-    - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-code-blocks)
-    - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
+    - [Why does the log show `Unexpected fields`, `Mismatched type`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-mismatched-type-unrecognised-values-or-code-blocks)
+    - [Why are some appliance features, programs, or options missing, unavailable, or reported as `Missing options for N programs`?](#why-are-some-appliance-features-programs-or-options-missing-unavailable-or-reported-as-missing-options-for-n-programs)
     - [Why are ambient light colour and brightness controls missing or limited?](#why-are-ambient-light-colour-and-brightness-controls-missing-or-limited)
     - [Why are fan controls missing for my integrated venting hob?](#why-are-fan-controls-missing-for-my-integrated-venting-hob)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
@@ -377,32 +377,38 @@ When these disconnections occur, the plugin logs the event and updates the HomeK
 
 ### Programs and Options
 
-#### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
+#### Why does the log show `Unexpected fields`, `Mismatched type`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-199-2e94 issue-200-9f7a issue-202-9963 issue-203-2ddc issue-204-2f61 issue-205-1db7 issue-206-cf42 issue-207-4f2c issue-209-d7db issue-210-cc8e issue-212-38c3 issue-213-c06c issue-216-fa69 issue-217-41c5 issue-220-c9a6 issue-221-f53a issue-222-611c issue-223-87a6 issue-228-c1b3 issue-231-e5d9 issue-233-f1a2 issue-235-b061 issue-236-11a6 issue-237-74bf issue-238-902b issue-243-afde issue-244-beeb issue-246-85c6 issue-247-ab8a issue-248-683b issue-254-ab2e issue-255-2835 issue-257-721b issue-258-d2a3 issue-262-4486 issue-265-872d issue-266-7e59 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin includes a diagnostic mechanism to identify data from the Home Connect API that it does not yet recognise. This frequently occurs because the API implementation deviates from official documentation, or because new appliance models or firmware introduce undocumented features, programs, or options.
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-2e94 issue-200-9f7a issue-202-9963 issue-203-2ddc issue-204-2f61 issue-205-1db7 issue-206-cf42 issue-207-4f2c issue-209-d7db issue-210-cc8e issue-212-38c3 issue-213-c06c issue-216-fa69 issue-217-41c5 issue-220-c9a6 issue-221-f53a issue-222-611c issue-223-87a6 issue-228-c1b3 issue-231-e5d9 issue-233-f1a2 issue-235-b061 issue-236-11a6 issue-237-74bf issue-238-902b issue-243-afde issue-244-beeb issue-246-85c6 issue-247-ab8a issue-248-683b issue-254-ab2e issue-255-2835 issue-257-721b issue-258-d2a3 issue-262-4486 issue-265-872d issue-266-7e59 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+The plugin includes a diagnostic mechanism to identify data from the Home Connect API that it does not yet recognise or which deviates from official documentation. This frequently occurs because the API implementation differs from the specification, or because new appliance models introduce undocumented features.
 
-While unrecognised values usually do not prevent the plugin from functioning, the specific feature may be missing or unavailable in HomeKit until it is added to the plugin's internal schema. When this happens, the plugin generates a technical diagnostic block in the log file, delimited by lines of `=` characters and containing comments marked `// (unrecognised)`. This helps the maintainer update the plugin's definitions and map the missing information to HomeKit services.
+While unrecognised values usually do not prevent the plugin from functioning, the specific feature may be missing or unavailable in HomeKit until it is added to the internal schema. These warnings manifest in several ways:
+- **Diagnostic blocks**: Technical blocks delimited by `=` characters containing comments marked `// (unrecognised)`.
+- **Mismatched types**: Warnings that a value (such as `ActiveProgram` or refrigeration door status) does not match the expected format.
+- **Code snippets**: Blocks starting with `export interface` generated to help update the plugin.
 
 If you observe these messages:
-
 1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
-2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
-3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
+2. **Report the values**: Locate the URL provided in the log message immediately following the block and click it to open a pre-populated GitHub issue.
+3. **Provide the snippet**: Paste the entire technical diagnostic block (including the `=` separators or `export interface` lines) into the **Log File** field of the issue template.
 
 Once these identifiers are added to the plugin, the warning will disappear and the corresponding features will be correctly mapped to HomeKit.
 
-#### Why are some appliance features, programs, or options missing or unavailable?
+#### Why are some appliance features, programs, or options missing, unavailable, or reported as `Missing options for N programs`?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-42-d406 issue-44-1e1b issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
-The plugin does not have appliance programs or features hardcoded; it dynamically discovers the capabilities of each appliance by querying the Home Connect API. There are several reasons why features may be missing or appear as `currently unavailable` in the logs:
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-42-d406 issue-44-1e1b issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-3565 issue-202-4160 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable`:
 
-- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it. Common examples include ice maker toggles for refrigerators and certain coffee machine options like milk percentage.
-- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
-- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
-- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.
+- **Private API Limitations**: The official Home Connect app uses a private API with functionality (such as ice maker toggles or specific coffee milk percentages) not available to third-party developers. If a feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
+- **API Availability**: Some programs (e.g. Bosch Dryer `Pillow` or `TimeCold`) may not be advertised by the API as selectable resources for your specific model, even if they appear on the physical appliance dial.
+- **Appliance Settings**: Certain programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
+- **Operational Status**: A program may be reported as unavailable if the appliance is busy, a cycle is running, a door is open, or required consumables (water, detergent) are missing.
+- **Maintenance Cycles**: Cycles like drum cleaning or descaling are frequently restricted or not advertised with full configuration options via the public API.
 
-If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
+To verify if a program is an API-level limitation:
+1. Enable `Log API Bodies` in the plugin settings and restart Homebridge.
+2. Locate the response for `GET /api/homeappliances/.../programs/available` in the logs.
+3. If your missing program is absent from this list, the plugin cannot access it. You may wish to contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance E-number to request its addition to the public API.
 
 #### Why are ambient light colour and brightness controls missing or limited?
 
@@ -583,63 +589,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely to be due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why does the log report `Missing options for N programs` or say programmes are currently unavailable? 🚧
-
-<!-- INCLUDES: issue-186-686f -->
-This message occurs when the Home Connect API does not include specific programmes in its response for available resources. If the API does not advertise a programme as being selectable, the plugin is unable to retrieve the necessary configuration options required to expose it to HomeKit. This frequently happens even if the programmes are visible on the physical appliance dial or within the official Home Connect app.
-
-Known examples of this behaviour include:
-- Bosch Dryers missing the `Pillow` (`LaundryCare.Dryer.Program.Pillow`) or `TimeCold` (`LaundryCare.Dryer.Program.TimeCold`) programmes.
-- Ovens where `Sabbath Mode` is either disabled in the appliance's local settings or not yet supported for that specific model via the API.
-
-To confirm if this is an API-level limitation for your appliance:
-1. Enable the `Log API Bodies` debug option in the plugin settings.
-2. Restart Homebridge and locate the response for the `GET /api/homeappliances/.../programs/available` request in the logs.
-3. Examine the `programs` array in the JSON response. If your missing programme is absent from this list, the plugin cannot access it.
-
-In such cases, the issue resides with the Home Connect platform or appliance firmware. You may wish to contact Home Connect developer support with your appliance E-number, `haID`, and the relevant API response log to request that these programmes be made available via their API.
-
-#### 🚧 What should I do if the log shows `Mismatched type` or `Unrecognised Setting` errors? 🚧
-
-<!-- INCLUDES: issue-189-e829 -->
-These messages indicate that an appliance is providing data that does not align with the Home Connect API documentation or includes features not yet supported by the plugin.
-
-**Mismatched types** occur when the data format returned by the appliance differs from the official specification. For example, some refrigeration models return door status values, such as `Refrigeration.Common.Status.Door.Freezer` or `BottleCooler`, in a format that the plugin must specifically translate to work around the documentation error.
-
-**Unrecognised settings, options, or statuses** indicate features (like `VarioSpeed` or specific fridge lighting) that the plugin has not yet been programmed to handle.
-
-If you see these warnings:
-1. Ensure you are using the latest version of the plugin, as support for new appliance features and fixes for documented API mismatches are added regularly.
-2. If the warnings persist on the latest version, the mentioned feature will typically be unavailable or non-functional in HomeKit, though the rest of the appliance should work normally.
-3. To help add support for the unrecognised feature, enable the `Log API Bodies` and `Log Debug as Info` debug options in the plugin configuration and share the resulting logs in a new GitHub issue. This provides the technical details needed to map the new or corrected functionality.
-
-#### 🚧 Why does the log show a `Mismatched type` warning for `ActiveProgram`? 🚧
-
-<!-- INCLUDES: issue-190-e84b -->
-These warnings occur when a Home Connect appliance reports a program key that is not included in the official Home Connect API documentation. The plugin validates incoming data against the known API specification; any unexpected values trigger an informational message like the following:
-
-`Mismatched type for NOTIFY Event.data.items[0] value in Home Connect API`  
-`└─ value.BSH.Common.Root.ActiveProgram is none of ProgramKey, null`  
-
-These warnings are for information only and do not affect the operation of the plugin or your ability to control the appliance. They help identify gaps in the official documentation so that the plugin's internal definitions can be updated to recognise these additional values.
-
-If you see these warnings:
-1. Ensure you are running the latest version of the plugin, as many common undocumented program keys (such as specific microwave power levels or automatic oven programs) have already been added.
-2. If the warning persists for a new program key, please report the specific key mentioned in the log (for example, `Cooking.Oven.Program.Microwave.600Watt`) by opening a new issue.
-
-#### 🚧 What should I do if the logs show `Unrecognised Option` or `Home Connect API returned keys/values that are unrecognised`? 🚧
-
-<!-- INCLUDES: issue-198-b26f -->
-The Home Connect API documentation is often incomplete, and appliances frequently report options, settings, or programs that are not officially documented. When the plugin encounters these, it logs a warning message to identify potential missing functionality.
-
-If you see a message stating `Home Connect API returned keys/values that are unrecognised by this plugin`:
-
-1. Check your logs for a specific GitHub link automatically generated by the plugin.
-2. Follow the link to create a new issue; it will pre-fill most of the required information.
-3. Copy the code block starting with `export interface` from your logs and paste it into the issue.
-
-These reports allow the maintainer to update the plugin's internal definitions. Once these are added in a future release, the warnings will cease and the features may be exposed to HomeKit.
 
 ### Appliance Status
 
