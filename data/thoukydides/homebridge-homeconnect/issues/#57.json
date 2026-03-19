@@ -1,14 +1,12 @@
 {
     "issue_number": 57,
-    "updated_at": "2026-02-19T16:27:58.402Z",
+    "updated_at": "2026-03-19T14:36:28.819Z",
     "faq": [
         {
-            "question": "How can I hide or disable specific Home Connect appliances in HomeKit?",
-            "answer": "Starting from version `v0.37.0`, the plugin supports the ability to exclude specific appliances from being exposed to HomeKit. This is particularly useful for users who may have multiple Home Connect devices but only wish to control a subset of them (for example, exposing only a hood to automate based on air quality while hiding a washing machine or dryer). Configuration options are available within the plugin settings to manage which devices are discovered and registered as HomeKit accessories.",
-            "semantic_abstract": "The plugin configuration allows for selective appliance exclusion from HomeKit discovery. This feature manages HomeKit accessory clutter by preventing the registration of specific Home Connect devices as services based on user preference.",
-            "alternative_resolution": "Ensure the plugin configuration UI provides a clear list or input method for identifying appliances to be excluded, such as by nickname or Home Connect Appliance ID (HaId), to simplify the setup for users with many devices.",
-            "confidence": "high",
-            "hash": "6cdceeec547a7602725f68a7815e4cb11430642e9297f1ff869e989b4ab17cd7"
+            "question": "Can I hide specific Home Connect appliances or `Switch` services from HomeKit?",
+            "answer": "The plugin distinguishes between core services and optional auxiliary features to allow for a customisable HomeKit interface:\n\n* **Optional Switches**: Many appliance features are exposed as optional `Switch` services. These can be individually disabled in the plugin configuration to reduce clutter and hide functionality you do not use.\n* **Core Services**: Certain basic services, such as the primary power switch, are considered essential for the appliance's representation in HomeKit. These are created by default for any appliance that has not been excluded.\n* **Appliance Exclusion**: If you wish to hide an appliance entirely, the plugin provides a configuration option to exclude specific devices from being exposed to HomeKit at all.",
+            "semantic_abstract": "Home Connect appliances are mapped to HomeKit using a hierarchy of mandatory core services and optional auxiliary services. This architectural distinction allows for granular control over optional switches while ensuring that any appliance not explicitly excluded retains its primary HomeKit functionality, such as power control.",
+            "hash": "124fab9332f5fb618b4fa80c13cf24e27a1e992643cc78cf7c6e6f775828df19"
         }
     ]
 }
