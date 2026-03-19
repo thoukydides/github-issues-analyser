@@ -920,19 +920,12 @@ For Home Assistant users, there are alternative community-maintained integration
 
 #### Why are features available in the official app or IFTTT missing from this plugin?
 
-<!-- INCLUDES: issue-23-272e issue-67-20e5 issue-94-b8d2 -->
-This plugin is restricted by the capabilities of the public Home Connect API. The official Home Connect app and some official partners like IFTTT often utilise private or internal APIs to provide functionality that is not exposed to independent third-party developers. If a specific program, option, or setting is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/), it cannot be supported by this plugin. If you require these features, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) directly to request their addition to the public API.
+<!-- INCLUDES: issue-23-272e issue-67-20e5 issue-94-b8d2 issue-188-d1f4 -->
+This plugin is restricted by the capabilities of the public Home Connect API. The official Home Connect app and some official partners like IFTTT often utilise private or internal APIs to provide functionality that is not exposed to independent third-party developers. 
+
+If a specific program, option, or setting—such as **Dryer AutoSense** (also known as Smart Dry)—is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/), it cannot be supported by this plugin. If you require these features, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) directly to request their addition to the public API.
 
 Direct integration with IFTTT to bridge these gaps has been declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes technical constraints such as increased code complexity, the user burden of manually creating IFTTT applets, and interface clutter in HomeKit. For users requiring IFTTT-specific functionality, such as triggering automations from Hood Favourite buttons, it is recommended to use a dedicated plugin like `homebridge-ifttt` alongside this one.
-
-#### 🚧 Why are some features like Dryer AutoSense available in IFTTT but not in this plugin? 🚧
-
-<!-- INCLUDES: issue-188-d1f4 -->
-This plugin is built upon the public Home Connect API, which does not always have feature parity with other integrations. Platforms such as IFTTT may use private API interfaces or special partnerships that provide access to features not available to third-party developers.
-
-Specific features like **Dryer AutoSense** (also known as Smart Dry) are currently not exposed via the public Home Connect API. If a program or option is not included in the official [Home Connect API documentation](https://api-docs.home-connect.com/programs-and-options/), it cannot be supported by this plugin.
-
-If you find a feature missing that is available in the official Home Connect app or IFTTT, you can request that the Home Connect team add it to the public API via their [support contact form](https://developer.home-connect.com/support/contact).
 
 ### Plugin Installation and Configuration
 
