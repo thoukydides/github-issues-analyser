@@ -720,12 +720,12 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?
 
-<!-- INCLUDES: issue-77-e342 issue-124-45f8 issue-240-ed8f issue-364-a64b -->
-The main `Switch` service for the appliance power is fundamental to the plugin's architecture and cannot be disabled. Most other services can be individually enabled or disabled for each appliance within the plugin configuration. This includes the `Active Program` switch, though disabling it removes other functionality:
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-240-ed8f issue-364-a64b -->
+The plugin allows for granular control over which services are exposed to HomeKit, but there are some architectural constraints:
 
-1. **Status Indicators**: The `On`, `Status Active`, and `Status Fault` characteristics which indicate the current operational state.
-2. **Program Control**: The ability to start, stop, pause, and resume the active program.
-3. **Time Remaining**: The `Remaining Duration` characteristic.
+1. **Core Services**: The main `Switch` service for the appliance power is fundamental and cannot be disabled.
+2. **Optional Services**: Most other features, such as the `Active Program` switch or `Internal Light`, can be individually disabled in the plugin configuration. Note that disabling the `Active Program` switch also removes status indicators (`On`, `Status Active`, `Status Fault`), the ability to control programs, and the `Remaining Duration` characteristic.
+3. **Appliance Exclusion**: If you wish to hide an appliance entirely, you can use the **Exclude Appliance** configuration option to prevent the device from being exposed to HomeKit at all.
 
 If services remain visible in HomeKit (often appearing as "unresponsive") after you have configured them to be hidden, it is likely due to HomeKit's internal caching and synchronisation mechanisms rather than the plugin itself. When a feature is disabled, the plugin removes the service from the accessory definition, but HomeKit may retain a stale cached version across multiple hubs or iCloud-synced devices. To resolve persistent stale entries, try these steps in order:
 
@@ -832,15 +832,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Can I hide specific Home Connect appliances or `Switch` services from HomeKit? 🚧
-
-<!-- INCLUDES: issue-57-124f -->
-The plugin distinguishes between core services and optional auxiliary features to allow for a customisable HomeKit interface:
-
-* **Optional Switches**: Many appliance features are exposed as optional `Switch` services. These can be individually disabled in the plugin configuration to reduce clutter and hide functionality you do not use.
-* **Core Services**: Certain basic services, such as the primary power switch, are considered essential for the appliance's representation in HomeKit. These are created by default for any appliance that has not been excluded.
-* **Appliance Exclusion**: If you wish to hide an appliance entirely, the plugin provides a configuration option to exclude specific devices from being exposed to HomeKit at all.
 
 ### Notifications & Events
 
