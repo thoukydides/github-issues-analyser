@@ -94,6 +94,8 @@
     - [Why are features available in the official app or IFTTT missing from this plugin?](#why-are-features-available-in-the-official-app-or-ifttt-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
+    - [How can I customise the plugin name or resolve the `<PLATFORM_CONFIG>.name is not a ApplianceConfig` error?](#how-can-i-customise-the-plugin-name-or-resolve-the-platform_configname-is-not-a-applianceconfig-error)
+    - [Why does the plugin fail to load with a `ReadableStream is not defined` error?](#why-does-the-plugin-fail-to-load-with-a-readablestream-is-not-defined-error)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -943,7 +945,7 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-#### 🚧 How can I change the plugin `name` in logs or resolve the error `<PLATFORM_CONFIG>.name is not a ApplianceConfig`? 🚧
+#### How can I customise the plugin name or resolve the `<PLATFORM_CONFIG>.name is not a ApplianceConfig` error?
 
 <!-- INCLUDES: issue-194-0961 -->
 The plugin supports the standard Homebridge `name` property within its configuration block. This allows for customisation of how the plugin identifies itself within the ecosystem.
@@ -964,14 +966,15 @@ Setting this property provides the following features:
 * **Customised Logging**: The log prefix will change from the default `[HomeConnect]` to your specified value, which is particularly useful for identifying specific plugin instances in the console.
 * **Bridge Identification**: When the plugin is configured to run as a child bridge, this value serves as the default name suggested when the bridge accessory is first paired with the Apple Home app.
 
-This property is not exposed through the graphical configuration editor in the Homebridge UI and must be added by editing the `config.json` file directly. Note that historical versions of the plugin may have produced validation errors when this property was present; ensure you are using the latest version to avoid these issues.
+This property is not exposed through the graphical configuration editor in the Homebridge UI and must be added by editing the `config.json` file directly. Note that older versions of the plugin may have produced validation errors when this property was present; ensure you are using the latest version to avoid these issues.
 
-#### 🚧 Why does the plugin fail to load with a `ReadableStream is not defined` error? 🚧
+#### Why does the plugin fail to load with a `ReadableStream is not defined` error?
 
 <!-- INCLUDES: issue-195-e227 -->
 This error occurs when the plugin is running on an unsupported version of Node.js. The `homebridge-homeconnect` plugin requires a minimum of Node.js 18, which is the standard for Homebridge verified plugins. The `ReadableStream` global is not available in older versions like Node.js 16.
 
 To resolve this issue:
+
 1. Update your environment to Node.js 18 or later (the current LTS version is recommended).
 2. If you are using HOOBS, please note that this is not an officially supported platform for this plugin. You must ensure the underlying Node.js version meets the requirements or migrate to a standard Homebridge installation.
 3. Verify that your Homebridge instance is updated to a version compatible with modern Node.js releases.
