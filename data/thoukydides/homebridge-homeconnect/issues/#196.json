@@ -1,14 +1,12 @@
 {
     "issue_number": 196,
-    "updated_at": "2026-02-20T03:18:13.900Z",
+    "updated_at": "2026-03-20T07:13:40.818Z",
     "faq": [
         {
-            "question": "Why can I not rename appliance services such as door sensors or switches in the Home app?",
-            "answer": "Prior to version 0.37.0, the plugin implemented the `ConfiguredName` characteristic as read-only. From v0.37.0 onwards, this has been changed to writable, allowing individual services (e.g. `Refrigerator Door`, `Eco Mode`, or specific power switches) to be renamed within HomeKit.\n\nIf you have updated to the latest version but find that custom names revert immediately, HomeKit is likely caching the previous read-only metadata. To resolve this:\n\n1. Force-quit the Home app on your iOS or macOS device.\n2. Restart your HomeKit hub (Apple TV or HomePod).\n3. If names still revert, reboot the device you are using to access the Home app.\n\nNote that by default, services include the appliance name as a prefix (as configured in the official Home Connect app). You can use the `Remove prefix from service names` option in the plugin configuration if you prefer shorter names, or simply rename the service to your preference once the cache is cleared.",
-            "semantic_abstract": "The `ConfiguredName` characteristic for Home Connect services was transitioned from read-only to writable in v0.37.0 to permit custom naming in HomeKit. Persistent naming reverts post-update are attributed to HomeKit's caching of service permissions, which necessitates a restart of the Home app or HomeKit hubs to synchronise the updated metadata.",
-            "alternative_resolution": "Include a troubleshooting note in the README or a one-time log warning upon updating to v0.37.0+ advising users to restart their Home app/hubs if service renaming fails due to HomeKit metadata caching.",
-            "confidence": "high",
-            "hash": "85112cbb65c1b225237fc03b33f088615409ddfc2db8eeb017f2778beab692f4"
+            "question": "Why do my refrigerator door sensors have duplicate names or fail to rename in HomeKit?",
+            "answer": "Historically, several services exposed by this plugin (such as refrigerator door sensors and internal switches) used a read-only `ConfiguredName` characteristic. While version `v0.37.0` and later updated these to be writable, HomeKit frequently caches the original read-only metadata for existing accessories.\n\nIf you find that renaming a sensor or switch in the Apple Home app fails or immediately reverts to the previous name, follow these steps to clear the HomeKit cache:\n\n1. Ensure you have updated the plugin to at least version `v0.37.0`.\n2. Force-quit the Home app on your iPhone, iPad, or Mac.\n3. If the issue persists, reboot your iOS devices and any HomeKit hubs (Apple TV or HomePod) to force a refresh of the characteristic permissions.\n\nTo address the issue of multiple sensors having identical names (e.g. all being named Fridge freezer), you can use the **Remove appliance name prefix** configuration option introduced in `v0.37.0`. This removes the appliance's own name from the individual service names, leaving clearer identifiers like Refrigerator Door or Freezer Door.",
+            "semantic_abstract": "HomeKit metadata caching causes the `ConfiguredName` characteristic to remain read-only for existing services even after plugin updates enable write access. This prevents users from renaming refrigerator door sensors or switches until the Home app and HomeKit hubs are restarted to refresh the characteristic permissions.",
+            "hash": "7bf5c98e543a269de58058b1b8b9efbf695306318869c416af76318edf5b5302"
         }
     ]
 }
