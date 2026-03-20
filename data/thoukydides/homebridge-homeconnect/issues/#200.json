@@ -1,14 +1,12 @@
 {
     "issue_number": 200,
-    "updated_at": "2026-02-20T05:05:17.846Z",
+    "updated_at": "2026-03-20T08:22:51.483Z",
     "faq": [
         {
-            "question": "What should I do if the logs show a block of code with `(unrecognised)` comments?",
-            "answer": "The plugin is designed to identify and log Home Connect API keys or values that it does not yet recognise. This typically occurs when a new appliance model or a firmware update introduces functionality that has not been encountered before by the plugin developer.\n\nIf you see a log entry framed by equals signs (`=======`) containing a TypeScript-style interface and `// (unrecognised)` comments (for example, `Dishcare.Dishwasher.Option.EnergySafe`), please follow these steps:\n1. Copy the entire formatted block from your Homebridge logs.\n2. Open a new issue on the plugin's GitHub repository.\n3. Paste the log block into the issue and provide your appliance model number.\n\nThese reports allow the maintainer to update the plugin's internal schema to support new features. Once you update to the subsequent plugin version containing the fix, these log messages will no longer appear.",
-            "semantic_abstract": "The plugin's monitoring system captures undocumented Home Connect API keys and values, outputting them as formatted TypeScript snippets to the logs. This crowdsourcing mechanism allows users to report new appliance features or firmware-specific options, which the maintainer then integrates into the plugin's data definitions to support evolving API specifications.",
-            "alternative_resolution": "The plugin's log output for unrecognised values could be enhanced by including a direct link to the GitHub 'New Issue' page to further simplify the reporting process for users.",
-            "confidence": "high",
-            "hash": "9f7a74cd966ed8b4f7dfc274f48bcdd1085504dafba882cc086ad623d2c68f96"
+            "question": "Why are there `(unrecognised)` or `(unknown)` values in my logs?",
+            "answer": "The plugin monitors the Home Connect API for statuses, settings, and options that have not yet been defined in its internal configuration. When an unknown key is encountered, the plugin generates a formatted log message wrapped in `=====` markers.\n\nThis output is designed to be easily incorporated into the plugin source code. If you encounter these messages:\n\n1. Copy the complete block, including the `=====` headers and footers.\n2. Open a new issue on GitHub.\n3. Provide the appliance manufacturer and model number alongside the log output.\n\nReporting these values allows the maintainer to update the plugin definitions, ensuring that all available features of your appliance are correctly supported and exposed to HomeKit.",
+            "semantic_abstract": "The Home Connect API frequently exposes new or undocumented data points that are not yet mapped within the plugin schema. To facilitate the addition of these features, the plugin performs runtime discovery and logs any unknown statuses, settings, or options within a structured TypeScript interface block, signalling that a manual update to the internal definitions is required.",
+            "hash": "174537b1d1da813727050d6593931509461ea7ca61c6432887ea4c80c0c8e223"
         }
     ]
 }
