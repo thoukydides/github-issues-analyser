@@ -701,12 +701,13 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why do multiple services or programs appear with identical names in the Apple Home app?",
-                                    "answer": "If multiple program switches appear with identical generic names (such as \"Dryer\"), this is typically caused by the Apple Home app's display logic rather than the plugin itself. To resolve this:\n\n1. Force-quit and restart the Apple Home app to see if the names refresh.\n2. If names remain identical, open the settings for an individual switch in the Home app and delete the prefix or appliance name from the name field. This often reveals the unique name (e.g. \"Cotton Eco\") that was previously hidden.\n3. Manually rename the switch to your preference if necessary.",
+                                    "question": "Why do multiple services have identical names, or why can I not rename them in the Apple Home app?",
+                                    "answer": "If multiple program switches or sensors appear with identical generic names (such as \"Dryer\" or \"Fridge freezer\"), this is usually caused by the Apple Home app's display logic or HomeKit caching.\n\n**Identical Names**\nThe Home app often hides the unique part of a service name if it starts with the appliance's name. To resolve this:\n1. Open the settings for an individual switch or sensor in the Home app and delete the prefix (the appliance name) from the name field. This often reveals the unique name (e.g. \"Cotton Eco\" or \"Freezer Door\").\n2. Alternatively, enable the **Remove appliance name prefix** configuration option in the plugin settings (available since `v0.37.0`). This removes the appliance's own name from the individual service names.\n\n**Renaming Failures**\nHistorically, several services (such as door sensors and internal switches) used a read-only `ConfiguredName` characteristic. Although this was updated to be writable in `v0.37.0`, HomeKit frequently caches the original read-only metadata. If renaming a service in the Home app fails or immediately reverts:\n- Ensure the plugin is updated to at least version `v0.37.0`.\n- Force-quit the Home app on all your devices.\n- Restart Homebridge to trigger a configuration update.\n- If the issue persists, reboot your HomeKit hubs (Apple TV or HomePod) to force a refresh of the cached characteristic permissions.",
                                     "included_ids": [
                                         "issue-108-edb7",
                                         "issue-116-5ab3",
-                                        "issue-230-3383"
+                                        "issue-230-3383",
+                                        "issue-196-7bf5"
                                     ]
                                 },
                                 {
@@ -761,14 +762,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 196,
-                                    "id": "issue-196-7bf5",
-                                    "question": "Why do my refrigerator door sensors have duplicate names or fail to rename in HomeKit?",
-                                    "answer": "Historically, several services exposed by this plugin (such as refrigerator door sensors and internal switches) used a read-only `ConfiguredName` characteristic. While version `v0.37.0` and later updated these to be writable, HomeKit frequently caches the original read-only metadata for existing accessories.\n\nIf you find that renaming a sensor or switch in the Apple Home app fails or immediately reverts to the previous name, follow these steps to clear the HomeKit cache:\n\n1. Ensure you have updated the plugin to at least version `v0.37.0`.\n2. Force-quit the Home app on your iPhone, iPad, or Mac.\n3. If the issue persists, reboot your iOS devices and any HomeKit hubs (Apple TV or HomePod) to force a refresh of the characteristic permissions.\n\nTo address the issue of multiple sensors having identical names (e.g. all being named Fridge freezer), you can use the **Remove appliance name prefix** configuration option introduced in `v0.37.0`. This removes the appliance's own name from the individual service names, leaving clearer identifiers like Refrigerator Door or Freezer Door."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

@@ -72,7 +72,7 @@
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
     - [Why can I not set the alarm timer or `AlarmClock` setting on my appliance?](#why-can-i-not-set-the-alarm-timer-or-alarmclock-setting-on-my-appliance)
-    - [Why do multiple services or programs appear with identical names in the Apple Home app?](#why-do-multiple-services-or-programs-appear-with-identical-names-in-the-apple-home-app)
+    - [Why do multiple services have identical names, or why can I not rename them in the Apple Home app?](#why-do-multiple-services-have-identical-names-or-why-can-i-not-rename-them-in-the-apple-home-app)
     - [Why can I not see or control the child lock for my appliance in the Apple Home app?](#why-can-i-not-see-or-control-the-child-lock-for-my-appliance-in-the-apple-home-app)
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
@@ -772,14 +772,22 @@ HomeKit does not currently define services or characteristics with the correct s
 
 To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers.
 
-#### Why do multiple services or programs appear with identical names in the Apple Home app?
+#### Why do multiple services have identical names, or why can I not rename them in the Apple Home app?
 
-<!-- INCLUDES: issue-108-edb7 issue-116-5ab3 issue-230-3383 -->
-If multiple program switches appear with identical generic names (such as "Dryer"), this is typically caused by the Apple Home app's display logic rather than the plugin itself. To resolve this:
+<!-- INCLUDES: issue-108-edb7 issue-116-5ab3 issue-196-7bf5 issue-230-3383 -->
+If multiple program switches or sensors appear with identical generic names (such as "Dryer" or "Fridge freezer"), this is usually caused by the Apple Home app's display logic or HomeKit caching.
 
-1. Force-quit and restart the Apple Home app to see if the names refresh.
-2. If names remain identical, open the settings for an individual switch in the Home app and delete the prefix or appliance name from the name field. This often reveals the unique name (e.g. "Cotton Eco") that was previously hidden.
-3. Manually rename the switch to your preference if necessary.
+**Identical Names**
+The Home app often hides the unique part of a service name if it starts with the appliance's name. To resolve this:
+1. Open the settings for an individual switch or sensor in the Home app and delete the prefix (the appliance name) from the name field. This often reveals the unique name (e.g. "Cotton Eco" or "Freezer Door").
+2. Alternatively, enable the **Remove appliance name prefix** configuration option in the plugin settings (available since `v0.37.0`). This removes the appliance's own name from the individual service names.
+
+**Renaming Failures**
+Historically, several services (such as door sensors and internal switches) used a read-only `ConfiguredName` characteristic. Although this was updated to be writable in `v0.37.0`, HomeKit frequently caches the original read-only metadata. If renaming a service in the Home app fails or immediately reverts:
+- Ensure the plugin is updated to at least version `v0.37.0`.
+- Force-quit the Home app on all your devices.
+- Restart Homebridge to trigger a configuration update.
+- If the issue persists, reboot your HomeKit hubs (Apple TV or HomePod) to force a refresh of the cached characteristic permissions.
 
 #### Why can I not see or control the child lock for my appliance in the Apple Home app?
 
@@ -835,19 +843,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why do my refrigerator door sensors have duplicate names or fail to rename in HomeKit? 🚧
-
-<!-- INCLUDES: issue-196-7bf5 -->
-Historically, several services exposed by this plugin (such as refrigerator door sensors and internal switches) used a read-only `ConfiguredName` characteristic. While version `v0.37.0` and later updated these to be writable, HomeKit frequently caches the original read-only metadata for existing accessories.
-
-If you find that renaming a sensor or switch in the Apple Home app fails or immediately reverts to the previous name, follow these steps to clear the HomeKit cache:
-
-1. Ensure you have updated the plugin to at least version `v0.37.0`.
-2. Force-quit the Home app on your iPhone, iPad, or Mac.
-3. If the issue persists, reboot your iOS devices and any HomeKit hubs (Apple TV or HomePod) to force a refresh of the characteristic permissions.
-
-To address the issue of multiple sensors having identical names (e.g. all being named Fridge freezer), you can use the **Remove appliance name prefix** configuration option introduced in `v0.37.0`. This removes the appliance's own name from the individual service names, leaving clearer identifiers like Refrigerator Door or Freezer Door.
 
 ### Notifications & Events
 
