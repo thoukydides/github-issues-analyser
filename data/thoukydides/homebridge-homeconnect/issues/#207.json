@@ -1,13 +1,12 @@
 {
     "issue_number": 207,
-    "updated_at": "2026-02-20T13:40:58.850Z",
+    "updated_at": "2026-03-20T15:27:46.240Z",
     "faq": [
         {
-            "question": "Why are some appliance options or values marked as `(unrecognised)` in the logs?",
-            "answer": "During the initialisation of an appliance, the plugin retrieves a list of all supported programs, options, and settings from the Home Connect API. If the appliance reports a feature that has not yet been explicitly defined within the plugin's codebase—often a result of newer hardware models or firmware revisions—the plugin will mark that entry as `(unrecognised)` in the logs.\n\nThese markers are diagnostic and do not typically indicate a critical failure, but the associated feature may not appear or function correctly within HomeKit. To improve support for your specific appliance, please open a GitHub issue and include the log section containing the unrecognised values so they can be added to the plugin's definitions in a future update.",
-            "semantic_abstract": "Home Connect appliances can return manufacturer-specific or undocumented API options that the plugin identifies as `(unrecognised)` during its device discovery phase. These diagnostic logs signify features requiring manual mapping in the plugin's codebase to ensure proper exposure and functionality within the HomeKit ecosystem.",
-            "confidence": "high",
-            "hash": "4f2c676293eeacb9e58d5091e508f3fd8abcc707b854144713d7a256814dae50"
+            "question": "Why do some appliance options appear as `(unrecognised)` in the logs?",
+            "answer": "The Home Connect API frequently includes program options, settings, or states that are undocumented or specific to certain manufacturers and firmware versions. When the plugin encounters a key that has not yet been mapped to a HomeKit characteristic, it identifies it as `(unrecognised)` in the diagnostic logs.\n\nTo resolve this:\n1. Ensure the plugin is updated to the latest version, as support for new keys is added regularly.\n2. If the key remains unrecognised, open an issue on GitHub. Include the relevant log snippet, the appliance manufacturer, and the model number. This information allows for the undocumented API keys to be properly integrated into the plugin.",
+            "semantic_abstract": "Home Connect API implementations frequently deviate from official documentation by providing undocumented, model-specific program options. The plugin identifies these discrepancies as `(unrecognised)` in logs, indicating a mismatch between the API response and the internal schema that prevents the feature from being exposed to HomeKit.",
+            "hash": "fb079dfdd8b22149f79b62789460aa95ef46343b3ed40d0d7f8136b4e6f4966e"
         }
     ]
 }
