@@ -302,24 +302,16 @@ This plugin supports starting a new program with the `SilenceOnDemand` option if
 
 #### How can I refresh appliance capabilities or resolve stale program information?
 
-<!-- INCLUDES: issue-26-db7c -->
-If an appliance program stops responding, fails to start, or reflects outdated capabilities (possibly due to a firmware update or server glitch), you can force the plugin to refresh its data:
+<!-- INCLUDES: issue-26-db7c issue-202-8138 -->
+If an appliance program stops responding, fails to start, or reflects outdated capabilities (possibly due to a firmware update or server glitch), or if you need to force the plugin to re-discover all possible values for a program or option (e.g. to debug unrecognised keys), you can force a data refresh:
 
-1. **HomeKit Identify**: Activating the `Identify` method for the accessory in the Home app forces the plugin to refresh supported programs and rebuild the configuration schema.
+1. **HomeKit Identify**: Activating the `Identify` method for the accessory forces the plugin to refresh supported programs and rebuild the configuration schema. This can be triggered from the accessory settings in the Home app, or via third-party apps such as **Eve** (where it may be labelled as **ID**). This also triggers a comprehensive query and logging of available programs and options.
 2. **Clear Plugin Cache**: If issues persist, you can delete the cached appliance data:
     - **Stop Homebridge**.
     - Navigate to the plugin's persistent cache directory (typically `~/.homebridge/homebridge-homeconnect/persist`).
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 How can I force the plugin to re-read and log all available appliance options? 🚧
-
-<!-- INCLUDES: issue-202-8138 -->
-The plugin caches appliance capabilities to avoid exceeding the Home Connect API rate limits. If you need to force the plugin to re-discover all possible values for a program or option (for example, to help debug unrecognised keys), you can use one of the following methods:
-
-*   **HomeKit Identify**: Open a third-party HomeKit app such as the **Eve app** and navigate to the appliance. Tap the **ID** (Identify) button. This triggers the plugin to perform a comprehensive query of the appliance's available programs and options.
-*   **Clear Plugin Cache**: Stop Homebridge and delete the files in the `~/.homebridge/homebridge-homeconnect/persist` directory. **Important**: Do not delete the file `94a08da1fecbb6e8b46990538c7b50b2` (or the file that holds your OAuth credentials), as this will require you to re-authorise the plugin. Removing the other files and restarting Homebridge will force a fresh discovery cycle.
 
 ### Local/Remote Control
 
