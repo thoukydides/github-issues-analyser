@@ -1,13 +1,12 @@
 {
     "issue_number": 217,
-    "updated_at": "2026-02-21T07:53:18.824Z",
+    "updated_at": "2026-03-21T11:55:29.491Z",
     "faq": [
         {
-            "question": "What should I do if the logs show a block of code with `(unrecognised)` markers?",
-            "answer": "The plugin is designed to identify and report Home Connect API features that it does not yet support. When it encounters unknown program options, statuses, or settings, it generates a formatted block of TypeScript code in the logs between two lines of `=` characters. If you see such a block in your log:\n\n1. Copy the entire block, starting from the line of `=` characters through to the end.\n2. Open a new issue on the GitHub repository.\n3. Include the log output and mention the specific appliance model and firmware version if known.\n\nThis information is essential for the maintainer to update the plugin's internal definitions and expose new features, such as specific washing machine `IDosingLevel` settings or `ProcessPhase` options, to HomeKit.",
-            "semantic_abstract": "The plugin includes a discovery mechanism for undocumented Home Connect API values, which logs formatted TypeScript definitions when unrecognised enum types or options are encountered. These logs facilitate the integration of new appliance features and firmware-specific extensions that are not yet represented in the plugin's internal schema.",
-            "confidence": "high",
-            "hash": "41c55ebc0beaf4e471ca63dfd1fd40cdb22a22a39d9601773ffddd1df52ba455"
+            "question": "Why does the log contain blocks of TypeScript code like `// Union types` or `// Option`?",
+            "answer": "The `homebridge-homeconnect` plugin maintains a library of known Home Connect API keys, options, and enum values. When it connects to an appliance that provides data not yet in this library—often due to new firmware features or undocumented API additions—it generates a diagnostic log entry formatted as TypeScript code.\n\nThis output is intended to assist the maintainer in adding support for these new features. If you see these blocks in your log, follow these steps:\n1. Ensure you are running the latest version of the plugin, as support for many new values is added regularly.\n2. If the messages persist on the latest version, open a new issue on the GitHub repository.\n3. Copy the entire block including the `=======` separators into the issue description.\n4. Include the manufacturer and model number of the appliance (e.g. Siemens Washer WMH6Y899DN/09) that triggered the log.\n\nThese messages are diagnostic and do not indicate a plugin failure, although the specific unrecognised options will not be controllable via HomeKit until they are officially added to the plugin's data model.",
+            "semantic_abstract": "The Home Connect API frequently exposes undocumented program options and enum values that are not present in the plugin's static definitions. The plugin identifies these unrecognised keys and outputs diagnostic TypeScript snippets to the logs to facilitate the reporting and integration of new appliance features into the internal data model.",
+            "hash": "68d086119213a0af4bf2b6fce37034217b4bb8a5582472a062627b0b7e3ce01e"
         }
     ]
 }
