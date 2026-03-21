@@ -1,13 +1,12 @@
 {
     "issue_number": 221,
-    "updated_at": "2026-02-21T11:47:20.429Z",
+    "updated_at": "2026-03-21T14:44:34.234Z",
     "faq": [
         {
-            "question": "Why does the log show `(unrecognised)` next to some Home Connect API values?",
-            "answer": "The plugin includes a diagnostic feature that identifies appliance features, options, or settings that have not yet been formally mapped in the plugin's code. This is common when using newer appliance models or firmware versions that introduce new functionality, such as the `FlexSpray` settings found on certain Bosch dishwashers. These entries are logged as a TypeScript-compatible block to make it easy for users to identify and report them. If you see these in your logs, you can provide the log content in a GitHub issue to help the maintainer add support for those specific features in a future release.",
-            "semantic_abstract": "Appliance firmware updates or new hardware models often introduce specific API keys (e.g., `FlexSpray` options) that are not yet defined in the plugin's schema. The plugin identifies these unknown keys via a diagnostic log block, allowing users to report them for inclusion in future updates to improve device-specific feature support.",
-            "confidence": "high",
-            "hash": "f53a6fec3765936c1befbe2b65655fa48ac46e79af2ac6eb532c892bb7b590f4"
+            "question": "What should I do if the logs show `(unrecognised)` API keys or values?",
+            "answer": "The plugin includes a discovery mechanism to identify Home Connect API identifiers (options, settings, statuses, or enum values) that are not yet mapped to its internal logic. These appear in the logs as TypeScript-like blocks with a `// (unrecognised)` comment.\n\nThis typically happens when a new appliance model or firmware version introduces features not previously encountered by the plugin, such as the `FlexSpray` intensity settings on newer Bosch dishwashers. If you see these messages:\n\n1. Update the plugin to the latest version to see if support has already been added.\n2. If the values remain unrecognised, open an issue on GitHub and provide the log snippet. This information is essential for the maintainer to add official support for those features.\n3. You can often trigger these logs by changing settings or selecting programmes in the official Home Connect app while the plugin is running, which forces the appliance to report its available options.",
+            "semantic_abstract": "The plugin logs Home Connect API identifiers as `(unrecognised)` when it encounters keys or values missing from its internal schema, often caused by new appliance hardware or firmware updates. Reporting these snippets allows the mapping of new appliance capabilities, such as dishwasher `FlexSpray` options, to HomeKit characteristics.",
+            "hash": "75f771a330ca479e2df46e6d70d2ce0a67e66c7a12085b943b7605f573da90d5"
         }
     ]
 }
