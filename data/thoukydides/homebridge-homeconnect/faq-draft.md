@@ -8,6 +8,7 @@
     - [Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?](#why-does-authorisation-fail-with-invalid_client-grant_type-is-invalid-unauthorized_client-or-client-has-limited-user-list)
     - [Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?](#why-does-the-authorisation-link-expire-or-fail-with-an-expired_token-or-invalid-code-error)
     - [Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?](#why-does-authorisation-fail-with-access_denied-device-authorization-session-has-expired-or-login-session-expired)
+    - [Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?](#why-does-authorisation-fail-with-the-error-client-not-authorized-for-this-oauth-flow-grant_type)
     - [Why does authorisation fail with a `403 Forbidden` error?](#why-does-authorisation-fail-with-a-403-forbidden-error)
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
   - **[Home Connect API Errors](#home-connect-api-errors)**
@@ -30,9 +31,8 @@
     - [Why does my appliance fail to start when using the switch in the Home app?](#why-does-my-appliance-fail-to-start-when-using-the-switch-in-the-home-app)
     - [Why does my appliance frequently show `Disconnected (setting On error status)`?](#why-does-my-appliance-frequently-show-disconnected-setting-on-error-status)
   - **[Programs and Options](#programs-and-options)**
-    - [Why does the log show `Unexpected fields`, `Mismatched type`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-mismatched-type-unrecognised-values-or-code-blocks)
-    - [Why are some appliance features, programs, or options missing, unavailable, or reported as `Missing options for N programs`?](#why-are-some-appliance-features-programs-or-options-missing-unavailable-or-reported-as-missing-options-for-n-programs)
-    - [Why are ambient light colour and brightness controls missing or limited?](#why-are-ambient-light-colour-and-brightness-controls-missing-or-limited)
+    - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-code-blocks)
+    - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
     - [Why are fan controls missing for my integrated venting hob?](#why-are-fan-controls-missing-for-my-integrated-venting-hob)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
     - [Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?](#why-is-my-appliance-stuck-during-initialisation-showing-as-not-responding-or-missing-all-options)
@@ -52,17 +52,17 @@
     - [Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?](#why-does-the-plugin-log-unrecognised-powerstate-values-like-undefined-or-mainsoff)
     - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
   - **[Appliance Status](#appliance-status)**
-    - [Why does my appliance status (such as door state) appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-such-as-door-state-appear-stuck-or-show-as-offline-in-homekit)
+    - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
-    - [Why do my appliances remain visible in the Home app when they are offline, or why do they sometimes disappear?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-offline-or-why-do-they-sometimes-disappear)
+    - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
     - [Why does my dishwasher trigger a Program Finished event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
-    - [Why does my dishwasher show as ON in HomeKit after it has finished a program and powered itself off?](#why-does-my-dishwasher-show-as-on-in-homekit-after-it-has-finished-a-program-and-powered-itself-off)
     - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
     - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
+    - [Why do Home Connect appliances disappear or lose their Favourites status in the Home app?](#why-do-home-connect-appliances-disappear-or-lose-their-favourites-status-in-the-home-app)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
@@ -72,7 +72,7 @@
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
     - [Why can I not set the alarm timer or `AlarmClock` setting on my appliance?](#why-can-i-not-set-the-alarm-timer-or-alarmclock-setting-on-my-appliance)
-    - [Why do multiple services have identical names, or why can I not rename them in the Apple Home app?](#why-do-multiple-services-have-identical-names-or-why-can-i-not-rename-them-in-the-apple-home-app)
+    - [Why do multiple services or programs appear with identical names in the Apple Home app?](#why-do-multiple-services-or-programs-appear-with-identical-names-in-the-apple-home-app)
     - [Why can I not see or control the child lock for my appliance in the Apple Home app?](#why-can-i-not-see-or-control-the-child-lock-for-my-appliance-in-the-apple-home-app)
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
@@ -94,8 +94,6 @@
     - [Why are features available in the official app or IFTTT missing from this plugin?](#why-are-features-available-in-the-official-app-or-ifttt-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
-    - [How can I customise the plugin name or resolve the `<PLATFORM_CONFIG>.name is not a ApplianceConfig` error?](#how-can-i-customise-the-plugin-name-or-resolve-the-platform_configname-is-not-a-applianceconfig-error)
-    - [Why does the plugin fail to load with a `ReadableStream is not defined` error?](#why-does-the-plugin-fail-to-load-with-a-readablestream-is-not-defined-error)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -131,37 +129,42 @@ Ensure the `Client ID` in your Homebridge configuration exactly matches the one 
 - **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app. Check this in both your global profile's **Default Home Connect User Account for Testing** and within the specific application's settings.
 - **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set to `Authorization Code Grant Flow`, you must create a new application.
 - **Success Redirect**: Leave blank or ensure it is a valid URL. Mismatches here can trigger `unauthorized_client` errors.
-- **Propagation Delay**: It can take up to 48 hours for a newly created application or modified user list to fully propagate across all Home Connect systems.
 - **One Time Token Mode**: Disabled.
 - **Proof Key for Code Exchange**: Disabled.
 - **Sync to China**: Disabled, unless you are using the Home Connect servers in China.
 
-If the configuration is correct but errors persist after 48 hours, try deleting and recreating the application in the developer portal to reset its state.
+If the configuration is correct but errors persist, try deleting and recreating the application in the developer portal to reset its state.
 
 #### Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?
 
 <!-- INCLUDES: issue-97-4efe issue-125-fcc5 issue-151-2b8d -->
-Authorisation links and their associated device codes have a limited validity period, typically between 10 and 30 minutes. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.
+Authorisation links and their associated device codes have a limited validity period. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.
 
-To resolve these issues:
-- **Wait for Propagation**: New applications can take up to an hour to become active on production servers. Attempting to use a link before this may result in a rejection.
-- **Refresh the UI**: The plugin configuration interface (e.g. `homebridge-config-ui-x`) does not always refresh the displayed URL automatically. If you encounter an expiry error, close the settings dialogue, refresh the Homebridge web page, and re-open the settings to ensure you are using a fresh link.
-- **Check Logs for Fresh Links**: The plugin automatically retries every 60 seconds and logs new URLs. Always use the most recent link found in the Homebridge logs.
-- **Single Use**: A `device_code` is invalidated immediately upon successful use or if replaced by a newer attempt. Do not attempt to reuse old links.
+If the authorisation fails:
+- **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.
+- **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI.
+- **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt.
+- **Single Use**: The `device_code` is invalidated as soon as it is successfully used. Do not attempt to reuse old authorisation URLs.
 
 #### Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?
 
 <!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 issue-295-521b issue-299-15d1 -->
 These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:
 
-- **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise.
-- **SingleKey ID Redirection Bug**: A known issue with Content Security Policy (CSP) headers on the SingleKey ID site can prevent the browser from redirecting back to the authorisation success page. When signing in, tick the **stay logged in** option. If the page hangs after login, check the browser's developer tools for the callback URL or try manually navigating to the verification link again while the session is active.
+- **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometime necessary to log out of the app and log back in again to trigger account migration to complete.
 - **Internationalisation Bug**: A server-side bug can cause authorisation to fail if your browser's preferred language is not English. This often prevents the password prompt from appearing. Set your web browser's preferred language to English (`en`), refresh, and attempt the authorisation again. You can revert this setting once the tokens are obtained.
 
 To complete the process:
 1. Obtain the URL from the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
 2. Open the URL in a browser and sign in with the account used in the official app.
 3. Approve the request. The plugin will detect completion and save the tokens automatically.
+
+#### Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?
+
+<!-- INCLUDES: issue-51-4991 -->
+This error indicates that the application registered in the Home Connect Developer Portal was not configured to use the `Device Flow` OAuth method.
+
+The `OAuth Flow` setting is fixed at the time of application creation. If it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one, ensuring that `Device Flow` is selected during the creation process.
 
 #### Why does authorisation fail with a `403 Forbidden` error?
 
@@ -210,11 +213,7 @@ The Home Connect API uses `409 Conflict` errors for a wide variety of failures t
 
 - `SDK.Error.WrongOperationState`: This indicates that the appliance is in an incorrect state for the requested operation, such as attempting to start a program while another is already running or if the appliance is currently performing a self-cleaning cycle.
 
-- `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program or retrieve the list of supported programs when the appliance is in a state where that information is inaccessible. This is common when:
-  1. The appliance is physically powered off or in standby.
-  2. The appliance is currently running a program.
-  3. The appliance is performing a mandatory maintenance task, such as an automatic rinse cycle (common with coffee machines).
-  4. Local control is active or there are firmware-specific constraints.
+- `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program that the API considers unavailable for remote execution. This may be due to appliance settings, safety features (e.g. local control active), or firmware bugs.
 
 - `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggled together.
 
@@ -267,7 +266,6 @@ To resolve this, ensure your Homebridge server has a stable internet connection 
 1. **Diagnostic Commands**: Test DNS resolution using `dig api.home-connect.com` or `nslookup api.home-connect.com` from the same system.
 2. **DNS Provider**: Try manually setting a public DNS provider (such as Google's `8.8.8.8` or Cloudflare's `1.1.1.1`) in your operating system's network configuration.
 3. **Network Filtering**: Verify that local firewall or DNS filtering (like Pi-hole) is not blocking requests to the Home Connect API or AWS endpoints.
-4. **Management Layers**: If using HOOBS or similar management layers, check their documentation for network troubleshooting as they may have unique networking configurations.
 
 If using Docker:
 
@@ -314,6 +312,14 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
+
+#### 🚧 How can I force the plugin to re-read and log all available appliance options? 🚧
+
+<!-- INCLUDES: issue-202-8138 -->
+The plugin caches appliance capabilities to avoid exceeding the Home Connect API rate limits. If you need to force the plugin to re-discover all possible values for a program or option (for example, to help debug unrecognised keys), you can use one of the following methods:
+
+*   **HomeKit Identify**: Open a third-party HomeKit app such as the **Eve app** and navigate to the appliance. Tap the **ID** (Identify) button. This triggers the plugin to perform a comprehensive query of the appliance's available programs and options.
+*   **Clear Plugin Cache**: Stop Homebridge and delete the files in the `~/.homebridge/homebridge-homeconnect/persist` directory. **Important**: Do not delete the file `94a08da1fecbb6e8b46990538c7b50b2` (or the file that holds your OAuth credentials), as this will require you to re-authorise the plugin. Removing the other files and restarting Homebridge will force a fresh discovery cycle.
 
 ### Local/Remote Control
 
@@ -379,50 +385,32 @@ When these disconnections occur, the plugin logs the event and updates the HomeK
 
 ### Programs and Options
 
-#### Why does the log show `Unexpected fields`, `Mismatched type`, `(unrecognised)` values, or code blocks?
+#### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-9963 issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-d7db issue-210-cc8e issue-212-38c3 issue-213-c06c issue-216-fa69 issue-217-41c5 issue-220-c9a6 issue-221-f53a issue-222-611c issue-223-87a6 issue-228-c1b3 issue-231-e5d9 issue-233-f1a2 issue-235-b061 issue-236-11a6 issue-237-74bf issue-238-902b issue-243-afde issue-244-beeb issue-246-85c6 issue-247-ab8a issue-248-683b issue-254-ab2e issue-255-2835 issue-257-721b issue-258-d2a3 issue-262-4486 issue-265-872d issue-266-7e59 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin includes a diagnostic mechanism to identify data from the Home Connect API that it does not yet recognise or which deviates from official documentation. This frequently occurs because the API implementation differs from the specification, because new appliance models introduce undocumented features, or following manufacturer firmware updates.
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-220-c9a6 issue-222-611c issue-223-87a6 issue-228-c1b3 issue-231-e5d9 issue-233-f1a2 issue-235-b061 issue-236-11a6 issue-237-74bf issue-238-902b issue-243-afde issue-244-beeb issue-246-85c6 issue-247-ab8a issue-248-683b issue-254-ab2e issue-255-2835 issue-257-721b issue-258-d2a3 issue-262-4486 issue-265-872d issue-266-7e59 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+The plugin includes a diagnostic mechanism to identify data from the Home Connect API that it does not yet recognise. This frequently occurs because the API implementation deviates from official documentation, or because new appliance models or firmware introduce undocumented features, programs, or options.
 
-While unrecognised values usually do not prevent the plugin from functioning, the specific feature may be missing or unavailable in HomeKit until it is added to the internal schema. These warnings manifest in several ways:
-- **Diagnostic blocks**: Technical blocks delimited by `▼▼▼`/`▲▲▲` or `=====` characters containing comments marked `// (unrecognised)`.
-- **TypeScript interfaces**: Blocks starting with `export interface` (e.g. `OptionValues` or `StateValues`) generated to help update the plugin.
-- **Mismatched types**: Warnings that a value (such as `ActiveProgram` or refrigeration door status) does not match the expected format.
+While unrecognised values usually do not prevent the plugin from functioning, the specific feature may be missing or unavailable in HomeKit until it is added to the plugin's internal schema. When this happens, the plugin generates a technical diagnostic block in the log file, delimited by lines of `=` characters and containing comments marked `// (unrecognised)`. This helps the maintainer update the plugin's definitions and map the missing information to HomeKit services.
 
 If you observe these messages:
+
 1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
-2. **Report the values**: Locate the URL provided in the log message immediately following the block and click it to open a pre-populated GitHub issue. Alternatively, open a new issue and include the appliance manufacturer and model number.
-3. **Provide the snippet**: Paste the entire technical diagnostic block (including the separators and any `export interface` lines) into the issue.
+2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
+3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
 
 Once these identifiers are added to the plugin, the warning will disappear and the corresponding features will be correctly mapped to HomeKit.
 
-#### Why are some appliance features, programs, or options missing, unavailable, or reported as `Missing options for N programs`?
+#### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-29-ff17 issue-42-d406 issue-44-1e1b issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-4160 issue-208-0821 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-208-0821 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
 The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable`:
 
-- **Private API Limitations**: The official Home Connect app uses a private API with functionality (such as ice maker toggles or coffee milk percentages) not available to third-party developers. If a feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
-- **Power State Conflicts**: Ovens or steamers may return errors like `409 Conflict` or `SDK.Error.InvalidSettingState` if the API cannot fetch program details because the appliance is not in a suitable remote-ready state.
-- **Appliance Settings**: Certain programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
-- **Operational Status**: A program may be reported as unavailable if the appliance is busy, a cycle is running, a door is open, or required consumables (water, detergent) are missing.
-- **Maintenance Cycles**: Cycles like drum cleaning or descaling are frequently restricted or not advertised with full configuration options via the public API.
+- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
+- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
+- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
+- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent) are missing. This is a dynamic status provided by the Home Connect API based on the physical state of the machine.
 
-To resolve missing programs or options:
-1. Ensure the appliance is idle and consumables are replenished.
-2. Manually select (but do not start) each missing program on the physical control panel, remaining on each selection for one minute to allow the Home Connect API to update its status.
-3. Restart Homebridge or trigger the **Identify** routine (the **ID** button in the Eve app) to force the plugin to re-scan for capabilities.
-4. If the issue persists, enable `Log API Bodies` in the plugin settings and locate the response for `GET /api/homeappliances/.../programs/available` in the logs. If the program is absent from this list, it is a limitation of the Home Connect API for your specific model.
-
-#### Why are ambient light colour and brightness controls missing or limited?
-
-<!-- INCLUDES: issue-24-8ee6 issue-42-e5af issue-54-196a -->
-Ambient lighting functionality via the Home Connect API has several constraints and unique behaviours:
-
-- **Appliance Category Restrictions**: The API currently limits ambient light control to Hood appliances. While many dishwashers feature internal or ambient lighting, the public API does not yet expose these controls for the dishwasher category, even if they are available in the official app.
-- **Discovery and Power State**: The API often omits lighting settings if the appliance or the light itself is switched off. To detect these features, the plugin attempts to briefly switch the light on during its initial discovery phase. If this process is interrupted by manual operation or API latency, controls may be missing in HomeKit. This can usually be resolved by deleting the appliance's cache file in the `persist` directory and restarting Homebridge while the appliance is idle.
-- **Mutually Exclusive Modes**: The API uses two distinct modes. In `CustomColor` mode, brightness is typically integrated into the colour value and a separate brightness slider may be unavailable. In fixed colour mode (predefined presets 1-99), brightness control is available but custom colour selection is disabled.
-
-To force a re-discovery, ensure the appliance is idle, delete the MD5-hashed cache file for that appliance, and restart Homebridge. The plugin will attempt to re-detect the ambient light capabilities during startup.
+If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
 
 #### Why are fan controls missing for my integrated venting hob?
 
@@ -524,7 +512,7 @@ This discovery phase typically occurs upon the first successful authorisation of
 2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options.
 3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).
 
-This typically happens only once during initial setup or after a cache deletion. Results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open. If no cache exists and the appliance is offline, startup will stall until a connection is established. For stubborn programs, see the manual selection workaround in the FAQ regarding missing features.
+This typically happens only once during initial setup or after a cache deletion. Results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open. If no cache exists and the appliance is offline, startup will stall until a connection is established.
 
 #### Which settings are used for programs started without specific options?
 
@@ -593,9 +581,146 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
+#### 🚧 Why does the log show `Home Connect API returned keys/values that are unrecognised`? 🚧
+
+<!-- INCLUDES: issue-202-bb2c -->
+This message appears when the Home Connect API provides data for features that are not yet included in the official API documentation or the plugin's internal definitions. This is common when new appliance models or firmware updates introduce fresh functionality, such as specific dishwasher spray zones or new oven programs.
+
+When these unrecognised keys are detected, the plugin automatically generates a code template in the logs. You should:
+1. Copy the block of code provided between the `===` separators.
+2. Open a new issue on GitHub using the provided link in the logs.
+3. Paste the code into the issue description.
+
+Reporting these allows the maintainer to update the plugin's internal schema to support these new features in future releases.
+
+#### 🚧 What does the message `programs advertised by appliance currently unavailable` mean? 🚧
+
+<!-- INCLUDES: issue-202-c38d -->
+This message indicates that the Home Connect API has reported that the appliance supports certain programs, but they cannot currently be selected or queried. This is normal behaviour and does not indicate a fault with the plugin. Programs may be unavailable because:
+
+*   An appliance program is already running, so other programs cannot be selected.
+*   The appliance is busy with a specific task, such as a cleaning or maintenance cycle.
+*   Required resources are missing, such as water for steam, cleaning agents, or coffee beans.
+*   Specific settings must be enabled on the physical appliance, such as the Sabbath program on ovens.
+
+The plugin displays this warning because it is unable to read the detailed options and settings for these programs while they are unavailable, which may temporarily limit the functionality visible in the Homebridge UI.
+
+#### 🚧 Why does my Homebridge log show `(unrecognised)` for `BSH.Common.Program.Favorite` keys? 🚧
+
+<!-- INCLUDES: issue-209-bb2e -->
+The plugin maintains an internal list of known program keys to map Home Connect API values to HomeKit. For appliances that support multiple user-defined favorites, such as coffee makers, the API uses a numbered naming convention (e.g. `BSH.Common.Program.Favorite.013`). If an appliance uses a favorite slot index that has not yet been explicitly defined in the plugin's schema, it will be flagged as unrecognised in the logs.
+
+The plugin currently supports favorite programs up to index 20 (`BSH.Common.Program.Favorite.020`). If your logs show an unrecognised favorite with a higher index, please report the specific key so it can be added in a future update.
+
+#### 🚧 Why does the log contain an `export interface` block with `(unrecognised)` comments? 🚧
+
+<!-- INCLUDES: issue-210-b8f3 -->
+The plugin includes a discovery mechanism that monitors the Home Connect API for data that does not match its internal schema. When this occurs, the plugin logs a block of code formatted as a TypeScript interface to help identify the discrepancy. This typically happens in two scenarios:
+
+*   **New features**: The appliance supports a setting or option that was not available or known when the plugin was last updated.
+*   **API inconsistencies**: The Home Connect API occasionally deviates from its standard behaviour, such as returning a `number` for a field that typically uses a `string` (key). This is often due to model-specific firmware quirks or errors in the API implementation.
+
+If you see these blocks in your logs, please open an issue on GitHub and provide the full log output. This allows the maintainer to update the plugin to support new features or accommodate the specific behaviour of your appliance model.
+
+#### 🚧 Why does the log say `Home Connect API returned keys/values that are unrecognised by this plugin`? 🚧
+
+<!-- INCLUDES: issue-211-f9e3 -->
+The Home Connect API is frequently updated by manufacturers to support new appliance models, firmware features, and program options. When the plugin encounters a key or value that is not yet part of its internal definitions, it generates a log entry with instructions on how to report it.
+
+To resolve this:
+1. Ensure you are running the latest version of the plugin, as support for these identifiers may have already been added.
+2. If the warning persists, click the GitHub link provided in the log. This link will pre-fill a new issue template with the relevant technical details.
+3. Copy the specific code block from your log (the section between the lines of `=` symbols) and paste it into the issue report.
+
+These warnings generally do not affect the overall stability of the plugin, but the specific feature or status represented by the unrecognised key will not be functional or visible in HomeKit until it has been added to the plugin's schema.
+
+#### 🚧 What should I do if the logs show `(unrecognised)` programs or options? 🚧
+
+<!-- INCLUDES: issue-212-c927 -->
+The plugin maintains an internal database of known Home Connect API programs, options, and settings. When it encounters a value that has not yet been mapped—which frequently occurs with newer appliance models or following manufacturer firmware updates—it generates a diagnostic log block to assist in adding support.
+
+These blocks are clearly delimited by `====================` separators and contain TypeScript-style definitions. Lines representing unknown data are marked with a `// (unrecognised)` comment.
+
+If you see these messages in your logs:
+1. Copy the entire block of code, including the separator lines.
+2. Search the [GitHub issues](https://github.com/thoukydides/homebridge-homeconnect/issues) for this project to see if the values have already been reported for your appliance model.
+3. If no existing issue exists, open a new one and paste the log snippet.
+
+Providing these logs is the primary method for identifying new appliance features and ensuring they are correctly exposed to HomeKit in future plugin releases.
+
+#### 🚧 Why does the log contain blocks of code with `(unrecognised)` values? 🚧
+
+<!-- INCLUDES: issue-213-6ee5 -->
+The Home Connect API is frequently updated with new constants for different appliance models and firmware versions. When the plugin encounters a value (such as a program phase, option, or setting) that is not already in its internal database, it generates a formatted block of code in the logs marked with `// (unrecognised)`.
+
+These messages are an intentional diagnostic feature and do not indicate a failure of the plugin. They are designed to capture the exact technical details required to support new appliance capabilities. If you see these blocks in your logs:
+
+1. Copy the complete block of code, including the separator lines of `=` symbols.
+2. Create a new issue on the GitHub repository.
+3. Include your appliance model number and mention what the appliance was doing at the time (for example, starting a specific cycle or reaching a certain stage of a program).
+
+The maintainer uses these reports to update the plugin's definitions, allowing these new states or options to be correctly identified and exposed to HomeKit in subsequent releases.
+
+#### 🚧 Why does the log show a block of code with `(unrecognised)` annotations? 🚧
+
+<!-- INCLUDES: issue-214-298a -->
+The plugin includes a diagnostic feature that identifies features of the Home Connect API not yet mapped in its internal definitions. When your appliance reports an undocumented programme, option, or status, the plugin generates a TypeScript interface snippet in the log to highlight these new values.
+
+These definitions are updated frequently as new appliances and features are released by manufacturers. If you see these entries in your logs:
+
+* Update the plugin to the latest version to see if support has already been added.
+* If the values are still marked as unrecognised in the latest version, open a new issue on GitHub and paste the entire code block. This information is essential for the maintainer to add support for those specific features in a future release.
+
+#### 🚧 What should I do if the logs contain `(unrecognised)` Home Connect API keys or values? 🚧
+
+<!-- INCLUDES: issue-216-198c -->
+The Home Connect API is regularly updated by manufacturers to support new appliance models and firmware features. When the plugin encounters a capability, programme option, or setting value that is not yet in its internal database, it prints a diagnostic block to the log marked with `(unrecognised)`.
+
+If you see these messages:
+1. Ensure you are running the latest version of the plugin, as many new values are added in regular updates.
+2. If the values are still unrecognised on the latest version, copy the entire section of the log — including the rows of `=` separators — and create a new issue on GitHub.
+3. This data allows the maintainer to map the new API values to HomeKit characteristics or plugin options.
+
+Note that support for new options often requires observing multiple values (for example, different levels of a setting). If only one value is identified initially, the feature may only be partially functional until other possible values are captured and reported.
+
+#### 🚧 Why does the log contain blocks of TypeScript code like `// Union types` or `// Option`? 🚧
+
+<!-- INCLUDES: issue-217-68d0 -->
+The `homebridge-homeconnect` plugin maintains a library of known Home Connect API keys, options, and enum values. When it connects to an appliance that provides data not yet in this library—often due to new firmware features or undocumented API additions—it generates a diagnostic log entry formatted as TypeScript code.
+
+This output is intended to assist the maintainer in adding support for these new features. If you see these blocks in your log, follow these steps:
+1. Ensure you are running the latest version of the plugin, as support for many new values is added regularly.
+2. If the messages persist on the latest version, open a new issue on the GitHub repository.
+3. Copy the entire block including the `=======` separators into the issue description.
+4. Include the manufacturer and model number of the appliance (e.g. Siemens Washer WMH6Y899DN/09) that triggered the log.
+
+These messages are diagnostic and do not indicate a plugin failure, although the specific unrecognised options will not be controllable via HomeKit until they are officially added to the plugin's data model.
+
+#### 🚧 Why does the plugin log `unrecognised` options or `export interface` snippets? 🚧
+
+<!-- INCLUDES: issue-219-85c9 -->
+Home Connect appliances frequently receive firmware updates or feature additions that are not yet reflected in the official API documentation or the plugin's internal database. The plugin is designed to detect these new programs, options, and status keys during operation.
+
+When an unknown element is encountered, the plugin generates diagnostic log entries. These logs often appear as TypeScript code blocks, such as `export interface OptionValues`, and may flag specific items as `unrecognised`. This behaviour is intentional and serves as a prompt for users to report new functionality that the plugin does not yet understand.
+
+If you encounter these log messages:
+1. Verify that you are using the latest version of the plugin, as support for new appliance features is added regularly.
+2. If the items remain unrecognised on the latest version, create a new issue on GitHub and include the relevant log snippets. This allows the maintainer to incorporate the new definitions into a future release, potentially making the new features available in HomeKit.
+
+#### 🚧 What should I do if the logs show `(unrecognised)` API keys or values? 🚧
+
+<!-- INCLUDES: issue-221-75f7 -->
+The plugin includes a discovery mechanism to identify Home Connect API identifiers (options, settings, statuses, or enum values) that are not yet mapped to its internal logic. These appear in the logs as TypeScript-like blocks with a `// (unrecognised)` comment.
+
+This typically happens when a new appliance model or firmware version introduces features not previously encountered by the plugin, such as the `FlexSpray` intensity settings on newer Bosch dishwashers. If you see these messages:
+
+1. Update the plugin to the latest version to see if support has already been added.
+2. If the values remain unrecognised, open an issue on GitHub and provide the log snippet. This information is essential for the maintainer to add official support for those features.
+3. You can often trigger these logs by changing settings or selecting programmes in the official Home Connect app while the plugin is running, which forces the appliance to report its available options.
+
 ### Appliance Status
 
-#### Why does my appliance status (such as door state) appear stuck or show as offline in HomeKit?
+#### Why does my appliance status appear stuck or show as offline in HomeKit?
 
 <!-- INCLUDES: issue-15-1a1d issue-74-dd76 issue-170-750c -->
 The plugin relies on a real-time Server-Sent Events (SSE) stream from the Home Connect API to receive status updates. Because the Home Connect API enforces extremely restrictive rate limits, the plugin does not perform regular polling; it only fetches the full status when it first starts or following a reconnection to the event stream.
@@ -604,7 +729,7 @@ The API sends a `KEEP-ALIVE` event approximately every 55 seconds. The plugin mo
 
 To troubleshoot:
 
-1. Enable the **Log Debug as Info** plugin option to see all raw events. If no events (e.g. `BSH.Common.Status.DoorState`) are logged when you interact with the appliance, the issue resides with the Home Connect platform or appliance connectivity.
+1. Enable the **Log Debug as Info** plugin option to see all raw events received from the API. If no events are logged when you interact with the appliance, the issue resides with the Home Connect platform or appliance.
 2. Ensure the appliance has successfully reconnected to Wi-Fi after being powered on; many devices have a delay before they re-establish a cloud connection.
 3. Restart Homebridge to force the plugin to subscribe to a fresh event stream.
 4. Ensure your network configuration does not prematurely terminate long-lived TCP connections.
@@ -622,19 +747,12 @@ To diagnose and resolve this:
 
 Most connectivity issues are transient and will resolve themselves once the appliance reconnects to the servers or the cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.
 
-#### Why do my appliances remain visible in the Home app when they are offline, or why do they sometimes disappear?
+#### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
 <!-- INCLUDES: issue-52-1e99 -->
-The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. 
+The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as an appliance is associated with your account in the Home Connect API, it will persist in HomeKit. Being unreachable or powered off does not trigger the removal of the accessory from HomeKit, but the Home app will display it as **No Response**. Dynamically adding and removing appliances from HomeKit based on their connectivity would result in loss of user configuration, such as their name, location, scenes, and automations.
 
-**Why they stay visible**: Accessories persist in HomeKit even when an appliance is unreachable or powered off (displaying as **No Response**). This prevents the loss of user configuration, such as custom names, room assignments, scenes, and automations.
-
-**Why they may disappear**: If the Home Connect API temporarily fails to report an appliance during a synchronisation check (due to cloud instability), the plugin may remove the accessory. When the API later reports the appliance again, the plugin recreates it as a brand-new accessory, which results in the loss of all previous HomeKit configurations.
-
-To resolve inconsistent behaviour:
-
-- Check the Home Connect API status to rule out cloud service disruptions.
-- If the issue is persistent, perform a clean reset by removing the bridge from the Home app, clearing the Homebridge `persist` and `accessories` cache files, and then re-adding the bridge.
+If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing, this may be due to a synchronisation issue within HomeKit or the Homebridge cache. This can often be resolved by removing the bridge from the Home app, clearing the Homebridge cache files, and then re-adding the bridge.
 
 #### Why does the log show a program running or time remaining when my appliance is off?
 
@@ -653,18 +771,6 @@ This is a transient server-side or firmware issue that cannot be corrected by th
 
 <!-- INCLUDES: issue-66-dad9 -->
 Some Bosch dishwasher models appear to re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a connection to the Home Connect cloud after being offline. The plugin maps events from the API directly to HomeKit triggers; therefore, these re-broadcasts are passed through as button presses or notifications. This is a quirk of the appliance firmware or API event handling rather than a defect in the plugin itself.
-
-#### Why does my dishwasher show as ON in HomeKit after it has finished a program and powered itself off?
-
-<!-- INCLUDES: issue-181-6697 -->
-This is caused by a quirk in certain dishwashers using the **Auto Power Off** feature. When the appliance completes a cycle and powers down, it may send a `BSH.Common.Setting.PowerState=Off` notification followed almost immediately by a `BSH.Common.Status.OperationState=Ready` status. Because some appliances (like certain Coffee Makers) do not send explicit power events, the plugin uses the `Ready` state to infer that power is ON. In this scenario, the `Ready` event incorrectly overrides the `Off` event.
-
-This was addressed in version 0.30.2 and later:
-
-1. **Blackout Period**: The plugin now implements a 2-second blackout period after an explicit `PowerState` change, during which it ignores any power state inferences triggered by `OperationState` updates.
-2. **Explicit Polling**: The plugin ensures it reads the actual `PowerState` setting during startup or reconnection to verify the inferred state.
-
-If you encounter this, ensure you are running at least version 0.30.2 of the plugin.
 
 #### Why is the log filling up with oven `Event STATUS` temperature messages?
 
@@ -701,6 +807,21 @@ To troubleshoot and potentially work around this:
 <!-- INCLUDES: issue-306-65ff -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
 
+#### Why do Home Connect appliances disappear or lose their Favourites status in the Home app?
+
+<!-- INCLUDES: issue-52-1e99 -->
+The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.
+
+If accessories spontaneously disappear, reappear, or lose their HomeKit configuration (e.g. room assignments, custom names, scenes, or automations) it is usually due to one of the following:
+
+1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations are lost.
+2. **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.
+
+To resolve these issues:
+
+- Check the Home Connect API status to rule out cloud service disruptions.
+- If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
 ## Apple HomeKit
 
 ### HomeKit Accessories, Services, and Characteristics
@@ -727,8 +848,9 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 The plugin allows for granular control over which services are exposed to HomeKit, but there are some architectural constraints:
 
 1. **Core Services**: The main `Switch` service for the appliance power is fundamental and cannot be disabled.
-2. **Optional Services**: Most other features, such as the `Active Program` switch or `Internal Light`, can be individually disabled in the plugin configuration. Note that disabling the `Active Program` switch also removes status indicators (`On`, `Status Active`, `Status Fault`), the ability to control programs, and the `Remaining Duration` characteristic.
-3. **Appliance Exclusion**: If you wish to hide an appliance entirely, you can use the **Exclude Appliance** configuration option to prevent the device from being exposed to HomeKit at all.
+2. **Optional Services**: Most other features, such as the `Active Program` switch or `Internal Light`, can be individually disabled in the plugin configuration. Note that disabling the `Active Program` switch also removes status indicators (`On`, `Status Active`, `Status Fault`) and the `Remaining Duration` characteristic.
+3. **Individual Programs**: The `Switch` services for individual programs can be completely customised with chosen programs and options.
+4. **Appliance Exclusion**: Whole appliances can be disabled to prevent them being exposed to HomeKit.
 
 If services remain visible in HomeKit (often appearing as "unresponsive") after you have configured them to be hidden, it is likely due to HomeKit's internal caching and synchronisation mechanisms rather than the plugin itself. When a feature is disabled, the plugin removes the service from the accessory definition, but HomeKit may retain a stale cached version across multiple hubs or iCloud-synced devices. To resolve persistent stale entries, try these steps in order:
 
@@ -772,22 +894,14 @@ HomeKit does not currently define services or characteristics with the correct s
 
 To maintain HomeKit consistency and ensure reliable voice control, the plugin does not support setting the `BSH.Common.Setting.AlarmClock` timer. This feature will only be considered if Apple introduces suitable HomeKit definitions that match the behaviour of appliance timers.
 
-#### Why do multiple services have identical names, or why can I not rename them in the Apple Home app?
+#### Why do multiple services or programs appear with identical names in the Apple Home app?
 
 <!-- INCLUDES: issue-108-edb7 issue-116-5ab3 issue-196-7bf5 issue-230-3383 -->
-If multiple program switches or sensors appear with identical generic names (such as "Dryer" or "Fridge freezer"), this is usually caused by the Apple Home app's display logic or HomeKit caching.
+If multiple program switches appear with identical generic names (such as "Dryer"), this is typically caused by the Apple Home app's display logic rather than the plugin itself. To resolve this:
 
-**Identical Names**
-The Home app often hides the unique part of a service name if it starts with the appliance's name. To resolve this:
-1. Open the settings for an individual switch or sensor in the Home app and delete the prefix (the appliance name) from the name field. This often reveals the unique name (e.g. "Cotton Eco" or "Freezer Door").
-2. Alternatively, enable the **Remove appliance name prefix** configuration option in the plugin settings (available since `v0.37.0`). This removes the appliance's own name from the individual service names.
-
-**Renaming Failures**
-Historically, several services (such as door sensors and internal switches) used a read-only `ConfiguredName` characteristic. Although this was updated to be writable in `v0.37.0`, HomeKit frequently caches the original read-only metadata. If renaming a service in the Home app fails or immediately reverts:
-- Ensure the plugin is updated to at least version `v0.37.0`.
-- Force-quit the Home app on all your devices.
-- Restart Homebridge to trigger a configuration update.
-- If the issue persists, reboot your HomeKit hubs (Apple TV or HomePod) to force a refresh of the cached characteristic permissions.
+1. Force-quit and restart the Apple Home app to see if the names refresh.
+2. If names remain identical, open the settings for an individual switch in the Home app and delete the prefix or appliance name from the name field. This often reveals the unique name (e.g. "Cotton Eco") that was previously hidden.
+3. Manually rename the switch to your preference if necessary.
 
 #### Why can I not see or control the child lock for my appliance in the Apple Home app?
 
@@ -849,15 +963,11 @@ The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%`
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
 
 <!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-aa32 issue-43-3f35 issue-45-b6c3 issue-56-1910 issue-132-49f7 issue-153-2cda issue-323-9301 -->
-Home Connect communicates many appliance states and alerts as **transient events** rather than persistent, queryable states. This mapping allows these events to be used as HomeKit automation triggers. Examples include:
-
-- **Kitchen Appliances**: A dishwasher program finishing or being aborted; a hob reaching preheat temperature; an oven reaching its target temperature; or a toaster tray being released.
-- **Maintenance Alerts**: A coffee maker's drip tray being full; a washing machine's i-Dos level being low; or a dishwasher's salt level being low.
-- **Security & Safety**: Freezer door alarms or temperature alerts.
+Home Connect communicates many appliance states (such as a coffee maker's "Drip tray full", a washing machine's "iDos fill level poor", or a dishwasher's "Salt low" alert) as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous "Single Press" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.
 
 This design is necessary for several reasons:
 
-1. **API Limitations**: The Home Connect API often does not allow the plugin to poll the current state of these alerts (e.g. after a reboot). Because the actual state cannot be reliably determined at startup, using a persistent sensor (like a `Contact Sensor`) could lead to incorrect status displays if a "cleared" event was missed while the plugin was offline.
+1. **API Limitations**: The Home Connect API often does not allow the plugin to poll the current state of these alerts (e.g. after a reboot or reconnection). Because the actual state cannot be reliably determined at startup, using a persistent sensor (like a `Contact Sensor`) could lead to incorrect status displays if a "cleared" event was missed while the plugin was offline.
 2. **Inconsistent Reporting**: The API does not consistently report when an event condition clears. While some appliances might send an 'off' status, others simply stop sending the 'present' event with no standard timeout defined.
 3. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines sensors like `Contact Sensor` for continuous states. Mapping a momentary event to these services is technically incorrect.
 
@@ -892,9 +1002,7 @@ Door notifications for appliances like fridges or freezers are managed by the Ap
 3. Navigate to the **Doors** section.
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
-Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. These settings are independent of the manufacturer's official Home Connect app; disabling alerts in one does not automatically disable them in the other. 
-
-Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
+Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
 
 ### Siri
 
@@ -934,7 +1042,7 @@ For Home Assistant users, there are alternative community-maintained integration
 <!-- INCLUDES: issue-23-272e issue-67-20e5 issue-94-b8d2 issue-188-d1f4 -->
 This plugin is restricted by the capabilities of the public Home Connect API. The official Home Connect app and some official partners like IFTTT often utilise private or internal APIs to provide functionality that is not exposed to independent third-party developers. 
 
-If a specific program, option, or setting—such as **Dryer AutoSense** (also known as Smart Dry)—is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/), it cannot be supported by this plugin. If you require these features, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) directly to request their addition to the public API.
+If a specific program, option, or setting is not documented in the [official Home Connect API documentation](https://api-docs.home-connect.com/), it cannot be supported by this plugin. If you require these features, you should contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact) directly to request their addition to the public API.
 
 Direct integration with IFTTT to bridge these gaps has been declined to maintain plugin stability and avoid architectural complexity. The maintainer's rationale includes technical constraints such as increased code complexity, the user burden of manually creating IFTTT applets, and interface clutter in HomeKit. For users requiring IFTTT-specific functionality, such as triggering automations from Hood Favourite buttons, it is recommended to use a dedicated plugin like `homebridge-ifttt` alongside this one.
 
@@ -954,38 +1062,4 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-#### How can I customise the plugin name or resolve the `<PLATFORM_CONFIG>.name is not a ApplianceConfig` error?
-
-<!-- INCLUDES: issue-194-0961 -->
-The plugin supports the standard Homebridge `name` property within its configuration block. This allows for customisation of how the plugin identifies itself within the ecosystem.
-
-To use this, manually add a `name` key to the platform configuration in your `config.json` file:
-
-```json
-{
-    "platform": "HomeConnect",
-    "name": "My Custom Name",
-    "clientid": "...",
-    "simulator": false
-}
-```
-
-Setting this property provides the following features:
-
-* **Customised Logging**: The log prefix will change from the default `[HomeConnect]` to your specified value, which is particularly useful for identifying specific plugin instances in the console.
-* **Bridge Identification**: When the plugin is configured to run as a child bridge, this value serves as the default name suggested when the bridge accessory is first paired with the Apple Home app.
-
-This property is not exposed through the graphical configuration editor in the Homebridge UI and must be added by editing the `config.json` file directly. Note that older versions of the plugin may have produced validation errors when this property was present; ensure you are using the latest version to avoid these issues.
-
-#### Why does the plugin fail to load with a `ReadableStream is not defined` error?
-
-<!-- INCLUDES: issue-195-e227 -->
-This error occurs when the plugin is running on an unsupported version of Node.js. The `homebridge-homeconnect` plugin requires a minimum of Node.js 18, which is the standard for Homebridge verified plugins. The `ReadableStream` global is not available in older versions like Node.js 16.
-
-To resolve this issue:
-
-1. Update your environment to Node.js 18 or later (the current LTS version is recommended).
-2. If you are using HOOBS, please note that this is not an officially supported platform for this plugin. You must ensure the underlying Node.js version meets the requirements or migrate to a standard Homebridge installation.
-3. Verify that your Homebridge instance is updated to a version compatible with modern Node.js releases.
-
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-239-ce99 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-ce99 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
