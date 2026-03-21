@@ -1,5 +1,12 @@
 {
     "issue_number": 219,
-    "updated_at": "2026-02-21T09:53:39.339Z",
-    "faq": []
+    "updated_at": "2026-03-21T13:53:37.654Z",
+    "faq": [
+        {
+            "question": "Why does the plugin log `unrecognised` options or `export interface` snippets?",
+            "answer": "Home Connect appliances frequently receive firmware updates or feature additions that are not yet reflected in the official API documentation or the plugin's internal database. The plugin is designed to detect these new programs, options, and status keys during operation.\n\nWhen an unknown element is encountered, the plugin generates diagnostic log entries. These logs often appear as TypeScript code blocks, such as `export interface OptionValues`, and may flag specific items as `unrecognised`. This behaviour is intentional and serves as a prompt for users to report new functionality that the plugin does not yet understand.\n\nIf you encounter these log messages:\n1. Verify that you are using the latest version of the plugin, as support for new appliance features is added regularly.\n2. If the items remain unrecognised on the latest version, create a new issue on GitHub and include the relevant log snippets. This allows the maintainer to incorporate the new definitions into a future release, potentially making the new features available in HomeKit.",
+            "semantic_abstract": "Home Connect appliances periodically introduce new API keys for programs and options that are undocumented or missing from the plugin's internal data model. The plugin identifies these unknown elements and outputs them to the log as TypeScript snippets, allowing users to report them for formal support in future plugin versions.",
+            "hash": "85c92ced239a8589ce4c4619dda4ed02d7f47b75c3e8d688d81ae32205324fd8"
+        }
+    ]
 }
