@@ -1,5 +1,12 @@
 {
     "issue_number": 214,
-    "updated_at": "2026-02-21T06:03:35.616Z",
-    "faq": []
+    "updated_at": "2026-03-21T10:45:47.724Z",
+    "faq": [
+        {
+            "question": "Why does the log show a block of code with `(unrecognised)` annotations?",
+            "answer": "The plugin includes a diagnostic feature that identifies features of the Home Connect API not yet mapped in its internal definitions. When your appliance reports an undocumented programme, option, or status, the plugin generates a TypeScript interface snippet in the log to highlight these new values.\n\nThese definitions are updated frequently as new appliances and features are released by manufacturers. If you see these entries in your logs:\n\n* Update the plugin to the latest version to see if support has already been added.\n* If the values are still marked as unrecognised in the latest version, open a new issue on GitHub and paste the entire code block. This information is essential for the maintainer to add support for those specific features in a future release.",
+            "semantic_abstract": "The plugin identifies undocumented Home Connect API fields by generating TypeScript code blocks in the logs for any `(unrecognised)` keys or values. This diagnostic mechanism allows the mapping of new appliance features and telemetry that are not yet covered by the plugin internal schema or the official API documentation.",
+            "hash": "298a6a3737948e6f7dbfe8335aca5503b405ada9d7d4450073b7f59ab693fa27"
+        }
+    ]
 }
