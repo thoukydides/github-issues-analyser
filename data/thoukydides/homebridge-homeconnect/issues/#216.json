@@ -1,13 +1,12 @@
 {
     "issue_number": 216,
-    "updated_at": "2026-02-21T08:57:17.465Z",
+    "updated_at": "2026-03-21T13:12:12.149Z",
     "faq": [
         {
-            "question": "Why does my log contain code snippets with `(unrecognised)` comments?",
-            "answer": "The plugin includes a discovery mechanism to identify new features or values introduced by Home Connect appliance firmware. When an unknown program option, setting, or enumeration value is encountered, the plugin generates a TypeScript-formatted block in the log marked with `(unrecognised)`. This indicates that the specific feature is not yet fully supported by the plugin's internal mapping.\n\nTo resolve this and help improve the plugin:\n1. Locate the log section containing the `(unrecognised)` tags.\n2. Provide this information in a new GitHub issue, including the appliance model and the specific actions being performed when the log entry was generated.\n\nAdding these unrecognised values allows the maintainer to update the plugin's internal definitions, ensuring that all appliance capabilities are correctly exposed to HomeKit.",
-            "semantic_abstract": "Home Connect appliance firmware updates or newer models may introduce API keys and enumeration values that are missing from the plugin's static definitions. The plugin detects these discrepancies and outputs diagnostic TypeScript snippets to the log to assist in updating the internal API mapping for specific hardware features.",
-            "confidence": "high",
-            "hash": "fa69c9f69386aec7ecc40cb26ff408b6bb2fc20fe58fcecce47363ca7adb2d65"
+            "question": "What should I do if the logs contain `(unrecognised)` Home Connect API keys or values?",
+            "answer": "The Home Connect API is regularly updated by manufacturers to support new appliance models and firmware features. When the plugin encounters a capability, programme option, or setting value that is not yet in its internal database, it prints a diagnostic block to the log marked with `(unrecognised)`.\n\nIf you see these messages:\n1. Ensure you are running the latest version of the plugin, as many new values are added in regular updates.\n2. If the values are still unrecognised on the latest version, copy the entire section of the log — including the rows of `=` separators — and create a new issue on GitHub.\n3. This data allows the maintainer to map the new API values to HomeKit characteristics or plugin options.\n\nNote that support for new options often requires observing multiple values (for example, different levels of a setting). If only one value is identified initially, the feature may only be partially functional until other possible values are captured and reported.",
+            "semantic_abstract": "The Home Connect API schema evolution results in the plugin encountering previously unknown keys or enum values, which are flagged in logs as `(unrecognised)`. These diagnostic blocks provide technical definitions required to update internal mappings, though full functionality may require reporting multiple values for a single option to complete the implementation.",
+            "hash": "198c8f43d9f6bf0c06eec62e35842ef7a03da08a06145277625c52f98ccd3541"
         }
     ]
 }
