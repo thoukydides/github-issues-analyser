@@ -1,13 +1,12 @@
 {
     "issue_number": 213,
-    "updated_at": "2026-02-21T04:52:22.891Z",
+    "updated_at": "2026-03-21T09:46:14.163Z",
     "faq": [
         {
-            "question": "Why does my log contain blocks of code marked as unrecognised?",
-            "answer": "When the plugin identifies values from the Home Connect API that are not yet in its internal database, it prints a diagnostic block of code to the log marked with `(unrecognised)`. This often occurs following an appliance firmware update or when using a newer model with features not previously seen by the plugin. These log entries are not errors that you can fix through configuration; instead, they provide the necessary technical details to update the plugin. If you see these blocks, please copy the entire section and open a new issue on GitHub so that these values can be added to the plugin, ensuring that appliance states and options are correctly displayed in HomeKit.",
-            "semantic_abstract": "The plugin produces diagnostic log output when it encounters Home Connect API enumeration values—such as those for appliance phases or options—that are not defined in its internal schema. These entries identify new or undocumented appliance behaviours, often resulting from firmware updates, and require updates to the plugin code to ensure complete feature support.",
-            "confidence": "high",
-            "hash": "c06c06bc507b53948c5e65c3c8189a7385adfe5f4db6c4d6fadc533ccca34b45"
+            "question": "Why does the log contain blocks of code with `(unrecognised)` values?",
+            "answer": "The Home Connect API is frequently updated with new constants for different appliance models and firmware versions. When the plugin encounters a value (such as a program phase, option, or setting) that is not already in its internal database, it generates a formatted block of code in the logs marked with `// (unrecognised)`.\n\nThese messages are an intentional diagnostic feature and do not indicate a failure of the plugin. They are designed to capture the exact technical details required to support new appliance capabilities. If you see these blocks in your logs:\n\n1. Copy the complete block of code, including the separator lines of `=` symbols.\n2. Create a new issue on the GitHub repository.\n3. Include your appliance model number and mention what the appliance was doing at the time (for example, starting a specific cycle or reaching a certain stage of a program).\n\nThe maintainer uses these reports to update the plugin's definitions, allowing these new states or options to be correctly identified and exposed to HomeKit in subsequent releases.",
+            "semantic_abstract": "Home Connect API evolution results in the plugin encountering undocumented enumeration values, which are captured and logged as formatted TypeScript code snippets. This diagnostic mechanism enables users to identify and report novel appliance states or options, which are then integrated into the plugin's internal type definitions to maintain functional parity with new hardware and firmware.",
+            "hash": "6ee510edeb951c25db246de7fea6baf64c553ffa4354e865726e611bfd54fc62"
         }
     ]
 }
