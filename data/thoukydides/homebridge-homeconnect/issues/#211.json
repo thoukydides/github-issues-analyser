@@ -1,5 +1,12 @@
 {
     "issue_number": 211,
-    "updated_at": "2026-02-20T18:04:31.417Z",
-    "faq": []
+    "updated_at": "2026-03-21T07:03:22.022Z",
+    "faq": [
+        {
+            "question": "Why does the log say `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+            "answer": "The Home Connect API is frequently updated by manufacturers to support new appliance models, firmware features, and program options. When the plugin encounters a key or value that is not yet part of its internal definitions, it generates a log entry with instructions on how to report it.\n\nTo resolve this:\n1. Ensure you are running the latest version of the plugin, as support for these identifiers may have already been added.\n2. If the warning persists, click the GitHub link provided in the log. This link will pre-fill a new issue template with the relevant technical details.\n3. Copy the specific code block from your log (the section between the lines of `=` symbols) and paste it into the issue report.\n\nThese warnings generally do not affect the overall stability of the plugin, but the specific feature or status represented by the unrecognised key will not be functional or visible in HomeKit until it has been added to the plugin's schema.",
+            "semantic_abstract": "The Home Connect API schema evolves as new appliances and features are released, leading to unrecognised identifiers that require manual addition to the plugin's type definitions. The plugin detects these unknown keys and values during operation, providing a structured log output to facilitate the reporting and integration of new data types into the codebase.",
+            "hash": "f9e36c01523c74e6ec61b45b2fdc62af94231889f14ea927349579a44474c11f"
+        }
+    ]
 }
