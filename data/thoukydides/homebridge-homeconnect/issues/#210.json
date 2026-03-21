@@ -1,13 +1,12 @@
 {
     "issue_number": 210,
-    "updated_at": "2026-02-20T19:13:39.591Z",
+    "updated_at": "2026-03-21T07:46:07.393Z",
     "faq": [
         {
-            "question": "What should I do if the logs show unrecognised options or an `export interface` block?",
-            "answer": "When the plugin encounters appliance options, settings, or states that are not yet supported or that return unexpected data types, it generates a diagnostic log block formatted as a TypeScript interface (e.g. `export interface OptionValues` or `export interface StateValues`). This usually indicates that the appliance is providing data that does not match the plugin's current understanding of the Home Connect API.\n\nTo help resolve this, please:\n1. Ensure you are using the latest version of the plugin, as support for new features is added regularly.\n2. If the block remains, copy the entire section between the `====` separators.\n3. Open a new issue on GitHub, including the appliance manufacturer, model, and the copied log block.\n\nThis information allows the maintainer to update the plugin to correctly handle these values. For example, some Bosch washers were found to use both numeric and string identifiers for the same `LaundryCare.Common.Option.ReferToProgram` option, which required a specific update to the plugin's type definitions to accommodate both formats.",
-            "semantic_abstract": "The plugin implements a diagnostic logging mechanism that generates TypeScript interface definitions when it encounters undocumented or incorrectly typed Home Connect API entities. This metadata facilitates the manual mapping of new appliance features and the resolution of implementation mismatches within the plugin's internal definitions.",
-            "confidence": "high",
-            "hash": "cc8eb12e03aeb1b8748e0d0f3ccf7168568ba9fd7784bac759374d6158316cfa"
+            "question": "Why does the log contain an `export interface` block with `(unrecognised)` comments?",
+            "answer": "The plugin includes a discovery mechanism that monitors the Home Connect API for data that does not match its internal schema. When this occurs, the plugin logs a block of code formatted as a TypeScript interface to help identify the discrepancy. This typically happens in two scenarios:\n\n*   **New features**: The appliance supports a setting or option that was not available or known when the plugin was last updated.\n*   **API inconsistencies**: The Home Connect API occasionally deviates from its standard behaviour, such as returning a `number` for a field that typically uses a `string` (key). This is often due to model-specific firmware quirks or errors in the API implementation.\n\nIf you see these blocks in your logs, please open an issue on GitHub and provide the full log output. This allows the maintainer to update the plugin to support new features or accommodate the specific behaviour of your appliance model.",
+            "semantic_abstract": "The plugin performs runtime schema validation of Home Connect API responses, logging auto-generated TypeScript interfaces when it detects unrecognised keys or unexpected data types. This diagnostic output facilitates the identification of undocumented API variations and model-specific firmware quirks, enabling future plugin compatibility updates.",
+            "hash": "b8f349a1b29f5bf2f00a123d23e41d1af90066f5ebf47171985e38b6de249d9b"
         }
     ]
 }
