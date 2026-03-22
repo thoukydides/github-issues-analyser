@@ -1,13 +1,12 @@
 {
     "issue_number": 225,
-    "updated_at": "2026-02-21T13:59:05.296Z",
+    "updated_at": "2026-03-22T07:08:39.550Z",
     "faq": [
         {
-            "question": "Why does the Apple Home app not show the remaining time for my appliance programs?",
-            "answer": "The plugin exposes the remaining program duration using the HomeKit `Remaining Duration` characteristic on the Active Program `Switch` service. However, Apple's official Home app only supports displaying this specific characteristic for `Irrigation System` or `Valve` services. Using these service types for appliances like washing machines or dishwashers is semantically incorrect and would lead to other functional issues. To view the remaining time, you must use a third-party HomeKit app, such as **Eve for HomeKit**, which correctly displays the `Remaining Duration` characteristic for all service types that include it.",
-            "semantic_abstract": "Apple Home app UI limitations prevent the display of the `Remaining Duration` characteristic for standard appliance-related service mappings. The plugin provides this data via the Active Program `Switch` service, but official HomeKit client restrictions require the use of third-party HomeKit applications to visualise the timer.",
-            "confidence": "high",
-            "hash": "731f511ba5a80baf575a04a87b1b0ed81a78a35ff745b44c3b4b0f17bc6b84e0"
+            "question": "Why is the remaining program time not visible in the Apple Home app?",
+            "answer": "The plugin exposes the remaining duration of an active program using the `Remaining Duration` characteristic attached to the `Active Program` switch service. However, Apple's Home app currently only supports displaying this characteristic for specific service types, such as `Irrigation System` or `Valve` services, which are not appropriate for home appliances.\n\nTo view the remaining time, you should use a third-party HomeKit application such as **Eve**. The maintainer has explicitly decided against using semantically incorrect service types (like valves or irrigation controllers) to force compatibility with the Apple Home app UI, as this would result in a confusing and inaccurate representation of the appliance within the HomeKit ecosystem.",
+            "semantic_abstract": "Apple Home app UI constraints prevent the display of the `Remaining Duration` characteristic on standard appliance-mapped services. The plugin implements this characteristic on the `Active Program` switch service, but visibility is limited to third-party HomeKit applications because the maintainer rejects using semantically incorrect service mappings like `Irrigation System` for home appliances.",
+            "hash": "45433dfbeab4a90f56698f3d3bc705170078a11e2099da6424ea980d13ab8b71"
         }
     ]
 }
