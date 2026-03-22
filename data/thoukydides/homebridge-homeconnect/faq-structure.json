@@ -914,15 +914,16 @@
                             "preamble": "",
                             "partitions": [
                                 {
-                                    "entries": [],
-                                    "candidates": [
+                                    "entries": [
                                         {
-                                            "issue_number": 239,
-                                            "id": "issue-239-6f85",
                                             "question": "Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?",
-                                            "answer": "This error indicates that the plugin is running on an unsupported version of Node.js. The `homebridge-homeconnect` plugin requires Node.js 18.x or 20.x LTS, in alignment with Homebridge Verified plugin requirements.\n\nThe `ReadableStream` object was first exposed on the global scope in Node.js 18.0.0. If your environment is running an older version (such as Node.js 16), the plugin will fail during the initialisation process. To resolve this, you must update your Node.js engine to the latest 18.x or 20.x LTS release.\n\nUsers of HOOBS should ensure their platform is updated to a version supporting these Node.js releases. As this is a Homebridge plugin, any platform-specific issues related to HOOBS should be referred to their respective support channels."
+                                            "answer": "This error indicates that the plugin is running on an unsupported version of Node.js. The `homebridge-homeconnect` plugin requires Node.js 18.x or 20.x LTS, in alignment with Homebridge Verified plugin requirements.\n\nThe `ReadableStream` object was first exposed on the global scope in Node.js 18.0.0. If your environment is running an older version (such as Node.js 16), the plugin will fail during the initialisation process. To resolve this, you must update your Node.js engine to the latest 18.x or 20.x LTS release.\n\nUsers of HOOBS should ensure their platform is updated to a version supporting these Node.js releases. As this is a Homebridge plugin, any platform-specific issues related to HOOBS should be referred to their respective support channels.",
+                                            "included_ids": [
+                                                "issue-239-6f85"
+                                            ]
                                         }
-                                    ]
+                                    ],
+                                    "candidates": []
                                 }
                             ],
                             "subcategories": []

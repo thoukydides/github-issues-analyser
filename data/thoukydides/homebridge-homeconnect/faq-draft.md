@@ -94,6 +94,7 @@
     - [Why are features available in the official app or IFTTT missing from this plugin?](#why-are-features-available-in-the-official-app-or-ifttt-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
+    - [Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?](#why-does-the-plugin-fail-with-referenceerror-readablestream-is-not-defined)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -921,9 +922,9 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- PARTITION: Node.js Environment Requirements -->
+<!-- PARTITION -->
 
-#### 🚧 Why does the plugin fail with `ReferenceError: ReadableStream is not defined`? 🚧
+#### Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?
 
 <!-- INCLUDES: issue-239-6f85 -->
 This error indicates that the plugin is running on an unsupported version of Node.js. The `homebridge-homeconnect` plugin requires Node.js 18.x or 20.x LTS, in alignment with Homebridge Verified plugin requirements.
