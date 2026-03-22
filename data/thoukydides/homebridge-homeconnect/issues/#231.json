@@ -1,13 +1,12 @@
 {
     "issue_number": 231,
-    "updated_at": "2026-02-22T06:10:07.243Z",
+    "updated_at": "2026-03-22T13:13:57.588Z",
     "faq": [
         {
-            "question": "What should I do if the logs show unrecognised program keys?",
-            "answer": "When the plugin encounters appliance programs or settings that are not yet known to its internal database, it outputs a block of TypeScript code to the log annotated with `(unrecognised)`. This typically occurs when a new appliance model is released or Home Connect updates their API with new functionality. To ensure these programs are properly supported, please open a GitHub issue and provide the complete block of code from the log. This allows the maintainer to add the missing definitions in a future release.",
-            "semantic_abstract": "The plugin identifies and logs undocumented Home Connect API program keys and options as unrecognised TypeScript snippets to facilitate feature discovery. Reporting these log outputs via GitHub issues allows for the manual integration of new appliance features into the plugin's internal definitions.",
-            "confidence": "high",
-            "hash": "e5d928a8d6f942bbb325f3b0ca72d15519d833400f475540ebe0a5ffacc353af"
+            "question": "What should I do if the logs show `(unrecognised)` values?",
+            "answer": "The plugin automatically detects and logs any data received from the Home Connect API that it does not currently recognise. This is typically caused by newer appliance models or firmware versions using programs, options, or settings that were not included in the official API documentation used to develop the plugin.\n\nWhen these values are encountered, the plugin generates a structured block of code in the logs to assist with adding support. If you see such a block:\n\n1. Copy the entire section, starting and ending with the `====` lines.\n2. Open a new issue on the GitHub repository.\n3. Provide the model number of your appliance and the copied log content.\n\nOnce reported, these values can be formally mapped in a future plugin release to enable full control and status reporting for those features.",
+            "semantic_abstract": "The plugin's diagnostic logging identifies mismatches between the Home Connect API response and internal type definitions, producing structured output for unrecognised programs or settings. This mechanism enables the collection of appliance-specific metadata required to support undocumented features introduced by newer hardware or firmware.",
+            "hash": "a6d968a983d046342ea1ad473372e06692efd7bc432da4bad82cb3fc248a887b"
         }
     ]
 }
