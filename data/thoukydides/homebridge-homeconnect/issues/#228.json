@@ -1,13 +1,12 @@
 {
     "issue_number": 228,
-    "updated_at": "2026-02-21T16:56:22.992Z",
+    "updated_at": "2026-03-22T09:47:40.235Z",
     "faq": [
         {
-            "question": "Why does the log show a TypeScript block with `(unrecognised)` values?",
-            "answer": "The plugin includes a diagnostic feature that monitors for appliance programs, options, settings, or enum values that are not yet defined in its internal database. When the Home Connect API returns a value that the plugin does not recognise—which occurs frequently with new appliance models, updated firmware, or undocumented API features—it generates a block of TypeScript code in the logs highlighting these as `(unrecognised)`.\n\nIf you see this block in your logs, please open a GitHub issue and provide the complete log output. This information allows the maintainer to update the plugin's definitions to support the new functionality. Once the plugin is updated, these features will be correctly identified and exposed to HomeKit.",
-            "semantic_abstract": "The plugin generates diagnostic TypeScript log blocks to identify undocumented or new Home Connect API keys and enum values that are missing from its internal definitions. This mechanism facilitates the addition of support for new appliance features and firmware-specific variations through user reporting.",
-            "confidence": "high",
-            "hash": "c1b394d652a026a6b50a1c55ef78aec96639ac55ce872189507e408868973ace"
+            "question": "Why does the log contain a diagnostic block with `(unrecognised)` values?",
+            "answer": "The plugin identifies values sent by the Home Connect API that are not yet present in its internal definitions, such as new appliance programs, options, or settings. This often occurs with newer appliance models or following a firmware update.\n\nWhen these unknown values are encountered, the plugin generates a diagnostic block in the log, formatted as TypeScript code and enclosed between lines of `=` characters. Keys that the plugin does not yet understand are marked with `// (unrecognised)`.\n\nTo assist with adding support for these features:\n1. Copy the entire block (including the rows of `=` characters).\n2. Open a new issue on the GitHub repository.\n3. Paste the diagnostic output into the issue description.\n\nThis information allows the maintainer to update the plugin's definitions and expose the new functionality in a subsequent release.",
+            "semantic_abstract": "The plugin generates diagnostic log blocks when encountering undocumented Home Connect API schema elements, such as new programs or options, to facilitate their inclusion in future updates. This mechanism captures data from newer appliance hardware or firmware that exceeds the plugin's current internal type definitions, requiring manual reporting to the maintainer for integration.",
+            "hash": "b228c55274504997a7161530e1b87a78bd87002c74bbe6fbd0d5a89c65b9804d"
         }
     ]
 }
