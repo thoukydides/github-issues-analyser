@@ -683,10 +683,10 @@ To resolve these issues:
 
 #### Why does the Apple Home app not show the remaining time or detailed status for my appliance?
 
-<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-eae0 issue-124-ba42 -->
+<!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-eae0 issue-124-ba42 issue-225-4543 issue-230-e24b -->
 The plugin exposes the `Remaining Duration` characteristic and other status information to HomeKit for all supported appliances, typically on the `Active Program` switch service.
 
-However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. While a `Valve` service might appear applicable to "wet" appliances like dishwashers or washing machines, it is semantically inappropriate for many other Home Connect types that also report remaining time, such as ovens, dryers, or coffee machines. To maintain a consistent architectural model and avoid interface clutter, the plugin does not create these extra services purely for display in the Apple Home app.
+However, the Apple Home app only displays this information for specific accessory types defined in the HomeKit Accessory Protocol (HAP) specification, such as `Irrigation System` and `Valve` services. While a `Valve` service might appear applicable to "wet" appliances like dishwashers or washing machines, it is semantically inappropriate for many other Home Connect types that also report remaining time, such as ovens, dryers, or coffee machines. The maintainer has explicitly decided against using these semantically incorrect service types to force compatibility with the Apple Home app UI, as this would result in a confusing and inaccurate representation of the appliance within the HomeKit ecosystem.
 
 To view the remaining time, or use other characteristics that the Apple Home app hides, you must use a third-party HomeKit application (such as *Eve*, *Home+*, or *Controller for HomeKit*). Look for the **Remaining Duration** characteristic on the Active Program switch service. These applications support the full range of standard HomeKit characteristics and allow them to be used in automations.
 
@@ -751,8 +751,10 @@ To maintain HomeKit consistency and ensure reliable voice control, the plugin do
 
 #### Why do multiple services or programs appear with identical names in the Apple Home app?
 
-<!-- INCLUDES: issue-108-edb7 issue-116-5ab3 issue-196-7bf5 -->
-If multiple program switches appear with identical generic names (such as "Dryer"), this is typically caused by the Apple Home app's display logic rather than the plugin itself. To resolve this:
+<!-- INCLUDES: issue-108-edb7 issue-116-5ab3 issue-196-7bf5 issue-230-fe75 -->
+If multiple program switches appear with identical generic names (such as "Dryer"), this is typically caused by the Apple Home app's display logic rather than the plugin itself. This often happens because the app prefixes the program name with the appliance name, or displays a cached generic name.
+
+To resolve this:
 
 1. Force-quit and restart the Apple Home app to see if the names refresh.
 2. If names remain identical, open the settings for an individual switch in the Home app and delete the prefix or appliance name from the name field. This often reveals the unique name (e.g. "Cotton Eco") that was previously hidden.
@@ -812,28 +814,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why is the remaining program time not visible in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-225-4543 -->
-The plugin exposes the remaining duration of an active program using the `Remaining Duration` characteristic attached to the `Active Program` switch service. However, Apple's Home app currently only supports displaying this characteristic for specific service types, such as `Irrigation System` or `Valve` services, which are not appropriate for home appliances.
-
-To view the remaining time, you should use a third-party HomeKit application such as **Eve**. The maintainer has explicitly decided against using semantically incorrect service types (like valves or irrigation controllers) to force compatibility with the Apple Home app UI, as this would result in a confusing and inaccurate representation of the appliance within the HomeKit ecosystem.
-
-#### 🚧 Why does the time remaining not appear in the Home app? 🚧
-
-<!-- INCLUDES: issue-230-e24b -->
-The plugin exposes the remaining duration of an active program as a characteristic, but the standard Apple Home app lacks a native UI element to display this information. To view the remaining time, you must use a third-party HomeKit app such as the Eve app, Home+, or Controller for HomeKit. These applications are able to access and display additional technical characteristics that Apple's standard interface ignores.
-
-#### 🚧 Why are all my appliance program switches named identically in the Home app? 🚧
-
-<!-- INCLUDES: issue-230-fe75 -->
-When multiple `Switch` services are exposed for a single appliance (for example, to start different programs), the Apple Home app may display them using the generic appliance category or name instead of their individual program names. This is typically a display caching issue within the Home app. To resolve this:
-
-1. Force-quit and restart the Apple Home app to see if the names update automatically.
-2. If the names remain generic, open the settings for an individual switch within the Home app.
-3. Tap on the name field and delete the appliance name prefix (for example, delete the word "Dryer"). This usually reveals the underlying program name (such as "Cotton").
-4. You can also manually rename the switches to your preference within the Home app settings.
 
 ### Notifications & Events
 
