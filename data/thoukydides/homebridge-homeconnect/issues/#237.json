@@ -1,13 +1,12 @@
 {
     "issue_number": 237,
-    "updated_at": "2026-02-22T08:58:20.663Z",
+    "updated_at": "2026-03-22T14:45:46.218Z",
     "faq": [
         {
-            "question": "Why does the log show a block of code with unrecognised Home Connect API values?",
-            "answer": "The plugin includes a diagnostic feature that detects and reports any options or enumeration values received from the Home Connect API that it does not yet recognise. This typically occurs when a new appliance model is released or when a firmware update introduces new functionality. These blocks of code, often containing comments like `// (unrecognised)`, are intended to be shared with the plugin developer via a GitHub Issue. Reporting these logs allows the plugin to be updated with the correct definitions, ensuring that all appliance features can be correctly supported and controlled through HomeKit. While these messages are diagnostic and usually do not indicate a total failure, the specific unrecognised feature may be unavailable or limited until the plugin is updated.",
-            "semantic_abstract": "The plugin's diagnostic system monitors the Home Connect event stream for undocumented API keys and enumeration values, outputting a formatted TypeScript interface block to the logs when matches occur. This mechanism facilitates the identification of new appliance features or firmware changes that require updates to the plugin's internal schema definitions for full HomeKit compatibility.",
-            "confidence": "high",
-            "hash": "74bfe844ca9c546040c0efaa526c855024b2ab504f7819b547ae4751a5b2e2b8"
+            "question": "Why does the log contain a block of code with `(unrecognised)` comments?",
+            "answer": "The plugin includes a discovery mechanism to identify features, options, or values from the Home Connect API that are not yet part of its internal definitions. This is common when new appliance models are released or when firmware updates introduce undocumented capabilities.\n\nWhen these undocumented elements are detected, the plugin generates a block of TypeScript-like code in the log output, identifying the specific keys and values that are `(unrecognised)`. This behaviour is intentional and designed to help users provide the necessary information to add support for these features.\n\nIf you see such a block in your logs:\n1. Copy the entire section including the header and footer lines of equal signs (`====`).\n2. Open a new issue on the GitHub repository.\n3. Include the appliance model number and the copied log block.\n\nProviding this information allows the maintainer to update the plugin's schema, ensuring that these new options are correctly handled and exposed to HomeKit.",
+            "semantic_abstract": "The plugin's discovery mechanism identifies undocumented Home Connect API program options and enum values, outputting them as structured TypeScript code blocks to the log. This process facilitates the identification of new appliance features and firmware-specific capabilities that require manual integration into the plugin's schema to ensure full HomeKit compatibility.",
+            "hash": "4f1f246c4c19c20f08735b30e06206308501a50a4e3ded2de7bd0777dfde4b01"
         }
     ]
 }
