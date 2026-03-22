@@ -922,7 +922,7 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- PARTITION -->
+<!-- PARTITION: Node.js Environment Requirements -->
 
 #### Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?
 
