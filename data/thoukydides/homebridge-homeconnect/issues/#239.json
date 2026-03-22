@@ -1,13 +1,12 @@
 {
     "issue_number": 239,
-    "updated_at": "2026-02-22T07:12:48.967Z",
+    "updated_at": "2026-03-22T14:04:14.936Z",
     "faq": [
         {
             "question": "Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?",
-            "answer": "This error occurs when the plugin is run on an unsupported or outdated version of Node.js. The `homebridge-homeconnect` plugin requires **Node.js 18.x or 20.x (LTS)** to function correctly.\n\nThe `ReadableStream` object was only exposed on the global object starting with Node.js 18.0.0. Attempting to run the plugin on older versions, such as Node.js 16, will result in this crash during the loading process. This version requirement ensures compliance with Homebridge Verified plugin standards.\n\nTo resolve this issue:\n1. Upgrade your Node.js installation to the latest 18.x or 20.x LTS release.\n2. If you are using HOOBS, ensure your system is updated to a version that includes a supported Node.js runtime. Note that as this is a Homebridge plugin, any platform-specific issues with HOOBS should be referred to HOOBS support.",
-            "semantic_abstract": "The `homebridge-homeconnect` plugin requires Node.js 18.x or 20.x LTS to support global `ReadableStream` functionality and comply with Homebridge Verified plugin standards. Version-specific runtime errors such as `ReferenceError: ReadableStream is not defined` occur when the plugin is executed on Node.js 16 or earlier, a common configuration in legacy HOOBS environments.",
-            "confidence": "high",
-            "hash": "ce99e57419fadc992eadc37324661855558533b0e8edaa9c681976fcf5aa0251"
+            "answer": "This error indicates that the plugin is running on an unsupported version of Node.js. The `homebridge-homeconnect` plugin requires Node.js 18.x or 20.x LTS, in alignment with Homebridge Verified plugin requirements.\n\nThe `ReadableStream` object was first exposed on the global scope in Node.js 18.0.0. If your environment is running an older version (such as Node.js 16), the plugin will fail during the initialisation process. To resolve this, you must update your Node.js engine to the latest 18.x or 20.x LTS release.\n\nUsers of HOOBS should ensure their platform is updated to a version supporting these Node.js releases. As this is a Homebridge plugin, any platform-specific issues related to HOOBS should be referred to their respective support channels.",
+            "semantic_abstract": "The plugin's dependency on the global `ReadableStream` object requires Node.js version 18.0.0 or higher, leading to execution failures on legacy engines like Node.js 16. This requirement adheres to Homebridge Verified plugin standards for maintaining compatibility with current LTS environments.",
+            "hash": "6f8563ef6ef19b860030a91f5b165371edc54cb2006fe3151de884b17ba22653"
         }
     ]
 }
