@@ -1,13 +1,12 @@
 {
     "issue_number": 223,
-    "updated_at": "2026-02-21T14:54:04.924Z",
+    "updated_at": "2026-03-22T07:50:06.903Z",
     "faq": [
         {
-            "question": "Why does the plugin log unrecognised Home Connect API values?",
-            "answer": "The plugin is designed to identify and log API values that are not yet known to its internal mapping, which often occurs when manufacturers introduce new appliance models or firmware updates with undocumented features. When this occurs, the plugin will output a block of code to the log—such as for `LaundryCare.Dryer.EnumType.ProcessPhase`—and prompt you to report it. Support for these values is then added in subsequent updates; for example, several dryer process phases (`CupboardDryReached`, `Drying`, and `IronDryReached`) were added in version v0.38.0. If you encounter these logs, ensure you are running the latest version of the plugin, and if the values are still listed as unrecognised, please submit a GitHub issue with the provided log snippet.",
-            "semantic_abstract": "The plugin identifies unrecognised Home Connect API identifiers, such as dryer process phases or program options, which are often the result of undocumented firmware updates or newer appliance models. This mechanism allows for the discovery of manufacturer-specific API values that can be subsequently mapped to HomeKit services in plugin updates.",
-            "confidence": "high",
-            "hash": "87a6d4c6fe2b4eb21a2a09e9bf59af7a19c4b39ba89a1b241db48dce4c88add1"
+            "question": "Why does the log show `(unrecognised)` for certain appliance settings or process phases?",
+            "answer": "Home Connect appliances sometimes report status values, program options, or process phases that are not included in the official API documentation or have not yet been encountered by the plugin. Examples include specific dryer phases like `CupboardDryReached`, `Drying`, or `IronDryReached`.\n\nWhen the plugin detects an unknown value, it prints a block of code to the Homebridge log containing the unrecognised identifier. If you see this, please report it to the maintainer by following these steps:\n1. Copy the entire log block between the lines of `=` characters.\n2. Open a new issue on the GitHub repository.\n3. Paste the log block into the issue description.\n\nThe maintainer uses these reports to update the plugin's internal definitions. Once the plugin is updated to the version containing the fix, these values will be correctly handled and the log warnings will cease.",
+            "semantic_abstract": "Home Connect appliances may report enumeration values for process phases or program options that are absent from official API documentation, causing the plugin to log them as `(unrecognised)`. These discrepancies between device firmware and the API specification require manual updates to the plugin's internal definitions to support new or model-specific appliance behaviours.",
+            "hash": "c141e3a585289c32c6835a62c6afd03a6d5c940116ce7363a4103b5cb2ef0308"
         }
     ]
 }
