@@ -1,13 +1,12 @@
 {
     "issue_number": 243,
-    "updated_at": "2026-02-22T16:58:03.475Z",
+    "updated_at": "2026-03-23T12:32:15.751Z",
     "faq": [
         {
-            "question": "What should I do if the log reports unrecognised Home Connect API keys or values?",
-            "answer": "This message occurs when your appliance uses programs, options, or settings that are not yet known to the plugin. This is common because the Home Connect API frequently introduces new features or uses undocumented identifiers that vary between manufacturers and models. To resolve this and help improve the plugin: 1. Copy the technical snippet provided in the log (the section between the `=======` markers). 2. Click the GitHub link provided in the log message to open a new issue. The link is pre-configured to populate most of the required information. 3. Paste the snippet into the **Log File** field and submit the issue. Once reported, these keys are typically added in a subsequent release, allowing the plugin to correctly interpret and expose those specific appliance features to HomeKit.",
-            "semantic_abstract": "Home Connect API implementations frequently include undocumented program keys and settings that vary by appliance model and firmware version. The plugin utilizes a validation system to detect these unrecognised values, requiring user reports via provided log templates to map new functionality in subsequent updates.",
-            "confidence": "high",
-            "hash": "afde589318125c990c107c5db92b6f7e45798bb60ab9655b1d86325ee9ce28ba"
+            "question": "Why does the log show `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+            "answer": "This warning appears when the plugin encounters a `ProgramKey`, setting, or option from the Home Connect API that it does not recognise. This typically happens because manufacturers often release appliances with features that are undocumented or specific to certain models, requiring them to be manually mapped within the plugin to be exposed to HomeKit.\n\nTo address this:\n1. Verify that you are running the latest version of the plugin, as support for new appliance features is added regularly.\n2. If the log message still appears, follow the link provided in the log. This link is specifically crafted to open a new GitHub issue with the required technical definitions (such as `ProgramKey` and `EventNotifyValues`) pre-populated.\n\nOnce reported, these undocumented features can be added to the plugin's internal registry in a future update.",
+            "semantic_abstract": "Home Connect appliances may transmit undocumented API identifiers that the plugin cannot automatically map to HomeKit services. The plugin identifies these unrecognised `ProgramKey` or `EventNotifyValues` and provides a diagnostic link to report the raw data, enabling the maintainer to update the internal registry with support for new appliance features.",
+            "hash": "6ba9b4ce7a024b3d830339b9a7dd853faecc5922585f272a19550aa22a1c7cbf"
         }
     ]
 }
