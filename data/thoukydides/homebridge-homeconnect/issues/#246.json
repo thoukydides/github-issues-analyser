@@ -1,13 +1,12 @@
 {
     "issue_number": 246,
-    "updated_at": "2026-02-23T08:07:08.613Z",
+    "updated_at": "2026-03-23T15:15:04.883Z",
     "faq": [
         {
-            "question": "Why are some coffee maker programs like `CoffeePot` or cleaning cycles missing or labelled as unrecognised?",
-            "answer": "Certain appliance models, particularly newer Siemens coffee makers like the `TQ905` series, use program keys for beverages and maintenance cycles that are not included in the standard Home Connect API documentation. Examples include the `CoffeePot` program and various `CleaningModes` such as `CalcNClean`, `FrostProtection`, and `RinseMilkSystem`. The plugin identifies these as `(unrecognised)` in logs until they are explicitly added to the plugin's internal definitions. Support for these specific programs was added in `v0.40.1`. If you encounter other missing programs, ensure the plugin is updated to the latest version; if they remain missing, providing the log output in a GitHub issue allows these undocumented keys to be mapped.",
-            "semantic_abstract": "Home Connect coffee makers may utilise undocumented API program keys for specific beverages and maintenance routines, such as `CoffeePot` or model-specific cleaning modes, which are not present in official documentation. These gaps between the API specification and implementation require manual mapping within the plugin to ensure all appliance functions are correctly identified and exposed to HomeKit.",
-            "confidence": "high",
-            "hash": "85c60a12665027f769e1cdbd197e1c9da759444d2489ce7d9ade93260ccf39d9"
+            "question": "Why does the log show `(unrecognised)` Home Connect API values or programs?",
+            "answer": "The Home Connect API frequently returns values, program keys, or settings that are not included in the official technical documentation. This often occurs with newer appliance models or specific regional variants. When the plugin encounters these unknown identifiers, it logs them as `(unrecognised)` within a block of TypeScript-like definitions, such as `export type ProgramKey` or `export interface EventNotifyValues`.\n\nThis is an intentional feature designed to help identify missing functionality that the plugin does not yet know how to handle. If you see these messages in your log:\n\n1. **Update the plugin**: Ensure you are running the latest version of `homebridge-homeconnect`, as support for new programs and options is added regularly.\n2. **Report new values**: If the values persist on the latest version, please open a GitHub issue. Include the full section of the log containing these definitions. This allows the maintainer to map these values to appropriate HomeKit services in a future release.\n\nCommon examples of unrecognised values include specific beverage types for coffee makers (e.g. `CoffeePot`), specialised cleaning cycles, or model-specific appliance settings.",
+            "semantic_abstract": "The Home Connect API provides undocumented program keys and settings that vary across appliance models, which the plugin identifies and logs as unrecognised. These mismatches between the API specification and observed behaviour require manual identification from logs and inclusion in plugin updates to expose the corresponding functionality in HomeKit.",
+            "hash": "2c5ff2592dacedb2f021cc18935dace1a4f9f619f577c04a3913b5d302e24162"
         }
     ]
 }
