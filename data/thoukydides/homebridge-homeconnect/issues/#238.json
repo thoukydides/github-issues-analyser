@@ -1,13 +1,12 @@
 {
     "issue_number": 238,
-    "updated_at": "2026-02-22T09:54:48.366Z",
+    "updated_at": "2026-03-23T06:16:58.254Z",
     "faq": [
         {
-            "question": "What should I do if the logs show code blocks with values marked as `(unrecognised)`?",
-            "answer": "The plugin includes a diagnostic feature that automatically detects when a Home Connect appliance reports a program, option, or state that is not yet defined in the plugin's internal schema. When this occurs, it logs a block of TypeScript code (such as `export type ProgramKey`) with the missing values explicitly tagged as `(unrecognised)`.\n\nIf you see these entries in your logs:\n1. Verify that you are running the latest version of the plugin, as support for new appliance features is added frequently.\n2. If the values remain unrecognised in the latest version, please open a GitHub issue and provide the complete log block. This information allows the maintainer to update the plugin's definitions to support the specific features of your appliance model.\n\nFor instance, support for the `LaundryCare.Washer.Program.SportShoes` program on Siemens WasherDryer models was integrated in version 0.40.0 following a user report of this type.",
-            "semantic_abstract": "Home Connect appliances frequently report undocumented or model-specific API keys for programs and options, triggering a diagnostic log feature in the plugin. This feature outputs TypeScript union types to facilitate the reporting and subsequent integration of these unknown values into the plugin's schema definitions.",
-            "confidence": "high",
-            "hash": "902bdbcd411808fb319ec4a854ce9ddaa61c8370b27f2a55a77a182b3ab08989"
+            "question": "Why does the log contain a block of code marked with `unrecognised`?",
+            "answer": "The plugin logs a block of TypeScript code when it encounters a program key or option from the Home Connect API that is not included in its internal definitions. This typically occurs when a new appliance model or a firmware update introduces a feature or program that the plugin has not yet been updated to support.\n\nTo address this:\n1. Ensure the plugin is updated to the latest version, as support for the key may have already been added.\n2. If the `unrecognised` warning remains, open a new issue on GitHub.\n3. Copy and paste the entire block of code from the log (everything between the `=====` lines) into your issue report.\n\nProviding this log output allows the maintainer to update the plugin's definitions and ensure the new functionality is correctly mapped within Homebridge.",
+            "semantic_abstract": "The plugin identifies discrepancies between the Home Connect API response and its internal schema, logging generated TypeScript union types when unrecognised program keys or options are detected. This diagnostic feature facilitates the reporting and integration of new appliance-specific features into the plugin's codebase.",
+            "hash": "a8154c594e110a083071771967380afc0875f5edb1866b050108d8d4bfc9db16"
         }
     ]
 }
