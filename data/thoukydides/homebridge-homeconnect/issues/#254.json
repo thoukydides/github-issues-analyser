@@ -1,13 +1,12 @@
 {
     "issue_number": 254,
-    "updated_at": "2026-02-24T03:21:34.404Z",
+    "updated_at": "2026-03-24T14:04:32.687Z",
     "faq": [
         {
-            "question": "Why does the log show a block of TypeScript code with `(unrecognised)` comments?",
-            "answer": "The plugin is designed to automatically identify features, options, and states reported by the Home Connect API that have not yet been explicitly defined in the plugin's source code. When the plugin encounters such a value, it generates a diagnostic block of TypeScript in the logs, delimited by equal signs (`===`), and marks the missing entries with `(unrecognised)`. This is a deliberate design choice to capture model-specific variations in appliance firmware. If you see these blocks in your log, please open a GitHub issue and provide the complete log snippet. This allows the maintainer to update the plugin's internal mappings and ensure that all functionality of your specific appliance is correctly supported and exposed to HomeKit.",
-            "semantic_abstract": "The plugin generates diagnostic log snippets containing TypeScript code when it detects unmapped Home Connect API enumeration values or options. This telemetry mechanism allows for the discovery of model-specific appliance features and facilitates their inclusion in the plugin via user-submitted reports.",
-            "confidence": "high",
-            "hash": "ab2e87aff1026e40cec7ba1cf3cbfc97e1ef975a3d33bd0a3945907b0071bada"
+            "question": "What should I do if I see a block of code in my logs with `// (unrecognised)` comments?",
+            "answer": "The plugin includes a mechanism to detect values returned by the Home Connect API that are not yet defined in its internal schema. When this happens, it prints a diagnostic block of TypeScript code to the log, surrounded by equal signs (`===`), with specific values marked with `// (unrecognised)`.\n\nThese logs typically appear when using newer appliance models or updated firmware that introduces new programs, options, or states. To help improve the plugin:\n\n1. Copy the entire block between the `===` separators.\n2. Open a new issue on the GitHub repository.\n3. State the manufacturer and model of your appliance.\n4. Paste the log block into the issue description.\n\nReporting these values allows the maintainer to update the plugin's definitions, ensuring that your appliance's features are correctly mapped and available within HomeKit.",
+            "semantic_abstract": "The plugin's internal schema validation generates diagnostic log blocks when encountering undocumented Home Connect API enum values, specifically tagging them with `// (unrecognised)`. This mechanism facilitates the identification of new appliance states or options from newer firmware, enabling manual updates to the plugin's service and characteristic mapping logic.",
+            "hash": "5a308072d0e2ceb90686002ff6b6dce9898e2a83fe0e8089db2efb4286838143"
         }
     ]
 }
