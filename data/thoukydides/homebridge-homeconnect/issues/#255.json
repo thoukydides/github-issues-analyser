@@ -1,13 +1,12 @@
 {
     "issue_number": 255,
-    "updated_at": "2026-02-24T05:09:45.778Z",
+    "updated_at": "2026-03-24T15:19:15.049Z",
     "faq": [
         {
-            "question": "What should I do if the log shows `Home Connect API returned keys/values that are unrecognised by this plugin`?",
-            "answer": "The plugin maintains an internal database of known appliance programs, options, and settings. Home Connect frequently introduces new features or appliance models that are not yet included in the official API documentation or the plugin's definitions. This is common with newer hardware, such as the Siemens Oven `CM936GCB1/C5`, which introduced `AirFry` heating modes and specific microwave power levels like `360Watt`.\n\nWhen the plugin encounters these unknown identifiers, it logs an alert to help improve the software. If you see this message:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new appliance features is added regularly. Many unrecognised keys reported in older versions are already supported in recent releases.\n2. **Report the values**: If you are already on the latest version, follow the instructions provided in the log. The plugin generates a block of code specifically formatted for inclusion in a new GitHub issue. This allows the maintainer to update the plugin's internal mapping logic for that specific appliance model.\n\nThis reporting mechanism is essential for supporting newer hardware where the manufacturer has not yet updated the public API specifications.",
-            "semantic_abstract": "Home Connect appliances frequently return program or option keys that are absent from the plugin's internal schema due to undocumented API updates or new hardware releases. The plugin identifies these unrecognised values in logs to facilitate user reporting and subsequent integration into the mapping logic, ensuring support for new features such as `AirFry` or specific microwave power levels.",
-            "confidence": "high",
-            "hash": "2835b800386afa3ca826bc93db41d1152479b58fffe80699a02b30aa3f4cb20a"
+            "question": "What should I do if the log reports `Home Connect API returned keys/values that are unrecognised`?",
+            "answer": "This message indicates that your appliance is reporting programs, settings, or options that the plugin does not yet recognise. This typically occurs with newer appliance models or when the Home Connect API introduces features that are not yet included in the official documentation.\n\nTo support these features in future updates, please follow the instructions provided in the log:\n1. Copy the block of code displayed between the `=================` separators.\n2. Click the GitHub link provided in the log message to open a pre-filled issue template.\n3. Paste the copied information into the issue and submit it.\n\nProviding this information allows the maintainer to map these new API keys to the appropriate HomeKit characteristics, ensuring the features can be controlled or monitored through the plugin.",
+            "semantic_abstract": "The Home Connect API frequently exposes new appliance programs and settings that are undocumented or previously unknown to the plugin. The plugin implements a detection mechanism to identify these unrecognised keys in the appliance event stream and provides a structured reporting workflow for users to contribute data required for future service mapping updates.",
+            "hash": "37c5e1a49a59fb7ad277296eb024e883df414628dbdc687a6580fb3a13b0385c"
         }
     ]
 }
