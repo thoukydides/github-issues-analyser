@@ -1,5 +1,12 @@
 {
     "issue_number": 253,
-    "updated_at": "2026-02-23T19:40:10.121Z",
-    "faq": []
+    "updated_at": "2026-03-24T12:34:10.647Z",
+    "faq": [
+        {
+            "question": "Why does the log show `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+            "answer": "The plugin maintains a strict internal schema of known Home Connect API keys, values, and enumeration types. When an appliance reports a value that is not yet defined in this schema—such as a new `ProcessPhase`, `Option`, or `Setting`—the plugin logs a warning. This usually indicates that the appliance is running newer firmware or is a model variant with features not previously encountered by the plugin developers.\n\nThese warnings are non-critical and do not prevent the plugin from operating, but they do mean that certain appliance states may be ignored or incorrectly displayed in HomeKit. To address this, follow the link provided in your log file to create a GitHub issue. This link automatically generates a template containing the technical identifiers required for the maintainer to add support for the new values in a future update. Once reported, support for the new identifiers is typically added in the next plugin release.",
+            "semantic_abstract": "Home Connect API schema enforcement logs warnings when appliances report unmapped status keys or enum values, frequently resulting from firmware updates or new hardware features. These reports facilitate the expansion of the plugin's internal type definitions to support emerging appliance capabilities and ensure accurate mapping to HomeKit characteristics.",
+            "hash": "01f98a1e04e8479078637477726a72c7460286f15fa3e7d6ec23eaded59f8f63"
+        }
+    ]
 }
