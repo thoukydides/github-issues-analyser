@@ -1,13 +1,12 @@
 {
     "issue_number": 248,
-    "updated_at": "2026-02-23T10:31:13.984Z",
+    "updated_at": "2026-03-24T07:40:46.750Z",
     "faq": [
         {
-            "question": "Why does the plugin log TypeScript-like code snippets for Union types or OptionValues?",
-            "answer": "The plugin identifies values reported by the Home Connect API that it does not yet recognise, often because they are undocumented or recently added by the manufacturer. When this occurs, it prints a formatted block of TypeScript-compatible code to the Homebridge logs, often marked with `(unrecognised)`. If you see these snippets in your logs, please open a GitHub issue and provide the full log output. This information allows the maintainer to update the plugin's internal mappings and support new appliance features or statuses in future releases.",
-            "semantic_abstract": "The homebridge-homeconnect plugin identifies unrecognised Home Connect API program options and status values, logging them as formatted code snippets for user reporting. This mechanism enables the capture of technical data from undocumented API extensions to facilitate their integration into the plugin's service mapping.",
-            "confidence": "high",
-            "hash": "683b1f796c8144073f90946b0f86947b67cc693e1b0f777a9114eaa0544cebe4"
+            "question": "Why does my log show a block of code with `unrecognised` Home Connect API values?",
+            "answer": "This plugin includes a diagnostic feature to identify data received from the Home Connect API that does not match its internal definitions. This typically occurs when a new appliance model or a firmware update introduces program options, settings, or status values that are not yet documented in the official API specification.\n\nWhen these values are detected, the plugin outputs a formatted block of TypeScript-like code to the Homebridge log, delimited by lines of `=` characters and containing comments such as `// (unrecognised)`.\n\nIf you encounter these messages:\n1. Verify that you are running the latest version of the plugin, as support for new values is added frequently.\n2. If the messages persist on the latest version, copy the entire block (including the separator lines) and open a new issue on the GitHub repository.\n\nThis information is essential for updating the plugin's internal schema, ensuring that all appliance features and states are correctly mapped to HomeKit.",
+            "semantic_abstract": "The plugin implements a diagnostic capture mechanism for undocumented Home Connect API schema elements, such as process phases or program options, that appear in appliance event streams. These unrecognised values are logged as formatted TypeScript snippets to facilitate the manual update of the plugin's internal data models to maintain compatibility with newer device firmware or models.",
+            "hash": "cee7c424f236ee0936f0b0619d3078a34d1389005570734e8b1a3c061f7fc5eb"
         }
     ]
 }
