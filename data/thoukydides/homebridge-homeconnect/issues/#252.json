@@ -1,5 +1,12 @@
 {
     "issue_number": 252,
-    "updated_at": "2026-02-23T17:42:01.682Z",
-    "faq": []
+    "updated_at": "2026-03-24T11:31:23.161Z",
+    "faq": [
+        {
+            "question": "What should I do if the log reports `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+            "answer": "This message is generated when an appliance provides a program, option, or state identifier that is not yet known to the plugin. This typically occurs with newer appliance models (such as certain Bosch washers or dryers) or following manufacturer firmware updates.\n\nTo resolve this and contribute to the plugin's development:\n1. Open a new issue on the GitHub repository using the link provided in your logs.\n2. Copy the code block provided between the `===` separators. This will look like a TypeScript union type definition (for example, starting with `export type ProgramKey =`).\n3. Paste this block into the \"Log File\" field of the new issue template.\n\nOnce the maintainer has added these definitions to the plugin's internal schema, you will need to update to the latest version of the plugin to make the new features available in HomeKit and remove the warning from your logs. The plugin will continue to function in the meantime, but the specific unrecognised features will be unavailable until updated.",
+            "semantic_abstract": "The plugin utilizes a static internal schema to map Home Connect API features to HomeKit, requiring manual updates when appliances introduce new programs or identifiers. When the API returns unrecognised identifiers due to firmware or hardware revisions, the plugin generates log warnings containing the necessary code snippets to facilitate the inclusion of these new capabilities in future releases.",
+            "hash": "2404fa67664ee49086d606a58dc7532cd5b23bcdfbac531ffddc8b6ecf3bee61"
+        }
+    ]
 }
