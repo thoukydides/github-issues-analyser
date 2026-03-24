@@ -900,16 +900,16 @@
                                     "included_ids": [
                                         "issue-53-27e2"
                                     ]
+                                },
+                                {
+                                    "question": "Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?",
+                                    "answer": "This error occurs when the plugin is run on an outdated version of Node.js, such as Node.js 16 or earlier. Recent versions of the plugin and its dependencies, particularly the `undici` library used for network requests, require modern Web APIs that are only available globally in Node.js 18 and later.\n\nTo resolve this, you should update your Node.js environment to a current Long Term Support (LTS) version (Node.js 18 or Node.js 20). If you are using HOOBS, you may need to update the underlying operating system or follow the HOOBS-specific procedures for upgrading Node.js to ensure compatibility with modern Homebridge plugins.\n\nWhile reverting to an older version of the plugin (such as `v0.30.2`) may temporarily bypass the error, this is not a recommended solution as you will lose access to recent bug fixes, security updates, and new appliance features.",
+                                    "included_ids": [
+                                        "issue-256-069a"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 256,
-                                    "id": "issue-256-069a",
-                                    "question": "Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?",
-                                    "answer": "This error occurs when the plugin is run on an outdated version of Node.js, such as Node.js 16 or earlier. Recent versions of the plugin and its dependencies, particularly the `undici` library used for network requests, require modern Web APIs that are only available globally in Node.js 18 and later.\n\nTo resolve this, you should update your Node.js environment to a current Long Term Support (LTS) version (Node.js 18 or Node.js 20). If you are using HOOBS, you may need to update the underlying operating system or follow the HOOBS-specific procedures for upgrading Node.js to ensure compatibility with modern Homebridge plugins.\n\nWhile reverting to an older version of the plugin (such as `0.30.2`) may temporarily bypass the error, this is not a recommended solution as you will lose access to recent bug fixes, security updates, and new appliance features."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
