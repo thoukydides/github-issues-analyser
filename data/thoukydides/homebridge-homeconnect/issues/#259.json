@@ -1,13 +1,12 @@
 {
     "issue_number": 259,
-    "updated_at": "2026-02-24T09:29:33.159Z",
+    "updated_at": "2026-03-25T08:31:02.111Z",
     "faq": [
         {
-            "question": "Why does the plugin fail with a `Wasm SIMD unsupported` error on older Raspberry Pi models?",
-            "answer": "This error occurs on hardware with CPU architectures that lack SIMD (Single Instruction, Multiple Data) support, such as the ARMv6 processor used in the Raspberry Pi Zero W and early Raspberry Pi models. Certain versions of the `undici` library, a dependency used by this plugin, required these instructions for WebAssembly compilation, leading to a `CompileError` and subsequent Homebridge crash loop. This compatibility issue was addressed in plugin version `v0.41.3`. If you encounter this error, it indicates that you are running an outdated version of the plugin or its dependencies. Ensure you are using the latest release to maintain compatibility with older processor architectures.",
-            "semantic_abstract": "ARMv6 and ARMv7 CPU architectures without SIMD support are incompatible with certain WebAssembly features in Node.js dependencies, leading to `Wasm SIMD unsupported` errors. This hardware limitation requires the use of specific library versions that do not depend on SIMD instructions to ensure compatibility with devices like the Raspberry Pi Zero W.",
-            "confidence": "high",
-            "hash": "62ac0a377df9490efedaa8076f14b74cbbb381a09c985a583d4e737a5f6e1583"
+            "question": "Why does Homebridge continue to crash or reboot even after disabling the plugin in the configuration?",
+            "answer": "Disabling a plugin in the `config.json` prevents Homebridge from initialising that plugin, but it does not necessarily prevent the plugin's code from being loaded. Homebridge typically scans and loads the entry points of all installed plugins during its startup sequence.\n\nIf a plugin or one of its dependencies contains an error that occurs during this loading phase, the Node.js process may crash before it can process the configuration and see that the plugin should be disabled. Common examples of such issues include:\n\n* **Hardware Incompatibility**: Errors such as `Wasm SIMD unsupported` occur when the host CPU (such as the **Raspberry Pi Zero W**) lacks support for modern instructions required by a dependency's WebAssembly code.\n* **Runtime Errors**: Issues caused by incompatible Node.js versions or missing system-level libraries required by a dependency.\n\nIn these scenarios, the only way to restore stability is to **uninstall** the plugin completely. If the Homebridge UI is inaccessible due to a reboot loop, you can uninstall the plugin via the terminal using:\n\n`npm uninstall -g homebridge-homeconnect`",
+            "semantic_abstract": "Homebridge evaluates plugin entry points during the initial loading phase before configuration settings are applied, causing failures like WebAssembly compilation errors on incompatible hardware to trigger crashes even if the plugin is disabled. This behavior requires full uninstallation via the command line to resolve reboot loops when the underlying technical issue, such as a lack of SIMD support on older CPUs, prevents successful module evaluation.",
+            "hash": "ff85b55c759b66bd070787c43d5ba9b5f8beaa2ce056adfb230afeef096801ae"
         }
     ]
 }
