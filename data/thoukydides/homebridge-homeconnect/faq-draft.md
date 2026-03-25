@@ -95,6 +95,7 @@
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
     - [Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?](#why-does-the-plugin-fail-with-referenceerror-readablestream-is-not-defined)
+    - [Why does Homebridge continue to crash or reboot even after disabling the plugin in the configuration?](#why-does-homebridge-continue-to-crash-or-reboot-even-after-disabling-the-plugin-in-the-configuration)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -929,7 +930,7 @@ To resolve this, you should update your Node.js environment to a current Long Te
 
 While reverting to an older version of the plugin (such as `v0.30.2`) may temporarily bypass the error, this is not a recommended solution as you will lose access to recent bug fixes, security updates, and new appliance features.
 
-#### 🚧 Why does Homebridge continue to crash or reboot even after disabling the plugin in the configuration? 🚧
+#### Why does Homebridge continue to crash or reboot even after disabling the plugin in the configuration?
 
 <!-- INCLUDES: issue-259-ff85 -->
 Disabling a plugin in the `config.json` prevents Homebridge from initialising that plugin, but it does not necessarily prevent the plugin's code from being loaded. Homebridge typically scans and loads the entry points of all installed plugins during its startup sequence.

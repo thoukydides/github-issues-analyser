@@ -909,16 +909,16 @@
                                     "included_ids": [
                                         "issue-256-069a"
                                     ]
+                                },
+                                {
+                                    "question": "Why does Homebridge continue to crash or reboot even after disabling the plugin in the configuration?",
+                                    "answer": "Disabling a plugin in the `config.json` prevents Homebridge from initialising that plugin, but it does not necessarily prevent the plugin's code from being loaded. Homebridge typically scans and loads the entry points of all installed plugins during its startup sequence.\n\nIf a plugin or one of its dependencies contains an error that occurs during this loading phase, the Node.js process may crash before it can process the configuration and see that the plugin should be disabled. Common examples of such issues include:\n\n* **Hardware Incompatibility**: Errors such as `Wasm SIMD unsupported` occur when the host CPU (such as the **Raspberry Pi Zero W**) lacks support for modern instructions required by a dependency's WebAssembly code.\n* **Runtime Errors**: Issues caused by incompatible Node.js versions or missing system-level libraries required by a dependency.\n\nIn these scenarios, the only way to restore stability is to **uninstall** the plugin completely. If the Homebridge UI is inaccessible due to a reboot loop, you can uninstall the plugin via the terminal using:\n\n`npm uninstall -g homebridge-homeconnect`",
+                                    "included_ids": [
+                                        "issue-259-ff85"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 259,
-                                    "id": "issue-259-ff85",
-                                    "question": "Why does Homebridge continue to crash or reboot even after disabling the plugin in the configuration?",
-                                    "answer": "Disabling a plugin in the `config.json` prevents Homebridge from initialising that plugin, but it does not necessarily prevent the plugin's code from being loaded. Homebridge typically scans and loads the entry points of all installed plugins during its startup sequence.\n\nIf a plugin or one of its dependencies contains an error that occurs during this loading phase, the Node.js process may crash before it can process the configuration and see that the plugin should be disabled. Common examples of such issues include:\n\n* **Hardware Incompatibility**: Errors such as `Wasm SIMD unsupported` occur when the host CPU (such as the **Raspberry Pi Zero W**) lacks support for modern instructions required by a dependency's WebAssembly code.\n* **Runtime Errors**: Issues caused by incompatible Node.js versions or missing system-level libraries required by a dependency.\n\nIn these scenarios, the only way to restore stability is to **uninstall** the plugin completely. If the Homebridge UI is inaccessible due to a reboot loop, you can uninstall the plugin via the terminal using:\n\n`npm uninstall -g homebridge-homeconnect`"
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
