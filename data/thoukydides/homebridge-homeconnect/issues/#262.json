@@ -1,13 +1,12 @@
 {
     "issue_number": 262,
-    "updated_at": "2026-02-24T12:03:12.395Z",
+    "updated_at": "2026-03-25T11:27:48.769Z",
     "faq": [
         {
-            "question": "Why does the log show unrecognised `ProgramKey` or other API values?",
-            "answer": "The Home Connect API frequently uses identifiers for programs, options, and statuses that are not included in the official developer documentation. When the plugin encounters a value it does not recognise, it logs a snippet of TypeScript code (for example, marking a `ProgramKey` as `unrecognised`). This is expected behaviour when using appliances with newer firmware or regional specialisations, such as identifying cycle-specific identifiers like `LaundryCare.Washer.Program.Spin.SpinDrain` or `LaundryCare.Washer.Program.Rinse`. Users should first ensure they are running the latest version of the plugin; if the logs persist, providing these snippets in a GitHub issue allows the maintainer to map these undocumented features for all users.",
-            "semantic_abstract": "Home Connect API implementations often include appliance-specific or region-specific identifiers that are absent from official documentation. The plugin identifies these mismatches and logs them as unrecognised values to facilitate manual mapping of undocumented firmware features into the plugin's service definitions.",
-            "confidence": "high",
-            "hash": "4486d2fdab245e91ae6b17b329af82e6200eedec8ada4aadac327fe77c1b2e1a"
+            "question": "How do I report unrecognised Home Connect programs or options?",
+            "answer": "The plugin is designed to identify and log values from the Home Connect API that it does not yet recognise. When this occurs, a block of pseudo-TypeScript code is written to the Homebridge log, featuring annotations such as `// (unrecognised)`. This provides a structured way for users to report undocumented features of their specific appliance models.\n\nIf you encounter these logs, please follow these steps:\n1. Verify that you are using the latest version of the plugin, as the values may have already been added in a recent update.\n2. Copy the block of generated code, typically starting with the line `// Union types`.\n3. Create a new issue on the GitHub repository, including the model number of your appliance and the copied log snippet.\n\nThis information is used to update the plugin's internal schema, enabling support for the newly identified programs and settings.",
+            "semantic_abstract": "The plugin's logging mechanism identifies undocumented Home Connect API constants by generating TypeScript-style definitions with `(unrecognised)` annotations. This design facilitates the identification and inclusion of new appliance programs and options into the plugin's internal schema via user-reported log data.",
+            "hash": "e72f5ecf3206cb401ccd1a9f75d7edac506cb199c1cd963c66e0e89ab5f8c5ad"
         }
     ]
 }
