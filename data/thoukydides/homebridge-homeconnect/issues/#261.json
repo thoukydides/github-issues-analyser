@@ -1,5 +1,12 @@
 {
     "issue_number": 261,
-    "updated_at": "2026-02-24T11:25:21.567Z",
-    "faq": []
+    "updated_at": "2026-03-25T10:32:12.340Z",
+    "faq": [
+        {
+            "question": "What should I do if the log shows `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+            "answer": "This warning occurs when an appliance provides data—such as a new cooking program, option, or status—that has not yet been mapped within the plugin. This is common with newer appliance models or following firmware updates that introduce features not yet covered by the official Home Connect API documentation.\n\nWhile the plugin will continue to function, the specific unrecognised feature may be missing from HomeKit or displayed with a generic identifier. To resolve this:\n\n1. **Check for updates**: Ensure you are running the latest version of the `homebridge-homeconnect` plugin, as support for new appliance features is added frequently.\n2. **Report the keys**: If you are already on the latest version, follow the instructions provided in your Homebridge logs. The log output includes a pre-formatted GitHub link that will automatically populate a new issue with the technical identifiers required to add support for these features.",
+            "semantic_abstract": "Home Connect appliances frequently introduce new programs and settings via firmware updates or new hardware releases that are not yet present in the official API documentation or the plugin's internal mapping. This mismatch requires the manual identification and integration of undocumented identifiers into the plugin's schema to ensure all appliance features are correctly exposed to HomeKit.",
+            "hash": "f0a25624da16d201e0a56b2aa43e3d551906e9f5c64f12fc879b6a198dff7f00"
+        }
+    ]
 }
