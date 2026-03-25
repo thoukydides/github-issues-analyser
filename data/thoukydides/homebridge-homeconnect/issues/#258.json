@@ -1,13 +1,12 @@
 {
     "issue_number": 258,
-    "updated_at": "2026-02-24T08:06:45.915Z",
+    "updated_at": "2026-03-25T07:40:00.808Z",
     "faq": [
         {
-            "question": "Why does the log show unrecognised or undocumented programmes and options?",
-            "answer": "The Home Connect API frequently employs programmes, options, and enum values that are not documented in the official specification. This is particularly common with newer appliance models, such as the Siemens iQ700 series, or following firmware updates. When the plugin identifies an unmapped value, it generates a diagnostic log block to help identify the missing data.\n\nIf your logs contain the text `(unrecognised)` alongside programme or option keys:\n1. **Update the plugin**: Many unmapped values are added in new releases. For example, support for several washing and drying programmes (like `WoolBasket` and `Steaming`) was added in v0.41.3 following user reports.\n2. **Report new values**: If the values persist on the latest version, the logs indicate features that the plugin cannot yet interpret. Copy the diagnostic block (the sections starting with `// Union types` or `// Option`) into a new GitHub issue. These snapshots are essential for updating the plugin's internal definitions and ensuring all appliance features are correctly exposed to HomeKit.",
-            "semantic_abstract": "Home Connect appliances frequently use undocumented programme keys and option values that differ from the published API specification, especially on newer hardware models like the Siemens iQ700 series. The plugin implements a detection mechanism that logs these unmapped identifiers to assist in updating internal type definitions and service mappings.",
-            "confidence": "high",
-            "hash": "d2a3ec87031bdd5428f09e1628dc5ff196a525a8676c6512d1dab3975bb9e655"
+            "question": "Why does the log show TypeScript code with `(unrecognised)` tags?",
+            "answer": "The plugin includes a mechanism to identify programs, options, and status keys returned by the Home Connect API that are not yet defined in its internal schema. This usually happens because the API is providing undocumented values for specific appliance models or new firmware versions.\n\nWhen this occurs, the plugin generates a block of TypeScript code in the logs, marking the unknown items with `// (unrecognised)`. This is intended to help users report new appliance features so they can be officially supported.\n\nTo have these features added to the plugin:\n1. Copy the entire log block (including the `=======` separator lines).\n2. Create a new issue on the GitHub repository.\n3. Provide the log block and the model number of the appliance involved.\n\nOnce added to the plugin, these features can be correctly mapped to HomeKit services and characteristics.",
+            "semantic_abstract": "The plugin performs runtime validation of Home Connect API responses against its internal schema, logging any undocumented program keys or enum values as `(unrecognised)` TypeScript snippets. This mechanism bridges gaps between the API specification and observed device behaviour, requiring manual schema updates to support new appliance features.",
+            "hash": "e9811d8b66dbe5419e83cb367e3b58fc9a468426874f8128e3635da0c4e4c149"
         }
     ]
 }
