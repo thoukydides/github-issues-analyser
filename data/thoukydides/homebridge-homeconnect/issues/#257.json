@@ -1,13 +1,12 @@
 {
     "issue_number": 257,
-    "updated_at": "2026-02-24T06:36:27.911Z",
+    "updated_at": "2026-03-25T06:13:27.281Z",
     "faq": [
         {
-            "question": "What should I do if my logs show unrecognised programs or process phases?",
-            "answer": "The plugin includes a diagnostic feature to identify and report values returned by the Home Connect API that are not yet defined in its internal schema. These appear in the logs as a block of TypeScript-like code snippets containing the label `(unrecognised)`. This typically occurs when a new appliance model or firmware update introduces features that are missing from the official Home Connect API documentation.\n\nIf you see these entries in your log:\n1. Ensure you are running the latest version of the plugin, as support for new programs and phases is added frequently.\n2. If the values persist on the latest version, open a GitHub issue and provide the complete log block. This allows the maintainers to identify the missing strings and incorporate them into the next release.\n\nCommon examples of undocumented values that have been added include specific appliance programs like `LaundryCare.Dryer.Program.Bedlinens` or operational phases such as `LaundryCare.Common.EnumType.ProcessPhase.DetectingTextile`.",
-            "semantic_abstract": "The plugin identifies and logs undocumented Home Connect API values, such as programs or process phases, using `(unrecognised)` markers in a TypeScript-formatted block. This diagnostic behaviour allows users to report new or model-specific features that require manual addition to the plugin's internal mapping to ensure full compatibility with newer appliances.",
-            "confidence": "high",
-            "hash": "721b1c43cb234f4b845a037f023ad765ee278171599eeb1807b56daaba11ff5e"
+            "question": "Why does the log show `(unrecognised)` programs or settings?",
+            "answer": "Home Connect frequently introduces new features, programmes, or process phases in appliance firmware that are not yet included in the official API documentation. When the plugin encounters one of these unknown identifiers, it captures the technical details and prints a formatted block of code to the Homebridge log.\n\nThis output is designed to be shared with the maintainer so that support for the new functionality can be added to the plugin. If you see these entries in your log:\n\n1. Copy the block of log text starting from `// Union types` through to the end of the `OptionValues` interface.\n2. Create a new issue on GitHub and paste this information, along with the model names of the affected appliances.\n\nSupport for these new identifiers is typically added in the next plugin release. After updating, the `(unrecognised)` labels will be removed and the corresponding features will be correctly mapped within HomeKit.",
+            "semantic_abstract": "Home Connect appliances often transmit undocumented identifiers for new programmes or states that are not yet present in the plugin type definitions. The plugin detects these unknown values and generates structured log output to facilitate user reporting, enabling the maintainer to update the mapping between API keys and HomeKit functionality.",
+            "hash": "6688d79f7e7d20ce610b284997496fcc6312ab5f22266312e350c330acc464df"
         }
     ]
 }
