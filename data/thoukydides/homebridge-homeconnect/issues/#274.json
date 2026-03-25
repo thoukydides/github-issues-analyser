@@ -1,5 +1,12 @@
 {
     "issue_number": 274,
-    "updated_at": "2026-02-25T03:21:53.929Z",
-    "faq": []
+    "updated_at": "2026-03-25T15:21:09.830Z",
+    "faq": [
+        {
+            "question": "Why is there TypeScript code in my logs with `(unrecognised)` tags?",
+            "answer": "The plugin includes a discovery mechanism to identify features reported by the Home Connect API that are not yet part of its internal definitions. When it encounters an unknown program, option, or setting, it generates a block of TypeScript code in the log to help the maintainer add support for it.\n\nIf you see these blocks in your log:\n1. **Update the plugin**: Ensure you are using the latest version, as support for new appliances and programs is added frequently. Many reported unrecognised values are already fixed in newer releases.\n2. **Report the snippet**: If the log persists on the latest version, copy the entire block (including the `====` separators) and open a new GitHub issue. This data is essential for mapping the API keys to user-friendly names and HomeKit functionality.\n\nThese log entries do not indicate a system failure; they represent the discovery of new appliance capabilities that have not yet been integrated into the plugin.",
+            "semantic_abstract": "The plugin monitors for Home Connect API keys that lack internal mappings and generates diagnostic TypeScript code snippets in the system logs. This mechanism identifies undocumented programs or options, enabling users to report new appliance features for manual integration into the plugin's schema.",
+            "hash": "906088e2eb8956e875d2907e67737bd4f8124da76c759153e7e9346fbd2b87ed"
+        }
+    ]
 }
