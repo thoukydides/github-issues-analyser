@@ -1,12 +1,12 @@
 {
     "issue_number": 265,
-    "updated_at": "2026-02-24T17:35:38.483Z",
+    "updated_at": "2026-03-25T12:32:20.660Z",
     "faq": [
         {
-            "question": "What should I do if the logs contain a block of code with `(unrecognised)` values?",
-            "answer": "The plugin is designed to detect values returned by the Home Connect API that are not yet documented or supported, such as specific appliance programmes or configuration settings. When these are encountered, a formatted block of TypeScript code is output to the logs, typically starting with `// Union types` and containing `(unrecognised)` comments next to new keys. These blocks are intended to assist in adding support for new features. If you see such a block in your logs, please first ensure you are running the latest version of the plugin. If the values are still reported as unrecognised, open a new GitHub issue and paste the entire block of code from the logs. This allows the maintainer to update the plugin's internal definitions and expose the new functionality to HomeKit.",
-            "semantic_abstract": "Home Connect API implementations frequently return values for programmes, options, or statuses that are not present in official documentation. The plugin detects these discrepancies and generates diagnostic code blocks in the logs to facilitate reporting and subsequent integration into the plugin's internal type definitions.",
-            "hash": "872dfed2ac6f0f65efe64c50d0912e65ac08fb6467748c96a1e7c678700b61e6"
+            "question": "Why does the log contain a block of code with `ProgramKey` and `unrecognised` values?",
+            "answer": "The plugin logs a specific block of TypeScript code when it encounters a program, option, or state key from the Home Connect API that it does not currently recognise. These keys are often undocumented or specific to newer appliance models.\n\nIf your log contains a section delimited by `=====` lines and includes comments such as `// (unrecognised)`, please follow these steps:\n1. Ensure you are running the latest version of the plugin, as support for new keys is added frequently.\n2. If the message persists, copy the entire block of code from the log.\n3. Open a new issue on GitHub and provide the manufacturer and model number of your appliance (for example, Siemens Washer `WG56B2A9NL/11`) along with the log snippet.\n\nThis information allows the maintainer to update the plugin's internal definitions, ensuring that all appliance features are correctly identified and supported.",
+            "semantic_abstract": "Home Connect appliances often implement undocumented API program keys or settings which the plugin captures and logs as TypeScript union types. This diagnostic output allows users to report new appliance features for formal inclusion in the plugin's supported API schema.",
+            "hash": "c490487dfd4a5351b4111fb61be7e7215353f9a92e4b241ed979aecde78eab7d"
         }
     ]
 }
