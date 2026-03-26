@@ -170,7 +170,6 @@ The `OAuth Flow` setting is fixed at the time of application creation. If it was
 
 #### Why does authorisation fail with a `403 Forbidden` error?
 
-<!-- INCLUDES: issue-275-c0e7 -->
 This error typically indicates that the Home Connect API is geo-blocked in your region (for example, in Russia). This results in a `403 Forbidden` response when the plugin attempts to connect to authorisation endpoints such as `POST /security/oauth/device_authorization`. This is a restriction imposed by the service provider or regional network infrastructure and cannot be bypassed by the plugin. Users in affected regions may experience similar connectivity issues with the official Home Connect app unless a VPN is used.
 
 #### How do I configure the plugin for a Home Connect account in Mainland China?
@@ -184,11 +183,18 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
+#### 🚧 Why does the Home Connect API return `403 Forbidden` during authorisation? 🚧
+
+<!-- INCLUDES: issue-275-9b14 -->
+A `403 Forbidden` error during the `POST /security/oauth/device_authorization` request indicates that the Home Connect API servers are explicitly rejecting the connection from your network. This is typically caused by regional geo-blocking or service restrictions implemented by the provider (for example, in Russia).
+
+If the Home Connect API is restricted in your region, the plugin will be unable to establish an initial connection or refresh authorisation tokens. This is a network-level restriction imposed by the service provider, and the plugin does not provide mechanisms to bypass these geo-blocks.
+
 ### Home Connect API Errors
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
 
-<!-- INCLUDES: issue-39-d44c issue-74-f147 issue-268-28a5 issue-269-720a issue-378-832c -->
+<!-- INCLUDES: issue-39-d44c issue-74-f147 issue-268-28a5 issue-378-832c -->
 The Home Connect API enforces very strict [rate limits](https://api-docs.home-connect.com/general/?#rate-limiting). Exceeding any of these limits triggers a `429 Too Many Requests` error and a lockout for up to 24 hours. The plugin handles this by pausing all API requests until the `retry-after` time returned by the API, displaying a countdown in the logs.
 
 Most of the limits reset after 1 or 10 minutes, but there is also a daily quota of 1,000 requests. Certain conditions can cause these limits to be reached rapidly:
@@ -262,7 +268,7 @@ The error `Home Connect API error: Home Connect subsystem not available [503]` i
 
 #### Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?
 
-<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-276-cc5b issue-351-80b2 -->
+<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-351-80b2 -->
 These are standard networking errors indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com` (or `api.home-connect.cn` for users in China).
 
 To resolve this, ensure your Homebridge server has a stable internet connection and check the following:
@@ -315,6 +321,28 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
+
+#### 🚧 Why does the log show `Waiting ... before issuing Home Connect API request`? 🚧
+
+<!-- INCLUDES: issue-269-8032 -->
+This message indicates that the plugin has hit a Home Connect API rate limit. The Home Connect API enforces six distinct rate limits; when any of these are exceeded, the plugin must pause all communication with the servers until the limit resets. 
+
+It is common to encounter this message during the initial discovery phase after installing or updating the plugin. During this time, the plugin must issue a significant number of requests to retrieve metadata for all appliances, including their supported programs, features, and configuration options. If you see this message, allow the plugin to wait for the specified duration; it will automatically resume operation once the rate limit window has passed.
+
+#### 🚧 Why does the error `getaddrinfo ENOTFOUND api.home-connect.com` appear in the logs? 🚧
+
+<!-- INCLUDES: issue-276-249a -->
+The `ENOTFOUND` error is a DNS resolution failure. It indicates that the system hosting Homebridge cannot translate the hostname `api.home-connect.com` into an IP address. This is typically caused by local network configuration issues or problems with the configured DNS provider, rather than a bug within the plugin itself.
+
+To troubleshoot this issue:
+1. Verify the network connectivity of the host machine (e.g., Raspberry Pi or server).
+2. Test DNS resolution from a terminal on the same system using the following commands:
+   - `nslookup api.home-connect.com`
+   - `dig api.home-connect.com`
+3. If these commands fail, check your host's network settings. Common causes include:
+   - Incorrect DNS settings provided via DHCP from your router.
+   - Temporary outages with your ISP's DNS servers.
+4. As a workaround, you can manually configure your host machine to use a reliable public DNS provider, such as Google (`8.8.8.8`) or Cloudflare (`1.1.1.1`).
 
 ### Local/Remote Control
 
@@ -382,7 +410,7 @@ When these disconnections occur, the plugin logs the event and updates the HomeK
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, code blocks, or an `unrecognised by this plugin` warning?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise (such as the `LearningDishwasher` program, the `CoffeePot` beverage type, or transitions from numeric to enumerated settings like `ColorTemperature` for hoods).
 
 When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code (e.g. `export interface EventNotifyValues`) and delimited by `=====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
@@ -426,7 +454,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-273-c05e issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:
@@ -577,6 +605,54 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
+#### 🚧 Why have some program options, such as temperature or spin speed, disappeared from my appliance in HomeKit? 🚧
+
+<!-- INCLUDES: issue-273-cef7 -->
+The plugin dynamically discovers supported programs and their configurable options (such as `SpinSpeed`, `Temperature`, or `DryingTarget`) by querying the Home Connect API. If the API reports that a program no longer supports certain options, or returns an empty list of options, the plugin must respect this and will remove those controls from HomeKit to prevent invalid commands being sent.
+
+This behaviour is typically caused by:
+1.  Transient issues with the Home Connect cloud services failing to retrieve full metadata from your appliance.
+2.  Appliance firmware quirks where certain programs are temporarily marked as having no options.
+3.  The appliance being in a state where options cannot be modified (e.g. a cycle is already locked in or consumables are missing).
+
+If options disappear, you can force the plugin to re-read the supported capabilities from the API by triggering the HomeKit `Identify` routine for that appliance (for example, by using the **ID** button in the Eve app). If the options do not reappear immediately, it may indicate a larger issue with the Home Connect cloud servers which usually resolves itself within a few days.
+
+#### 🚧 What should I do if the logs show a block of code with `(unrecognised)` Home Connect API values? 🚧
+
+<!-- INCLUDES: issue-277-7b13 -->
+The plugin contains a diagnostic feature that identifies programs, options, or settings reported by an appliance that are not currently known to the software. These are logged as a TypeScript-style interface block (e.g. `export interface OptionValues`) marked with `// (unrecognised)` comments.
+
+This typically indicates that the appliance firmware has been updated or that the appliance is a newer model with features not yet mapped in the plugin's metadata. To resolve this:
+
+1. **Update the plugin**: Ensure you are running the latest version, as support for new API values is added frequently.
+2. **Report missing values**: If the values persist on the latest version, copy the full log block—including the `=====` delimiters and the `interface` definition—and open a new issue on the GitHub repository. 
+3. **Provide context**: Include the specific appliance model (e.g. `SMS6HMI03Z/15`) to assist the maintainer in identifying the correct mapping.
+
+Once the maintainer adds these identifiers to the plugin's source code, the associated features will be correctly exposed to HomeKit.
+
+#### 🚧 Why does the log show a block of code with `(unrecognised)` values? 🚧
+
+<!-- INCLUDES: issue-278-36c0 -->
+The Home Connect API frequently provides programs, options, or settings that are not officially documented or vary between specific appliance models. When the plugin encounters a value it does not recognise, it outputs a formatted block of TypeScript code to the logs, delimited by lines of `=` characters.
+
+This is a diagnostic feature intended to identify missing functionality. If you see this output:
+1. Check if a newer version of the plugin is available, as the values may have already been added.
+2. If the issue persists, copy the complete log block (including the `export type` and `// (unrecognised)` lines).
+3. Open a new issue on GitHub and provide the snippet along with your appliance's model number.
+
+The maintainer uses these snippets to update the plugin's internal definitions, ensuring that the unrecognised features are correctly mapped and exposed to HomeKit in future releases.
+
+#### 🚧 What should I do if the logs show `unrecognised` program keys or values? 🚧
+
+<!-- INCLUDES: issue-279-4938 -->
+The plugin maintains an internal library of known Home Connect API identifiers used to map appliance features to HomeKit. When an appliance reports a value that is not yet in this library—typically due to a firmware update or a newer appliance model—the plugin outputs a formatted block of code to the logs, with new identifiers marked as `(unrecognised)`.
+
+If you encounter this log block:
+1. Update to the **latest version** of the plugin, as support for new values is added frequently.
+2. If the values remain unrecognised on the latest version, copy the entire section between the `====` separators and open a new issue on the GitHub repository.
+
+Reporting these values is the primary way that support for new appliance features and programmes is added to the plugin.
+
 ### Appliance Status
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
@@ -640,7 +716,6 @@ The plugin logs all status information reported by the API. There is no configur
 
 #### Why does the log periodically show `Found X appliances (0 added, 0 removed)`?
 
-<!-- INCLUDES: issue-272-e11d -->
 This message appears because the plugin periodically polls the Home Connect API to discover any new or removed appliances. This ensures that changes to your Home Connect account are reflected in Homebridge without requiring a manual restart.
 
 There are plans to replace this polling mechanism with a more efficient event-based approach using `PAIRED` and `DEPAIRED` events from the Home Connect event stream. Once this enhancement is implemented, these log messages will only be generated when an appliance is actually added or removed from the account.
@@ -680,6 +755,13 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
+#### 🚧 Why does the plugin periodically log `Found X appliances (0 added, 0 removed)` even when nothing has changed? 🚧
+
+<!-- INCLUDES: issue-272-a6d5 -->
+The plugin currently uses a periodic polling mechanism to check the Home Connect appliance list for any changes. This ensures that new appliances are discovered and removed appliances are correctly handled. The log message `Found X appliances (0 added, 0 removed)` is a result of this routine check and provides confirmation that the plugin is successfully communicating with the Home Connect API.
+
+This behaviour is a deliberate design choice to maintain visibility into the plugin's background activity. However, there are plans to transition from periodic polling to an event-based system using `PAIRED` and `DEPAIRED` events. Once this architectural change is implemented, the plugin will only log appliance discovery information when an actual change in the list is detected.
 
 ## Apple HomeKit
 
