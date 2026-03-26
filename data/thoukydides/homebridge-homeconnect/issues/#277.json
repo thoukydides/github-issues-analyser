@@ -1,12 +1,12 @@
 {
     "issue_number": 277,
-    "updated_at": "2026-02-25T12:00:51.704Z",
+    "updated_at": "2026-03-26T12:39:59.690Z",
     "faq": [
         {
-            "question": "Why do my logs show `(unrecognised)` next to some appliance options?",
-            "answer": "The plugin logs appliance capabilities that are not currently supported or are undocumented in the Home Connect API specification. These items are marked with `(unrecognised)` within a log block formatted as a TypeScript `interface` (such as `OptionValues` or `SettingValues`). If these appear in your logs, please report them by opening a GitHub issue and including the relevant log snippet. This information allows the maintainer to update the plugin to support these additional features and settings.",
-            "semantic_abstract": "Home Connect appliances may expose undocumented API options or settings that the plugin does not natively recognise. The plugin identifies these unknown keys during the appliance discovery process and logs them with an `(unrecognised)` annotation, facilitating the technical expansion of the plugin's supported feature set via user-provided log data.",
-            "hash": "728a20ef8e5f7769d21413c3923ddc5d898101b83cb97d6f5742433f3e5f9f7d"
+            "question": "What should I do if the logs show a block of code with `(unrecognised)` Home Connect API values?",
+            "answer": "The plugin contains a diagnostic feature that identifies programs, options, or settings reported by an appliance that are not currently known to the software. These are logged as a TypeScript-style interface block (e.g. `export interface OptionValues`) marked with `// (unrecognised)` comments.\n\nThis typically indicates that the appliance firmware has been updated or that the appliance is a newer model with features not yet mapped in the plugin's metadata. To resolve this:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new API values is added frequently.\n2. **Report missing values**: If the values persist on the latest version, copy the full log block—including the `=====` delimiters and the `interface` definition—and open a new issue on the GitHub repository. \n3. **Provide context**: Include the specific appliance model (e.g. `SMS6HMI03Z/15`) to assist the maintainer in identifying the correct mapping.\n\nOnce the maintainer adds these identifiers to the plugin's source code, the associated features will be correctly exposed to HomeKit.",
+            "semantic_abstract": "Home Connect appliances frequently introduce new identifiers for programs and options via firmware updates or new hardware revisions. The plugin's diagnostic validation detects these undocumented API keys and logs them in a structured format to facilitate reporting, allowing the maintainer to update internal mappings and expose the new functionality within HomeKit.",
+            "hash": "7b13a45a2fcb48166f2c47d3346a179ccf8f1875a9901192c035bed71532c50f"
         }
     ]
 }
