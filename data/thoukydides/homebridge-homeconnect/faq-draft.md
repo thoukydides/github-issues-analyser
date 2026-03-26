@@ -379,30 +379,31 @@ When these disconnections occur, the plugin logs the event and updates the HomeK
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, code blocks, or an `unrecognised by this plugin` warning?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise (such as the `LearningDishwasher` program, the `CoffeePot` beverage type, or transitions from numeric to enumerated settings like `ColorTemperature` for hoods).
 
-When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code (e.g. `export interface EventNotifyValues`) and delimited by `=====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
+When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code (e.g. `export interface EventNotifyValues` or `export interface OptionValues`) and delimited by `=====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
 If you observe these messages:
 
 1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
-2. **Report the values**: Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
-3. **Provide the snippet**: Paste the entire technical diagnostic block (including the `=====` separators) into the **Log File** field of the issue template. This allows the maintainer to map the new identifiers to appropriate HomeKit services.
+2. **Report the values**: Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue. Alternatively, open a new issue manually.
+3. **Provide the snippet and context**: Paste the entire technical diagnostic block (including the `=====` separators and `// (unrecognised)` comments) into the issue. Also include your appliance's specific model number (e.g. `SMS6HMI03Z/15`) to help the maintainer identify the correct mapping.
 
 Once added, the warning will disappear and the features will be correctly mapped.
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
-The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing or appear as `currently unavailable`:
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features, or specific options like `SpinSpeed`, `Temperature`, or `DryingTarget`, to be missing or appear as `currently unavailable`:
 
 - **API Capability Lists**: The Home Connect API provides two separate lists: a complete list of all programs supported by the hardware, and a list of programs that can currently be selected. The plugin must be able to select a program to read its supported options. If a program is advertised but cannot be selected, the plugin will log an `Info` message.
+- **Transient Cloud Issues**: Temporary issues with the Home Connect cloud services can occasionally cause the API to fail to retrieve full metadata or return an empty list of options for your appliance. This usually resolves itself within a few days.
 - **Private API Limitations**: The official Home Connect app and partners like IFTTT use a private API. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
-- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
+- **Appliance Settings and Firmware**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu. Additionally, some firmware versions may temporarily mark certain programs as having no options.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (water, detergent, coffee beans) are missing.
 
-If a program is unexpectedly missing, ensure the appliance is powered on and idle, manually select it on the physical panel for one minute, and then trigger the plugin to re-read details using the HomeKit **Identify** method.
+If features are unexpectedly missing, ensure the appliance is powered on and idle, manually select the program on the physical panel for one minute, and then trigger the plugin to re-read details using the HomeKit **Identify** method.
 
 #### Why are fan controls missing for my integrated venting hob?
 
@@ -573,54 +574,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely to be due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why have some program options, such as temperature or spin speed, disappeared from my appliance in HomeKit? 🚧
-
-<!-- INCLUDES: issue-273-cef7 -->
-The plugin dynamically discovers supported programs and their configurable options (such as `SpinSpeed`, `Temperature`, or `DryingTarget`) by querying the Home Connect API. If the API reports that a program no longer supports certain options, or returns an empty list of options, the plugin must respect this and will remove those controls from HomeKit to prevent invalid commands being sent.
-
-This behaviour is typically caused by:
-1.  Transient issues with the Home Connect cloud services failing to retrieve full metadata from your appliance.
-2.  Appliance firmware quirks where certain programs are temporarily marked as having no options.
-3.  The appliance being in a state where options cannot be modified (e.g. a cycle is already locked in or consumables are missing).
-
-If options disappear, you can force the plugin to re-read the supported capabilities from the API by triggering the HomeKit `Identify` routine for that appliance (for example, by using the **ID** button in the Eve app). If the options do not reappear immediately, it may indicate a larger issue with the Home Connect cloud servers which usually resolves itself within a few days.
-
-#### 🚧 What should I do if the logs show a block of code with `(unrecognised)` Home Connect API values? 🚧
-
-<!-- INCLUDES: issue-277-7b13 -->
-The plugin contains a diagnostic feature that identifies programs, options, or settings reported by an appliance that are not currently known to the software. These are logged as a TypeScript-style interface block (e.g. `export interface OptionValues`) marked with `// (unrecognised)` comments.
-
-This typically indicates that the appliance firmware has been updated or that the appliance is a newer model with features not yet mapped in the plugin's metadata. To resolve this:
-
-1. **Update the plugin**: Ensure you are running the latest version, as support for new API values is added frequently.
-2. **Report missing values**: If the values persist on the latest version, copy the full log block—including the `=====` delimiters and the `interface` definition—and open a new issue on the GitHub repository. 
-3. **Provide context**: Include the specific appliance model (e.g. `SMS6HMI03Z/15`) to assist the maintainer in identifying the correct mapping.
-
-Once the maintainer adds these identifiers to the plugin's source code, the associated features will be correctly exposed to HomeKit.
-
-#### 🚧 Why does the log show a block of code with `(unrecognised)` values? 🚧
-
-<!-- INCLUDES: issue-278-36c0 -->
-The Home Connect API frequently provides programs, options, or settings that are not officially documented or vary between specific appliance models. When the plugin encounters a value it does not recognise, it outputs a formatted block of TypeScript code to the logs, delimited by lines of `=` characters.
-
-This is a diagnostic feature intended to identify missing functionality. If you see this output:
-1. Check if a newer version of the plugin is available, as the values may have already been added.
-2. If the issue persists, copy the complete log block (including the `export type` and `// (unrecognised)` lines).
-3. Open a new issue on GitHub and provide the snippet along with your appliance's model number.
-
-The maintainer uses these snippets to update the plugin's internal definitions, ensuring that the unrecognised features are correctly mapped and exposed to HomeKit in future releases.
-
-#### 🚧 What should I do if the logs show `unrecognised` program keys or values? 🚧
-
-<!-- INCLUDES: issue-279-4938 -->
-The plugin maintains an internal library of known Home Connect API identifiers used to map appliance features to HomeKit. When an appliance reports a value that is not yet in this library—typically due to a firmware update or a newer appliance model—the plugin outputs a formatted block of code to the logs, with new identifiers marked as `(unrecognised)`.
-
-If you encounter this log block:
-1. Update to the **latest version** of the plugin, as support for new values is added frequently.
-2. If the values remain unrecognised on the latest version, copy the entire section between the `====` separators and open a new issue on the GitHub repository.
-
-Reporting these values is the primary way that support for new appliance features and programmes is added to the plugin.
 
 ### Appliance Status
 
