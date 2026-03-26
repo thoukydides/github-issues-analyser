@@ -1,12 +1,12 @@
 {
     "issue_number": 272,
-    "updated_at": "2026-02-25T09:28:22.545Z",
+    "updated_at": "2026-03-26T10:35:56.114Z",
     "faq": [
         {
-            "question": "Why does the log show `Found X appliances (0 added, 0 removed)` periodically?",
-            "answer": "This message appears because the plugin currently performs periodic polling of the Home Connect API to discover any new or removed appliances. This ensures that changes to your Home Connect account are reflected in Homebridge without requiring a manual restart.\n\nThe maintainer plans to replace this polling mechanism with a more efficient event-based approach using `PAIRED` and `DEPAIRED` events from the Home Connect event stream. Once this enhancement is implemented, these log messages will only be generated when an appliance is actually added or removed from the account.",
-            "semantic_abstract": "The plugin's periodic polling of the Home Connect API for appliance discovery results in recurring log messages showing the count of found appliances. A planned transition to event-based discovery using PAIRED and DEPAIRED notifications will eliminate these periodic status updates in favour of activity-based logging.",
-            "hash": "e11d5f3f8af9ea9c301cae9b1122cf09a60eab50682d1f6dcd61aa31a5757ca7"
+            "question": "Why does the plugin periodically log `Found X appliances (0 added, 0 removed)` even when nothing has changed?",
+            "answer": "The plugin currently uses a periodic polling mechanism to check the Home Connect appliance list for any changes. This ensures that new appliances are discovered and removed appliances are correctly handled. The log message `Found X appliances (0 added, 0 removed)` is a result of this routine check and provides confirmation that the plugin is successfully communicating with the Home Connect API.\n\nThis behaviour is a deliberate design choice to maintain visibility into the plugin's background activity. However, there are plans to transition from periodic polling to an event-based system using `PAIRED` and `DEPAIRED` events. Once this architectural change is implemented, the plugin will only log appliance discovery information when an actual change in the list is detected.",
+            "semantic_abstract": "The plugin utilises periodic polling of the Home Connect appliance list for discovery and state maintenance, which generates recurring status logs regardless of change. A future architectural shift from polling to event-based monitoring via `PAIRED` and `DEPAIRED` signals will eliminate these periodic entries in favour of change-triggered logging.",
+            "hash": "a6d533f972758a808048543f9d687bb7ec78cb5917b7a3acfbc77d7376485330"
         }
     ]
 }
