@@ -1,13 +1,12 @@
 {
     "issue_number": 276,
-    "updated_at": "2026-02-25T08:06:56.972Z",
+    "updated_at": "2026-03-26T09:13:46.809Z",
     "faq": [
         {
-            "question": "Why am I seeing the error `getaddrinfo ENOTFOUND api.home-connect.com`?",
-            "answer": "The `ENOTFOUND` error is a standard Node.js/system error indicating a DNS resolution failure. It means the host system running Homebridge is unable to translate the hostname `api.home-connect.com` into an IP address. This is typically caused by a network configuration issue or a temporary problem with your DNS provider.\n\nTo resolve this issue, check the following:\n1. Ensure the Homebridge host has a working internet connection.\n2. Test DNS resolution from a shell on the same system using `dig api.home-connect.com` or `nslookup api.home-connect.com`.\n3. If your system is configured to use your router as its DNS server via DHCP, try manually setting a public DNS provider (such as Google's `8.8.8.8` or Cloudflare's `1.1.1.1`) in your operating system's network configuration.\n4. Verify if any local firewall or DNS filtering (like Pi-hole or AdGuard Home) is blocking requests to `api.home-connect.com` or its underlying Amazon Web Services (AWS) endpoints.",
-            "semantic_abstract": "DNS resolution failures on the host system prevent the plugin from locating the Home Connect API gateway, resulting in `getaddrinfo ENOTFOUND` errors during authorisation or appliance communication.",
-            "maintainer_authority": "thoukydides",
-            "hash": "cc5ba5ff7c304198edce50405365dd224cf896755bdaee615d5eee33bc1221ce"
+            "question": "Why does the error `getaddrinfo ENOTFOUND api.home-connect.com` appear in the logs?",
+            "answer": "The `ENOTFOUND` error is a DNS resolution failure. It indicates that the system hosting Homebridge cannot translate the hostname `api.home-connect.com` into an IP address. This is typically caused by local network configuration issues or problems with the configured DNS provider, rather than a bug within the plugin itself.\n\nTo troubleshoot this issue:\n1. Verify the network connectivity of the host machine (e.g., Raspberry Pi or server).\n2. Test DNS resolution from a terminal on the same system using the following commands:\n   - `nslookup api.home-connect.com`\n   - `dig api.home-connect.com`\n3. If these commands fail, check your host's network settings. Common causes include:\n   - Incorrect DNS settings provided via DHCP from your router.\n   - Temporary outages with your ISP's DNS servers.\n4. As a workaround, you can manually configure your host machine to use a reliable public DNS provider, such as Google (`8.8.8.8`) or Cloudflare (`1.1.1.1`).",
+            "semantic_abstract": "DNS resolution failures within the host environment cause `getaddrinfo ENOTFOUND` errors, preventing the plugin from establishing a connection to the `api.home-connect.com` endpoint. This network-level issue occurs when the system's DNS provider cannot resolve the API hostname, often requiring manual configuration of public DNS servers or correction of DHCP-assigned network settings.",
+            "hash": "249a52b7ec1cfb2daab19101a874c72b6f96033cf1433f3876cd276ce5aca899"
         }
     ]
 }
