@@ -1,13 +1,12 @@
 {
     "issue_number": 278,
-    "updated_at": "2026-02-25T15:33:23.691Z",
+    "updated_at": "2026-03-26T14:13:05.334Z",
     "faq": [
         {
-            "question": "How do I report unrecognised programs or Union types appearing in the logs?",
-            "answer": "These log entries appear when the plugin encounters a value from the Home Connect API—such as a program, option, or setting—that is not currently in its internal database. This typically occurs with newer appliance models, regional variants, or firmware updates that introduce undocumented identifiers.\n\nThe plugin is designed to detect these unknown values and print a formatted diagnostic block to the logs to simplify the reporting process. If you see this output:\n\n1. Copy the entire block starting from `// Union types` down to the final `================`. \n2. Open a new issue on the GitHub repository.\n3. Include your appliance model number and the copied log snippet in the report.\n\nThe maintainer will use this information to add the missing identifiers to the plugin. Once the new version is released, the unrecognised values will be fully supported and available for use in HomeKit.",
-            "semantic_abstract": "Home Connect appliances often utilise undocumented program identifiers and settings that are not part of the standard API specification. The plugin identifies these unknown values and outputs diagnostic code snippets to the Homebridge logs, facilitating user reporting and subsequent integration into the plugin's supported feature set.",
-            "confidence": "high",
-            "hash": "e4b620f3b95e43b981350c94e7cdd227eac6caf9680c0dad38c680f4dfa9c59d"
+            "question": "Why does the log show a block of code with `(unrecognised)` values?",
+            "answer": "The Home Connect API frequently provides programs, options, or settings that are not officially documented or vary between specific appliance models. When the plugin encounters a value it does not recognise, it outputs a formatted block of TypeScript code to the logs, delimited by lines of `=` characters.\n\nThis is a diagnostic feature intended to identify missing functionality. If you see this output:\n1. Check if a newer version of the plugin is available, as the values may have already been added.\n2. If the issue persists, copy the complete log block (including the `export type` and `// (unrecognised)` lines).\n3. Open a new issue on GitHub and provide the snippet along with your appliance's model number.\n\nThe maintainer uses these snippets to update the plugin's internal definitions, ensuring that the unrecognised features are correctly mapped and exposed to HomeKit in future releases.",
+            "semantic_abstract": "The Home Connect API frequently returns undocumented or model-specific identifiers for programs and settings. The plugin includes a mechanism to detect these unrecognised values and log them as TypeScript code blocks, which serves as a diagnostic tool for users to report missing API keys for inclusion in future plugin updates.",
+            "hash": "36c0d3ba7b4e6852bfaafe908ee6d36d89ffb79aae5a768529fbbf27b433ec8b"
         }
     ]
 }
