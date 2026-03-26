@@ -185,13 +185,13 @@ Note that the China Mainland server may use different login credentials, such as
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
 
-<!-- INCLUDES: issue-39-d44c issue-74-f147 issue-268-28a5 issue-378-832c -->
-The Home Connect API enforces very strict [rate limits](https://api-docs.home-connect.com/general/?#rate-limiting). Exceeding any of these limits triggers a `429 Too Many Requests` error and a lockout for up to 24 hours. The plugin handles this by pausing all API requests until the `retry-after` time returned by the API, displaying a countdown in the logs.
+<!-- INCLUDES: issue-39-d44c issue-74-f147 issue-268-28a5 issue-269-8032 issue-378-832c -->
+The Home Connect API enforces six distinct [rate limits](https://api-docs.home-connect.com/general/?#rate-limiting). Exceeding any of these triggers a `429 Too Many Requests` error and a lockout for up to 24 hours. The plugin handles this by pausing all API requests until the `retry-after` time returned by the API, displaying a countdown in the logs.
 
-Most of the limits reset after 1 or 10 minutes, but there is also a daily quota of 1,000 requests. Certain conditions can cause these limits to be reached rapidly:
+Most limits reset after 1 or 10 minutes, but there is also a daily quota of 1,000 requests. It is common to encounter these limits during the initial discovery phase after installation or an update as the plugin retrieves metadata for all appliances. Certain conditions can cause these limits to be reached rapidly:
 
-1. **Frequent Homebridge Restarts**: Each time the plugin starts, it issues multiple API requests to discover features, programs, and current state. Frequent restarts quickly consume the daily allowance. Ensure Homebridge is stable and consider running this plugin in its own **child bridge**.
-2. **Unstable Appliance Connectivity**: When an appliance disconnects and reconnects to Wi-Fi, the plugin issues several API requests to re-synchronise state. Check your logs for repeated `DISCONNECTED` or `CONNECTED` messages and improve the Wi-Fi coverage for that specific appliance. Note that appliance Wi-Fi hardware is often lower quality than that found in smartphones or laptops, and can be susceptible to interference from internal components like compressors.
+1. **Frequent Homebridge Restarts or Initial Discovery**: The plugin must issue a significant number of API requests to discover features, supported programs, and configuration options for every appliance. Frequent restarts during setup or troubleshooting quickly consume the daily allowance. Ensure Homebridge is stable and consider running this plugin in its own **child bridge**.
+2. **Unstable Appliance Connectivity**: When an appliance disconnects and reconnects to Wi-Fi, the plugin issues several API requests to re-synchronise state. Check your logs for repeated `DISCONNECTED` or `CONNECTED` messages and improve Wi-Fi coverage for that appliance. Note that appliance Wi-Fi hardware is often lower quality than that found in smartphones and can be susceptible to interference from internal components like compressors.
 3. **Multiple API Clients**: Using the same Client ID across multiple Homebridge instances or other third-party integrations shares these limits. Create a separate application for each use.
 4. **High HomeKit Activity**: Automations that trigger rapid state changes or frequent manual control through HomeKit contribute to hitting the limit.
 5. **Large Number of Appliances**: Each additional appliance increases the baseline volume of status updates and initialisation requests. Users with many appliances are more susceptible to reaching the daily quota during periods of high activity or following restarts.
@@ -259,7 +259,7 @@ The error `Home Connect API error: Home Connect subsystem not available [503]` i
 
 #### Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?
 
-<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-351-80b2 -->
+<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-276-249a issue-351-80b2 -->
 These are standard networking errors indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com` (or `api.home-connect.cn` for users in China).
 
 To resolve this, ensure your Homebridge server has a stable internet connection and check the following:
@@ -312,28 +312,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does the log show `Waiting ... before issuing Home Connect API request`? 🚧
-
-<!-- INCLUDES: issue-269-8032 -->
-This message indicates that the plugin has hit a Home Connect API rate limit. The Home Connect API enforces six distinct rate limits; when any of these are exceeded, the plugin must pause all communication with the servers until the limit resets. 
-
-It is common to encounter this message during the initial discovery phase after installing or updating the plugin. During this time, the plugin must issue a significant number of requests to retrieve metadata for all appliances, including their supported programs, features, and configuration options. If you see this message, allow the plugin to wait for the specified duration; it will automatically resume operation once the rate limit window has passed.
-
-#### 🚧 Why does the error `getaddrinfo ENOTFOUND api.home-connect.com` appear in the logs? 🚧
-
-<!-- INCLUDES: issue-276-249a -->
-The `ENOTFOUND` error is a DNS resolution failure. It indicates that the system hosting Homebridge cannot translate the hostname `api.home-connect.com` into an IP address. This is typically caused by local network configuration issues or problems with the configured DNS provider, rather than a bug within the plugin itself.
-
-To troubleshoot this issue:
-1. Verify the network connectivity of the host machine (e.g., Raspberry Pi or server).
-2. Test DNS resolution from a terminal on the same system using the following commands:
-   - `nslookup api.home-connect.com`
-   - `dig api.home-connect.com`
-3. If these commands fail, check your host's network settings. Common causes include:
-   - Incorrect DNS settings provided via DHCP from your router.
-   - Temporary outages with your ISP's DNS servers.
-4. As a workaround, you can manually configure your host machine to use a reliable public DNS provider, such as Google (`8.8.8.8`) or Cloudflare (`1.1.1.1`).
 
 ### Local/Remote Control
 
