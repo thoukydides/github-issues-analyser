@@ -1,13 +1,12 @@
 {
     "issue_number": 285,
-    "updated_at": "2026-02-26T08:05:07.109Z",
+    "updated_at": "2026-03-27T11:07:02.340Z",
     "faq": [
         {
-            "question": "What should I do if my logs contain a block of code with `(unrecognised)` comments?",
-            "answer": "If your logs contain a section of TypeScript code delimited by `===` lines with `(unrecognised)` comments, it indicates that your appliance is using programs or options (such as `LaundryCare.Washer.Option.MultipleSoak`) not yet mapped in the plugin. This occurs when Home Connect introduces new API values in firmware updates. To resolve this, open a GitHub issue and provide the complete log block along with your appliance manufacturer and model number. This technical data is required for the maintainer to update the plugin's internal definitions and expose these features to HomeKit.",
-            "semantic_abstract": "Home Connect appliance firmware updates may introduce new program keys or options that are not yet mapped in the plugin's type definitions, resulting in logs containing `(unrecognised)` markers. This diagnostic output allows users to provide technical metadata required for the maintainer to update the plugin and support new appliance features such as `MultipleSoak` or specific `ProgramMode` settings.",
-            "confidence": "high",
-            "hash": "d7dec005744f9f61ac2d1c233b7cf7a1f878b1f751b8a1423b13d64338315d28"
+            "question": "Why does the log show `(unrecognised)` alongside `Union types` or `OptionValues`?",
+            "answer": "The plugin identifies programs, options, or status values sent by your appliance that are not currently defined in the plugin's internal database. This usually occurs with newer appliance models or firmware updates that introduce features not yet covered by the official Home Connect API documentation.\n\nThe plugin detects these unknown identifiers and prints the technical definitions required to support them in a formatted block. If you see a log entry delimited by `====================` containing lines marked as `(unrecognised)`, please follow these steps:\n\n1. Copy the entire block from the log, including the header and footer lines.\n2. Open a new issue on the GitHub repository.\n3. Provide the model number of your appliance.\n4. Describe the action you were taking (for example, selecting a specific program on the appliance's physical control panel) when the log entry appeared.\n\nThis information is used to update the plugin's schema, ensuring that new features are correctly recognised and exposed to HomeKit in future releases.",
+            "semantic_abstract": "Runtime detection of undocumented Home Connect API keys triggers the generation of TypeScript union types and interface extensions in the plugin logs. This mechanism identifies discrepancies between the official API specification and actual appliance behaviour, specifically regarding new `ProgramKey`, `OptionValues`, and `EnumType` identifiers, facilitating their integration into the plugin's internal device mappings.",
+            "hash": "9573b73ada262f56890dcd75068ca93acc6fc24abffc2796802fd46304507afa"
         }
     ]
 }
