@@ -1,13 +1,12 @@
 {
     "issue_number": 284,
-    "updated_at": "2026-02-26T06:34:30.846Z",
+    "updated_at": "2026-03-27T10:06:17.960Z",
     "faq": [
         {
-            "question": "Why does my log show `unrecognised` next to a `ProgramKey` or other API value?",
-            "answer": "The plugin maps Home Connect API keys to HomeKit services and characteristics. If an appliance uses a program or setting that is undocumented or recently introduced by the manufacturer, the plugin will label it as `// (unrecognised)` in the logs. This typically occurs when the appliance firmware includes features not yet documented in the official Home Connect API specification or when a new appliance model uses unique identifiers for its programs. While the plugin can often still operate with these values, they may not be fully exposed to HomeKit until their definitions are added to the code. If you identify unrecognised values (such as `Dishcare.Dishwasher.Program.GlassShine`), please open a GitHub issue including the log output and your appliance model number so the definitions can be updated.",
-            "semantic_abstract": "Home Connect appliance firmware frequently implements program keys and configuration options that are missing from the official API documentation, resulting in `unrecognised` labels within the plugin diagnostic logs. This technical discrepancy between the API specification and actual device behaviour requires manual identification and mapping of specific identifiers to ensure correct HomeKit integration.",
-            "confidence": "high",
-            "hash": "a2a69c754a36a2ff11f5418dc0e548a9ced965c41853dc004ae75bb324b165fe"
+            "question": "Why does the log show `(unrecognised)` next to some appliance programs or options?",
+            "answer": "The plugin maintains an internal schema of known programs, options, and settings for various appliances. When the Home Connect API returns a value that is not yet in this list—often because a manufacturer has released a new feature that is not yet reflected in the official API documentation—the plugin logs it with an `(unrecognised)` comment.\n\nTo address this:\n1. **Update the plugin**: Check if a newer version of `homebridge-homeconnect` is available, as support for new appliance features is added regularly.\n2. **Report the value**: If the value persists on the latest version, please open a GitHub issue and include the log lines containing the `(unrecognised)` tag. This information allows for the value to be formally added to the plugin's definitions in a future release.",
+            "semantic_abstract": "New appliance features often use program and option keys that are not included in the official Home Connect API documentation. The plugin detects these mismatches between the API response and its internal schema, logging them as `(unrecognised)` to signal that a schema update is required to support the new functionality.",
+            "hash": "483e2710b3a8dbee7e27f1911d37d8264fceb6985f8f2b6b91d020055c5d657d"
         }
     ]
 }
