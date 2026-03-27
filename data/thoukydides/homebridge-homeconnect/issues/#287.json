@@ -1,13 +1,12 @@
 {
     "issue_number": 287,
-    "updated_at": "2026-02-26T10:13:11.887Z",
+    "updated_at": "2026-03-27T13:43:09.691Z",
     "faq": [
         {
-            "question": "Why are some appliance programs or options appearing as `unrecognised` in the logs?",
-            "answer": "When the plugin identifies appliance features that do not match the known Home Connect API specification, it logs them as `(unrecognised)`. This typically occurs because the appliance (often a newer model or regional variant like the Siemens `WN54C2070/01` WasherDryer) is using identifiers that are not yet included in the plugin's internal definitions. These missing definitions prevent the plugin from correctly mapping specific programmes or options to HomeKit.\n\nIf you see log output containing blocks like `export type ProgramKey` or `export interface EventNotifyValues` followed by `(unrecognised)`:\n1. Update to the latest version of the plugin. Support for several undocumented `WasherDryer` programs (such as `HHSynthetics`, `WD45`, and `Eco4060`) was added in `v0.42.4`.\n2. If the programs remain unrecognised after an update, please provide the relevant log sections in a GitHub issue. The maintainers use these snippets to update the plugin's logic and support new device capabilities.",
-            "semantic_abstract": "Home Connect appliances may utilise undocumented program or option identifiers that deviate from the standard API specification, appearing as `(unrecognised)` in logs. This mismatch between documented API keys and actual device firmware requires manual updates to the plugin to ensure specific hardware features are correctly exposed to HomeKit.",
-            "confidence": "high",
-            "hash": "a63bcbf68c7c4eec9d54de9856c04057fc9051c4c225b857d4f8eace937cdfd7"
+            "question": "Why does the log show `(unrecognised)` for some Home Connect program keys or settings?",
+            "answer": "The plugin maintains an internal registry of known Home Connect API keys, programs, and options. When an appliance reports a value that is not in this registry, it is logged with an `(unrecognised)` label. This typically occurs because the Home Connect API documentation is not always up-to-date with new appliance models or firmware releases.\n\nTo resolve these messages:\n1. **Update the plugin**: Check if a newer version of `homebridge-homeconnect` is available, as support for new programs is added frequently.\n2. **Report new values**: If the latest version still shows unrecognised values, please open a GitHub issue. Include the relevant section of your log file. The plugin is designed to output these unrecognised entries as TypeScript code snippets, which allows the maintainer to quickly integrate them into future releases.",
+            "semantic_abstract": "The Home Connect API frequently introduces new program keys and settings that are not immediately documented, causing them to appear as `(unrecognised)` in plugin logs. This mismatch between the official API specification and real-world appliance behaviour requires the manual addition of these keys to the plugin's type definitions to ensure full feature compatibility.",
+            "hash": "d4de5accd54c3715f544976e22210039a25efdc510dd66f81790a28a93fea79c"
         }
     ]
 }
