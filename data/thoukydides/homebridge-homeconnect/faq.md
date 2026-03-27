@@ -5,10 +5,9 @@
   - **[Home Connect or SingleKey ID Authorisation Issues](#home-connect-or-singlekey-id-authorisation-issues)**
     - [Why is the plugin not starting or failing to show an authorisation URL?](#why-is-the-plugin-not-starting-or-failing-to-show-an-authorisation-url)
     - [Why does authorisation fail with `invalid_request`, `invalid content type`, or `request rejected by client authorization authority`?](#why-does-authorisation-fail-with-invalid_request-invalid-content-type-or-request-rejected-by-client-authorization-authority)
-    - [Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?](#why-does-authorisation-fail-with-invalid_client-grant_type-is-invalid-unauthorized_client-or-client-has-limited-user-list)
+    - [Why does authorisation fail with `invalid_client`, `unauthorized_client`, or `client not authorized for this oauth flow`?](#why-does-authorisation-fail-with-invalid_client-unauthorized_client-or-client-not-authorized-for-this-oauth-flow)
     - [Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?](#why-does-the-authorisation-link-expire-or-fail-with-an-expired_token-or-invalid-code-error)
     - [Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?](#why-does-authorisation-fail-with-access_denied-device-authorization-session-has-expired-or-login-session-expired)
-    - [Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?](#why-does-authorisation-fail-with-the-error-client-not-authorized-for-this-oauth-flow-grant_type)
     - [Why does authorisation fail with a `403 Forbidden` error?](#why-does-authorisation-fail-with-a-403-forbidden-error)
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
   - **[Home Connect API Errors](#home-connect-api-errors)**
@@ -31,7 +30,7 @@
     - [Why does my appliance fail to start when using the switch in the Home app?](#why-does-my-appliance-fail-to-start-when-using-the-switch-in-the-home-app)
     - [Why does my appliance frequently show `Disconnected (setting On error status)`?](#why-does-my-appliance-frequently-show-disconnected-setting-on-error-status)
   - **[Programs and Options](#programs-and-options)**
-    - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-code-blocks)
+    - [Why does the log show `Unexpected fields`, `(unrecognised)` values, code blocks, or an `unrecognised by this plugin` warning?](#why-does-the-log-show-unexpected-fields-unrecognised-values-code-blocks-or-an-unrecognised-by-this-plugin-warning)
     - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
     - [Why are fan controls missing for my integrated venting hob?](#why-are-fan-controls-missing-for-my-integrated-venting-hob)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
@@ -39,14 +38,14 @@
     - [Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?](#why-do-i-see-an-invalidstepsize-or-sdkerrorinvalidoptionvalue-error)
     - [Why are Pause and Resume features missing or inconsistent?](#why-are-pause-and-resume-features-missing-or-inconsistent)
     - [Why doesn't the plugin automatically turn on my coffee machine when I start a beverage program?](#why-doesnt-the-plugin-automatically-turn-on-my-coffee-machine-when-i-start-a-beverage-program)
-    - [Why is the `Active Program` switch failing or unavailable in HomeKit?](#why-is-the-active-program-switch-failing-or-unavailable-in-homekit)
+    - [Why is the `Active Program` switch failing, read-only, or unavailable in HomeKit scenes?](#why-is-the-active-program-switch-failing-read-only-or-unavailable-in-homekit-scenes)
     - [How can I trigger the Identify function in the Eve app?](#how-can-i-trigger-the-identify-function-in-the-eve-app)
     - [How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?](#how-can-i-enable-dishwasher-options-like-half-load-extra-dry-or-efficient-dry-in-homekit)
     - [Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?](#why-does-my-appliance-turn-on-automatically-switch-off-immediately-or-homebridge-startup-stall)
     - [Which settings are used for programs started without specific options?](#which-settings-are-used-for-programs-started-without-specific-options)
     - [How can I change the default duration or temperature for oven programs?](#how-can-i-change-the-default-duration-or-temperature-for-oven-programs)
     - [Why is the scheduled start time for my appliance program not being honoured?](#why-is-the-scheduled-start-time-for-my-appliance-program-not-being-honoured)
-    - [How can I reduce the number of switches created for appliance programs?](#how-can-i-reduce-the-number-of-switches-created-for-appliance-programs)
+    - [How can I reduce the number of switches created or disable the Active Program switch?](#how-can-i-reduce-the-number-of-switches-created-or-disable-the-active-program-switch)
     - [What does the log message `Using expired cache result` mean?](#what-does-the-log-message-using-expired-cache-result-mean)
     - [Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?](#why-does-setting-my-hood-fan-to-auto-in-the-home-app-not-immediately-turn-it-on)
     - [Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?](#why-does-the-plugin-log-unrecognised-powerstate-values-like-undefined-or-mainsoff)
@@ -95,6 +94,7 @@
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
     - [Why does the plugin fail with `ReferenceError: ReadableStream is not defined`?](#why-does-the-plugin-fail-with-referenceerror-readablestream-is-not-defined)
+    - [Why does Homebridge continue to crash or reboot even after disabling the plugin in the configuration?](#why-does-homebridge-continue-to-crash-or-reboot-even-after-disabling-the-plugin-in-the-configuration)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -107,6 +107,7 @@
 If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.
 
 First, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, the plugin is not being loaded. Common causes include:
+
 - **Incorrect Nesting**: Ensure the `HomeConnect` platform block is a separate top-level item within the `platforms` array and not accidentally nested inside another plugin's configuration.
 - **Missing Client ID**: The plugin requires the `clientid` property to be set. If missing, it will log an error and stop initialisation.
 - **Manual Editing Errors**: Structural JSON errors are common during manual editing. It is recommended to use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration.
@@ -123,12 +124,12 @@ These errors are returned when the provided `Client ID` is not recognised or is 
 #### Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?
 
 <!-- INCLUDES: issue-51-3a91 issue-51-4991 issue-51-60d6 issue-60-2ad5 issue-115-de4a issue-117-e569 issue-162-34c9 -->
-These errors are returned by the Home Connect API and indicate a configuration mismatch or synchronization delay in the [Home Connect Developer Portal](https://developer.home-connect.com/):
+These errors are returned by the Home Connect API and indicate a configuration mismatch or synchronisation delay in the [Home Connect Developer Portal](https://developer.home-connect.com/):
 
 Ensure the `Client ID` in your Homebridge configuration exactly matches the one in the portal, and that the application is configured as follows:
 
 - **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app. Check this in both your global profile's **Default Home Connect User Account for Testing** and within the specific application's settings.
-- **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set to `Authorization Code Grant Flow`, you must create a new application.
+- **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set incorrectly to `Authorization Code Grant Flow`, you must delete the existing application and create a new one, ensuring `Device Flow` is selected.
 - **Success Redirect**: Leave blank or ensure it is a valid URL. Mismatches here can trigger `unauthorized_client` errors.
 - **One Time Token Mode**: Disabled.
 - **Proof Key for Code Exchange**: Disabled.
@@ -142,6 +143,7 @@ If the configuration is correct but errors persist, try deleting and recreating 
 Authorisation links and their associated device codes have a limited validity period. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.
 
 If the authorisation fails:
+
 - **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.
 - **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI.
 - **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt.
@@ -152,10 +154,11 @@ If the authorisation fails:
 <!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 issue-295-521b issue-299-15d1 -->
 These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:
 
-- **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometime necessary to log out of the app and log back in again to trigger account migration to complete.
+- **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometimes necessary to log out of the app and log back in again to trigger account migration to complete.
 - **Internationalisation Bug**: A server-side bug can cause authorisation to fail if your browser's preferred language is not English. This often prevents the password prompt from appearing. Set your web browser's preferred language to English (`en`), refresh, and attempt the authorisation again. You can revert this setting once the tokens are obtained.
 
 To complete the process:
+
 1. Obtain the URL from the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
 2. Open the URL in a browser and sign in with the account used in the official app.
 3. Approve the request. The plugin will detect completion and save the tokens automatically.
@@ -169,8 +172,10 @@ The `OAuth Flow` setting is fixed at the time of application creation. If it was
 
 #### Why does authorisation fail with a `403 Forbidden` error?
 
-<!-- INCLUDES: issue-275-c0e7 -->
-This error typically indicates that the Home Connect API is geo-blocked in your region (for example, in Russia). This results in a `403 Forbidden` response when the plugin attempts to connect to authorisation endpoints such as `POST /security/oauth/device_authorization`. This is a restriction imposed by the service provider or regional network infrastructure and cannot be bypassed by the plugin. Users in affected regions may experience similar connectivity issues with the official Home Connect app unless a VPN is used.
+<!-- INCLUDES: issue-275-9b14 -->
+A `403 Forbidden` error during the `POST /security/oauth/device_authorization` request indicates that the Home Connect API servers are explicitly rejecting the connection from your network. This is typically caused by regional geo-blocking or service restrictions implemented by the provider (for example, in Russia).
+
+This is a network-level restriction imposed by the service provider and cannot be bypassed by the plugin. Users in affected regions may experience similar connectivity issues with the official Home Connect app unless a VPN is used.
 
 #### How do I configure the plugin for a Home Connect account in Mainland China?
 
@@ -187,15 +192,16 @@ Note that the China Mainland server may use different login credentials, such as
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
 
-<!-- INCLUDES: issue-39-d44c issue-74-f147 issue-268-601f issue-269-720a issue-378-832c -->
-The Home Connect API enforces very strict [rate limits](https://api-docs.home-connect.com/general/?#rate-limiting). Exceeding any of these limits triggers a `429 Too Many Requests` error and a lockout for up to 24 hours. The plugin handles this by pausing all API requests until the `retry-after` time returned by the API, displaying a countdown in the logs.
+<!-- INCLUDES: issue-39-d44c issue-74-f147 issue-268-28a5 issue-269-8032 issue-378-832c -->
+The Home Connect API enforces very strict [rate limits](https://api-docs.home-connect.com/general/?#rate-limiting). Exceeding any of these triggers a `429 Too Many Requests` error and a lockout for up to 24 hours. The plugin handles this by pausing all API requests until the `retry-after` time returned by the API, displaying a countdown in the logs.
 
-Most of the limits reset after 1 or 10 minutes, but there is also a daily quota of 1,000 requests. Certain conditions can cause these limits to be reached rapidly:
+Most limits reset after 1 or 10 minutes, but there is also a daily quota of 1,000 requests. It is common to encounter these limits during the initial discovery phase after installation or an update as the plugin retrieves metadata for all appliances. Certain conditions can cause these limits to be reached rapidly:
 
-1. **Frequent Homebridge Restarts**: Each time the plugin starts, it issues multiple API requests to discover features, programs, and current state. Frequent restarts quickly consume the daily allowance. Ensure Homebridge is stable and consider running this plugin in its own **child bridge**.
-2. **Unstable Appliance Connectivity**: When an appliance disconnects and reconnects to Wi-Fi, the plugin issues several API requests to re-synchronise state. Check your logs for repeated `DISCONNECTED` or `CONNECTED` messages and improve the Wi-Fi coverage for that specific appliance. Note that appliance Wi-Fi hardware is often lower quality than that found in smartphones or laptops.
+1. **Frequent Homebridge Restarts or Initial Discovery**: The plugin must issue a significant number of API requests to discover features, supported programs, and configuration options for every appliance. Frequent restarts during setup or troubleshooting quickly consume the daily allowance. Ensure Homebridge is stable and consider running this plugin in its own **child bridge**.
+2. **Unstable Appliance Connectivity**: When an appliance disconnects and reconnects to Wi-Fi, the plugin issues several API requests to re-synchronise state. Check your logs for repeated `DISCONNECTED` or `CONNECTED` messages and improve Wi-Fi coverage for that appliance. Note that appliance Wi-Fi hardware is often lower quality than that found in smartphones and can be susceptible to interference from internal components like compressors.
 3. **Multiple API Clients**: Using the same Client ID across multiple Homebridge instances or other third-party integrations shares these limits. Create a separate application for each use.
 4. **High HomeKit Activity**: Automations that trigger rapid state changes or frequent manual control through HomeKit contribute to hitting the limit.
+5. **Large Number of Appliances**: Each additional appliance increases the baseline volume of status updates and initialisation requests. Users with many appliances are more susceptible to reaching the daily quota during periods of high activity or following restarts.
 
 No manual intervention is required; the plugin will automatically resume communication once the Home Connect servers lift the block.
 
@@ -260,7 +266,7 @@ The error `Home Connect API error: Home Connect subsystem not available [503]` i
 
 #### Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?
 
-<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-276-cc5b issue-351-80b2 -->
+<!-- INCLUDES: issue-50-4e01 issue-137-3fe8 issue-276-249a issue-351-80b2 -->
 These are standard networking errors indicating a DNS name resolution failure or loss of internet connectivity. This means your Homebridge host is unable to resolve the IP address for `api.home-connect.com` (or `api.home-connect.cn` for users in China).
 
 To resolve this, ensure your Homebridge server has a stable internet connection and check the following:
@@ -380,10 +386,10 @@ When these disconnections occur, the plugin logs the event and updates the HomeK
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-11a6 issue-237-4f1f issue-238-902b issue-243-afde issue-244-beeb issue-246-85c6 issue-247-ab8a issue-248-683b issue-254-ab2e issue-255-2835 issue-257-721b issue-258-d2a3 issue-262-4486 issue-265-872d issue-266-7e59 issue-277-728a issue-278-e4b6 issue-279-b94c issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin includes a diagnostic mechanism to identify data from the Home Connect API that it does not yet recognise. This occurs when the API implementation deviates from official documentation, or because new appliance models or firmware introduce undocumented features, programs, or options.
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-281-83fc issue-282-dfda issue-283-981b issue-284-a2a6 issue-285-d7de issue-286-9e5b issue-287-a63b issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.
 
-While unrecognised values usually do not prevent the plugin from functioning, the specific feature may be missing in HomeKit until it is added to the plugin's internal schema. When this happens, the plugin generates a technical diagnostic block in the log, delimited by `=` characters and containing comments marked `// (unrecognised)`. This helps the maintainer update the plugin's definitions and map features to HomeKit services.
+When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
 If you observe these messages:
 
@@ -391,11 +397,11 @@ If you observe these messages:
 2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
 3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
 
-Once these identifiers are added to the plugin, the warning will disappear and the corresponding features will be correctly mapped to HomeKit.
+Once added, the warning will disappear and the features will be correctly mapped.
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-e41c issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-303-9e0f issue-316-e6c5 issue-368-b5fa issue-380-03ac -->
 The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable`:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
@@ -424,7 +430,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-273-c05e issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-df65 issue-292-77b3 issue-315-9e82 issue-323-f483 issue-329-1549 issue-333-49b8 issue-335-7107 issue-342-27bc -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:
@@ -455,25 +461,26 @@ The plugin dynamically detects supported commands for each specific appliance. I
 
 #### Why doesn't the plugin automatically turn on my coffee machine when I start a beverage program?
 
-<!-- INCLUDES: issue-242-dd71 -->
-The plugin does not implement automated sequencing, such as powering on an appliance and waiting for it to be ready before starting a program, for several technical reasons:
+<!-- INCLUDES: issue-242-6a1e -->
+The plugin does not implement automated sequencing, such as powering on an appliance and waiting for it to be ready before starting a program, for several reasons:
 
-- **HomeKit Response Timeouts**: HomeKit requires a rapid response when a characteristic is updated. Waiting for a power-on sequence or rinse cycle would exceed the allowed time, causing HomeKit to report a timeout error.
-- **State Reporting Inconsistency**: Different models report their power state and readiness inconsistently. Some may not reliably indicate when they are ready to receive a program command.
-- **User Feedback**: To avoid timeouts, the plugin would have to report success immediately. If the subsequent background sequence failed (e.g. the water tank is empty), the user would receive no feedback in HomeKit or via Siri.
-- **Device Behaviour**: Many appliances automatically power on when a program command is received via the API, making additional sequencing unnecessary for those models.
+- **HomeKit Feedback and Timeouts**: The plugin is designed to wait for an API response before confirming success to HomeKit. This ensures that when using Siri, you receive immediate feedback if a command fails. A multi-step sequence (Power On -> Wait -> Start Program) would exceed HomeKit's response timeout or require reporting success prematurely, hiding subsequent failures from the user.
+- **State Reporting Inconsistency**: Different coffee machine models report power and readiness inconsistently. Some allow starting a program from an `Off` state, while others require an explicit `On` command and a specific 'Ready' state.
+- **Maintenance Cycles**: Many machines perform an automatic rinse when powered on. Automating drink selection immediately after power-on could result in coffee being dispensed into rinse water, or could fail because the user has not yet placed a cup.
+- **Device Behaviour**: Many other appliances automatically power on when a program command is received via the API, making additional sequencing unnecessary for those models.
 
-If your model requires manual power-on before a beverage can be requested, you should use the Apple **Shortcuts** app or HomeKit automations to create a sequence (e.g. Turn On → Wait → Start Drink).
+If your model requires manual power-on, you should use the Apple **Shortcuts** app to create a sequence (e.g. Turn On -> Wait -> Start Drink) tailored to your appliance's behaviour.
 
 #### Why is the `Active Program` switch failing or unavailable in HomeKit?
 
-<!-- INCLUDES: issue-224-e8e4 -->
-The generic `Active Program` switch relies on the Home Connect API reporting which program is currently selected on the physical appliance via the `BSH.Common.Root.SelectedProgram` event. There are several limitations to this:
+<!-- INCLUDES: issue-224-64d5 -->
+The generic `Active Program` switch relies on the Home Connect API reporting which program is currently selected on the physical appliance via `BSH.Common.Root.SelectedProgram` events. 
 
-- **API Event Dependency**: Many appliances (especially washers and dryers) do not consistently generate events for program selection. If the plugin cannot determine which program is selected, toggling the switch will result in an `Error: No program selected` in the logs.
-- **HomeKit UI Restrictions**: If the plugin cannot reliably set the state of a switch due to these API limitations, HomeKit apps may prevent the switch from being used in scenes or automations to avoid inconsistent states.
+Several factors limit its reliability:
+- **API Event Dependency**: Many appliances (especially washers and dryers) do not consistently generate selection events. If the plugin does not know which program is selected, it cannot send the required identifier to the API to start the machine.
+- **Scenes and Automations**: If the plugin cannot determine the selected program, HomeKit may treat the switch as read-only or prevent it from triggering within scenes to avoid inconsistent states.
 
-To ensure reliable automation, it is recommended to use the **specific named program switches** (e.g. `Cotton`, `Eco 50`) instead of the generic `Active Program` switch. These named switches explicitly define the program to be started and do not depend on the appliance's current selection state.
+To ensure reliable automation, it is recommended to use **specific named program switches** (e.g. `Cotton`, `Eco 50`) instead of the generic `Active Program` switch. These explicitly define the program to be started and do not depend on the appliance's current physical selection state.
 
 #### How can I trigger the Identify function in the Eve app?
 
@@ -533,7 +540,7 @@ To resolve this:
 
 #### How can I reduce the number of switches created for appliance programs?
 
-<!-- INCLUDES: issue-49-35dc issue-368-4f23 -->
+<!-- INCLUDES: issue-49-35dc issue-240-65b3 issue-368-4f23 -->
 By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via Homebridge UI:
 
 - **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.
@@ -637,8 +644,8 @@ The plugin logs all status information reported by the API. There is no configur
 
 #### Why does the log periodically show `Found X appliances (0 added, 0 removed)`?
 
-<!-- INCLUDES: issue-272-e11d -->
-This message appears because the plugin periodically polls the Home Connect API to discover any new or removed appliances. This ensures that changes to your Home Connect account are reflected in Homebridge without requiring a manual restart.
+<!-- INCLUDES: issue-272-a6d5 -->
+This message is generated by the plugin's periodic polling of the Home Connect API to discover any new or removed appliances. This ensures that changes to your Home Connect account are reflected in Homebridge without requiring a manual restart.
 
 There are plans to replace this polling mechanism with a more efficient event-based approach using `PAIRED` and `DEPAIRED` events from the Home Connect event stream. Once this enhancement is implemented, these log messages will only be generated when an appliance is actually added or removed from the account.
 
@@ -700,7 +707,7 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-240-ed8f issue-364-a64b -->
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-a64b -->
 The plugin allows for granular control over which services are exposed to HomeKit, but there are some architectural constraints:
 
 1. **Core Services**: The main `Switch` service for the appliance power is fundamental and cannot be disabled.
@@ -918,4 +925,5 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-249-f952 issue-256-6e03 issue-259-62ac issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d issue-239-6f85 -->
+
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-294-4d50 issue-298-e829 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d issue-256-069a issue-259-ff85 -->
