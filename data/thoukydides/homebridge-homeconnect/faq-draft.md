@@ -390,7 +390,7 @@ When these disconnections occur, the plugin logs the event and updates the HomeK
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-e546 issue-297-f476 issue-301-9995 issue-305-c3b1 issue-307-94f6 issue-309-bfa9 issue-312-1263 issue-313-5c17 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.
 
 When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
@@ -399,7 +399,7 @@ If you observe these messages:
 
 1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
 2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
-3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
+3. **Provide context**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template. Please also include the **model number** of your appliance and describe the **action you were taking** (for example, selecting a specific program on the physical control panel) when the log entry appeared.
 
 Once added, the warning will disappear and the features will be correctly mapped.
 
@@ -584,74 +584,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely to be due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why does the log show code blocks with `// (unrecognised)` entries? 🚧
-
-<!-- INCLUDES: issue-282-79e6 -->
-These log entries are generated when an appliance reports a value—such as a program, setting, or status—that is not yet defined in the plugin's internal database. This typically occurs with newer appliance models (for example, the Siemens `CM936GCB1/C5`) or when a firmware update introduces new functionality.
-
-The log is formatted as a TypeScript snippet to assist with integrating the missing value into the plugin's code. If you see these blocks in your logs:
-
-1. Ensure you are running the latest version of the plugin. Support for newly discovered API values is added frequently in regular updates.
-2. If the log persists on the latest version, open a GitHub issue and provide the complete block of code starting from `export type...` to the end of the equals sign separator. This allows the maintainer to add formal support for the specific value in a future release.
-
-#### 🚧 What should I do if the logs show unrecognised Home Connect API keys or values? 🚧
-
-<!-- INCLUDES: issue-283-831d -->
-The Home Connect API includes a wide variety of appliance-specific settings and options. While the plugin supports many common features, new or model-specific keys may occasionally be unrecognised. The plugin is designed to identify these and provide a way for users to report them for inclusion.
-
-When the plugin detects unsupported data, it generates a formatted block of code in the logs with the instruction: `Just paste the following into the "Log File" field and submit the issue`.
-
-To assist in adding support for these features:
-1. Copy the code block from your logs, including the interface definition and any lines marked as `(unrecognised)`.
-2. Create a new issue on the GitHub repository.
-3. Paste the copied text into the **Log File** field of the issue template.
-
-Submitting these snippets allows the maintainers to map the technical keys used by your specific appliance model to HomeKit characteristics in a future update.
-
-#### 🚧 Why does the log show `(unrecognised)` next to some appliance programs or options? 🚧
-
-<!-- INCLUDES: issue-284-483e -->
-The plugin maintains an internal schema of known programs, options, and settings for various appliances. When the Home Connect API returns a value that is not yet in this list—often because a manufacturer has released a new feature that is not yet reflected in the official API documentation—the plugin logs it with an `(unrecognised)` comment.
-
-To address this:
-1. **Update the plugin**: Check if a newer version of `homebridge-homeconnect` is available, as support for new appliance features is added regularly.
-2. **Report the value**: If the value persists on the latest version, please open a GitHub issue and include the log lines containing the `(unrecognised)` tag. This information allows for the value to be formally added to the plugin's definitions in a future release.
-
-#### 🚧 Why does the log show `(unrecognised)` alongside `Union types` or `OptionValues`? 🚧
-
-<!-- INCLUDES: issue-285-9573 -->
-The plugin identifies programs, options, or status values sent by your appliance that are not currently defined in the plugin's internal database. This usually occurs with newer appliance models or firmware updates that introduce features not yet covered by the official Home Connect API documentation.
-
-The plugin detects these unknown identifiers and prints the technical definitions required to support them in a formatted block. If you see a log entry delimited by `====================` containing lines marked as `(unrecognised)`, please follow these steps:
-
-1. Copy the entire block from the log, including the header and footer lines.
-2. Open a new issue on the GitHub repository.
-3. Provide the model number of your appliance.
-4. Describe the action you were taking (for example, selecting a specific program on the appliance's physical control panel) when the log entry appeared.
-
-This information is used to update the plugin's schema, ensuring that new features are correctly recognised and exposed to HomeKit in future releases.
-
-#### 🚧 What should I do if the log shows `Home Connect API returned keys/values that are unrecognised by this plugin`? 🚧
-
-<!-- INCLUDES: issue-286-9052 -->
-The plugin maintains internal definitions for Home Connect programs, options, and statuses to ensure reliable operation and type safety. When an appliance uses a feature not yet present in these definitions—often due to new firmware, undocumented API extensions, or recent appliance models—the plugin logs a warning.
-
-To resolve this:
-1. Ensure you are running the latest version of the plugin. Support for newly discovered appliance features is added regularly, and an update may already include the missing keys.
-2. If the warning persists on the latest version, follow the link provided in your logs to create a new GitHub issue. The log generates a specific URL that helps pre-fill the necessary information.
-3. Copy the formatted technical details from your log (the sections beginning with `export type ProgramKey` or `export interface EventNotifyValues`) and paste them into the issue description.
-
-Providing these details allows the maintainer to update the plugin's internal mappings, ensuring that your appliance's full functionality is correctly exposed to Homebridge.
-
-#### 🚧 Why does the log show `(unrecognised)` for some Home Connect program keys or settings? 🚧
-
-<!-- INCLUDES: issue-287-d4de -->
-The plugin maintains an internal registry of known Home Connect API keys, programs, and options. When an appliance reports a value that is not in this registry, it is logged with an `(unrecognised)` label. This typically occurs because the Home Connect API documentation is not always up-to-date with new appliance models or firmware releases.
-
-To resolve these messages:
-1. **Update the plugin**: Check if a newer version of `homebridge-homeconnect` is available, as support for new programs is added frequently.
-2. **Report new values**: If the latest version still shows unrecognised values, please open a GitHub issue. Include the relevant section of your log file. The plugin is designed to output these unrecognised entries as TypeScript code snippets, which allows the maintainer to quickly integrate them into future releases.
 
 ### Appliance Status
 
