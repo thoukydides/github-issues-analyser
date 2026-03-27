@@ -1,13 +1,12 @@
 {
     "issue_number": 251,
-    "updated_at": "2026-02-26T11:22:58.927Z",
+    "updated_at": "2026-03-27T15:33:48.419Z",
     "faq": [
         {
-            "question": "Why does my appliance show as `Not Responding` in the Home app when turned off?",
-            "answer": "Certain Home Connect appliances, especially some washing machines and tumble dryers, disconnect their internal Wi-Fi module when powered off via the front panel button. When this occurs, the Home Connect API cannot distinguish between the appliance being switched off, disconnected from the mains, or losing its internet connection. Because the plugin can no longer communicate with the appliance or retrieve its state, it reports a `SERVICE_COMMUNICATION_FAILURE`, which HomeKit displays as `Not Responding`.\n\nWhile some appliances support a soft power state (standby) that maintains a network connection, others perform a hard internal disconnection. For these models, the disconnection is the only state that can be accurately reported. The plugin prioritises technical accuracy; faking a `Power Off` state when the appliance is unreachable would misrepresent its true connectivity status and imply that commands could still be successfully delivered to the device.",
-            "semantic_abstract": "Home Connect appliances that terminate their network connection when powered off result in a `Not Responding` status because the API cannot differentiate between manual power-off and network failure. The plugin maps these disconnections to `SERVICE_COMMUNICATION_FAILURE` to ensure HomeKit accurately reflects that the appliance is unreachable and its current state cannot be determined.",
-            "confidence": "high",
-            "hash": "b8f008f191610e69bdf8ca9d1594599c747a20c6708fafd4f73fa55640e4785c"
+            "question": "Why do my Home Connect appliances show as `Not Responding` in the Home app when I turn them off?",
+            "answer": "When certain appliances (commonly washers and dryers) are turned off using their front panel power button, they may disconnect entirely from the Home Connect cloud servers. The Home Connect API does not provide a way to distinguish between an appliance being manually powered off, unplugged from the mains, or losing its Wi-Fi/internet connection; in all these cases, the appliance simply appears as disconnected.\n\nTo ensure accuracy and consistency with native HomeKit devices, the plugin reports this state as a `SERVICE_COMMUNICATION_FAILURE`. This causes the Home app to display the device as `Not Responding`. While some Home Connect appliances remain in a low-power standby mode that maintains a cloud connection, others perform a complete internal power-down. \n\nThe plugin does not offer a configuration option to \"fake\" an off state when an appliance disconnects because:\n1. It would inaccurately represent the device's actual connectivity status.\n2. The plugin architecture relies on the Power service being active to report status reliably.\n3. Reporting a communication failure is the correct HomeKit behaviour for an unreachable accessory.",
+            "semantic_abstract": "Home Connect appliances that physically disconnect from cloud servers when powered off via front panel buttons cause the Home Connect API to report a generic disconnected state. The plugin maps this state to a HomeKit `SERVICE_COMMUNICATION_FAILURE` because the API cannot distinguish between manual power-down and genuine network connectivity issues, resulting in a `Not Responding` status in the Home app.",
+            "hash": "fbe8d68d6097a9590954e2121a6cd858d73c279675cce5fa970ed694c79a546a"
         }
     ]
 }
