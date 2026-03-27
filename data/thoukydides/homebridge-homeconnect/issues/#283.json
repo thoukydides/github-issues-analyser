@@ -1,13 +1,12 @@
 {
     "issue_number": 283,
-    "updated_at": "2026-02-26T05:08:25.485Z",
+    "updated_at": "2026-03-27T09:08:14.522Z",
     "faq": [
         {
-            "question": "Why does the plugin log `(unrecognised)` for certain Home Connect API options?",
-            "answer": "The Home Connect API is extensive and frequently updated with new features and options tailored to specific appliance models. When the plugin encounters a key or value that is not yet in its internal definitions—for example, the `ConsumerProducts.CoffeeMaker.Option.BeveragesRemaining` option on newer Siemens coffee makers—it logs the entry as `(unrecognised)`. This diagnostic output is designed to help you provide the necessary technical details to the maintainer. If you see these messages, please copy the formatted section from the logs and open an issue on GitHub so that support for the new features can be added in a future update.",
-            "semantic_abstract": "Evolution of the Home Connect API across different appliance models and firmware versions leads to the appearance of unsupported keys and values in the event stream. The plugin identifies these unrecognised elements and generates technical metadata snippets to ensure the internal characteristic definitions can be updated to support new appliance functionality.",
-            "confidence": "high",
-            "hash": "981b4df316fb3aa01c878eb55fbfbb939f6688058dafa7a2636b7f59b8960c05"
+            "question": "What should I do if the logs show unrecognised Home Connect API keys or values?",
+            "answer": "The Home Connect API includes a wide variety of appliance-specific settings and options. While the plugin supports many common features, new or model-specific keys may occasionally be unrecognised. The plugin is designed to identify these and provide a way for users to report them for inclusion.\n\nWhen the plugin detects unsupported data, it generates a formatted block of code in the logs with the instruction: `Just paste the following into the \"Log File\" field and submit the issue`.\n\nTo assist in adding support for these features:\n1. Copy the code block from your logs, including the interface definition and any lines marked as `(unrecognised)`.\n2. Create a new issue on the GitHub repository.\n3. Paste the copied text into the **Log File** field of the issue template.\n\nSubmitting these snippets allows the maintainers to map the technical keys used by your specific appliance model to HomeKit characteristics in a future update.",
+            "semantic_abstract": "The plugin identifies unrecognised Home Connect API keys and values, providing a formatted code block in the logs for users to report via GitHub. This crowdsourced mapping process allows the plugin to support unique appliance features and options that are not automatically discoverable via the standard API.",
+            "hash": "831d6b059aab46685c8d61834fb6db7040342cfd950c09411b15eaa0b9159cda"
         }
     ]
 }
