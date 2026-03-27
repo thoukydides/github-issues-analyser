@@ -1,13 +1,12 @@
 {
     "issue_number": 282,
-    "updated_at": "2026-02-26T03:17:59.002Z",
+    "updated_at": "2026-03-27T07:45:08.171Z",
     "faq": [
         {
-            "question": "Why does my Homebridge log show unrecognised program keys like `Cooking.Oven.Program.Microwave.Max`?",
-            "answer": "The Home Connect API frequently introduces new program keys for newer appliances that may not yet be defined in the plugin's internal mapping. When the plugin encounters an unknown key, it outputs a diagnostic block in the logs with the label `(unrecognised)`. Specifically, support for the `Cooking.Oven.Program.Microwave.Max` program was added in `v0.42.2`. To resolve similar log messages, ensure you are running the latest version of the plugin. If the message persists on the latest version, reporting the log output helps include the missing keys in future updates.",
-            "semantic_abstract": "Home Connect appliances frequently introduce new program keys that require explicit mapping within the plugin. Unrecognised keys are flagged in the Homebridge logs to facilitate their inclusion in subsequent plugin releases, such as the addition of the microwave maximum power program for Siemens ovens.",
-            "confidence": "high",
-            "hash": "dfda4e9c4ef485b4f0460a55b275769b7f5d5de5cec0f11955cd672292e66107"
+            "question": "Why does the log show code blocks with `// (unrecognised)` entries?",
+            "answer": "These log entries are generated when an appliance reports a value—such as a program, setting, or status—that is not yet defined in the plugin's internal database. This typically occurs with newer appliance models (for example, the Siemens `CM936GCB1/C5`) or when a firmware update introduces new functionality.\n\nThe log is formatted as a TypeScript snippet to assist with integrating the missing value into the plugin's code. If you see these blocks in your logs:\n\n1. Ensure you are running the latest version of the plugin. Support for newly discovered API values is added frequently in regular updates.\n2. If the log persists on the latest version, open a GitHub issue and provide the complete block of code starting from `export type...` to the end of the equals sign separator. This allows the maintainer to add formal support for the specific value in a future release.",
+            "semantic_abstract": "The plugin identifies undocumented Home Connect API values by logging TypeScript union type snippets when it encounters unknown `ProgramKey`, `OptionKey`, or `StatusKey` strings. This diagnostic mechanism serves as a data collection tool for expanding support to new appliance models and firmware features through updates to the plugin's internal type definitions.",
+            "hash": "79e6d5ea167324a600c8fcd49856e5357f0ed6abfb85a6bcd217d22505d483be"
         }
     ]
 }
