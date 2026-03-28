@@ -150,17 +150,17 @@ If the authorisation fails:
 
 #### Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?
 
-<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 -->
+<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 issue-295-c09a issue-299-6c02 -->
 These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:
 
 - **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometimes necessary to log out of the app and log back in again to trigger account migration to complete.
-- **Internationalisation Bug**: A server-side bug can cause authorisation to fail if your browser's preferred language is not English. This often prevents the password prompt from appearing. Set your web browser's preferred language to English (`en`), refresh, and attempt the authorisation again. You can revert this setting once the tokens are obtained.
+- **Internationalisation Bug**: A server-side bug can cause the authorisation to fail if your browser's preferred language is not English (for example, if set to German or Spanish). This often prevents the password prompt from appearing or returns a raw JSON error immediately after entering your username. To resolve this, go to your browser settings and move English (`en` or `en-GB`) to the top of your preferred language list. This ensures the correct `Accept-Language` header is sent. You can revert this setting once the plugin has been authorised.
 
 To complete the process:
 
 1. Obtain the URL from the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
-2. Open the URL in a browser and sign in with the account used in the official app.
-3. Approve the request. The plugin will detect completion and save the tokens automatically.
+2. Open the URL in a browser with the language workaround applied.
+3. Sign in with the account used in the official app and approve the request. The plugin will detect completion and save the tokens automatically.
 
 #### Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?
 
@@ -186,27 +186,6 @@ Home Connect appliances registered in Mainland China use a dedicated regional AP
 3. If you are configuring the plugin manually via `config.json`, add `"china": true` to the plugin configuration object.
 
 Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
-
-#### 🚧 Why does the authorisation link return an `access_denied` error with the message `login session expired`? 🚧
-
-<!-- INCLUDES: issue-295-c09a -->
-This error is caused by a bug on the Home Connect authorisation servers related to browser language settings. If your browser's preferred language is set to something other than English (for example, Spanish `es-ES` or German `de-DE`), the Home Connect login flow may fail prematurely and return a raw JSON error instead of completing the process.
-
-To resolve this and successfully authorise the plugin, follow these steps:
-1. Open your browser settings and navigate to the language or appearance section.
-2. Add English (`en` or `en-GB`) to your list of preferred languages.
-3. Move English to the top of the list so it is the primary language sent in the `Accept-Language` header.
-4. Restart the Homebridge plugin to generate a new authorisation link.
-5. Click the link and complete the sign-in process with English as the primary browser language.
-
-Once the authorisation is complete and the plugin has saved the credentials, you can revert your browser language settings to your preferred language.
-
-#### 🚧 Why do I receive an `access_denied` error with `login session expired` during authorisation? 🚧
-
-<!-- INCLUDES: issue-299-6c02 -->
-This error is caused by a known bug in the Home Connect authorisation servers. It typically occurs when the user is prompted for their username but the session expires before they can enter a password, or immediately after entering the username.
-
-To resolve this, set **English** as the preferred language in your web browser settings before starting the authorisation process. This workaround bypasses the server-side issue, allowing the login flow to complete successfully. You can revert your browser language settings once the plugin has been authorised.
 
 ### Home Connect API Errors
 
