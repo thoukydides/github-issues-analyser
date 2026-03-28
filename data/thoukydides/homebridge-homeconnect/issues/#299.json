@@ -1,13 +1,12 @@
 {
     "issue_number": 299,
-    "updated_at": "2026-02-27T07:26:45.193Z",
+    "updated_at": "2026-03-28T14:18:55.904Z",
     "faq": [
         {
-            "question": "Why does the authorisation process fail with a `login session expired` error?",
-            "answer": "This error is a known issue caused by a bug in the Home Connect authorisation servers, which often prevents the password prompt from appearing after the username is entered. To resolve this, set **English** as the preferred language in your web browser before starting the authorisation process. Once the plugin is successfully authorised, you can revert your browser language settings to your preference.",
-            "semantic_abstract": "Home Connect authorisation server bugs cause OAuth flow interruptions resulting in `access_denied` and `login session expired` errors when the browser is configured with certain non-English language preferences. This behaviour prevents the password entry phase of the authentication sequence, requiring a temporary change to English language settings to complete the process.",
-            "confidence": "high",
-            "hash": "15d13a97d56a9f2b228d8607859e2b796b4d3a63c7470368edef5ada12d887e9"
+            "question": "Why do I receive an `access_denied` error with `login session expired` during authorisation?",
+            "answer": "This error is caused by a known bug in the Home Connect authorisation servers. It typically occurs when the user is prompted for their username but the session expires before they can enter a password, or immediately after entering the username.\n\nTo resolve this, set **English** as the preferred language in your web browser settings before starting the authorisation process. This workaround bypasses the server-side issue, allowing the login flow to complete successfully. You can revert your browser language settings once the plugin has been authorised.",
+            "semantic_abstract": "A bug in the Home Connect OAuth authorisation servers causes session expiration errors when the requesting browser is configured for languages other than English. Setting the browser locale to English during the authentication flow allows the session to persist and successfully complete the login process.",
+            "hash": "6c02a83ab98f843bbb14b6f07cb2ce77b4ccf8bd8d93977dbd43fd6f1e8fce85"
         }
     ]
 }
