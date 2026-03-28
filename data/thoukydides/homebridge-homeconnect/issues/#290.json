@@ -1,13 +1,12 @@
 {
     "issue_number": 290,
-    "updated_at": "2026-02-26T15:26:38.855Z",
+    "updated_at": "2026-03-28T07:14:44.837Z",
     "faq": [
         {
-            "question": "Why does the log show `Appliance initialisation is taking longer than expected`?",
-            "answer": "This message indicates that the plugin is waiting for the Home Connect API to provide the current state of specific appliance features, such as `Power`, `Door`, `Light`, or `Programs`. This state typically occurs when the appliance's connection to the Home Connect cloud is interrupted or when a firmware update has caused a synchronisation delay.\n\nIf the appliance remains in this state and does not respond to HomeKit commands, follow these steps:\n1. Perform a manual reset of the appliance by power cycling it or following the manufacturer's specific reset procedure.\n2. Verify that the appliance is controllable via the official Home Connect app.\n3. Wait for the appliance to re-establish its cloud connection, which allows the plugin to complete its initialisation sequence.\n\nThis procedure forces a synchronisation of the device state with the Home Connect servers, resolving stalls in the plugin's feature discovery process.",
-            "semantic_abstract": "Home Connect appliances may stall during feature initialisation if the device state is out of sync with the cloud API, often triggered by firmware updates or network interruptions. A manual hardware reset of the appliance synchronises the local state with the Home Connect servers, allowing the plugin to retrieve required feature data and complete the initialisation process.",
-            "confidence": "high",
-            "hash": "df655334c4e90e91396f0b386249b45333ef3b03169865b2dbf2a459ce1abc79"
+            "question": "Why does the log say \"Appliance initialisation is taking longer than expected\" and the device is non-responsive?",
+            "answer": "This message indicates that the plugin is waiting for the Home Connect API to provide the current state of specific features (such as `Power`, `Door`, `Light`, or `Programs`). Until the API reports these states, the plugin cannot fully expose the appliance's functionality to HomeKit, often resulting in a \"No Response\" status in the Home app.\n\nThis situation typically occurs following an appliance firmware update or a transient communication failure between the appliance and the Home Connect cloud servers. To resolve this:\n\n1.  **Power cycle the appliance**: Disconnect the appliance from power (unplug it or turn off the circuit breaker) for at least 30 seconds, then reconnect it.\n2.  **Restart Homebridge**: Once the appliance has reconnected to Wi-Fi, restart your Homebridge instance to trigger a fresh initialisation sequence.\n3.  **Check official app**: Verify that the appliance is controllable and showing as online in the official Home Connect mobile application.",
+            "semantic_abstract": "Appliance feature initialisation delays occur when the Home Connect API fails to provide state information for mandatory capabilities during the plugin startup sequence. This condition is frequently linked to appliance firmware updates or network synchronisation issues and is generally resolved by a physical power cycle of the hardware to refresh its API session.",
+            "hash": "96f5f7cbd74d671be8ce3d8251ad58b6bab18da336fa495b3926359941754f74"
         }
     ]
 }
