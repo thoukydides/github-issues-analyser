@@ -1,13 +1,12 @@
 {
     "issue_number": 293,
-    "updated_at": "2026-02-26T16:14:04.733Z",
+    "updated_at": "2026-03-28T08:21:47.815Z",
     "faq": [
         {
-            "question": "Why is the scheduled start time for my appliance program not being honoured?",
-            "answer": "The plugin does not perform internal timezone processing or use the location settings from your Home Connect account. Instead, it relies entirely on the local timezone of the server running Node.js and Homebridge. If a scheduled program, such as one using `BSH.Common.Option.StartInRelative`, triggers at an unexpected time, it is likely that your server is configured to a different timezone (often UTC/GMT by default).\n\nTo resolve this:\n1. Verify your server's current timezone configuration. On most Linux distributions, you can use the `timedatectl` command.\n2. Ensure the operating system or container environment is set to your correct local timezone.\n3. If you cannot change the system-wide settings, you can explicitly set the timezone for the Homebridge process by configuring the `TZ` environment variable (for example, `TZ=America/Los_Angeles`).",
-            "semantic_abstract": "The plugin relies on the host server's Node.js environment to determine the local timezone for all time-based calculations and program scheduling. Discrepancies in scheduled appliance start times typically result from the server being configured to a different timezone, such as UTC, rather than the user's actual location. Correcting the system timezone via `timedatectl` or the `TZ` environment variable ensures absolute time values are interpreted correctly.",
-            "confidence": "high",
-            "hash": "c49d44563ee90371290394ae5c2214ef7ae55786b9d84cd631836d6b5ac74a51"
+            "question": "Why does my Home Connect appliance program with `BSH.Common.Option.StartInRelative` not start at the expected absolute time?",
+            "answer": "The `BSH.Common.Option.StartInRelative` parameter is designed to define a *duration* for a delayed start, not an *absolute time of day*. For example, setting `\"BSH.Common.Option.StartInRelative\": \"00:01\"` configures a 1-minute delay from the moment the program is activated, rather than specifying a start time of 1 minute past midnight.\n\n The plugin sends this `HH:MM` duration value directly to the Home Connect API without explicit timezone processing.\n\nFor any time-related behaviour, the plugin relies on the Homebridge server's local timezone configuration as determined by its Node.js environment. To ensure consistent behaviour:\n\n1.  **Verify server timezone**: Check that your Homebridge server's operating system has the correct timezone configured using a command like `timedatectl` (on Linux).\n2.  **Explicitly set timezone**: If required, you can explicitly set the `TZ` environment variable for the Homebridge process. This can override the system-wide setting, ensuring Homebridge operates within a specific timezone.\n\nAny further discrepancies in how the *appliance itself* or the *Home Connect API* interprets this relative duration, or how it aligns with absolute times, are typically external to the plugin's direct control.",
+            "semantic_abstract": "The `BSH.Common.Option.StartInRelative` parameter on Home Connect appliances defines a relative duration delay, not an absolute start time, causing user confusion when expecting time-of-day scheduling. The plugin passes `HH:MM` values directly, relying on the Homebridge server's local timezone for time interpretation, which can be configured via `timedatectl` or the `TZ` environment variable.",
+            "hash": "c55999c6fe207c16b782c06f12007ceedbae03edbe38bd52b1f1041ceb11c86d"
         }
     ]
 }
