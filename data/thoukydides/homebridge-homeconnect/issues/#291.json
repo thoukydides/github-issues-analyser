@@ -1,13 +1,12 @@
 {
     "issue_number": 291,
-    "updated_at": "2026-02-26T20:03:19.362Z",
+    "updated_at": "2026-03-28T10:51:12.913Z",
     "faq": [
         {
-            "question": "Why are some appliance programs or settings marked as `(unrecognised)` in the logs?",
-            "answer": "The plugin uses a comprehensive set of definitions to map Home Connect API values to HomeKit characteristics. Manufacturers like Siemens, Bosch, or Neff occasionally release new appliance models (such as the Siemens WN54C2070/01) or firmware updates that include programs, options, or settings not yet documented in the official API. When the plugin detects these unknown values, it identifies them as `(unrecognised)` in the log. This typically occurs during the initialisation of an appliance when the plugin generates a summary of supported features, often formatted as a `// Union types` block. If you encounter these messages:\n\n1. Update the plugin to the latest version, as support for new values is added in almost every release.\n2. If the values remain unrecognised on the latest version, please open a GitHub issue and include the relevant section of the log containing the unrecognised entries.\n\nProviding this log information allows the maintainer to add formal support for these values, ensuring that all appliance features are correctly represented and controllable within HomeKit.",
-            "semantic_abstract": "The Home Connect API periodically returns undocumented identifiers for programs and options when new appliance models or firmware are released. The plugin identifies these via `(unrecognised)` markers in diagnostic logs and generates formatted `Union types` blocks to facilitate their manual inclusion in the code. This explicit mapping ensures that all appliance functionality is correctly typed and exposed through HomeKit services.",
-            "confidence": "high",
-            "hash": "e54665de5a417ea1c1d255ac1ef525d4c310ca98af28582b05ba4d3766da41d5"
+            "question": "Why does the log contain TypeScript code snippets with `(unrecognised)` comments?",
+            "answer": "The Home Connect API frequently employs identifiers for programs, options, and settings that are not included in the official technical documentation provided to developers. When the plugin encounters a value it does not recognise, it cannot determine how to map it to HomeKit functionality and instead logs the technical key with an `(unrecognised)` label.\n\nTo facilitate support for these undocumented features, the plugin generates TypeScript code snippets in the log that define the unmapped values. This is common with newer appliances or specific models (such as washer-dryers) that may introduce programs like `DelicatesSilk` or combined modes like `WashingAndDrying` that were not previously known to the plugin.\n\nTo resolve these warnings:\n1. Ensure the plugin is updated to the latest version, as support for many new identifiers is added in each release.\n2. If the values are still unrecognised in the latest version, please create a GitHub issue and paste the generated log snippets. This information allows the maintainer to update the plugin's internal mapping and correctly expose those appliance features to HomeKit.",
+            "semantic_abstract": "The plugin generates TypeScript code snippets in the logs when it detects Home Connect API programs or options that are missing from its internal definitions and the official technical specification. These undocumented identifiers require manual mapping within the plugin's codebase to translate appliance-specific features into HomeKit-compatible services and characteristics.",
+            "hash": "0da8928dbd1e72e4eee822f1caa55bf9e42c79d4930e12eddce65b9920d0e2b6"
         }
     ]
 }
