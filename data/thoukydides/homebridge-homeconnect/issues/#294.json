@@ -1,13 +1,12 @@
 {
     "issue_number": 294,
-    "updated_at": "2026-02-27T03:12:49.889Z",
+    "updated_at": "2026-03-28T11:40:38.496Z",
     "faq": [
         {
-            "question": "Do I need to list every appliance in the configuration?",
-            "answer": "No. The plugin is designed to automatically discover all appliances linked to your Home Connect account without requiring them to be manually added to the `config.json` file. You only need to add specific entries to the `appliances` section if you wish to override the default behaviour for a device, such as:\n\n* Disabling a specific appliance so it does not appear in HomeKit.\n* Changing the service type or name for a specific device.\n* Applying specific feature flags or customisations.\n\nAny appliance not explicitly mentioned in your configuration will be enabled and exposed to HomeKit using its default settings. Note that version 1.0.0 briefly introduced a regression where unlisted devices caused a `TypeError: Cannot read properties of undefined (reading 'enabled')`, but this was corrected in version 1.0.1 and the intended automatic discovery behaviour has been restored.",
-            "semantic_abstract": "The plugin implements automatic appliance discovery for all devices associated with the Home Connect account, making manual configuration entries optional. Explicit configuration is only necessary for overriding default behaviours or excluding specific devices from the platform. The discovery mechanism ensures all account-linked devices are exposed to HomeKit by default unless specifically suppressed in the plugin settings.",
-            "confidence": "high",
-            "hash": "4d502464c8edc105f542e359e2cd693fcc85746447e5b6de8b437cc1857a4c44"
+            "question": "Do I need to manually list every appliance in the plugin configuration?",
+            "answer": "No. The plugin is designed to automatically discover all appliances associated with your Home Connect account. You only need to add specific appliance entries to your `config.json` if you wish to override the default behaviour. This includes:\n\n* **Excluding devices**: Setting `enabled: false` for a specific appliance ID to prevent it from appearing in HomeKit.\n* **Custom names**: Providing a specific name for an appliance that differs from the default name reported by the API.\n* **Feature configuration**: Defining specific programs, options, or settings for a particular model.\n\nBy default, any appliance detected via the Home Connect API that is not explicitly configured in your `config.json` will be automatically enabled and exposed to HomeKit.",
+            "semantic_abstract": "Home Connect appliances are automatically discovered and enabled by default via the API, with explicit entries in `config.json` required only for per-device overrides, customisations, or to disable specific units from the HomeKit ecosystem.",
+            "hash": "c8c6229671fb40c55bf9f250bcf1acd9d871c3aca3a240bab8a3452850da7668"
         }
     ]
 }
