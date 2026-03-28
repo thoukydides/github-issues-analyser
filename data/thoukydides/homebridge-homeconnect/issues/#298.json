@@ -1,13 +1,12 @@
 {
     "issue_number": 298,
-    "updated_at": "2026-02-27T06:09:39.253Z",
+    "updated_at": "2026-03-28T13:18:59.983Z",
     "faq": [
         {
-            "question": "Why does the plugin fail with `SyntaxError: Unexpected identifier 'assert'`?",
-            "answer": "This error occurs on Node.js 22 and updated versions of Node.js 18 and 20 due to a change in the ECMAScript module (ESM) import attribute syntax. The `assert` keyword, previously used for JSON imports, has been replaced by the `with` keyword. To resolve this, update the plugin to version 1.0.4 or later. Please note the following environment requirements: 1. **Node.js LTS**: Only Long Term Support (LTS) versions of Node.js are supported, following official Homebridge guidelines. 2. **Minimum Versions**: If using Node.js 18, version 18.20.0 or higher is required to support the updated syntax. 3. **Non-LTS Versions**: Versions such as Node.js 19 or 21 are not supported. If you cannot update the plugin immediately, a temporary workaround is to use a stable Node.js 20 LTS release.",
-            "semantic_abstract": "Node.js engine updates to ESM import attributes, specifically transitioning from the `assert` keyword to `with` for JSON imports, cause a `SyntaxError` in older plugin versions running on Node.js 22 or updated LTS releases. Resolution requires plugin v1.0.4 or higher and adherence to Homebridge's LTS-only support policy, requiring at least Node.js v18.20.0 for the 18.x branch.",
-            "confidence": "high",
-            "hash": "e8295a16616e0239ce7f81611201f30003ae295d64792c707ce4026036594133"
+            "question": "Which Node.js versions are compatible with this plugin?",
+            "answer": "This plugin aligns its compatibility with the official Homebridge support policy, which focuses on Node.js Long Term Support (LTS) releases. \n\n* **Supported versions**: Currently Node.js 18, 20, and 22 are supported.\n* **Minimum requirements**: Node.js 18 requires version 18.20.0 or later to ensure compatibility with modern JavaScript features like ESM import attributes.\n* **Non-LTS releases**: Interim releases that are not designated as LTS, such as Node.js 19 or 21, are not supported.\n\nUsing an unsupported or outdated version of Node.js may result in initialization errors, such as `SyntaxError: Unexpected identifier 'assert'`. It is recommended to always use a supported LTS version for stability and compatibility.",
+            "semantic_abstract": "Plugin compatibility is restricted to Node.js Long Term Support (LTS) releases, following Homebridge project standards. Technical requirements for ECMAScript import attributes necessitate minimum minor versions of older LTS branches and exclude support for non-LTS interim releases like Node.js 19.",
+            "hash": "1c85e578397fc3ee42a357dd0170cf3106d8cf5d8fbc0a5679762ccabc559212"
         }
     ]
 }
