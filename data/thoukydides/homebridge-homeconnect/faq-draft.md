@@ -94,6 +94,8 @@
     - [Why are features available in the official app or IFTTT missing from this plugin?](#why-are-features-available-in-the-official-app-or-ifttt-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
+    - [Do I need to manually list every appliance in the configuration?](#do-i-need-to-manually-list-every-appliance-in-the-configuration)
+    - [Which Node.js versions are compatible with this plugin?](#which-nodejs-versions-are-compatible-with-this-plugin)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -928,7 +930,7 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-#### 🚧 Do I need to manually list every appliance in the plugin configuration? 🚧
+#### Do I need to manually list every appliance in the configuration?
 
 <!-- INCLUDES: issue-294-c8c6 -->
 No. The plugin is designed to automatically discover all appliances associated with your Home Connect account. You only need to add specific appliance entries to your `config.json` if you wish to override the default behaviour. This includes:
@@ -939,7 +941,7 @@ No. The plugin is designed to automatically discover all appliances associated w
 
 By default, any appliance detected via the Home Connect API that is not explicitly configured in your `config.json` will be automatically enabled and exposed to HomeKit.
 
-#### 🚧 Which Node.js versions are compatible with this plugin? 🚧
+#### Which Node.js versions are compatible with this plugin?
 
 <!-- INCLUDES: issue-298-1c85 -->
 This plugin aligns its compatibility with the official Homebridge support policy, which focuses on Node.js Long Term Support (LTS) releases. 
@@ -948,6 +950,6 @@ This plugin aligns its compatibility with the official Homebridge support policy
 * **Minimum requirements**: Node.js 18 requires version 18.20.0 or later to ensure compatibility with modern JavaScript features like ESM import attributes.
 * **Non-LTS releases**: Interim releases that are not designated as LTS, such as Node.js 19 or 21, are not supported.
 
-Using an unsupported or outdated version of Node.js may result in initialization errors, such as `SyntaxError: Unexpected identifier 'assert'`. It is recommended to always use a supported LTS version for stability and compatibility.
+Using an unsupported or outdated version of Node.js may result in initialisation errors, such as `SyntaxError: Unexpected identifier 'assert'`. It is recommended to always use a supported LTS version for stability and compatibility.
 
 <!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-300-cd35 issue-303-3b35 issue-304-5f8b issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->

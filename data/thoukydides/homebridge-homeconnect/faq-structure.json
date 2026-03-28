@@ -901,22 +901,23 @@
                                     "included_ids": [
                                         "issue-53-27e2"
                                     ]
-                                }
-                            ],
-                            "candidates": [
-                                {
-                                    "issue_number": 294,
-                                    "id": "issue-294-c8c6",
-                                    "question": "Do I need to manually list every appliance in the plugin configuration?",
-                                    "answer": "No. The plugin is designed to automatically discover all appliances associated with your Home Connect account. You only need to add specific appliance entries to your `config.json` if you wish to override the default behaviour. This includes:\n\n* **Excluding devices**: Setting `enabled: false` for a specific appliance ID to prevent it from appearing in HomeKit.\n* **Custom names**: Providing a specific name for an appliance that differs from the default name reported by the API.\n* **Feature configuration**: Defining specific programs, options, or settings for a particular model.\n\nBy default, any appliance detected via the Home Connect API that is not explicitly configured in your `config.json` will be automatically enabled and exposed to HomeKit."
                                 },
                                 {
-                                    "issue_number": 298,
-                                    "id": "issue-298-1c85",
+                                    "question": "Do I need to manually list every appliance in the configuration?",
+                                    "answer": "No. The plugin is designed to automatically discover all appliances associated with your Home Connect account. You only need to add specific appliance entries to your `config.json` if you wish to override the default behaviour. This includes:\n\n* **Excluding devices**: Setting `enabled: false` for a specific appliance ID to prevent it from appearing in HomeKit.\n* **Custom names**: Providing a specific name for an appliance that differs from the default name reported by the API.\n* **Feature configuration**: Defining specific programs, options, or settings for a particular model.\n\nBy default, any appliance detected via the Home Connect API that is not explicitly configured in your `config.json` will be automatically enabled and exposed to HomeKit.",
+                                    "included_ids": [
+                                        "issue-294-c8c6"
+                                    ]
+                                },
+                                {
                                     "question": "Which Node.js versions are compatible with this plugin?",
-                                    "answer": "This plugin aligns its compatibility with the official Homebridge support policy, which focuses on Node.js Long Term Support (LTS) releases. \n\n* **Supported versions**: Currently Node.js 18, 20, and 22 are supported.\n* **Minimum requirements**: Node.js 18 requires version 18.20.0 or later to ensure compatibility with modern JavaScript features like ESM import attributes.\n* **Non-LTS releases**: Interim releases that are not designated as LTS, such as Node.js 19 or 21, are not supported.\n\nUsing an unsupported or outdated version of Node.js may result in initialization errors, such as `SyntaxError: Unexpected identifier 'assert'`. It is recommended to always use a supported LTS version for stability and compatibility."
+                                    "answer": "This plugin aligns its compatibility with the official Homebridge support policy, which focuses on Node.js Long Term Support (LTS) releases. \n\n* **Supported versions**: Currently Node.js 18, 20, and 22 are supported.\n* **Minimum requirements**: Node.js 18 requires version 18.20.0 or later to ensure compatibility with modern JavaScript features like ESM import attributes.\n* **Non-LTS releases**: Interim releases that are not designated as LTS, such as Node.js 19 or 21, are not supported.\n\nUsing an unsupported or outdated version of Node.js may result in initialisation errors, such as `SyntaxError: Unexpected identifier 'assert'`. It is recommended to always use a supported LTS version for stability and compatibility.",
+                                    "included_ids": [
+                                        "issue-298-1c85"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
