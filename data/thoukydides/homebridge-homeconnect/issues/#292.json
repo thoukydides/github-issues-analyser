@@ -1,13 +1,12 @@
 {
     "issue_number": 292,
-    "updated_at": "2026-02-26T19:13:27.952Z",
+    "updated_at": "2026-03-28T10:05:15.978Z",
     "faq": [
         {
-            "question": "Why is my hood stuck with a message saying it is waiting for features to finish initialising?",
-            "answer": "If your hood (or any other appliance) is stuck during initialisation with log messages like `Waiting for 3 features to finish initialising: Power, Fan, and Light`, it usually indicates that the appliance is disconnected from the Home Connect cloud servers. The plugin cannot retrieve the necessary feature details from the API until the appliance is reported as connected. This can happen even if the appliance appears functional in the official Home Connect app, as the app may be using a local connection or the cloud status hasn't synchronised. To resolve this, try removing the appliance from the Home Connect app and then re-adding it to your home network to force a fresh connection to the cloud servers.",
-            "semantic_abstract": "Home Connect appliance initialisation delays occur when the Home Connect API reports the device as disconnected, preventing the plugin from querying supported features like power, fan, and light. This state can persist despite local app control, often requiring a full reset and re-pairing of the appliance to the Home Connect cloud service to restore API visibility.",
-            "confidence": "high",
-            "hash": "77b3e4d0a0789756afc799fbef262922600aa9f04d4b81ec4f0e7ed2d0c1b901"
+            "question": "Why is my appliance stuck with a `Waiting for features to finish initialising` message in the logs?",
+            "answer": "This message indicates that the plugin is unable to communicate with the appliance via the Home Connect API because the API reports the device as disconnected from their cloud servers. This typically occurs when the plugin is waiting for specific features like `Power`, `Fan`, or `Light` to respond to discovery requests.\n\nEven if the official Home Connect app is able to control the appliance, it may be using a different communication path, or the API's view of the device state may be stale. The plugin cannot discover or configure appliance features until the API confirms the device is online and reachable.\n\nTo resolve this state:\n1. Verify the appliance has a stable Wi-Fi connection and shows as connected in the official app.\n2. If the problem persists despite the appliance appearing online in the official app, remove the appliance from the Home Connect mobile app.\n3. Re-pair the appliance with your Wi-Fi network and add it back to the Home Connect app from scratch.\n4. Restart Homebridge to trigger a fresh initialisation of the appliance features.",
+            "semantic_abstract": "Inconsistent connectivity states between the Home Connect mobile app and the official API can cause appliances to appear offline to the plugin, preventing feature discovery and resulting in persistent initialization delays. This discrepancy requires re-pairing the appliance with the Home Connect platform to synchronise the cloud connection state and allow the API to correctly report the device as reachable.",
+            "hash": "3212895e490a751cb04dae60acbc0455c7677ad958b82a363be74594dcfec265"
         }
     ]
 }
