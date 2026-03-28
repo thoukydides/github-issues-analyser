@@ -1,13 +1,12 @@
 {
     "issue_number": 297,
-    "updated_at": "2026-02-27T04:59:21.956Z",
+    "updated_at": "2026-03-28T11:59:08.263Z",
     "faq": [
         {
-            "question": "Why do the logs show unrecognised options like `LaundryCare.Washer.Option.WaterAndRinsePlus1`?",
-            "answer": "The Home Connect API frequently includes settings and options that are not documented in the official manufacturer specification. When the plugin encounters these undocumented values, it logs the discovered schema and marks them as `unrecognised`. These options will not be available in HomeKit until they are manually added to the plugin. If you find such entries in your logs, please report them by opening a GitHub issue and providing the relevant log snippets. This allows the maintainer to map the undocumented values in a future update. Once implemented, updating to the latest version of the plugin will resolve the message and enable the feature. For example, support for the `LaundryCare.Washer.Option.WaterAndRinsePlus1` option found on some Siemens washers was added in version 1.0.3.",
-            "semantic_abstract": "Siemens and other Home Connect appliances often feature undocumented program options that are absent from the official API specification. The plugin identifies these discrepancies and logs them as unrecognised TypeScript-style interfaces, which serve as a prompt for users to report the values for manual inclusion in future plugin versions.",
-            "confidence": "medium",
-            "hash": "f476437a01a63192be0f01db0a295ec42931e11e7ea36b72ed4c5e75a6dd9db9"
+            "question": "Why does the log show `(unrecognised)` options like `LaundryCare.Washer.Option.WaterAndRinsePlus1`?",
+            "answer": "The plugin includes a discovery mechanism to identify appliance features, settings, or program options that are not yet officially documented by Home Connect or supported by the plugin. If an appliance reports a value that is unknown to the plugin, it will log a suggested TypeScript interface containing the missing key and a `// (unrecognised)` comment.\n\nThis typically happens when:\n* A specific model (such as a Siemens or Bosch washer) uses proprietary extensions to the standard API.\n* A firmware update introduces new functionality.\n* The Home Connect API returns values that deviate from its public specification.\n\nIf you encounter these log entries:\n1. Ensure you are running the latest version of the `homebridge-homeconnect` plugin.\n2. If the entries persist, open a GitHub issue and provide the log output. The maintainer uses these snippets to update the plugin's internal definitions and expose the new functionality to Homebridge.",
+            "semantic_abstract": "The Home Connect API often contains undocumented or model-specific keys that do not match the official specification. The plugin identifies these mismatches and generates diagnostic log output to allow users to report new appliance features for inclusion in future updates.",
+            "hash": "6f1dd9659eae5591214a97bde18cea5ba798c980873db763dd26b0732ca2f25e"
         }
     ]
 }
