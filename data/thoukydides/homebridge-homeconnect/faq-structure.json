@@ -58,9 +58,7 @@
                                         "issue-60-aba8",
                                         "issue-82-1bfb",
                                         "issue-118-0a9e",
-                                        "issue-121-d035",
-                                        "issue-295-521b",
-                                        "issue-299-15d1"
+                                        "issue-121-d035"
                                     ]
                                 },
                                 {
@@ -85,7 +83,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 295,
+                                    "id": "issue-295-c09a",
+                                    "question": "Why does the authorisation link return an `access_denied` error with the message `login session expired`?",
+                                    "answer": "This error is caused by a bug on the Home Connect authorisation servers related to browser language settings. If your browser's preferred language is set to something other than English (for example, Spanish `es-ES` or German `de-DE`), the Home Connect login flow may fail prematurely and return a raw JSON error instead of completing the process.\n\nTo resolve this and successfully authorise the plugin, follow these steps:\n1. Open your browser settings and navigate to the language or appearance section.\n2. Add English (`en` or `en-GB`) to your list of preferred languages.\n3. Move English to the top of the list so it is the primary language sent in the `Accept-Language` header.\n4. Restart the Homebridge plugin to generate a new authorisation link.\n5. Click the link and complete the sign-in process with English as the primary browser language.\n\nOnce the authorisation is complete and the plugin has saved the credentials, you can revert your browser language settings to your preferred language."
+                                },
+                                {
+                                    "issue_number": 299,
+                                    "id": "issue-299-6c02",
+                                    "question": "Why do I receive an `access_denied` error with `login session expired` during authorisation?",
+                                    "answer": "This error is caused by a known bug in the Home Connect authorisation servers. It typically occurs when the user is prompted for their username but the session expires before they can enter a password, or immediately after entering the username.\n\nTo resolve this, set **English** as the preferred language in your web browser settings before starting the authorisation process. This workaround bypasses the server-side issue, allowing the login flow to complete successfully. You can revert your browser language settings once the plugin has been authorised."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -317,8 +328,6 @@
                                         "issue-277-7b13",
                                         "issue-278-36c0",
                                         "issue-279-4938",
-                                        "issue-291-e546",
-                                        "issue-297-f476",
                                         "issue-301-9995",
                                         "issue-305-c3b1",
                                         "issue-307-94f6",
@@ -401,7 +410,6 @@
                                     "included_ids": [
                                         "issue-50-7106",
                                         "issue-78-6bc5",
-                                        "issue-288-9266",
                                         "issue-328-99fc"
                                     ]
                                 },
@@ -411,8 +419,6 @@
                                     "included_ids": [
                                         "issue-27-a038",
                                         "issue-42-d406",
-                                        "issue-290-df65",
-                                        "issue-292-77b3",
                                         "issue-315-9e82",
                                         "issue-323-f483",
                                         "issue-329-1549",
@@ -492,9 +498,7 @@
                                 {
                                     "question": "Why is the scheduled start time for my appliance program not being honoured?",
                                     "answer": "The plugin does not perform internal time zone processing or use the location settings from your Home Connect account. Instead, it relies entirely on the local time zone of the server running Node.js and Homebridge. If a scheduled program, such as one using `BSH.Common.Option.StartInRelative`, triggers at an unexpected time, it is likely that your server is configured to a different time zone (often UTC/GMT by default).\n\nTo resolve this:\n1. Verify your server's current time zone configuration. On most Linux distributions, you can use the `timedatectl` command.\n2. Ensure the operating system or container environment is set to your correct local time zone.\n3. If you cannot change the system-wide settings, you can explicitly set the time zone for the Homebridge process by configuring the `TZ` environment variable (for example, `TZ=Europe/London`).",
-                                    "included_ids": [
-                                        "issue-293-c49d"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "How can I reduce the number of switches created for appliance programs?",
@@ -508,16 +512,12 @@
                                 {
                                     "question": "What does the log message `Using expired cache result` mean?",
                                     "answer": "The plugin caches technical details about appliance programs because the Home Connect API only allows this information to be retrieved reliably when a program is selected but not yet running. The plugin considers this cache expired if the program has not been selected on the appliance for more than 24 hours.\n\nWhen the plugin requires these details but cannot refresh them from the API (because a different program is currently selected), it will use the last known data and log this message. This is expected behaviour and does not indicate a functional failure; it simply signifies that the plugin is relying on historical data for a program that has not been used recently.",
-                                    "included_ids": [
-                                        "issue-288-674a"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?",
                                     "answer": "The plugin prioritises the `Active` characteristic (the power state) over the `TargetFanState` (Manual/Auto). When the fan is off, selecting `Auto` in HomeKit saves the preference within the plugin, but it typically only takes effect once the fan is subsequently switched to `On` (for example, by adjusting the speed slider or toggling the power).\n\nThis design choice is driven by several factors:\n\n- **API Limitations**: Many Home Connect hoods do not report current fan speed when operating in automatic mode. This makes it difficult for the plugin to provide accurate feedback to HomeKit.\n- **Hardware Variations**: Different manufacturers implement automatic modes differently. Some require the fan to be explicitly `Active` before an automatic program can be engaged.\n- **HomeKit Specification**: The Apple HomeKit Accessory Protocol (HAP) does not define whether setting a fan to `Auto` should implicitly power it on.\n\nIf your hood does not respond when you toggle `Auto`, ensure the fan is also switched to `On`. Note that because some hoods do not report speed in this mode, the Home app may display an incorrect speed percentage while the automatic program is running.",
-                                    "included_ids": [
-                                        "issue-289-b4fa"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?",
@@ -535,7 +535,56 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 288,
+                                    "id": "issue-288-5cc2",
+                                    "question": "Why does the log show `is not supported by the Home Connect API` for a selected program?",
+                                    "answer": "This is caused by an inconsistency within the Home Connect API itself. The API may report that a specific program (for example, `LaundryCare.Washer.Program.Super153045.Super30`) is currently selected on the appliance, yet simultaneously omit that program from the list of supported programs for that specific device. This prevents the plugin from retrieving the full details and options for that program. Because this data is provided directly by the Home Connect servers, it cannot be corrected by the plugin."
+                                },
+                                {
+                                    "issue_number": 288,
+                                    "id": "issue-288-01bf",
+                                    "question": "What does the log message `Using expired cache result` mean?",
+                                    "answer": "The plugin maintains a local cache of appliance program details because the Home Connect API only allows this information to be retrieved reliably when a program is selected on the physical appliance but not yet running. The `Using expired cache result` message indicates that:\n\n1. The cached data for a specific program is more than 24 hours old.\n2. The plugin attempted to refresh this information, but was unable to do so because the appliance was not in the required state (the program was not selected).\n\nThis is normal behaviour and does not indicate a fault with the plugin. The plugin will continue to use the existing cached data to maintain functionality until the program is next selected and a refresh becomes possible."
+                                },
+                                {
+                                    "issue_number": 289,
+                                    "id": "issue-289-99bf",
+                                    "question": "Why does setting my Home Connect hood fan to \"auto\" in HomeKit not immediately activate it, or why does HomeKit display incorrect status when it does activate?",
+                                    "answer": "The plugin's design prioritises the HomeKit `Active` characteristic (on/off) over the `TargetFanState.AUTO` characteristic for hood appliances. When `AUTO` is selected in HomeKit, this state is remembered by the plugin but only takes effect when the fan is subsequently activated, for example, by selecting a non-zero fan speed.\n\nThis approach was chosen because the Apple HAP Specification does not provide clear guidance on the interaction between these characteristics, and the plugin aims for a 'set-and-forget' `AUTO` behaviour that triggers when the fan is switched on. This has been the plugin's implementation for an extended period, reflecting a balance across various hood models' behaviours.\n\nHowever, some specific hood models (e.g., certain Thermador models) may behave differently. When `AUTO` is pressed on the physical appliance, the Home Connect API might send events indicating both `active` and `program mode auto` simultaneously. In these cases, the current plugin logic can lead to:\n\n*   HomeKit displaying \"no response\" from the fan, even if the hood has correctly switched to auto mode.\n*   HomeKit displaying a previous fan speed, rather than the actual speed when in auto mode.\n\nFurthermore, the Home Connect API generally does not provide explicit fan speed information when an appliance is operating in automatic mode. This lack of information makes it challenging for the plugin to accurately reflect the actual fan speed back to HomeKit, although some appliances might internally track and display different speeds."
+                                },
+                                {
+                                    "issue_number": 290,
+                                    "id": "issue-290-96f5",
+                                    "question": "Why does the log say \"Appliance initialisation is taking longer than expected\" and the device is non-responsive?",
+                                    "answer": "This message indicates that the plugin is waiting for the Home Connect API to provide the current state of specific features (such as `Power`, `Door`, `Light`, or `Programs`). Until the API reports these states, the plugin cannot fully expose the appliance's functionality to HomeKit, often resulting in a \"No Response\" status in the Home app.\n\nThis situation typically occurs following an appliance firmware update or a transient communication failure between the appliance and the Home Connect cloud servers. To resolve this:\n\n1.  **Power cycle the appliance**: Disconnect the appliance from power (unplug it or turn off the circuit breaker) for at least 30 seconds, then reconnect it.\n2.  **Restart Homebridge**: Once the appliance has reconnected to Wi-Fi, restart your Homebridge instance to trigger a fresh initialisation sequence.\n3.  **Check official app**: Verify that the appliance is controllable and showing as online in the official Home Connect mobile application."
+                                },
+                                {
+                                    "issue_number": 291,
+                                    "id": "issue-291-0da8",
+                                    "question": "Why does the log contain TypeScript code snippets with `(unrecognised)` comments?",
+                                    "answer": "The Home Connect API frequently employs identifiers for programs, options, and settings that are not included in the official technical documentation provided to developers. When the plugin encounters a value it does not recognise, it cannot determine how to map it to HomeKit functionality and instead logs the technical key with an `(unrecognised)` label.\n\nTo facilitate support for these undocumented features, the plugin generates TypeScript code snippets in the log that define the unmapped values. This is common with newer appliances or specific models (such as washer-dryers) that may introduce programs like `DelicatesSilk` or combined modes like `WashingAndDrying` that were not previously known to the plugin.\n\nTo resolve these warnings:\n1. Ensure the plugin is updated to the latest version, as support for many new identifiers is added in each release.\n2. If the values are still unrecognised in the latest version, please create a GitHub issue and paste the generated log snippets. This information allows the maintainer to update the plugin's internal mapping and correctly expose those appliance features to HomeKit."
+                                },
+                                {
+                                    "issue_number": 292,
+                                    "id": "issue-292-3212",
+                                    "question": "Why is my appliance stuck with a `Waiting for features to finish initialising` message in the logs?",
+                                    "answer": "This message indicates that the plugin is unable to communicate with the appliance via the Home Connect API because the API reports the device as disconnected from their cloud servers. This typically occurs when the plugin is waiting for specific features like `Power`, `Fan`, or `Light` to respond to discovery requests.\n\nEven if the official Home Connect app is able to control the appliance, it may be using a different communication path, or the API's view of the device state may be stale. The plugin cannot discover or configure appliance features until the API confirms the device is online and reachable.\n\nTo resolve this state:\n1. Verify the appliance has a stable Wi-Fi connection and shows as connected in the official app.\n2. If the problem persists despite the appliance appearing online in the official app, remove the appliance from the Home Connect mobile app.\n3. Re-pair the appliance with your Wi-Fi network and add it back to the Home Connect app from scratch.\n4. Restart Homebridge to trigger a fresh initialisation of the appliance features."
+                                },
+                                {
+                                    "issue_number": 293,
+                                    "id": "issue-293-c559",
+                                    "question": "Why does my Home Connect appliance program with `BSH.Common.Option.StartInRelative` not start at the expected absolute time?",
+                                    "answer": "The `BSH.Common.Option.StartInRelative` parameter is designed to define a *duration* for a delayed start, not an *absolute time of day*. For example, setting `\"BSH.Common.Option.StartInRelative\": \"00:01\"` configures a 1-minute delay from the moment the program is activated, rather than specifying a start time of 1 minute past midnight.\n\n The plugin sends this `HH:MM` duration value directly to the Home Connect API without explicit timezone processing.\n\nFor any time-related behaviour, the plugin relies on the Homebridge server's local timezone configuration as determined by its Node.js environment. To ensure consistent behaviour:\n\n1.  **Verify server timezone**: Check that your Homebridge server's operating system has the correct timezone configured using a command like `timedatectl` (on Linux).\n2.  **Explicitly set timezone**: If required, you can explicitly set the `TZ` environment variable for the Homebridge process. This can override the system-wide setting, ensuring Homebridge operates within a specific timezone.\n\nAny further discrepancies in how the *appliance itself* or the *Home Connect API* interprets this relative duration, or how it aligns with absolute times, are typically external to the plugin's direct control."
+                                },
+                                {
+                                    "issue_number": 297,
+                                    "id": "issue-297-6f1d",
+                                    "question": "Why does the log show `(unrecognised)` options like `LaundryCare.Washer.Option.WaterAndRinsePlus1`?",
+                                    "answer": "The plugin includes a discovery mechanism to identify appliance features, settings, or program options that are not yet officially documented by Home Connect or supported by the plugin. If an appliance reports a value that is unknown to the plugin, it will log a suggested TypeScript interface containing the missing key and a `// (unrecognised)` comment.\n\nThis typically happens when:\n* A specific model (such as a Siemens or Bosch washer) uses proprietary extensions to the standard API.\n* A firmware update introduces new functionality.\n* The Home Connect API returns values that deviate from its public specification.\n\nIf you encounter these log entries:\n1. Ensure you are running the latest version of the `homebridge-homeconnect` plugin.\n2. If the entries persist, open a GitHub issue and provide the log output. The maintainer uses these snippets to update the plugin's internal definitions and expose the new functionality to Homebridge."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -903,7 +952,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 294,
+                                    "id": "issue-294-c8c6",
+                                    "question": "Do I need to manually list every appliance in the plugin configuration?",
+                                    "answer": "No. The plugin is designed to automatically discover all appliances associated with your Home Connect account. You only need to add specific appliance entries to your `config.json` if you wish to override the default behaviour. This includes:\n\n* **Excluding devices**: Setting `enabled: false` for a specific appliance ID to prevent it from appearing in HomeKit.\n* **Custom names**: Providing a specific name for an appliance that differs from the default name reported by the API.\n* **Feature configuration**: Defining specific programs, options, or settings for a particular model.\n\nBy default, any appliance detected via the Home Connect API that is not explicitly configured in your `config.json` will be automatically enabled and exposed to HomeKit."
+                                },
+                                {
+                                    "issue_number": 298,
+                                    "id": "issue-298-1c85",
+                                    "question": "Which Node.js versions are compatible with this plugin?",
+                                    "answer": "This plugin aligns its compatibility with the official Homebridge support policy, which focuses on Node.js Long Term Support (LTS) releases. \n\n* **Supported versions**: Currently Node.js 18, 20, and 22 are supported.\n* **Minimum requirements**: Node.js 18 requires version 18.20.0 or later to ensure compatibility with modern JavaScript features like ESM import attributes.\n* **Non-LTS releases**: Interim releases that are not designated as LTS, such as Node.js 19 or 21, are not supported.\n\nUsing an unsupported or outdated version of Node.js may result in initialization errors, such as `SyntaxError: Unexpected identifier 'assert'`. It is recommended to always use a supported LTS version for stability and compatibility."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -940,8 +1002,6 @@
         "issue-194-0961",
         "issue-195-e227",
         "issue-239-6f85",
-        "issue-294-4d50",
-        "issue-298-e829",
         "issue-300-cd35",
         "issue-303-3b35",
         "issue-304-5f8b",
