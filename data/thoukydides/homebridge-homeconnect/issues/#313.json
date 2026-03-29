@@ -1,13 +1,12 @@
 {
     "issue_number": 313,
-    "updated_at": "2026-02-27T19:51:47.510Z",
+    "updated_at": "2026-03-29T15:04:40.320Z",
     "faq": [
         {
-            "question": "Why does the log contain blocks of TypeScript code with `(unrecognised)` comments?",
-            "answer": "The plugin is designed to monitor for features, options, or settings reported by the Home Connect API that are not yet known or documented. When an unknown key is encountered—such as `Dishcare.Dishwasher.Option.StorageFunction`—the plugin generates a TypeScript interface snippet in the logs to help identify the missing data. If you see these blocks in your log:\n\n1. Ensure you are running the latest version of the plugin, as support for the specific value may have already been added.\n2. If the message persists on the latest version, open a GitHub issue and provide the full log block.\n\nThis diagnostic output is a deliberate mechanism to identify undocumented appliance capabilities so they can be integrated into future releases of the plugin.",
-            "semantic_abstract": "The plugin performs runtime discovery of Home Connect API keys and identifies undocumented or unsupported values by outputting generated TypeScript interface blocks in the logs. This mechanism flags `(unrecognised)` appliance options or settings, facilitating user reports that allow the maintainer to update the plugin's internal schema for better device support.",
-            "confidence": "high",
-            "hash": "5c17bfaac4c51d6c0fe4cc4911f3b7b5272cc82a91d5692167b207f28a101a36"
+            "question": "What should I do if the logs show `(unrecognised)` Home Connect options or settings?",
+            "answer": "The plugin includes a diagnostic feature to identify appliance capabilities that are not yet officially documented in the Home Connect API specification or supported by the plugin. When these are detected, the plugin logs a block of code (an `interface`) and marks specific entries with the comment `// (unrecognised)`.\n\nIf you encounter these messages in your logs:\n1. Ensure you are running the latest version of the plugin, as support for new appliance features and undocumented options is added regularly.\n2. If the `(unrecognised)` entries persist on the latest version, copy the entire log block, including the `=====` delimiters.\n3. Open a new issue on GitHub and provide this log snippet along with the model of your appliance.\n\nProviding these logs allows the maintainer to update the plugin's internal definitions, enabling the new functionality to be monitored or controlled via HomeKit in future releases.",
+            "semantic_abstract": "The Home Connect API frequently utilizes undocumented keys for appliance options, settings, and status values, which the plugin identifies by logging diagnostic `interface` blocks with `(unrecognised)` tags. Reporting these logged snippets via GitHub issues enables the maintainer to synchronize the plugin's internal schema with the appliance's actual capabilities, allowing new features to be exposed to HomeKit.",
+            "hash": "9e94239e3697f81e0793667454d9ae7f2f762417c8e1eb43dc5296dbcb714cc6"
         }
     ]
 }
