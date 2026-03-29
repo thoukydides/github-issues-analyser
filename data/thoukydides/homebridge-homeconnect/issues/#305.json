@@ -1,13 +1,12 @@
 {
     "issue_number": 305,
-    "updated_at": "2026-02-27T15:04:02.942Z",
+    "updated_at": "2026-03-29T10:53:41.068Z",
     "faq": [
         {
-            "question": "Why does the log contain a block of code with `unrecognised` comments?",
-            "answer": "The plugin includes a diagnostic feature that monitors the Home Connect API for values not currently defined in its internal schema. This occurs when appliance firmware provides undocumented options or states that were previously unknown to the plugin. When this happens, the plugin outputs a formatted block of code to the logs, identifying the specific `ProcessPhase`, `OptionValues`, or other identifiers that need to be added to the plugin definitions. If these blocks appear in your logs, first ensure you are running the latest version of the plugin, as many unrecognised values (such as certain laundry `ProcessPhase` values) are added in regular updates. If the messages persist on the latest version, please report them by opening a GitHub issue and providing the complete output between the `=` delimiters to assist with incorporating the new values into the next release.",
-            "semantic_abstract": "The plugin employs a schema-validation mechanism that identifies undocumented Home Connect API enumeration values and logs them as TypeScript-formatted code blocks. This design facilitates the identification of manufacturer-specific or firmware-dependent values, such as appliance process phases and options, allowing for their systematic integration into the plugin type definitions.",
-            "confidence": "high",
-            "hash": "c3b1f42e2f0b90cd7efaa898c462f820a894a352de47ca3b3ae8c76342cfa40f"
+            "question": "What should I do if I see `(unrecognised)` API values in my logs?",
+            "answer": "The plugin automatically detects when a Home Connect appliance provides data—such as program options, states, or process phases—that has not yet been documented or mapped in the plugin's internal definitions. When this happens, it generates a diagnostic log entry formatted as a TypeScript code block, with the missing values highlighted by an `// (unrecognised)` comment.\n\nIf you see this in your logs:\n1. Copy the entire block of code, including the `================` separator lines.\n2. Open a new issue on the GitHub repository.\n3. Paste the log output into the issue description.\n\nProviding this information allows the maintainers to update the plugin's schema to support these new values in a future release.",
+            "semantic_abstract": "The plugin's diagnostic logging identifies undocumented Home Connect API schema values, such as appliance-specific process phases or options, by generating TypeScript-compatible code blocks. These entries indicate that the API has returned data not yet mapped within the plugin, requiring a manual update to the plugin's internal definitions to support the specific hardware behaviour.",
+            "hash": "082b653c66c40071c2c17d40ce42298be2df2a0c487f4490a7d93615ea8ca187"
         }
     ]
 }
