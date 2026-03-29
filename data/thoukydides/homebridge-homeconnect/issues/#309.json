@@ -1,13 +1,12 @@
 {
     "issue_number": 309,
-    "updated_at": "2026-02-27T17:01:01.501Z",
+    "updated_at": "2026-03-29T12:01:57.048Z",
     "faq": [
         {
-            "question": "What should I do if I see `Home Connect API returned keys/values that are unrecognised by this plugin`?",
-            "answer": "This warning appears when your appliance reports features, settings, or washing programmes that the plugin does not yet recognise. This usually occurs with recently released appliance models or after a firmware update introduces new functionality not yet documented in the Home Connect API.\n\nTo help add support for these features:\n1. Ensure you are running the latest version of the plugin, as support for new values is frequently added.\n2. If the warning remains, locate the code block in your logs starting after the line `Just paste the following into the \"Log File\" field and submit the issue`.\n3. Follow the GitHub link provided in the logs to open a new issue. The link is specifically crafted to include your appliance's model information.\n4. Paste the copied code block into the issue and submit it.\n\nThe maintainer uses these reports to update the plugin's internal definitions. Once a new version is released containing these updates (such as the addition of `LaundryCare.Washer.Option.SpinSpeed` in v1.0.7), the warning will disappear and the new functionality may become available in HomeKit.",
-            "semantic_abstract": "Home Connect appliances frequently introduce new API keys or values that require manual addition to the plugin's internal definitions. The plugin facilitates this by detecting unrecognised data and generating a pre-formatted report that users can submit via GitHub to help the maintainer implement support for new hardware features.",
-            "confidence": "high",
-            "hash": "bfa91919922b131faefe74073cb36521ae0852592a56bb9d52479c2de67efc41"
+            "question": "Why does the log show `Home Connect API returned keys/values that are unrecognised`?",
+            "answer": "The Home Connect API is frequently updated by the manufacturer with new programs, options, and status values that are not yet included in the official technical documentation. When the plugin encounters one of these undocumented identifiers, it logs a block of code and provides a link to report the discovery.\n\nThis is a deliberate design choice to ensure the plugin can support new appliance features as they are released. If you see this message:\n\n* Follow the link provided in your logs to create a new GitHub issue.\n* Paste the provided code snippet into the issue description.\n* The maintainers will use this information to update the plugin's internal definitions.\n\nOnce the definitions are updated in a future release, the message will no longer appear for that specific feature, and the corresponding functionality will be correctly mapped to HomeKit services.",
+            "semantic_abstract": "The Home Connect API introduces appliance-specific features and settings that are often missing from the official technical documentation. The plugin's discovery mechanism identifies these undocumented identifiers in the API response, facilitating the expansion of service mappings to support new hardware and firmware capabilities through user-submitted logs.",
+            "hash": "42e3e73783618cce40c110ab8cd35b8bb5cced8c42661fa532649476d2bc9827"
         }
     ]
 }
