@@ -237,19 +237,14 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why does my appliance frequently show `Disconnected (setting On error status)`?",
-                                    "answer": "Frequent transitions between `Connected` and `Disconnected` states usually indicate transient communication interruptions between the plugin and the Home Connect cloud. This plugin relies entirely on the manufacturer's cloud-based API; if the connection between the appliance and the cloud, or the cloud and the plugin, is interrupted, the device must be reported as disconnected.\n\n- **API Instability**: The Home Connect servers occasionally experience maintenance or instability. You can check the current status on the [Home Connect Server Status](https://homeconnect.thouky.co.uk/) page.\n- **Local Network**: Weak Wi-Fi signals or intermittent internet drops can cause the appliance to lose its cloud heartbeat.\n\nWhen these disconnections occur, the plugin logs the event and updates the HomeKit status to reflect that the device is unreachable. This is a reporting of the appliance's actual cloud state and cannot be resolved via plugin code changes.",
-                                    "included_ids": []
+                                    "question": "Why does my appliance frequently show `Disconnected (setting On error status)` or `EVENT STREAM END`?",
+                                    "answer": "Frequent transitions between `Connected` and `Disconnected` states (often logged as `EVENT STREAM END`) usually indicate transient communication interruptions between the plugin and the Home Connect cloud. This plugin relies entirely on the manufacturer's cloud-based API; if the connection between the appliance and the cloud, or the cloud and the plugin, is interrupted, the device must be reported as disconnected.\n\nCommon causes include:\n1. **API Instability**: The official Home Connect servers occasionally experience maintenance or instability, which can interrupt the event stream. You can check the current status on the [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page.\n2. **Wi-Fi Signal Strength**: If the API servers are stable, the appliance itself may be losing its connection to your local network. Check the official Home Connect app's network settings for the appliance; it should consistently show three green lines.\n3. **Internet Connection**: Intermittent drops in your internet connection will disrupt the persistent event stream required for real-time updates.\n\nThe plugin is designed to handle these interruptions by automatically attempting to reconnect. If your appliance transitions between states frequently but eventually restores its connection, it is almost certainly due to one of these environmental factors rather than a plugin bug.",
+                                    "included_ids": [
+                                        "issue-306-97c5"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 306,
-                                    "id": "issue-306-97c5",
-                                    "question": "Why does my appliance frequently disconnect with `EVENT STREAM END` or `Disconnected (setting On error status)` logs?",
-                                    "answer": "Frequent disconnections and reconnections are typically caused by factors external to the plugin:\n\n1. **Home Connect API Instability**: The official Home Connect API servers can be unreliable, leading to frequent interruptions of the event stream. You can verify the current status of the API via the [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page.\n2. **Wi-Fi Signal Strength**: If the API servers are stable, the appliance itself may be losing its connection to your local network. Check the official Home Connect app's network settings for the appliance; it should consistently show three green lines.\n3. **Internet Connection**: Intermittent drops in your internet connection will disrupt the persistent event stream required for real-time updates.\n\nThe plugin is designed to handle these interruptions by automatically attempting to reconnect. If your appliance transitions between `Connected` and `Disconnected` states frequently but eventually restores its connection, it is almost certainly due to one of these environmental factors rather than a plugin bug."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
