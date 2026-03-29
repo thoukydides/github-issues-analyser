@@ -80,12 +80,17 @@
                                 {
                                     "question": "How do I configure the plugin for a Home Connect account in Mainland China?",
                                     "answer": "Home Connect appliances registered in Mainland China use a dedicated regional API endpoint (`api.home-connect.cn`) and require specific configuration both in the Developer Portal and the plugin:\n\n1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and ensure your application has the **Sync to China** option enabled.\n2. In the Homebridge UI, locate the plugin settings and set the **Server Location** to **China**.\n3. If you are configuring the plugin manually via `config.json`, add `\"china\": true` to the plugin configuration object.\n\nNote that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.",
-                                    "included_ids": [
-                                        "issue-311-bcea"
-                                    ]
+                                    "included_ids": []
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 311,
+                                    "id": "issue-311-261b",
+                                    "question": "How do I configure the plugin for use with a Home Connect account in China?",
+                                    "answer": "The Home Connect China Mainland server operates on a separate infrastructure from the global service and requires specific configuration both in the developer portal and the plugin settings.\n\nTo enable support for the China Mainland server:\n1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and create (or update) your application. You must ensure that the **Sync to China** option is selected.\n2. In the Homebridge UI configuration for this plugin, locate the **Server Location** setting and select **China**.\n3. If you are manually editing your `config.json`, add `\"china\": true` to the plugin configuration object.\n\nThis configuration ensures the plugin uses the `api.home-connect.cn` endpoint instead of the default global endpoint. This is necessary to support the authentication flow and data residency requirements specific to the Chinese region."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -192,7 +197,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 303,
+                                    "id": "issue-303-eee7",
+                                    "question": "Why does my dishwasher report a `409 Conflict` or `SDK.Error.UnsupportedProgram` for certain programs like `LearningDishwasher`?",
+                                    "answer": "The Home Connect API does not necessarily expose every program available via the official Home Connect app or the appliance's physical control panel. If a program (for example, `Dishcare.Dishwasher.Program.LearningDishwasher`) is not advertised as supported by the API for your specific model, the plugin cannot select or control it.\n\nThis is a limitation of the Home Connect API platform, not the plugin. If a program is missing, it is recommended to contact Home Connect support directly to request its addition to their API."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -244,12 +256,17 @@
                                 {
                                     "question": "Why does my appliance frequently show `Disconnected (setting On error status)`?",
                                     "answer": "Frequent transitions between `Connected` and `Disconnected` states usually indicate transient communication interruptions between the plugin and the Home Connect cloud. This plugin relies entirely on the manufacturer's cloud-based API; if the connection between the appliance and the cloud, or the cloud and the plugin, is interrupted, the device must be reported as disconnected.\n\n- **API Instability**: The Home Connect servers occasionally experience maintenance or instability. You can check the current status on the [Home Connect Server Status](https://homeconnect.thouky.co.uk/) page.\n- **Local Network**: Weak Wi-Fi signals or intermittent internet drops can cause the appliance to lose its cloud heartbeat.\n\nWhen these disconnections occur, the plugin logs the event and updates the HomeKit status to reflect that the device is unreachable. This is a reporting of the appliance's actual cloud state and cannot be resolved via plugin code changes.",
-                                    "included_ids": [
-                                        "issue-306-b5fb"
-                                    ]
+                                    "included_ids": []
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 306,
+                                    "id": "issue-306-97c5",
+                                    "question": "Why does my appliance frequently disconnect with `EVENT STREAM END` or `Disconnected (setting On error status)` logs?",
+                                    "answer": "Frequent disconnections and reconnections are typically caused by factors external to the plugin:\n\n1. **Home Connect API Instability**: The official Home Connect API servers can be unreliable, leading to frequent interruptions of the event stream. You can verify the current status of the API via the [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page.\n2. **Wi-Fi Signal Strength**: If the API servers are stable, the appliance itself may be losing its connection to your local network. Check the official Home Connect app's network settings for the appliance; it should consistently show three green lines.\n3. **Internet Connection**: Intermittent drops in your internet connection will disrupt the persistent event stream required for real-time updates.\n\nThe plugin is designed to handle these interruptions by automatically attempting to reconnect. If your appliance transitions between `Connected` and `Disconnected` states frequently but eventually restores its connection, it is almost certainly due to one of these environmental factors rather than a plugin bug."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -317,12 +334,6 @@
                                         "issue-277-7b13",
                                         "issue-278-36c0",
                                         "issue-279-4938",
-                                        "issue-301-9995",
-                                        "issue-305-c3b1",
-                                        "issue-307-94f6",
-                                        "issue-309-bfa9",
-                                        "issue-312-1263",
-                                        "issue-313-5c17",
                                         "issue-314-f707",
                                         "issue-317-9950",
                                         "issue-320-c379",
@@ -382,7 +393,6 @@
                                         "issue-208-0821",
                                         "issue-250-36bc",
                                         "issue-273-cef7",
-                                        "issue-303-9e0f",
                                         "issue-316-e6c5",
                                         "issue-368-b5fa",
                                         "issue-380-03ac"
@@ -535,7 +545,50 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 301,
+                                    "id": "issue-301-4c18",
+                                    "question": "Why does the log show a large block of `(unrecognised)` values for my appliance?",
+                                    "answer": "The plugin includes a diagnostic feature that triggers when it encounters a value from the Home Connect API that is not currently in its internal dictionary. This is common when manufacturers release new appliance models or firmware updates with features like 'Learning' or 'Intelligent' programs (for example, `LearningDishwasher.DryingLevel`).\n\nIf you see a log entry bounded by `====` lines containing `// Union types` or `// Option`, it indicates that your appliance is using an undocumented API value. To help improve the plugin:\n\n1. Ensure you are running the latest version of the plugin, as many values are added shortly after they are discovered.\n2. If the log message remains, create a new issue on the GitHub repository.\n3. Include the complete block of text (from the start of the `====` lines to the end) in your report.\n\nOnce reported, these values can be added to the plugin's definitions, ensuring they are correctly mapped and supported in future releases."
+                                },
+                                {
+                                    "issue_number": 303,
+                                    "id": "issue-303-4ed6",
+                                    "question": "Does the plugin support Smart Start or scheduled starting for dishwasher programs?",
+                                    "answer": "Yes, the plugin supports delayed start functionality via the `BSH.Common.Option.StartInRelative` option. This allows a program to be configured to start after a specific number of seconds or at a specific time of day.\n\nThis feature is available provided that the Home Connect API supports this option for the selected program on your specific appliance model. The plugin automatically exposes all programs and options that the Home Connect API identifies as available."
+                                },
+                                {
+                                    "issue_number": 305,
+                                    "id": "issue-305-082b",
+                                    "question": "What should I do if I see `(unrecognised)` API values in my logs?",
+                                    "answer": "The plugin automatically detects when a Home Connect appliance provides data—such as program options, states, or process phases—that has not yet been documented or mapped in the plugin's internal definitions. When this happens, it generates a diagnostic log entry formatted as a TypeScript code block, with the missing values highlighted by an `// (unrecognised)` comment.\n\nIf you see this in your logs:\n1. Copy the entire block of code, including the `================` separator lines.\n2. Open a new issue on the GitHub repository.\n3. Paste the log output into the issue description.\n\nProviding this information allows the maintainers to update the plugin's schema to support these new values in a future release."
+                                },
+                                {
+                                    "issue_number": 307,
+                                    "id": "issue-307-0bd5",
+                                    "question": "Why does my coffee maker show an `Unknown` value in the logs?",
+                                    "answer": "The appearance of an `Unknown` value in the logs is typically not generated by the plugin itself, but is instead a value returned directly by the Home Connect API. This usually occurs when the API returns a state or program identifier that is not recognised or documented in the current API specification.\n\nIn most cases, this is due to:\n* A temporary fault or bug within the Home Connect cloud servers.\n* An undocumented program or state unique to a specific appliance firmware version.\n\nIf this behaviour persists, it is helpful to provide a complete log with debug mode enabled to identify the specific context in which the API is returning this value."
+                                },
+                                {
+                                    "issue_number": 309,
+                                    "id": "issue-309-42e3",
+                                    "question": "Why does the log show `Home Connect API returned keys/values that are unrecognised`?",
+                                    "answer": "The Home Connect API is frequently updated by the manufacturer with new programs, options, and status values that are not yet included in the official technical documentation. When the plugin encounters one of these undocumented identifiers, it logs a block of code and provides a link to report the discovery.\n\nThis is a deliberate design choice to ensure the plugin can support new appliance features as they are released. If you see this message:\n\n* Follow the link provided in your logs to create a new GitHub issue.\n* Paste the provided code snippet into the issue description.\n* The maintainers will use this information to update the plugin's internal definitions.\n\nOnce the definitions are updated in a future release, the message will no longer appear for that specific feature, and the corresponding functionality will be correctly mapped to HomeKit services."
+                                },
+                                {
+                                    "issue_number": 312,
+                                    "id": "issue-312-f274",
+                                    "question": "Why does the log show `Home Connect API returned keys/values that are unrecognised by this plugin`?",
+                                    "answer": "This message indicates that an appliance has reported data using keys or values that are not yet defined in the plugin's internal schema. This typically occurs when new appliance models or firmware updates introduce undocumented additions to the Home Connect API, such as specific laundry process phases (e.g. `CupboardDryReached` or `AutomaticDirtDetection`).\n\nTo address this:\n1. Update the plugin to the latest version, as support for newly discovered values is added frequently.\n2. If the warnings continue, follow the link provided in the log. The plugin automatically generates a URL that pre-fills a GitHub issue template with the required technical definitions.\n3. Submit the issue so the maintainer can incorporate the new values into the plugin's definitions.\n\nProviding these reports allows the plugin to correctly map appliance states to HomeKit characteristics rather than ignoring them."
+                                },
+                                {
+                                    "issue_number": 313,
+                                    "id": "issue-313-9e94",
+                                    "question": "What should I do if the logs show `(unrecognised)` Home Connect options or settings?",
+                                    "answer": "The plugin includes a diagnostic feature to identify appliance capabilities that are not yet officially documented in the Home Connect API specification or supported by the plugin. When these are detected, the plugin logs a block of code (an `interface`) and marks specific entries with the comment `// (unrecognised)`.\n\nIf you encounter these messages in your logs:\n1. Ensure you are running the latest version of the plugin, as support for new appliance features and undocumented options is added regularly.\n2. If the `(unrecognised)` entries persist on the latest version, copy the entire log block, including the `=====` delimiters.\n3. Open a new issue on GitHub and provide this log snippet along with the model of your appliance.\n\nProviding these logs allows the maintainer to update the plugin's internal definitions, enabling the new functionality to be monitored or controlled via HomeKit in future releases."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -617,9 +670,7 @@
                                 {
                                     "question": "Can I use data from the Home Connect status page for automations or scripts?",
                                     "answer": "No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.",
-                                    "included_ids": [
-                                        "issue-306-65ff"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why do Home Connect appliances disappear or lose their Favourites status in the Home app?",
@@ -629,7 +680,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 306,
+                                    "id": "issue-306-2022",
+                                    "question": "Can I programmatically access the data from the unofficial Home Connect Server Status page?",
+                                    "answer": "No. The [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is intended as a diagnostic tool for users and is integrated into the plugin configuration UI and README. There is no public API for this data, and the maintainer does not support or allow programmatic scraping of the status page for use in third-party scripts or automations. Attempting to scrape the page may lead to your access being blocked."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -690,7 +748,6 @@
                                     "question": "Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?",
                                     "answer": "The plugin uses the `Door` service to represent appliance doors by design, as this is the most semantically accurate HomeKit service for the hardware. While many appliances only provide a read-only door status, the Home Connect API supports `Open Door` and `Partly Open Door` commands for specific high-end models. Mapping these to a `Door` service allows the plugin to expose this control functionality where supported; on other models, it remains a read-only sensor.\n\nBecause Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors, and receive automatic notifications when the door state changes. This is standard HomeKit behaviour and cannot be changed by the plugin. If this behaviour is not desired, you have two options:\n\n1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.\n2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.",
                                     "included_ids": [
-                                        "issue-303-3c06",
                                         "issue-350-8ab5",
                                         "issue-361-065e"
                                     ]
@@ -771,7 +828,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 303,
+                                    "id": "issue-303-180f",
+                                    "question": "Can the dishwasher door be changed from a `Door` service to a `Contact Sensor` to stop notifications?",
+                                    "answer": "The plugin uses the HomeKit `Door` service for appliance doors as it represents the hardware most accurately. If you find the default HomeKit notifications for the door being opened or closed intrusive, there is no need to change the plugin implementation. You can disable these notifications within the Apple Home app:\n\n1. Open the Home app.\n2. Go to **Home Settings**.\n3. Select **Doors**.\n4. Toggle notifications off for the specific appliance.\n\nThe maintainer has opted for the `Door` service over `Contact Sensor` to maintain consistency with HomeKit's service definitions."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -917,7 +981,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 300,
+                                    "id": "issue-300-7e4a",
+                                    "question": "Why does the plugin fail with `SyntaxError: Unexpected token 'with'`?",
+                                    "answer": "This error indicates that your Node.js version is too old to support the **Import Attributes** syntax (`with { type: 'json' }`) used by the plugin to load JSON metadata.\n\nTo fix this, you should update Node.js to the latest available LTS version. The plugin generally requires:\n* **Node.js 18**: 18.20.0 or later\n* **Node.js 20**: 20.10.0 or later\n* **Node.js 22**: All versions\n\nThese specific versions are required because of a change in how Node.js handles JSON imports that was backported from Node.js 22 to the earlier LTS branches. \n\nIf you are using an environment where you cannot easily update Node.js (such as a Synology NAS running DSM), ensure you have updated the plugin to at least version 1.0.5. That release restored compatibility with Node.js 20.9.0, although staying on the latest Node.js LTS is always the preferred solution for security and stability."
+                                },
+                                {
+                                    "issue_number": 304,
+                                    "id": "issue-304-0ee0",
+                                    "question": "Why does the plugin fail to load with `SyntaxError: Unexpected token 'with'`?",
+                                    "answer": "This error occurs when the Node.js version running Homebridge does not support the **Import Attributes** syntax (the `with` keyword) used by the plugin to load JSON files in ES modules. Support for this syntax was added in Node.js versions 18.20.0, 20.10.0, and 21.0.0.\n\nThe plugin's `package.json` specifies minimum Node.js versions based on what is currently tested by the maintainer, which typically includes the latest releases of each active LTS (Long Term Support) branch. Using versions of Node.js older than those specified may lead to failures during plugin loading.\n\nIf you are using a restricted environment like a Synology NAS that provides older Node.js versions:\n* Ensure the `homebridge-homeconnect` plugin is updated to the latest version. Compatibility for specific older versions, such as Node.js v20.9.0, has been previously restored to accommodate common platform-specific limitations.\n* If your Node.js version is still unsupported and cannot be updated via your operating system, consider running Homebridge within a Docker container. This allows you to use a modern Node.js environment regardless of the host system's restrictions."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -954,9 +1031,6 @@
         "issue-194-0961",
         "issue-195-e227",
         "issue-239-6f85",
-        "issue-300-cd35",
-        "issue-303-3b35",
-        "issue-304-5f8b",
         "issue-340-77ce",
         "issue-340-9a52",
         "issue-351-9e01",
