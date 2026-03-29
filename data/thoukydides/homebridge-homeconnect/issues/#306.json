@@ -1,20 +1,18 @@
 {
     "issue_number": 306,
-    "updated_at": "2026-02-27T13:36:00.093Z",
+    "updated_at": "2026-03-29T09:52:45.734Z",
     "faq": [
         {
-            "question": "Why does my appliance frequently show `Disconnected (setting On error status)`?",
-            "answer": "Logs showing frequent `Disconnected` and `Connected` events (often with the message `setting On error status`) usually indicate communication interruptions between the plugin and the Home Connect cloud. This is typically caused by one of two factors:\n\n1. **Home Connect API Instability**: The official Home Connect servers frequently experience transient issues or maintenance periods. You can verify the current platform health via the [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page. This status is also integrated into the plugin README and the Homebridge UI configuration.\n2. **Local Network Stability**: If the status page indicates the API is healthy, the appliance may be struggling with a weak Wi-Fi signal or your local internet connection may be experiencing drops.\n\nBecause this plugin relies entirely on the manufacturer's cloud-based API, these disconnections are external to the plugin's logic and cannot be resolved through code changes. When the API is unreachable or the appliance loses its cloud connection, the plugin must report the device as disconnected.",
-            "semantic_abstract": "Frequent appliance connectivity cycles and `setting On error status` log entries are generally attributable to Home Connect API server instability or local Wi-Fi signal degradation rather than plugin defects.",
-            "confidence": "high",
-            "hash": "b5fb2ab24c9bc47e869caeca9f0d21d726eea1735c818038be17601cef4a9c3e"
+            "question": "Why does my appliance frequently disconnect with `EVENT STREAM END` or `Disconnected (setting On error status)` logs?",
+            "answer": "Frequent disconnections and reconnections are typically caused by factors external to the plugin:\n\n1. **Home Connect API Instability**: The official Home Connect API servers can be unreliable, leading to frequent interruptions of the event stream. You can verify the current status of the API via the [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page.\n2. **Wi-Fi Signal Strength**: If the API servers are stable, the appliance itself may be losing its connection to your local network. Check the official Home Connect app's network settings for the appliance; it should consistently show three green lines.\n3. **Internet Connection**: Intermittent drops in your internet connection will disrupt the persistent event stream required for real-time updates.\n\nThe plugin is designed to handle these interruptions by automatically attempting to reconnect. If your appliance transitions between `Connected` and `Disconnected` states frequently but eventually restores its connection, it is almost certainly due to one of these environmental factors rather than a plugin bug.",
+            "semantic_abstract": "Frequent appliance disconnections and event stream terminations often result from Home Connect API server-side instabilities or local Wi-Fi connectivity problems. The plugin automatically attempts reconnection, but underlying stability depends on the cloud service and network signal strength.",
+            "hash": "97c52ab0777d360cb27606e4081f38c9b83e4404a7c4ef099f00aaef567734c0"
         },
         {
-            "question": "Can I use the data from the Home Connect status page for my own automations or scripts?",
-            "answer": "No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. The maintainer has explicitly stated that there are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.",
-            "semantic_abstract": "The unofficial Home Connect status monitor is a diagnostic tool for manual verification of API health and is deliberately restricted from automated third-party data extraction or API-like usage.",
-            "confidence": "high",
-            "hash": "65ffd8ba409b08e442171c03412a8210ffa46e2e7fe835ea3b160d906ce7fa39"
+            "question": "Can I programmatically access the data from the unofficial Home Connect Server Status page?",
+            "answer": "No. The [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is intended as a diagnostic tool for users and is integrated into the plugin configuration UI and README. There is no public API for this data, and the maintainer does not support or allow programmatic scraping of the status page for use in third-party scripts or automations. Attempting to scrape the page may lead to your access being blocked.",
+            "semantic_abstract": "The unofficial Home Connect Server Status tool is intended for manual diagnostic use and plugin integration only. No public API is provided for programmatic access or external automation scripts to prevent service abuse and maintain its primary purpose as a project health indicator.",
+            "hash": "2022891bc6d536ce9816f0cef1731df965ca23e4789ef65980c203a2ae832c48"
         }
     ]
 }
