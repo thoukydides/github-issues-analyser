@@ -1,13 +1,12 @@
 {
     "issue_number": 311,
-    "updated_at": "2026-02-27T17:58:43.645Z",
+    "updated_at": "2026-03-29T13:19:33.145Z",
     "faq": [
         {
-            "question": "How do I configure the plugin for a Home Connect account in Mainland China?",
-            "answer": "Home Connect appliances registered in Mainland China use a dedicated regional API endpoint (`api.home-connect.cn`) and require specific configuration both in the Developer Portal and the plugin:\n\n1. Log in to the Home Connect Developer Portal and ensure your application has the **Sync to China** option enabled.\n2. In the Homebridge UI, locate the plugin settings and set the **Server Location** to **China**.\n3. If you are configuring the plugin manually via `config.json`, add `\"china\": true` to the plugin configuration object.\n\nNote that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.",
-            "semantic_abstract": "Home Connect accounts in Mainland China require the use of the `api.home-connect.cn` regional endpoint and the 'Sync to China' application setting. The `china` configuration flag in the plugin redirects all API calls and authentication requests to this specific regional domain to support local hardware and account types.",
-            "confidence": "high",
-            "hash": "bcea8a1327f172955cf5a23c7bfc9f5c6e3e86cca88b124fd469d09e65c42870"
+            "question": "How do I configure the plugin for use with a Home Connect account in China?",
+            "answer": "The Home Connect China Mainland server operates on a separate infrastructure from the global service and requires specific configuration both in the developer portal and the plugin settings.\n\nTo enable support for the China Mainland server:\n1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and create (or update) your application. You must ensure that the **Sync to China** option is selected.\n2. In the Homebridge UI configuration for this plugin, locate the **Server Location** setting and select **China**.\n3. If you are manually editing your `config.json`, add `\"china\": true` to the plugin configuration object.\n\nThis configuration ensures the plugin uses the `api.home-connect.cn` endpoint instead of the default global endpoint. This is necessary to support the authentication flow and data residency requirements specific to the Chinese region.",
+            "semantic_abstract": "Home Connect appliances registered on the China Mainland server require communication with a specific regional API endpoint (`api.home-connect.cn`) instead of the default global service. Successful integration requires enabling the \"Sync to China\" flag during OAuth application registration and setting the plugin's `china` configuration parameter to redirect API traffic.",
+            "hash": "261bc6bfbd334a1cbd809f8ef8f37fec63aa68d6c399c9fe88c58dc21d0d057f"
         }
     ]
 }
