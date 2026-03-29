@@ -1,13 +1,12 @@
 {
     "issue_number": 304,
-    "updated_at": "2026-02-27T11:51:15.140Z",
+    "updated_at": "2026-03-29T08:58:30.657Z",
     "faq": [
         {
-            "question": "Why does the plugin fail with `SyntaxError: Unexpected token 'with'` on Node.js v20.9.0?",
-            "answer": "This error occurs when the version of Node.js running Homebridge does not support modern JavaScript syntax (specifically Import Attributes) used by the plugin. This is a common issue for users on Synology DSM, where the available Node.js package is often restricted to v20.9.0.\n\nWhile the plugin generally requires more recent LTS versions, compatibility for Node.js v20.9.0 was specifically restored in plugin version **v1.0.5**. If you encounter this error on a Synology system, ensure you have updated the plugin to at least this version.\n\nFor optimal stability and to support modern syntax, the recommended Node.js versions are:\n1. Node.js 22: `^22.8.0`\n2. Node.js 20: `^20.17.0`\n3. Node.js 18: `^18.20.4`",
-            "semantic_abstract": "Incompatibility between older Node.js v20 minor releases and the plugin's use of Import Attributes results in a `SyntaxError`. While the plugin officially targets more recent LTS versions, specific compatibility for Node.js v20.9.0 was restored to support restricted environments like Synology DSM.",
-            "confidence": "high",
-            "hash": "5f8b5710699a1756025b261e2a48678b24c3353a96630f45c4c900a5007539c5"
+            "question": "Why does the plugin fail to load with `SyntaxError: Unexpected token 'with'`?",
+            "answer": "This error occurs when the Node.js version running Homebridge does not support the **Import Attributes** syntax (the `with` keyword) used by the plugin to load JSON files in ES modules. Support for this syntax was added in Node.js versions 18.20.0, 20.10.0, and 21.0.0.\n\nThe plugin's `package.json` specifies minimum Node.js versions based on what is currently tested by the maintainer, which typically includes the latest releases of each active LTS (Long Term Support) branch. Using versions of Node.js older than those specified may lead to failures during plugin loading.\n\nIf you are using a restricted environment like a Synology NAS that provides older Node.js versions:\n* Ensure the `homebridge-homeconnect` plugin is updated to the latest version. Compatibility for specific older versions, such as Node.js v20.9.0, has been previously restored to accommodate common platform-specific limitations.\n* If your Node.js version is still unsupported and cannot be updated via your operating system, consider running Homebridge within a Docker container. This allows you to use a modern Node.js environment regardless of the host system's restrictions.",
+            "semantic_abstract": "The `homebridge-homeconnect` plugin utilises ESM Import Attributes, which require specific minimum Node.js versions (18.20.0, 20.10.0, or 21.0.0) to recognise the `with` keyword, otherwise resulting in a `SyntaxError`. The maintainer's policy of testing against the latest LTS releases determines the engine requirements in `package.json`, necessitating workarounds like Docker or specific compatibility fixes for environments with delayed Node.js updates, such as Synology NAS.",
+            "hash": "0ee04daaa81e729e92b3baec1448191bb77e99535c9c156b552eddf4fed8a3dd"
         }
     ]
 }
