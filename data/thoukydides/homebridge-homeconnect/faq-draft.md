@@ -5,10 +5,9 @@
   - **[Home Connect or SingleKey ID Authorisation Issues](#home-connect-or-singlekey-id-authorisation-issues)**
     - [Why is the plugin not starting or failing to show an authorisation URL?](#why-is-the-plugin-not-starting-or-failing-to-show-an-authorisation-url)
     - [Why does authorisation fail with `invalid_request`, `invalid content type`, or `request rejected by client authorization authority`?](#why-does-authorisation-fail-with-invalid_request-invalid-content-type-or-request-rejected-by-client-authorization-authority)
-    - [Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?](#why-does-authorisation-fail-with-invalid_client-grant_type-is-invalid-unauthorized_client-or-client-has-limited-user-list)
+    - [Why does authorisation fail with `invalid_client`, `unauthorized_client`, or `client has limited user list`?](#why-does-authorisation-fail-with-invalid_client-unauthorized_client-or-client-has-limited-user-list)
     - [Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?](#why-does-the-authorisation-link-expire-or-fail-with-an-expired_token-or-invalid-code-error)
     - [Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?](#why-does-authorisation-fail-with-access_denied-device-authorization-session-has-expired-or-login-session-expired)
-    - [Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?](#why-does-authorisation-fail-with-the-error-client-not-authorized-for-this-oauth-flow-grant_type)
     - [Why does authorisation fail with a `403 Forbidden` error?](#why-does-authorisation-fail-with-a-403-forbidden-error)
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
   - **[Home Connect API Errors](#home-connect-api-errors)**
@@ -122,19 +121,17 @@ These errors are returned when the provided `Client ID` is not recognised or is 
 - **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.
 - **Production vs Simulator Credentials**: The default "API Web Client" credentials provided in the portal are for the appliance simulator only. If you are using these for testing, you must set `"simulator": true` in your configuration. If you are connecting physical appliances, you must create a new application in the developer portal to obtain a production `Client ID`.
 
-#### Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?
+#### Why does authorisation fail with `invalid_client`, `unauthorized_client`, or `client has limited user list`?
 
 <!-- INCLUDES: issue-51-3a91 issue-51-4991 issue-51-60d6 issue-60-2ad5 issue-115-de4a issue-117-e569 issue-162-34c9 -->
 These errors are returned by the Home Connect API and indicate a configuration mismatch or synchronisation delay in the [Home Connect Developer Portal](https://developer.home-connect.com/):
 
 Ensure the `Client ID` in your Homebridge configuration exactly matches the one in the portal, and that the application is configured as follows:
 
+- **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one. The error `client not authorized for this oauth flow (grant_type)` specifically indicates this setting is incorrect.
 - **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app. Check this in both your global profile's **Default Home Connect User Account for Testing** and within the specific application's settings.
-- **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set incorrectly to `Authorization Code Grant Flow`, you must delete the existing application and create a new one, ensuring `Device Flow` is selected.
 - **Success Redirect**: Leave blank or ensure it is a valid URL. Mismatches here can trigger `unauthorized_client` errors.
-- **One Time Token Mode**: Disabled.
-- **Proof Key for Code Exchange**: Disabled.
-- **Sync to China**: Disabled, unless you are using the Home Connect servers in China.
+- **Security Settings**: Ensure **One Time Token Mode**, **Proof Key for Code Exchange**, and **Sync to China** (unless you are using the Home Connect servers in China) are all disabled.
 
 If the configuration is correct but errors persist, try deleting and recreating the application in the developer portal to reset its state.
 
@@ -156,20 +153,13 @@ If the authorisation fails:
 These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:
 
 - **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometimes necessary to log out of the app and log back in again to trigger account migration to complete.
-- **Internationalisation Bug**: A server-side bug can cause the authorisation to fail if your browser's preferred language is not English (for example, if set to German or Spanish). This often prevents the password prompt from appearing or returns a raw JSON error immediately after entering your username. To resolve this, go to your browser settings and move English (`en` or `en-GB`) to the top of your preferred language list. This ensures the correct `Accept-Language` header is sent. You can revert this setting once the plugin has been authorised.
+- **Internationalisation Bug**: A server-side bug can cause the authorisation to fail if your browser's preferred language is not English. This often prevents the password prompt from appearing or returns a raw JSON error immediately after entering your username. To resolve this, go to your browser settings and move English (`en` or `en-GB`) to the top of your preferred language list. You can revert this setting once the plugin has been authorised.
 
 To complete the process:
 
 1. Obtain the URL from the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
 2. Open the URL in a browser with the language workaround applied.
 3. Sign in with the account used in the official app and approve the request. The plugin will detect completion and save the tokens automatically.
-
-#### Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?
-
-<!-- INCLUDES: issue-51-4991 -->
-This error indicates that the application registered in the Home Connect Developer Portal was not configured to use the `Device Flow` OAuth method.
-
-The `OAuth Flow` setting is fixed at the time of application creation. If it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one, ensuring that `Device Flow` is selected during the creation process.
 
 #### Why does authorisation fail with a `403 Forbidden` error?
 
@@ -180,25 +170,14 @@ This is a network-level restriction imposed by the service provider and cannot b
 
 #### How do I configure the plugin for a Home Connect account in Mainland China?
 
-Home Connect appliances registered in Mainland China use a dedicated regional API endpoint (`api.home-connect.cn`) and require specific configuration both in the Developer Portal and the plugin:
+<!-- INCLUDES: issue-311-261b -->
+Home Connect appliances registered in Mainland China operate on a separate infrastructure and require specific configuration in both the Developer Portal and the plugin to comply with regional data residency requirements:
 
 1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and ensure your application has the **Sync to China** option enabled.
 2. In the Homebridge UI, locate the plugin settings and set the **Server Location** to **China**.
 3. If you are configuring the plugin manually via `config.json`, add `"china": true` to the plugin configuration object.
 
-Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
-
-#### 🚧 How do I configure the plugin for use with a Home Connect account in China? 🚧
-
-<!-- INCLUDES: issue-311-261b -->
-The Home Connect China Mainland server operates on a separate infrastructure from the global service and requires specific configuration both in the developer portal and the plugin settings.
-
-To enable support for the China Mainland server:
-1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and create (or update) your application. You must ensure that the **Sync to China** option is selected.
-2. In the Homebridge UI configuration for this plugin, locate the **Server Location** setting and select **China**.
-3. If you are manually editing your `config.json`, add `"china": true` to the plugin configuration object.
-
-This configuration ensures the plugin uses the `api.home-connect.cn` endpoint instead of the default global endpoint. This is necessary to support the authentication flow and data residency requirements specific to the Chinese region.
+This configuration ensures the plugin uses the dedicated `api.home-connect.cn` endpoint. Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
 ### Home Connect API Errors
 

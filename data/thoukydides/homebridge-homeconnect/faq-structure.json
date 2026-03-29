@@ -30,8 +30,8 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why does authorisation fail with `invalid_client`, `grant_type is invalid`, `unauthorized_client`, or `client has limited user list`?",
-                                    "answer": "These errors are returned by the Home Connect API and indicate a configuration mismatch or synchronisation delay in the [Home Connect Developer Portal](https://developer.home-connect.com/):\n\nEnsure the `Client ID` in your Homebridge configuration exactly matches the one in the portal, and that the application is configured as follows:\n\n- **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app. Check this in both your global profile's **Default Home Connect User Account for Testing** and within the specific application's settings.\n- **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set incorrectly to `Authorization Code Grant Flow`, you must delete the existing application and create a new one, ensuring `Device Flow` is selected.\n- **Success Redirect**: Leave blank or ensure it is a valid URL. Mismatches here can trigger `unauthorized_client` errors.\n- **One Time Token Mode**: Disabled.\n- **Proof Key for Code Exchange**: Disabled.\n- **Sync to China**: Disabled, unless you are using the Home Connect servers in China.\n\nIf the configuration is correct but errors persist, try deleting and recreating the application in the developer portal to reset its state.",
+                                    "question": "Why does authorisation fail with `invalid_client`, `unauthorized_client`, or `client has limited user list`?",
+                                    "answer": "These errors are returned by the Home Connect API and indicate a configuration mismatch or synchronisation delay in the [Home Connect Developer Portal](https://developer.home-connect.com/):\n\nEnsure the `Client ID` in your Homebridge configuration exactly matches the one in the portal, and that the application is configured as follows:\n\n- **OAuth Flow**: Must be set to **Device Flow**. This setting is fixed at the time of application creation; if it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one. The error `client not authorized for this oauth flow (grant_type)` specifically indicates this setting is incorrect.\n- **Home Connect user account for testing**: This must exactly match the email address used for your Home Connect mobile app. Check this in both your global profile's **Default Home Connect User Account for Testing** and within the specific application's settings.\n- **Success Redirect**: Leave blank or ensure it is a valid URL. Mismatches here can trigger `unauthorized_client` errors.\n- **Security Settings**: Ensure **One Time Token Mode**, **Proof Key for Code Exchange**, and **Sync to China** (unless you are using the Home Connect servers in China) are all disabled.\n\nIf the configuration is correct but errors persist, try deleting and recreating the application in the developer portal to reset its state.",
                                     "included_ids": [
                                         "issue-51-3a91",
                                         "issue-51-4991",
@@ -39,7 +39,8 @@
                                         "issue-60-2ad5",
                                         "issue-115-de4a",
                                         "issue-117-e569",
-                                        "issue-162-34c9"
+                                        "issue-162-34c9",
+                                        "issue-51-4991"
                                     ]
                                 },
                                 {
@@ -53,7 +54,7 @@
                                 },
                                 {
                                     "question": "Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?",
-                                    "answer": "These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:\n\n- **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometimes necessary to log out of the app and log back in again to trigger account migration to complete.\n- **Internationalisation Bug**: A server-side bug can cause the authorisation to fail if your browser's preferred language is not English (for example, if set to German or Spanish). This often prevents the password prompt from appearing or returns a raw JSON error immediately after entering your username. To resolve this, go to your browser settings and move English (`en` or `en-GB`) to the top of your preferred language list. This ensures the correct `Accept-Language` header is sent. You can revert this setting once the plugin has been authorised.\n\nTo complete the process:\n\n1. Obtain the URL from the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).\n2. Open the URL in a browser with the language workaround applied.\n3. Sign in with the account used in the official app and approve the request. The plugin will detect completion and save the tokens automatically.",
+                                    "answer": "These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:\n\n- **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometimes necessary to log out of the app and log back in again to trigger account migration to complete.\n- **Internationalisation Bug**: A server-side bug can cause the authorisation to fail if your browser's preferred language is not English. This often prevents the password prompt from appearing or returns a raw JSON error immediately after entering your username. To resolve this, go to your browser settings and move English (`en` or `en-GB`) to the top of your preferred language list. You can revert this setting once the plugin has been authorised.\n\nTo complete the process:\n\n1. Obtain the URL from the logs (e.g. `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).\n2. Open the URL in a browser with the language workaround applied.\n3. Sign in with the account used in the official app and approve the request. The plugin will detect completion and save the tokens automatically.",
                                     "included_ids": [
                                         "issue-60-aba8",
                                         "issue-82-1bfb",
@@ -61,13 +62,6 @@
                                         "issue-121-d035",
                                         "issue-295-c09a",
                                         "issue-299-6c02"
-                                    ]
-                                },
-                                {
-                                    "question": "Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?",
-                                    "answer": "This error indicates that the application registered in the Home Connect Developer Portal was not configured to use the `Device Flow` OAuth method.\n\nThe `OAuth Flow` setting is fixed at the time of application creation. If it was set incorrectly (for example, to `Authorization Code Grant Flow`), you must delete the existing application and create a new one, ensuring that `Device Flow` is selected during the creation process.",
-                                    "included_ids": [
-                                        "issue-51-4991"
                                     ]
                                 },
                                 {
@@ -79,18 +73,13 @@
                                 },
                                 {
                                     "question": "How do I configure the plugin for a Home Connect account in Mainland China?",
-                                    "answer": "Home Connect appliances registered in Mainland China use a dedicated regional API endpoint (`api.home-connect.cn`) and require specific configuration both in the Developer Portal and the plugin:\n\n1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and ensure your application has the **Sync to China** option enabled.\n2. In the Homebridge UI, locate the plugin settings and set the **Server Location** to **China**.\n3. If you are configuring the plugin manually via `config.json`, add `\"china\": true` to the plugin configuration object.\n\nNote that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.",
-                                    "included_ids": []
+                                    "answer": "Home Connect appliances registered in Mainland China operate on a separate infrastructure and require specific configuration in both the Developer Portal and the plugin to comply with regional data residency requirements:\n\n1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and ensure your application has the **Sync to China** option enabled.\n2. In the Homebridge UI, locate the plugin settings and set the **Server Location** to **China**.\n3. If you are configuring the plugin manually via `config.json`, add `\"china\": true` to the plugin configuration object.\n\nThis configuration ensures the plugin uses the dedicated `api.home-connect.cn` endpoint. Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.",
+                                    "included_ids": [
+                                        "issue-311-261b"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 311,
-                                    "id": "issue-311-261b",
-                                    "question": "How do I configure the plugin for use with a Home Connect account in China?",
-                                    "answer": "The Home Connect China Mainland server operates on a separate infrastructure from the global service and requires specific configuration both in the developer portal and the plugin settings.\n\nTo enable support for the China Mainland server:\n1. Log in to the [Home Connect Developer Portal](https://developer.home-connect.com/) and create (or update) your application. You must ensure that the **Sync to China** option is selected.\n2. In the Homebridge UI configuration for this plugin, locate the **Server Location** setting and select **China**.\n3. If you are manually editing your `config.json`, add `\"china\": true` to the plugin configuration object.\n\nThis configuration ensures the plugin uses the `api.home-connect.cn` endpoint instead of the default global endpoint. This is necessary to support the authentication flow and data residency requirements specific to the Chinese region."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
