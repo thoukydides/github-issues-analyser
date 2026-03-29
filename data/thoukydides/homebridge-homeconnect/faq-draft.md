@@ -44,12 +44,12 @@
     - [Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?](#why-does-my-appliance-turn-on-automatically-switch-off-immediately-or-homebridge-startup-stall)
     - [Which settings are used for programs started without specific options?](#which-settings-are-used-for-programs-started-without-specific-options)
     - [How can I change the default duration or temperature for oven programs?](#how-can-i-change-the-default-duration-or-temperature-for-oven-programs)
-    - [Why is the scheduled start time for my appliance program not being honoured?](#why-is-the-scheduled-start-time-for-my-appliance-program-not-being-honoured)
+    - [How does the plugin support scheduled or delayed starts, and why might the time be incorrect?](#how-does-the-plugin-support-scheduled-or-delayed-starts-and-why-might-the-time-be-incorrect)
     - [How can I reduce the number of switches created for appliance programs?](#how-can-i-reduce-the-number-of-switches-created-for-appliance-programs)
     - [What does the log message `Using expired cache result` mean?](#what-does-the-log-message-using-expired-cache-result-mean)
     - [Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?](#why-does-setting-my-hood-fan-to-auto-in-the-home-app-not-immediately-turn-it-on)
-    - [Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?](#why-does-the-plugin-log-unrecognised-powerstate-values-like-undefined-or-mainsoff)
-    - [Why is the power off function unavailable for my washing machine or delete?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-delete)
+    - [Why does the plugin log unrecognised `PowerState` or `Unknown` values?](#why-does-the-plugin-log-unrecognised-powerstate-or-unknown-values)
+    - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
   - **[Appliance Status](#appliance-status)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
@@ -386,8 +386,8 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. This is common with newer appliances or specific models (such as washer-dryers) that may introduce programs like `DelicatesSilk`, options like `WaterAndRinsePlus1`, or combined modes like `WashingAndDrying`.
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-f707 issue-317-9950 issue-320-c379 issue-324-386b issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. This is common with newer appliances or specific firmware updates that introduce features such as 'Learning' or 'Intelligent' programs (e.g. `LearningDishwasher.DryingLevel`), laundry process phases (e.g. `CupboardDryReached`), or specific options like `WaterAndRinsePlus1`.
 
 When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
@@ -529,15 +529,15 @@ When started remotely via the API, oven programs **must** have a defined duratio
 
 To resolve this, use the **Custom list of programs and options** in the plugin settings to explicitly set a `Duration` (for example, `3600` seconds) for your oven switches. This ensures the oven remains on until the timer expires or you manually stop it.
 
-#### Why is the scheduled start time for my appliance program not being honoured?
+#### How does the plugin support scheduled or delayed starts, and why might the time be incorrect?
 
-<!-- INCLUDES: issue-293-c559 -->
-The plugin does not perform internal time zone processing or use the location settings from your Home Connect account. Instead, it relies on the local time zone of the server running Node.js and Homebridge. Note that the `BSH.Common.Option.StartInRelative` parameter defines a *duration* for a delayed start (e.g. "start in 1 hour"), not an absolute time of day.
+<!-- INCLUDES: issue-293-c559 issue-303-4ed6 -->
+The plugin supports delayed start functionality via the `BSH.Common.Option.StartInRelative` option, provided that the Home Connect API identifies this option as available for the selected program on your appliance model. Note that this parameter defines a *duration* for a delayed start (e.g. "start in 1 hour"), not an absolute time of day.
 
-If a scheduled program triggers at an unexpected time:
-1. **Verify server timezone**: Check your server's current configuration (e.g. using `timedatectl` on Linux). Servers often default to UTC/GMT.
-2. **Explicitly set timezone**: If you cannot change system-wide settings, configure the `TZ` environment variable for the Homebridge process (e.g. `TZ=Europe/London`).
-3. **Check relative offsets**: Ensure you are not confusing a relative delay ("start in 00:30") with an absolute clock time ("start at 00:30"). Any discrepancies in how the appliance itself interprets relative durations are typically external to the plugin's control.
+If a scheduled program triggers at an unexpected time, consider the following factors:
+1. **Server Timezone**: The plugin relies on the local time zone of the server running Node.js and Homebridge. Check your server's configuration (e.g. using `timedatectl` on Linux) as many default to UTC/GMT. 
+2. **Environment Variables**: If you cannot change system-wide settings, configure the `TZ` environment variable for the Homebridge process (e.g. `TZ=Europe/London`).
+3. **Relative Offsets**: Ensure you are not confusing a relative delay ("start in 30 minutes") with an absolute clock time ("start at 00:30"). Any discrepancies in how the appliance itself interprets relative durations are typically external to the plugin's control.
 
 #### How can I reduce the number of switches created for appliance programs?
 
@@ -566,99 +566,19 @@ This design accounts for several factors:
 
 If your hood does not respond when you toggle `Auto`, ensure the fan is also switched to `On`. Note that because many hoods do not report speed in this mode, the Home app may display an incorrect or outdated speed percentage while the automatic program is running.
 
-#### Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?
+#### Why does the plugin log unrecognised `PowerState` or `Unknown` values?
 
-<!-- INCLUDES: issue-310-e840 issue-353-8bec -->
-Certain Home Connect appliances or firmware versions may report non-standard power states such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are typically the result of bugs in the appliance firmware or the Home Connect cloud servers, as they do not conform to the standard API specification.
+<!-- INCLUDES: issue-307-0bd5 issue-310-e840 issue-353-8bec -->
+Certain Home Connect appliances or firmware versions may report non-standard states such as `BSH.Common.EnumType.PowerState.Undefined`, `BSH.Common.EnumType.PowerState.MainsOff`, or simply `Unknown`. These values are typically the result of bugs in the appliance firmware or transient faults within the Home Connect cloud servers, as they do not conform to the standard API specification.
 
-To ensure plugin stability and correct HomeKit operation, the plugin treats both of these values as equivalent to `Off`.
+To ensure plugin stability and correct HomeKit operation, the plugin treats these values as equivalent to `Off`. If this behaviour persists, providing a complete log with debug mode enabled can help identify the specific context in which the API is returning these values.
 
-#### Why is the power off function unavailable for my washing machine or delete?
+#### Why is the power off function unavailable for my washing machine or dryer?
 
 <!-- INCLUDES: issue-3-9970 -->
-The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely to be due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
+The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why does the log show a large block of `(unrecognised)` values for my appliance? 🚧
-
-<!-- INCLUDES: issue-301-4c18 -->
-The plugin includes a diagnostic feature that triggers when it encounters a value from the Home Connect API that is not currently in its internal dictionary. This is common when manufacturers release new appliance models or firmware updates with features like 'Learning' or 'Intelligent' programs (for example, `LearningDishwasher.DryingLevel`).
-
-If you see a log entry bounded by `====` lines containing `// Union types` or `// Option`, it indicates that your appliance is using an undocumented API value. To help improve the plugin:
-
-1. Ensure you are running the latest version of the plugin, as many values are added shortly after they are discovered.
-2. If the log message remains, create a new issue on the GitHub repository.
-3. Include the complete block of text (from the start of the `====` lines to the end) in your report.
-
-Once reported, these values can be added to the plugin's definitions, ensuring they are correctly mapped and supported in future releases.
-
-#### 🚧 Does the plugin support Smart Start or scheduled starting for dishwasher programs? 🚧
-
-<!-- INCLUDES: issue-303-4ed6 -->
-Yes, the plugin supports delayed start functionality via the `BSH.Common.Option.StartInRelative` option. This allows a program to be configured to start after a specific number of seconds or at a specific time of day.
-
-This feature is available provided that the Home Connect API supports this option for the selected program on your specific appliance model. The plugin automatically exposes all programs and options that the Home Connect API identifies as available.
-
-#### 🚧 What should I do if I see `(unrecognised)` API values in my logs? 🚧
-
-<!-- INCLUDES: issue-305-082b -->
-The plugin automatically detects when a Home Connect appliance provides data—such as program options, states, or process phases—that has not yet been documented or mapped in the plugin's internal definitions. When this happens, it generates a diagnostic log entry formatted as a TypeScript code block, with the missing values highlighted by an `// (unrecognised)` comment.
-
-If you see this in your logs:
-1. Copy the entire block of code, including the `================` separator lines.
-2. Open a new issue on the GitHub repository.
-3. Paste the log output into the issue description.
-
-Providing this information allows the maintainers to update the plugin's schema to support these new values in a future release.
-
-#### 🚧 Why does my coffee maker show an `Unknown` value in the logs? 🚧
-
-<!-- INCLUDES: issue-307-0bd5 -->
-The appearance of an `Unknown` value in the logs is typically not generated by the plugin itself, but is instead a value returned directly by the Home Connect API. This usually occurs when the API returns a state or program identifier that is not recognised or documented in the current API specification.
-
-In most cases, this is due to:
-* A temporary fault or bug within the Home Connect cloud servers.
-* An undocumented program or state unique to a specific appliance firmware version.
-
-If this behaviour persists, it is helpful to provide a complete log with debug mode enabled to identify the specific context in which the API is returning this value.
-
-#### 🚧 Why does the log show `Home Connect API returned keys/values that are unrecognised`? 🚧
-
-<!-- INCLUDES: issue-309-42e3 -->
-The Home Connect API is frequently updated by the manufacturer with new programs, options, and status values that are not yet included in the official technical documentation. When the plugin encounters one of these undocumented identifiers, it logs a block of code and provides a link to report the discovery.
-
-This is a deliberate design choice to ensure the plugin can support new appliance features as they are released. If you see this message:
-
-* Follow the link provided in your logs to create a new GitHub issue.
-* Paste the provided code snippet into the issue description.
-* The maintainers will use this information to update the plugin's internal definitions.
-
-Once the definitions are updated in a future release, the message will no longer appear for that specific feature, and the corresponding functionality will be correctly mapped to HomeKit services.
-
-#### 🚧 Why does the log show `Home Connect API returned keys/values that are unrecognised by this plugin`? 🚧
-
-<!-- INCLUDES: issue-312-f274 -->
-This message indicates that an appliance has reported data using keys or values that are not yet defined in the plugin's internal schema. This typically occurs when new appliance models or firmware updates introduce undocumented additions to the Home Connect API, such as specific laundry process phases (e.g. `CupboardDryReached` or `AutomaticDirtDetection`).
-
-To address this:
-1. Update the plugin to the latest version, as support for newly discovered values is added frequently.
-2. If the warnings continue, follow the link provided in the log. The plugin automatically generates a URL that pre-fills a GitHub issue template with the required technical definitions.
-3. Submit the issue so the maintainer can incorporate the new values into the plugin's definitions.
-
-Providing these reports allows the plugin to correctly map appliance states to HomeKit characteristics rather than ignoring them.
-
-#### 🚧 What should I do if the logs show `(unrecognised)` Home Connect options or settings? 🚧
-
-<!-- INCLUDES: issue-313-9e94 -->
-The plugin includes a diagnostic feature to identify appliance capabilities that are not yet officially documented in the Home Connect API specification or supported by the plugin. When these are detected, the plugin logs a block of code (an `interface`) and marks specific entries with the comment `// (unrecognised)`.
-
-If you encounter these messages in your logs:
-1. Ensure you are running the latest version of the plugin, as support for new appliance features and undocumented options is added regularly.
-2. If the `(unrecognised)` entries persist on the latest version, copy the entire log block, including the `=====` delimiters.
-3. Open a new issue on GitHub and provide this log snippet along with the model of your appliance.
-
-Providing these logs allows the maintainer to update the plugin's internal definitions, enabling the new functionality to be monitored or controlled via HomeKit in future releases.
 
 ### Appliance Status
 
