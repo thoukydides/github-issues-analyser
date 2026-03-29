@@ -937,38 +937,14 @@ By default, any appliance detected via the Home Connect API that is not explicit
 
 #### Which Node.js versions are compatible with this plugin?
 
-<!-- INCLUDES: issue-298-1c85 -->
-This plugin aligns its compatibility with the official Homebridge support policy, which focuses on Node.js Long Term Support (LTS) releases. 
+<!-- INCLUDES: issue-298-1c85 issue-300-7e4a issue-304-0ee0 -->
+This plugin aligns its compatibility with the official Homebridge support policy, which focuses on Node.js Long Term Support (LTS) releases. Due to the use of modern JavaScript features such as Import Attributes for loading JSON metadata, specific minimum versions are required to avoid errors like `SyntaxError: Unexpected identifier 'assert'` or `SyntaxError: Unexpected token 'with'`.
 
 * **Supported versions**: Currently Node.js 18, 20, and 22 are supported.
-* **Minimum requirements**: Node.js 18 requires version 18.20.0 or later to ensure compatibility with modern JavaScript features like ESM import attributes.
-* **Non-LTS releases**: Interim releases that are not designated as LTS, such as Node.js 19 or 21, are not supported.
+* **Minimum requirements**: Node.js 18 requires version 18.20.0 or later; Node.js 20 requires version 20.10.0 or later.
+* **Synology and restricted environments**: If you are using an environment where Node.js cannot be easily updated (such as a Synology NAS running DSM), ensured you have updated the plugin to at least version 1.0.5, which restored compatibility with Node.js 20.9.0.
+* **Non-LTS releases**: Interim releases that are not designated as LTS, such as Node.js 19 or 21, are not officially supported.
 
-Using an unsupported or outdated version of Node.js may result in initialisation errors, such as `SyntaxError: Unexpected identifier 'assert'`. It is recommended to always use a supported LTS version for stability and compatibility.
-
-#### 🚧 Why does the plugin fail with `SyntaxError: Unexpected token 'with'`? 🚧
-
-<!-- INCLUDES: issue-300-7e4a -->
-This error indicates that your Node.js version is too old to support the **Import Attributes** syntax (`with { type: 'json' }`) used by the plugin to load JSON metadata.
-
-To fix this, you should update Node.js to the latest available LTS version. The plugin generally requires:
-* **Node.js 18**: 18.20.0 or later
-* **Node.js 20**: 20.10.0 or later
-* **Node.js 22**: All versions
-
-These specific versions are required because of a change in how Node.js handles JSON imports that was backported from Node.js 22 to the earlier LTS branches. 
-
-If you are using an environment where you cannot easily update Node.js (such as a Synology NAS running DSM), ensure you have updated the plugin to at least version 1.0.5. That release restored compatibility with Node.js 20.9.0, although staying on the latest Node.js LTS is always the preferred solution for security and stability.
-
-#### 🚧 Why does the plugin fail to load with `SyntaxError: Unexpected token 'with'`? 🚧
-
-<!-- INCLUDES: issue-304-0ee0 -->
-This error occurs when the Node.js version running Homebridge does not support the **Import Attributes** syntax (the `with` keyword) used by the plugin to load JSON files in ES modules. Support for this syntax was added in Node.js versions 18.20.0, 20.10.0, and 21.0.0.
-
-The plugin's `package.json` specifies minimum Node.js versions based on what is currently tested by the maintainer, which typically includes the latest releases of each active LTS (Long Term Support) branch. Using versions of Node.js older than those specified may lead to failures during plugin loading.
-
-If you are using a restricted environment like a Synology NAS that provides older Node.js versions:
-* Ensure the `homebridge-homeconnect` plugin is updated to the latest version. Compatibility for specific older versions, such as Node.js v20.9.0, has been previously restored to accommodate common platform-specific limitations.
-* If your Node.js version is still unsupported and cannot be updated via your operating system, consider running Homebridge within a Docker container. This allows you to use a modern Node.js environment regardless of the host system's restrictions.
+If your host system cannot provide a supported Node.js version, it is highly recommended to run Homebridge within a Docker container. This allows the use of a modern Node.js environment regardless of host operating system limitations.
 
 <!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-340-77ce issue-340-9a52 issue-351-9e01 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
