@@ -50,17 +50,17 @@
     - [Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?](#why-does-setting-my-hood-fan-to-auto-in-the-home-app-not-immediately-turn-it-on)
     - [Why does the plugin log unrecognised `PowerState` or `Unknown` values?](#why-does-the-plugin-log-unrecognised-powerstate-or-unknown-values)
     - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
-  - **[Appliance Status](#appliance-status)**
+  - **[Appliance Status and Connectivity](#appliance-status-and-connectivity)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
     - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
-    - [Why does my dishwasher trigger a Program Finished event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
+    - [Why does my dishwasher trigger a `Program Finished` event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
     - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
-    - [Can I use data from the Home Connect status page for automations or scripts?](#can-i-use-data-from-the-home-connect-status-page-for-automations-or-scripts)
+    - [Can I programmatically access data from the unofficial Home Connect status page?](#can-i-programmatically-access-data-from-the-unofficial-home-connect-status-page)
     - [Why do Home Connect appliances disappear or lose their Favourites status in the Home app?](#why-do-home-connect-appliances-disappear-or-lose-their-favourites-status-in-the-home-app)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
@@ -580,7 +580,7 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
-### Appliance Status
+### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
 
@@ -629,7 +629,7 @@ To resolve this, try the following:
 
 This is a transient server-side or firmware issue that cannot be corrected by the plugin itself.
 
-#### Why does my dishwasher trigger a Program Finished event when it reconnects?
+#### Why does my dishwasher trigger a `Program Finished` event when it reconnects?
 
 <!-- INCLUDES: issue-66-dad9 -->
 Some Bosch dishwasher models appear to re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a connection to the Home Connect cloud after being offline. The plugin maps events from the API directly to HomeKit triggers; therefore, these re-broadcasts are passed through as button presses or notifications. This is a quirk of the appliance firmware or API event handling rather than a defect in the plugin itself.
@@ -664,9 +664,10 @@ To troubleshoot and potentially work around this:
 2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
 3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
 
-#### Can I use data from the Home Connect status page for automations or scripts?
+#### Can I programmatically access data from the unofficial Home Connect status page?
 
-No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.
+<!-- INCLUDES: issue-306-2022 -->
+No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes and is integrated into the plugin configuration UI and README. There is no public API for this data. The maintainer does not support or allow programmatic scraping or frequent polling of the status page for use in third-party scripts or automations; such activity may result in the requesting IP being blocked.
 
 #### Why do Home Connect appliances disappear or lose their Favourites status in the Home app?
 
@@ -682,11 +683,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Can I programmatically access the data from the unofficial Home Connect Server Status page? 🚧
-
-<!-- INCLUDES: issue-306-2022 -->
-No. The [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is intended as a diagnostic tool for users and is integrated into the plugin configuration UI and README. There is no public API for this data, and the maintainer does not support or allow programmatic scraping of the status page for use in third-party scripts or automations. Attempting to scrape the page may lead to your access being blocked.
 
 ## Apple HomeKit
 

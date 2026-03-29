@@ -536,7 +536,7 @@
                     "subcategories": []
                 },
                 {
-                    "heading": "Appliance Status",
+                    "heading": "Appliance Status and Connectivity",
                     "preamble": "",
                     "partitions": [
                         {
@@ -575,7 +575,7 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why does my dishwasher trigger a Program Finished event when it reconnects?",
+                                    "question": "Why does my dishwasher trigger a `Program Finished` event when it reconnects?",
                                     "answer": "Some Bosch dishwasher models appear to re-broadcast the `BSH.Common.Event.ProgramFinished` event when re-establishing a connection to the Home Connect cloud after being offline. The plugin maps events from the API directly to HomeKit triggers; therefore, these re-broadcasts are passed through as button presses or notifications. This is a quirk of the appliance firmware or API event handling rather than a defect in the plugin itself.",
                                     "included_ids": [
                                         "issue-66-dad9"
@@ -610,9 +610,11 @@
                                     ]
                                 },
                                 {
-                                    "question": "Can I use data from the Home Connect status page for automations or scripts?",
-                                    "answer": "No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes to help users identify if connectivity issues are platform-wide. There are no plans to provide an API for third-party use or automated scripts. Automated scraping or frequent polling of the status page is unsupported and may result in the requesting IP being blocked.",
-                                    "included_ids": []
+                                    "question": "Can I programmatically access data from the unofficial Home Connect status page?",
+                                    "answer": "No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes and is integrated into the plugin configuration UI and README. There is no public API for this data. The maintainer does not support or allow programmatic scraping or frequent polling of the status page for use in third-party scripts or automations; such activity may result in the requesting IP being blocked.",
+                                    "included_ids": [
+                                        "issue-306-2022"
+                                    ]
                                 },
                                 {
                                     "question": "Why do Home Connect appliances disappear or lose their Favourites status in the Home app?",
@@ -622,14 +624,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 306,
-                                    "id": "issue-306-2022",
-                                    "question": "Can I programmatically access the data from the unofficial Home Connect Server Status page?",
-                                    "answer": "No. The [Unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is intended as a diagnostic tool for users and is integrated into the plugin configuration UI and README. There is no public API for this data, and the maintainer does not support or allow programmatic scraping of the status page for use in third-party scripts or automations. Attempting to scrape the page may lead to your access being blocked."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
