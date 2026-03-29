@@ -686,7 +686,8 @@
                                     "answer": "The plugin uses the `Door` service to represent appliance doors by design, as this is the most semantically accurate HomeKit service for the hardware. While many appliances only provide a read-only door status, the Home Connect API supports `Open Door` and `Partly Open Door` commands for specific high-end models. Mapping these to a `Door` service allows the plugin to expose this control functionality where supported; on other models, it remains a read-only sensor.\n\nBecause Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors, and receive automatic notifications when the door state changes. This is standard HomeKit behaviour and cannot be changed by the plugin. If this behaviour is not desired, you have two options:\n\n1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.\n2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.",
                                     "included_ids": [
                                         "issue-350-8ab5",
-                                        "issue-361-065e"
+                                        "issue-361-065e",
+                                        "issue-303-180f"
                                     ]
                                 },
                                 {
@@ -765,14 +766,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 303,
-                                    "id": "issue-303-180f",
-                                    "question": "Can the dishwasher door be changed from a `Door` service to a `Contact Sensor` to stop notifications?",
-                                    "answer": "The plugin uses the HomeKit `Door` service for appliance doors as it represents the hardware most accurately. If you find the default HomeKit notifications for the door being opened or closed intrusive, there is no need to change the plugin implementation. You can disable these notifications within the Apple Home app:\n\n1. Open the Home app.\n2. Go to **Home Settings**.\n3. Select **Doors**.\n4. Toggle notifications off for the specific appliance.\n\nThe maintainer has opted for the `Door` service over `Contact Sensor` to maintain consistency with HomeKit's service definitions."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
