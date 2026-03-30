@@ -1,13 +1,12 @@
 {
     "issue_number": 317,
-    "updated_at": "2026-02-28T07:00:57.854Z",
+    "updated_at": "2026-03-30T11:40:45.592Z",
     "faq": [
         {
-            "question": "What should I do if the logs show `unrecognised` Home Connect API values?",
-            "answer": "The plugin includes a diagnostic tool that identifies when an appliance reports values, settings, or options that are not currently defined in its internal schema. These are displayed in the log as a block of TypeScript code bounded by equals signs, with comments like `// (unrecognised)`. If you encounter these, first check if a newer version of the plugin is available and update if necessary. If the messages persist on the latest version, create a new issue on GitHub and provide the complete block of code from the logs. This information is essential for the maintainer to add support for new appliance models and firmware updates. For example, specific coffee strength levels and double-shot options for Siemens coffee makers were added to the plugin after being identified through these diagnostic logs.",
-            "semantic_abstract": "Home Connect appliances may report new enum values or options following firmware updates or for newer hardware models, which the plugin captures as TypeScript-formatted diagnostic logs. This mechanism allows for the identification of undocumented API fields, enabling the maintainer to extend the plugin schema to support these new appliance features.",
-            "confidence": "high",
-            "hash": "9950e21fbc53a52ffb9209c44cbd586e114d46a1bf81003df68b4e0ce2cc1f99"
+            "question": "Why does the log show `(unrecognised)` values or a block of code?",
+            "answer": "The plugin maintains an internal dictionary of known Home Connect API constants, including programs, options, settings, and enumeration values. When an appliance reports a value that is not yet in this dictionary, the plugin outputs a diagnostic block of code to the log, with specific lines marked as `(unrecognised)`.\n\nThis typically occurs in the following scenarios:\n* A new appliance model is released with unique features\n* A firmware update adds new functionality or settings to an existing appliance\n* The Home Connect API has been expanded with new constants\n\nIf you see this output in your logs, please open a new issue on GitHub and provide the entire block of text between the `==========` separators. This information allows the developer to add formal support for these values in a future release. Even when a value is unrecognised, the plugin will attempt to function, although the specific feature may not be fully interactive or correctly named within the Home app until the definitions are updated.",
+            "semantic_abstract": "Home Connect API constants such as programs and options that are missing from the plugin's internal schema trigger a diagnostic log output marked as `(unrecognised)`. This mechanism enables the collection of new appliance capabilities or firmware-introduced values for official support in subsequent plugin updates.",
+            "hash": "c7e3eb6527ce544c90d1fb518b2d8bddf7208977aaec7cf10c7558ea7ce95fa9"
         }
     ]
 }
