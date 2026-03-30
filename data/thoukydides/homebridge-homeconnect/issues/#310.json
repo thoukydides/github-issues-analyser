@@ -1,13 +1,12 @@
 {
     "issue_number": 310,
-    "updated_at": "2026-02-28T09:45:35.159Z",
+    "updated_at": "2026-03-30T15:54:14.413Z",
     "faq": [
         {
-            "question": "Why does my log show `BSH.Common.Setting.PowerState` as `Undefined` or unrecognised?",
-            "answer": "The Home Connect API occasionally returns `BSH.Common.EnumType.PowerState.Undefined` for certain appliances. This is regarded as a transient error or a bug within the Home Connect API servers, as it is not a documented valid power state. \n\nTo maintain plugin stability and prevent internal logic errors, this value is intentionally not supported as a valid state. If this appears in your logs, it can safely be ignored as it represents a temporary reporting issue from the manufacturer's cloud service.",
-            "semantic_abstract": "Home Connect API servers occasionally return an `Undefined` power state enumeration that deviates from the official specification. This transient API error is treated as an unrecognised value by the plugin to avoid internal logic conflicts, rather than being mapped to a valid HomeKit state.",
-            "confidence": "high",
-            "hash": "e840060859999cdb25c1fcd8b273a02f0e4e1d19d802a297b0a5a54c9aa350e3"
+            "question": "Why does the log show `BSH.Common.EnumType.PowerState.Undefined` as an unrecognised value?",
+            "answer": "The value `BSH.Common.EnumType.PowerState.Undefined` (and similar values like `Unknown` for programs) is occasionally returned by the Home Connect API servers. These values are not part of the official appliance specifications and typically indicate a transient error or a bug on the Home Connect server-side.\n\nThe plugin deliberately does not support these values as expected states. Adding them would interfere with the internal logic of the plugin, which requires a valid, actionable state to map to HomeKit. If you see these messages in your logs:\n\n* They can generally be ignored as they represent temporary API inconsistencies.\n* No configuration changes are required, as the issue resides with the third-party API service rather than the plugin or your local setup.",
+            "semantic_abstract": "Home Connect API servers occasionally return `BSH.Common.EnumType.PowerState.Undefined` or similar `Unknown` program values that fall outside the documented specification. These values represent transient server-side errors or undefined states that the plugin ignores to maintain logical consistency across HomeKit services.",
+            "hash": "be9fe244a657008075bd87ded260f7cd326ce0a24b91c245e8fa552bffad4c1d"
         }
     ]
 }
