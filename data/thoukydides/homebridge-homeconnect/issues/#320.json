@@ -1,13 +1,12 @@
 {
     "issue_number": 320,
-    "updated_at": "2026-02-28T07:44:54.222Z",
+    "updated_at": "2026-03-30T12:41:51.969Z",
     "faq": [
         {
-            "question": "Why does the plugin log unrecognised Home Connect API types or options like `BeverageSize`?",
-            "answer": "New Home Connect appliance models or firmware updates occasionally introduce features and options that are not yet included in the official API documentation. This is particularly common with newer devices, such as the Siemens TQ903 series coffee makers. When the plugin encounters these unknown fields, such as `BeverageSize` or `CoarsnessExtended`, it generates a log entry containing TypeScript-style definitions to help identify the missing data.\n\n*   These messages do not necessarily indicate a functional failure but highlight areas where the plugin's internal API map is incomplete.\n*   If you see these logs, ensure you are using the latest version of the plugin, as support for many undocumented fields (including those for coffee makers) was added in `v1.2.3` and subsequent releases.\n*   If the messages persist on the latest version, reporting the log output via a GitHub issue allows the maintainer to add formal support for the new features.",
-            "semantic_abstract": "Home Connect appliance firmware or new hardware releases can introduce undocumented API options and enum values, such as `BeverageSize` for coffee makers, which deviate from the official API specification. The plugin identifies these discrepancies and logs them as unrecognised fields using a specific diagnostic format to facilitate the integration of new appliance features into the plugin's internal definitions.",
-            "confidence": "high",
-            "hash": "c3797ec387d4c634c39f993e07fac804a9e3e0640248c49552847bcd09c49be7"
+            "question": "Why does the log show `(unrecognised)` types or options for my coffee machine?",
+            "answer": "Newer or high-end coffee machines, such as the Siemens TQ903 series, often implement features and program options that are not included in the official Home Connect API documentation. When the plugin encounters these undocumented settings, it logs them as `(unrecognised)` to help identify missing functionality.\n\nCommon examples of undocumented features include:\n* `ConsumerProducts.CoffeeMaker.Option.BeverageSize` \n* `ConsumerProducts.CoffeeMaker.EnumType.CoarsnessExtended` values like `Coarsness2` or `Coarsness4` \n\nThe plugin is regularly updated to include placeholders and support for these values as they are discovered. If you see these messages in your logs while running the latest version of the plugin, providing the logged output to the maintainer helps ensure these features can be properly mapped and supported in future releases.",
+            "semantic_abstract": "Home Connect coffee machines often utilise program options and settings that are absent from the official API documentation, such as `BeverageSize` or `CoarsnessExtended`. The plugin identifies and logs these unrecognised values to facilitate their manual mapping in future updates, as they cannot be automatically inferred from the API specification.",
+            "hash": "0ddb380cc2cf9f55d6bf6a1b45e752672a2e992fd8f84366655625be61c53501"
         }
     ]
 }
