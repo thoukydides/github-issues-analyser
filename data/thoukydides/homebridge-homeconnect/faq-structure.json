@@ -312,9 +312,6 @@
                                         "issue-277-7b13",
                                         "issue-278-36c0",
                                         "issue-279-4938",
-                                        "issue-314-f707",
-                                        "issue-317-9950",
-                                        "issue-320-c379",
                                         "issue-324-386b",
                                         "issue-326-59db",
                                         "issue-330-44ae",
@@ -376,7 +373,6 @@
                                         "issue-208-0821",
                                         "issue-250-36bc",
                                         "issue-273-cef7",
-                                        "issue-316-e6c5",
                                         "issue-368-b5fa",
                                         "issue-380-03ac"
                                     ]
@@ -404,7 +400,6 @@
                                     "included_ids": [
                                         "issue-27-a038",
                                         "issue-42-d406",
-                                        "issue-315-9e82",
                                         "issue-323-f483",
                                         "issue-329-1549",
                                         "issue-333-49b8",
@@ -517,7 +512,6 @@
                                     "question": "Why does the plugin log unrecognised `PowerState` or `Unknown` values?",
                                     "answer": "Certain Home Connect appliances or firmware versions may report non-standard states such as `BSH.Common.EnumType.PowerState.Undefined`, `BSH.Common.EnumType.PowerState.MainsOff`, or simply `Unknown`. These values are typically the result of bugs in the appliance firmware or transient faults within the Home Connect cloud servers, as they do not conform to the standard API specification.\n\nTo ensure plugin stability and correct HomeKit operation, the plugin treats these values as equivalent to `Off`. If this behaviour persists, providing a complete log with debug mode enabled can help identify the specific context in which the API is returning these values.",
                                     "included_ids": [
-                                        "issue-310-e840",
                                         "issue-353-8bec",
                                         "issue-307-0bd5"
                                     ]
@@ -530,7 +524,44 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 310,
+                                    "id": "issue-310-be9f",
+                                    "question": "Why does the log show `BSH.Common.EnumType.PowerState.Undefined` as an unrecognised value?",
+                                    "answer": "The value `BSH.Common.EnumType.PowerState.Undefined` (and similar values like `Unknown` for programs) is occasionally returned by the Home Connect API servers. These values are not part of the official appliance specifications and typically indicate a transient error or a bug on the Home Connect server-side.\n\nThe plugin deliberately does not support these values as expected states. Adding them would interfere with the internal logic of the plugin, which requires a valid, actionable state to map to HomeKit. If you see these messages in your logs:\n\n* They can generally be ignored as they represent temporary API inconsistencies.\n* No configuration changes are required, as the issue resides with the third-party API service rather than the plugin or your local setup."
+                                },
+                                {
+                                    "issue_number": 314,
+                                    "id": "issue-314-d0cf",
+                                    "question": "What should I do if the log shows `HomeConnect API unexpected values` or `(unrecognised)` keys?",
+                                    "answer": "The `homebridge-homeconnect` plugin proactively identifies programs, settings, and options in the Home Connect API that are not yet defined in its internal schema. This typically occurs when a newer appliance model or firmware version introduces functionality that the plugin has not yet encountered.\n\nWhen this message appears, follow these steps to help add support for the new features:\n1. Locate the block of text in your logs between the `====================` separators.\n2. Click the specific GitHub link provided in the log message to open a pre-filled issue template.\n3. Paste the captured log block into the issue and submit it.\n\nThis information allows the maintainer to map the new API keys to HomeKit services. After the maintainer integrates these values into a new plugin release, updating the plugin will enable the features and resolve the log warning."
+                                },
+                                {
+                                    "issue_number": 315,
+                                    "id": "issue-315-b7f2",
+                                    "question": "Why does the log show `Appliance initialisation is taking longer than expected` and wait for features to finish?",
+                                    "answer": "This message indicates that the plugin has successfully identified the appliance but is unable to retrieve the current status or configuration for specific features (such as `Power`, `Door`, `Light`, or `Programs`) from the Home Connect API. This prevents the appliance from being fully exposed to HomeKit.\n\nIf the list of features waiting to initialise does not decrease over several minutes, it typically suggests one of the following:\n\n* The appliance is offline or has lost its connection to the Home Connect cloud servers. Even if the appliance is connected to your local Wi-Fi, it must be reported as \"Online\" and be controllable within the official Home Connect mobile app for the plugin to function.\n* The Home Connect API is returning errors or timing out when queried for specific appliance details.\n* The appliance is in a state (such as a deep sleep or power-off mode) where it is not responding to status requests for certain features.\n\nTo resolve this, try the following steps:\n1. Check the official Home Connect app to ensure the appliance is online.\n2. Power-cycle the appliance by disconnecting it from the mains for 30 seconds.\n3. Verify that the appliance has a stable Wi-Fi connection and is not blocked by a firewall from reaching the Home Connect servers."
+                                },
+                                {
+                                    "issue_number": 316,
+                                    "id": "issue-316-2b86",
+                                    "question": "Why are some appliance programs missing or appearing as unavailable?",
+                                    "answer": "The Home Connect API only reports details for programs that are currently selectable on the physical appliance. Programs may not appear in HomeKit if the appliance is in a state that prevents their selection.\n\nCommon reasons for missing programs include:\n\n* The appliance is currently running a program or is busy.\n* Remote Control or Remote Start is not enabled on the appliance's physical control panel.\n* The appliance requires maintenance or consumables (such as salt or rinse aid) are depleted.\n* Certain programs, such as Sabbath mode, must be enabled in the appliance settings before they can be selected.\n\nTo ensure all programs are detected and cached:\n\n1. Ensure the appliance is powered on, idle, and all maintenance requirements are met.\n2. Enable **Remote Control** and **Remote Start** on the appliance.\n3. If specific programs are still missing, manually select them (but do not start them) on the appliance's front panel and leave it for a few minutes.\n4. Trigger a refresh by using the **Identify** function for the appliance in HomeKit or by restarting the plugin."
+                                },
+                                {
+                                    "issue_number": 317,
+                                    "id": "issue-317-c7e3",
+                                    "question": "Why does the log show `(unrecognised)` values or a block of code?",
+                                    "answer": "The plugin maintains an internal dictionary of known Home Connect API constants, including programs, options, settings, and enumeration values. When an appliance reports a value that is not yet in this dictionary, the plugin outputs a diagnostic block of code to the log, with specific lines marked as `(unrecognised)`.\n\nThis typically occurs in the following scenarios:\n* A new appliance model is released with unique features\n* A firmware update adds new functionality or settings to an existing appliance\n* The Home Connect API has been expanded with new constants\n\nIf you see this output in your logs, please open a new issue on GitHub and provide the entire block of text between the `==========` separators. This information allows the developer to add formal support for these values in a future release. Even when a value is unrecognised, the plugin will attempt to function, although the specific feature may not be fully interactive or correctly named within the Home app until the definitions are updated."
+                                },
+                                {
+                                    "issue_number": 320,
+                                    "id": "issue-320-0ddb",
+                                    "question": "Why does the log show `(unrecognised)` types or options for my coffee machine?",
+                                    "answer": "Newer or high-end coffee machines, such as the Siemens TQ903 series, often implement features and program options that are not included in the official Home Connect API documentation. When the plugin encounters these undocumented settings, it logs them as `(unrecognised)` to help identify missing functionality.\n\nCommon examples of undocumented features include:\n* `ConsumerProducts.CoffeeMaker.Option.BeverageSize` \n* `ConsumerProducts.CoffeeMaker.EnumType.CoarsnessExtended` values like `Coarsness2` or `Coarsness4` \n\nThe plugin is regularly updated to include placeholders and support for these values as they are discovered. If you see these messages in your logs while running the latest version of the plugin, providing the logged output to the maintainer helps ensure these features can be properly mapped and supported in future releases."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
