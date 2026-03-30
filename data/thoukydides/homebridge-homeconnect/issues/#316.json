@@ -1,13 +1,12 @@
 {
     "issue_number": 316,
-    "updated_at": "2026-02-28T05:53:46.901Z",
+    "updated_at": "2026-03-30T10:40:08.048Z",
     "faq": [
         {
-            "question": "Why are some programs missing or unavailable for my Home Connect appliance?",
-            "answer": "Programs may not appear in HomeKit if the plugin was unable to retrieve their details from the Home Connect API during initialisation. The API only provides full program options when the appliance is in a specific state that permits remote selection.\n\nCommon reasons for missing programs include:\n1. **Remote Control disabled**: Remote Start or Remote Control must be enabled on the physical appliance.\n2. **Local operation**: The appliance is being controlled via its physical interface, which can block API access to certain details.\n3. **Maintenance required**: The appliance needs attention, such as replenishing salt or rinse aid, or completing a cleaning cycle.\n4. **Active cycle**: Program details cannot be discovered while a program is already running.\n\nTo resolve this and force the plugin to re-read the available programs:\n1. Ensure the appliance is powered on and idle with no active errors.\n2. Enable Remote Control on the appliance.\n3. If specific programs are still missing, manually select them (without starting them) using the appliance controls to ensure they are visible to the API.\n4. Use the **Identify** function for the accessory in a HomeKit app (such as Eve) or restart the Homebridge plugin to trigger a fresh discovery.",
-            "semantic_abstract": "Home Connect appliance programs are only discoverable via the API when the device is in a ready state with remote control enabled. Restrictions such as local operation, active maintenance prompts, or running cycles prevent the plugin from retrieving program details, resulting in missing or unavailable options in HomeKit.",
-            "confidence": "high",
-            "hash": "e6c552a1162f412918d9339493e006c81c0d1e79e08f73afa0decc605ff8e322"
+            "question": "Why are some appliance programs missing or appearing as unavailable?",
+            "answer": "The Home Connect API only reports details for programs that are currently selectable on the physical appliance. Programs may not appear in HomeKit if the appliance is in a state that prevents their selection.\n\nCommon reasons for missing programs include:\n\n* The appliance is currently running a program or is busy.\n* Remote Control or Remote Start is not enabled on the appliance's physical control panel.\n* The appliance requires maintenance or consumables (such as salt or rinse aid) are depleted.\n* Certain programs, such as Sabbath mode, must be enabled in the appliance settings before they can be selected.\n\nTo ensure all programs are detected and cached:\n\n1. Ensure the appliance is powered on, idle, and all maintenance requirements are met.\n2. Enable **Remote Control** and **Remote Start** on the appliance.\n3. If specific programs are still missing, manually select them (but do not start them) on the appliance's front panel and leave it for a few minutes.\n4. Trigger a refresh by using the **Identify** function for the appliance in HomeKit or by restarting the plugin.",
+            "semantic_abstract": "Home Connect API program discovery is constrained by the appliance's operational state, requiring Remote Control authorisation and completion of maintenance tasks before program metadata is exposed. The plugin relies on these API responses to populate its local cache, meaning programs not selectable on the physical hardware during initialisation will not be available in HomeKit.",
+            "hash": "2b86bf3ec0601f30cb5572929b494cb00c54b0b259a63f0f6cbbb2b5c10ed38d"
         }
     ]
 }
