@@ -663,7 +663,10 @@ There are plans to replace this polling mechanism with a more efficient event-ba
 
 #### Why is the dishwasher door control read-only in HomeKit?
 
-The Home Connect API currently restricts door functionality for dishwasher appliances to monitoring-only. Remote control of the door is limited by the API to specific oven and fridge/freezer models, and even then, it is dependent on the specific appliance hardware. For dishwashers, the `Door` service in HomeKit is read-only; it will correctly indicate whether the door is open or closed, but it cannot be used to trigger the door to open. This is a limitation of the Home Connect API rather than the plugin itself.
+<!-- INCLUDES: issue-327-787f -->
+The Home Connect API currently restricts door control functionality to specific appliance categories, such as certain oven and fridge/freezer models. For dishwashers, even if they are equipped with hardware to automatically open the door (e.g. at the end of a cleaning cycle), the API only supports monitoring the door state.
+
+In HomeKit, the `Door` service for dishwashers is therefore read-only. It will correctly indicate whether the door is open or closed and provide status updates when manually operated, but it cannot be used to trigger the door to open. This is a limitation of the Home Connect API rather than the plugin itself.
 
 #### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
 
@@ -695,17 +698,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why does the Door accessory for my dishwasher not open the door? 🚧
-
-<!-- INCLUDES: issue-327-787f -->
-The Home Connect API currently limits door control functionality to specific appliance categories. While many dishwashers are equipped with hardware to open the door (e.g. at the end of a cleaning cycle), the API only supports the `open-door` command for certain Oven and Fridge/Freezer models.
-
-For dishwashers, the `Door` service in HomeKit is restricted to:
-1. Monitoring the current state (Open or Closed).
-2. Providing status updates when the door is manually operated.
-
-If the Home app correctly reflects whether the door is open or closed, the plugin is functioning as intended within the constraints of the Home Connect API. Remote opening of dishwasher doors is not possible unless the API is extended by the manufacturer.
 
 ## Apple HomeKit
 
