@@ -1,20 +1,18 @@
 {
     "issue_number": 323,
-    "updated_at": "2026-02-28T10:45:27.737Z",
+    "updated_at": "2026-03-31T06:43:36.318Z",
     "faq": [
         {
-            "question": "Why does a multi-button switch for events like `Program Finished` appear in HomeKit?",
-            "answer": "This is the `Event Buttons` feature, which exposes appliance events as a `Stateless Programmable Switch` service. Each button corresponds to a specific appliance event, such as:\n* `Program Finished` (`BSH.Common.Event.ProgramFinished`)\n* `Program Aborted` (`BSH.Common.Event.ProgramAborted`)\n* `Salt Low` (`Dishcare.Dishwasher.Event.SaltNearlyEmpty`)\n* `Rinse Aid Low` (`Dishcare.Dishwasher.Event.RinseAidNearlyEmpty`)\n\nThese buttons are designed to trigger HomeKit automations. If you do not want them to appear, you can disable them by setting the `Event Buttons` feature to `false` in your plugin configuration for that specific appliance.",
-            "semantic_abstract": "The `Event Buttons` feature maps Home Connect appliance events to HomeKit `Stateless Programmable Switch` services, enabling event-driven automations for statuses like program completion or low consumables.",
-            "confidence": "high",
-            "hash": "93013fd9659cdd4279dbf781e1bd8b030d77a76ca841968a0f2aae8351d7bc12"
+            "question": "Why is there a multi-button switch appearing for my appliance in HomeKit?",
+            "answer": "This is the `Event Buttons` feature, which maps specific appliance events to HomeKit `Stateless Programmable Switch` services. These buttons are designed to trigger HomeKit automations based on appliance status changes.\n\nFor a dishwasher, these buttons typically correspond to:\n1. `Program Finished` (`BSH.Common.Event.ProgramFinished`)\n2. `Program Aborted` (`BSH.Common.Event.ProgramAborted`)\n3. `Salt Low` (`Dishcare.Dishwasher.Event.SaltNearlyEmpty`)\n4. `Rinse Aid Low` (`Dishcare.Dishwasher.Event.RinseAidNearlyEmpty`)\n\nIf you do not want these buttons to appear in HomeKit, you can disable them in the plugin configuration for the specific appliance by setting the `Event Buttons` feature to `false` (or unchecking it in the Homebridge Settings UI).",
+            "semantic_abstract": "Home Connect appliance `Event Buttons` are exposed as `StatelessProgrammableSwitch` services in HomeKit to facilitate automations triggered by appliance events such as program completion or low consumables.",
+            "hash": "6a460843ab04c6aca37c69fd83ea055f19ed93ea77aaa34fbe16d3c02d2d393d"
         },
         {
-            "question": "Why does the log repeatedly show `Waiting for features to finish initialising`?",
-            "answer": "This message occurs when the plugin is unable to communicate with the appliance via the Home Connect API servers. The plugin requires an active connection to fetch the appliance's capabilities and current state during the initialisation process.\n\nIf the appliance is offline or has lost its connection to the Home Connect cloud, the plugin will periodically retry and log this message. To resolve this:\n1. Verify that the appliance is reachable in the official Home Connect app when your phone is using mobile data (Wi-Fi disabled).\n2. Check the appliance's network status in the Home Connect app settings; it should ideally show three green lines.\n3. Power cycle the appliance or check your home network if it appears offline in the official app.",
-            "semantic_abstract": "Plugin initialisation delays and persistent `Waiting for features to finish initialising` log messages occur when an appliance is disconnected from the Home Connect API servers, preventing the retrieval of device capabilities and state.",
-            "confidence": "high",
-            "hash": "f4835eb684673ff8ab44ba2f213a9462a8b076e965f58a7f1f0b0c2efb6d1a5a"
+            "question": "Why does the log show `Waiting for features to finish initialising` repeatedly?",
+            "answer": "This message indicates that the plugin cannot communicate with the appliance via the Home Connect API servers. The plugin requires an active connection to fetch the appliance's capabilities and current state to complete the initialisation of features like `Power`, `Door`, `Light`, `Programs`, and `Child Lock`.\n\nIf initialisation is stuck, it is usually because the appliance has lost its connection to the Home Connect cloud. To troubleshoot:\n* Open the official Home Connect app and verify that you can control the appliance while your mobile device's Wi-Fi is disabled (forcing a cloud connection).\n* Check the appliance's network settings within the Home Connect app; it should ideally show three green lines, indicating successful connections to the local network, the internet, and the Home Connect servers.\n\nThe plugin will automatically finish initialisation as soon as the appliance reconnects to the Home Connect servers.",
+            "semantic_abstract": "Persistent appliance initialisation delays and associated log warnings occur when an appliance is disconnected from Home Connect API servers, as the plugin requires an active cloud connection to retrieve device capabilities and state.",
+            "hash": "0be1710beca803f7388ab33696cf768c5abc8880a431aa0726d31d2eb7a0aa74"
         }
     ]
 }
