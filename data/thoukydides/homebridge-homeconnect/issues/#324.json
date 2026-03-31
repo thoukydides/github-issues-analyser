@@ -1,13 +1,12 @@
 {
     "issue_number": 324,
-    "updated_at": "2026-02-28T13:10:32.181Z",
+    "updated_at": "2026-03-31T09:45:19.001Z",
     "faq": [
         {
-            "question": "What should I do if the logs show `unrecognised` Home Connect API values?",
-            "answer": "The plugin includes a diagnostic feature that identifies data from the Home Connect API not yet known to its internal schema, which typically occurs when manufacturers release new appliance models or firmware updates. When this happens, a block of TypeScript code is generated in the logs, bounded by `====` lines, with specific entries marked `// (unrecognised)`. If you see such a block in your logs, please open a new issue on GitHub and paste the entire section. This allows the maintainer to update the plugin's internal definitions to support the new features. Always ensure you are running the latest version of the plugin before reporting, as support for those specific values may have already been added.",
-            "semantic_abstract": "The plugin implements an automated discovery mechanism for unknown Home Connect API enums and options by logging them as TypeScript code snippets. This process enables the identification of new appliance features or firmware capabilities that require inclusion in the plugin's internal data definitions.",
-            "confidence": "high",
-            "hash": "386b8661a74a6009aa9444e67cb46b825787f3176e5ef8087d5ff1490c20602c"
+            "question": "What should I do if the logs show `unrecognised` API keys or values?",
+            "answer": "The plugin monitors the Home Connect API for data that does not match its internal definitions. If an appliance reports a setting or option that the plugin does not yet recognise, it will generate a specific diagnostic block in the Homebridge logs. This block is formatted as TypeScript code and is surrounded by instructions to paste it into a GitHub issue.\n\nProviding this log output is the primary way that support for new appliance features and models is added. If you see these messages:\n\n1. Locate the log section containing the `unrecognised` comments.\n2. Copy the entire block, including the header and footer lines of `=` characters.\n3. Create a new issue on the GitHub repository and paste the copied text.\n\nOnce this information is provided, the maintainer can update the plugin to correctly interpret and expose these new capabilities.",
+            "semantic_abstract": "The plugin identifies Home Connect API responses containing unmapped keys or values and generates a diagnostic log block for reporting. This mechanism facilitates the integration of new appliance features and firmware-specific options by providing the maintainer with the necessary technical definitions to update the plugin.",
+            "hash": "75d291336e9e339d916079c228d43cd709b06c2ebb28ec3dd5035abdc7204d66"
         }
     ]
 }
