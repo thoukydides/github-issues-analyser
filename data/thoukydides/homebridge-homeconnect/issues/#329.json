@@ -1,13 +1,12 @@
 {
     "issue_number": 329,
-    "updated_at": "2026-02-28T15:42:06.884Z",
+    "updated_at": "2026-03-31T15:35:50.572Z",
     "faq": [
         {
-            "question": "Why is my appliance stuck \"Waiting for features to finish initialising\"?",
-            "answer": "This log message indicates that the plugin has identified the appliance in your Home Connect account but is unable to communicate with it to retrieve its current status, settings, or capabilities. This typically occurs because the appliance is offline or has lost its connection to the Home Connect cloud servers.\n\nTo resolve this issue, perform the following diagnostic steps:\n1. Open the official Home Connect app on your mobile device.\n2. Disable Wi-Fi on your phone to force a cellular/mobile data connection. If you cannot control the appliance in the official app over mobile data, the appliance is not correctly connected to the Home Connect servers.\n3. Check the appliance's network settings within the Home Connect app; it should ideally show three green lines indicating a strong connection.\n4. If the appliance appears offline, try power-cycling the device (unplugging it or turning off the circuit breaker for 30 seconds) or re-pairing it with your Wi-Fi network.\n\nThe plugin will automatically finish initialising the features once it can successfully establish a connection to the appliance via the Home Connect API.",
-            "semantic_abstract": "Appliance initialisation timeouts occur when the Home Connect API can identify an appliance associated with an account but cannot establish a real-time connection to fetch device states or features. This typically results from the physical appliance being offline or disconnected from the manufacturer's cloud servers, preventing the plugin from completing the HomeKit service mapping.",
-            "confidence": "high",
-            "hash": "1549deba75c034eb9404fd3732a6427e8acc67c9cac5103e1022c8bbeff6f51d"
+            "question": "Why does the log show `Waiting for features to finish initialising` for my appliance?",
+            "answer": "This message indicates that the plugin is unable to retrieve the necessary technical details for the appliance from the Home Connect API. This almost always occurs because the appliance is offline or has lost its connection to the Home Connect cloud servers.\n\nTo resolve this issue, please verify the connectivity of your appliance:\n\n1. Check cloud connectivity by disabling Wi-Fi on your mobile device and attempting to control the appliance using the official Home Connect app over a mobile data connection. If this fails, the appliance is not correctly connected to the Home Connect servers.\n2. Review the network settings within the Home Connect app for that specific appliance; it should indicate a stable connection (often represented by three green lines in the status section).\n3. Check the status of the Home Connect servers to ensure there are no regional outages.\n\nUntil the appliance successfully reconnects to the Home Connect cloud, the plugin cannot complete its initialisation and functionality within HomeKit will be limited or unavailable.",
+            "semantic_abstract": "Appliance connectivity failure to Home Connect cloud servers prevents the API from providing technical feature metadata, leading to persistent initialisation delays in the plugin. This state occurs when the appliance is offline, requiring verification of cloud control via the official app and inspection of the appliance's network status.",
+            "hash": "638e605b77a3d7f6f12a0d463f8940416134fee2ddd505851ab81665b2460869"
         }
     ]
 }
