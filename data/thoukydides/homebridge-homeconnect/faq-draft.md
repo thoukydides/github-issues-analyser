@@ -396,7 +396,7 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.
 
 When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
@@ -440,18 +440,19 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-333-49b8 issue-335-7107 issue-342-27bc -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-49b8 issue-335-7107 issue-342-27bc -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:
 
 1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.
-2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If the official app shows the device as offline or cannot control it, the issue lies with the appliance's connection to the Home Connect cloud servers.
-3. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.
-4. **Power Cycle**: Disconnect the appliance from the mains power (unplug it or turn off the circuit breaker) for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
-5. **Restart Homebridge**: Once the appliance has reconnected to Wi-Fi, restart Homebridge to trigger a fresh initialisation sequence.
-6. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
-7. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.
+2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If this fails, the appliance is not correctly connected to the cloud servers.
+3. **Verify App Connectivity Status**: Within the official Home Connect app, check the appliance's network settings. A fully functional connection is typically indicated by **three green lines**, representing successful links to the local network, the internet, and the Home Connect servers.
+4. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.
+5. **Power Cycle**: Disconnect the appliance from the mains power (unplug it or turn off the circuit breaker) for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
+6. **Restart Homebridge**: Once the appliance has reconnected to Wi-Fi, restart Homebridge to trigger a fresh initialisation sequence.
+7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
+8. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.
 
 #### Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?
 
@@ -591,43 +592,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why does the log show `Waiting for features to finish initialising` repeatedly? 🚧
-
-<!-- INCLUDES: issue-323-0be1 -->
-This message indicates that the plugin cannot communicate with the appliance via the Home Connect API servers. The plugin requires an active connection to fetch the appliance's capabilities and current state to complete the initialisation of features like `Power`, `Door`, `Light`, `Programs`, and `Child Lock`.
-
-If initialisation is stuck, it is usually because the appliance has lost its connection to the Home Connect cloud. To troubleshoot:
-* Open the official Home Connect app and verify that you can control the appliance while your mobile device's Wi-Fi is disabled (forcing a cloud connection).
-* Check the appliance's network settings within the Home Connect app; it should ideally show three green lines, indicating successful connections to the local network, the internet, and the Home Connect servers.
-
-The plugin will automatically finish initialisation as soon as the appliance reconnects to the Home Connect servers.
-
-#### 🚧 What should I do if the logs show `unrecognised` API keys or values? 🚧
-
-<!-- INCLUDES: issue-324-75d2 -->
-The plugin monitors the Home Connect API for data that does not match its internal definitions. If an appliance reports a setting or option that the plugin does not yet recognise, it will generate a specific diagnostic block in the Homebridge logs. This block is formatted as TypeScript code and is surrounded by instructions to paste it into a GitHub issue.
-
-Providing this log output is the primary way that support for new appliance features and models is added. If you see these messages:
-
-1. Locate the log section containing the `unrecognised` comments.
-2. Copy the entire block, including the header and footer lines of `=` characters.
-3. Create a new issue on the GitHub repository and paste the copied text.
-
-Once this information is provided, the maintainer can update the plugin to correctly interpret and expose these new capabilities.
-
-#### 🚧 Why does the log show `Waiting for features to finish initialising` for my appliance? 🚧
-
-<!-- INCLUDES: issue-329-638e -->
-This message indicates that the plugin is unable to retrieve the necessary technical details for the appliance from the Home Connect API. This almost always occurs because the appliance is offline or has lost its connection to the Home Connect cloud servers.
-
-To resolve this issue, please verify the connectivity of your appliance:
-
-1. Check cloud connectivity by disabling Wi-Fi on your mobile device and attempting to control the appliance using the official Home Connect app over a mobile data connection. If this fails, the appliance is not correctly connected to the Home Connect servers.
-2. Review the network settings within the Home Connect app for that specific appliance; it should indicate a stable connection (often represented by three green lines in the status section).
-3. Check the status of the Home Connect servers to ensure there are no regional outages.
-
-Until the appliance successfully reconnects to the Home Connect cloud, the plugin cannot complete its initialisation and functionality within HomeKit will be limited or unavailable.
 
 ### Appliance Status and Connectivity
 

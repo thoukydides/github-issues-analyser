@@ -367,7 +367,8 @@
                                         "issue-373-0d05",
                                         "issue-377-3b83",
                                         "issue-379-2e76",
-                                        "issue-381-fa8e"
+                                        "issue-381-fa8e",
+                                        "issue-324-75d2"
                                     ]
                                 },
                                 {
@@ -419,7 +420,7 @@
                                 },
                                 {
                                     "question": "Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?",
-                                    "answer": "The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.\n\nNote that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:\n\n1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.\n2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If the official app shows the device as offline or cannot control it, the issue lies with the appliance's connection to the Home Connect cloud servers.\n3. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.\n4. **Power Cycle**: Disconnect the appliance from the mains power (unplug it or turn off the circuit breaker) for at least 30 seconds to force its internal firmware to re-register with the cloud servers.\n5. **Restart Homebridge**: Once the appliance has reconnected to Wi-Fi, restart Homebridge to trigger a fresh initialisation sequence.\n6. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.\n7. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.",
+                                    "answer": "The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.\n\nNote that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:\n\n1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.\n2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If this fails, the appliance is not correctly connected to the cloud servers.\n3. **Verify App Connectivity Status**: Within the official Home Connect app, check the appliance's network settings. A fully functional connection is typically indicated by **three green lines**, representing successful links to the local network, the internet, and the Home Connect servers.\n4. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.\n5. **Power Cycle**: Disconnect the appliance from the mains power (unplug it or turn off the circuit breaker) for at least 30 seconds to force its internal firmware to re-register with the cloud servers.\n6. **Restart Homebridge**: Once the appliance has reconnected to Wi-Fi, restart Homebridge to trigger a fresh initialisation sequence.\n7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.\n8. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.",
                                     "included_ids": [
                                         "issue-27-a038",
                                         "issue-42-d406",
@@ -428,7 +429,9 @@
                                         "issue-315-b7f2",
                                         "issue-333-49b8",
                                         "issue-335-7107",
-                                        "issue-342-27bc"
+                                        "issue-342-27bc",
+                                        "issue-323-0be1",
+                                        "issue-329-638e"
                                     ]
                                 },
                                 {
@@ -547,26 +550,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 323,
-                                    "id": "issue-323-0be1",
-                                    "question": "Why does the log show `Waiting for features to finish initialising` repeatedly?",
-                                    "answer": "This message indicates that the plugin cannot communicate with the appliance via the Home Connect API servers. The plugin requires an active connection to fetch the appliance's capabilities and current state to complete the initialisation of features like `Power`, `Door`, `Light`, `Programs`, and `Child Lock`.\n\nIf initialisation is stuck, it is usually because the appliance has lost its connection to the Home Connect cloud. To troubleshoot:\n* Open the official Home Connect app and verify that you can control the appliance while your mobile device's Wi-Fi is disabled (forcing a cloud connection).\n* Check the appliance's network settings within the Home Connect app; it should ideally show three green lines, indicating successful connections to the local network, the internet, and the Home Connect servers.\n\nThe plugin will automatically finish initialisation as soon as the appliance reconnects to the Home Connect servers."
-                                },
-                                {
-                                    "issue_number": 324,
-                                    "id": "issue-324-75d2",
-                                    "question": "What should I do if the logs show `unrecognised` API keys or values?",
-                                    "answer": "The plugin monitors the Home Connect API for data that does not match its internal definitions. If an appliance reports a setting or option that the plugin does not yet recognise, it will generate a specific diagnostic block in the Homebridge logs. This block is formatted as TypeScript code and is surrounded by instructions to paste it into a GitHub issue.\n\nProviding this log output is the primary way that support for new appliance features and models is added. If you see these messages:\n\n1. Locate the log section containing the `unrecognised` comments.\n2. Copy the entire block, including the header and footer lines of `=` characters.\n3. Create a new issue on the GitHub repository and paste the copied text.\n\nOnce this information is provided, the maintainer can update the plugin to correctly interpret and expose these new capabilities."
-                                },
-                                {
-                                    "issue_number": 329,
-                                    "id": "issue-329-638e",
-                                    "question": "Why does the log show `Waiting for features to finish initialising` for my appliance?",
-                                    "answer": "This message indicates that the plugin is unable to retrieve the necessary technical details for the appliance from the Home Connect API. This almost always occurs because the appliance is offline or has lost its connection to the Home Connect cloud servers.\n\nTo resolve this issue, please verify the connectivity of your appliance:\n\n1. Check cloud connectivity by disabling Wi-Fi on your mobile device and attempting to control the appliance using the official Home Connect app over a mobile data connection. If this fails, the appliance is not correctly connected to the Home Connect servers.\n2. Review the network settings within the Home Connect app for that specific appliance; it should indicate a stable connection (often represented by three green lines in the status section).\n3. Check the status of the Home Connect servers to ensure there are no regional outages.\n\nUntil the appliance successfully reconnects to the Home Connect cloud, the plugin cannot complete its initialisation and functionality within HomeKit will be limited or unavailable."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
