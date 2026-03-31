@@ -13,7 +13,8 @@
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
   - **[Home Connect API Errors](#home-connect-api-errors)**
     - [Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?](#why-does-the-log-show-429-too-many-requests-1000-calls-in-1-day-reached-or-a-message-like-waiting--before-issuing-home-connect-api-request)
-    - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
+    - [Why does my appliance show a `409 Conflict` error for connection or program failures?](#why-does-my-appliance-show-a-409-conflict-error-for-connection-or-program-failures)
+    - [Why does the log show `SDK.Error.InvalidSettingState` when changing a setting or power state?](#why-does-the-log-show-sdkerrorinvalidsettingstate-when-changing-a-setting-or-power-state)
     - [Why does my appliance show as `Not Responding` in the Home app when turned off?](#why-does-my-appliance-show-as-not-responding-in-the-home-app-when-turned-off)
     - [Why does the power button not work or return a `BSH.Common.Error.WriteRequest.Busy` error?](#why-does-the-power-button-not-work-or-return-a-bshcommonerrorwriterequestbusy-error)
     - [What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?](#what-do-gateway-timeout-proxy-error-or-timeout-on-home-connect-subsystem-messages-mean)
@@ -204,28 +205,32 @@ Most limits reset after 1 or 10 minutes, but there is also a daily quota of 1,00
 
 No manual intervention is required; the plugin will automatically resume communication once the Home Connect servers lift the block.
 
-#### Why does my appliance show a `409 Conflict` error?
+#### Why does my appliance show a `409 Conflict` error for connection or program failures?
 
 <!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-374-e780 issue-378-832c -->
-The Home Connect API uses `409 Conflict` errors for a wide variety of failures that result in a request being rejected. The error message usually provides more details:
+The Home Connect API uses `409 Conflict` errors for a variety of failures that result in a request being rejected. Common sub-errors include:
 
-- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
-  1. In the official app, navigate to the appliance's **Settings** > **Network** and ensure all three connection stages (appliance-app, appliance-cloud, and app-cloud) are green.
-  2. Test the official app while your phone's Wi-Fi is disabled; if it fails to control the appliance over cellular data, the issue is with the appliance's cloud connection.
-  3. Power cycle the appliance or restart your router to refresh the connection to the Home Connect servers.
-  4. Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages.
+- `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: The appliance is not connected to the Home Connect cloud servers. Note that the official app may still work via local Wi-Fi, while this plugin requires the cloud API. To troubleshoot:
+  1. In the official app, check **Settings** > **Network** to ensure appliance-cloud and app-cloud connections are active.
+  2. Disable your phone's Wi-Fi; if the official app fails to control the appliance over cellular, the issue is the appliance's cloud connection.
+  3. Power cycle the appliance and router to refresh the link.
+- `SDK.Error.UnsupportedProgram`: You are attempting to start a program not exposed via the official API for your specific model. This is a platform limitation that should be reported to Home Connect support.
+- `SDK.Error.WrongOperationState`: The appliance is in an incorrect state, such as attempting to start a program while another is already running or performing a self-cleaning cycle.
+- `SDK.Error.ProgramNotAvailable`: The program is considered unavailable for remote execution due to safety features, local control being active, or firmware constraints.
+- `BSH.Common.Error.400.BadRequest`: Usually indicates an attempt to stop a program that is already stopped, often caused by HomeKit grouping multiple switches into a single tile.
 
-- `SDK.Error.InvalidSettingState`: This occurs when a setting is currently read-only or unavailable. It is often caused by inconsistencies in the API regarding power state capabilities (common with fridges, freezers, and hobs). It can also indicate that **Remote Start** or **Remote Control** has been disabled in the appliance's physical settings menu. While the API usually returns specific errors like `BSH.Common.Error.RemoteControlNotActive`, some appliances (particularly coffee makers) return `SDK.Error.InvalidSettingState` instead. On other appliances, it frequently indicates a maintenance message is displayed on the physical screen (e.g. "Change water filter" or "Descaling required") that requires manual confirmation before remote control can resume.
+Check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for outages. For other codes, refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
 
-- `SDK.Error.UnsupportedProgram`: This occurs when you attempt to start a program that is not exposed via the official Home Connect API for your specific model. The official app and physical control panel often support programs that have not yet been made available to third-party integrations. This is a platform limitation that should be reported to Home Connect support.
+#### Why does the log show `SDK.Error.InvalidSettingState` when changing a setting or power state?
 
-- `SDK.Error.WrongOperationState`: This indicates that the appliance is in an incorrect state for the requested operation, such as attempting to start a program while another is already running or if the appliance is currently performing a self-cleaning cycle.
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-374-e780 issue-378-832c -->
+The error `SDK.Error.InvalidSettingState` (often accompanied by `BSH.Common.Setting.PowerState currently not available or writable`) indicates that a setting is currently read-only. This typically occurs for three reasons:
 
-- `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program that the API considers unavailable for remote execution. This may be due to appliance settings, safety features (e.g. local control active), or firmware bugs.
+1. **Remote Start/Control Disabled**: For safety, many appliances (particularly coffee makers and washing machines) require **Remote Start** or **Remote Control** to be manually enabled on the physical control panel. Note that some models automatically disable this each time the door is opened or after a period of inactivity.
+2. **Maintenance Messages**: A message on the physical screen (e.g. "Change water filter" or "Descaling required") may require manual confirmation before remote operation can resume.
+3. **API Inconsistencies**: The API may incorrectly report a setting as writable when it is read-only in the current state (common with power states for hobs, fridges, and freezers).
 
-- `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggled together.
-
-For details of other `409` errors refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
+While the API usually returns `BSH.Common.Error.RemoteControlNotActive`, some firmware versions or appliance types (like coffee makers) return the more generic `SDK.Error.InvalidSettingState` instead. Ensure the physical appliance is ready and Remote Start is active.
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
@@ -234,7 +239,7 @@ The physical power button on some Home Connect appliances (most commonly washing
 
 The API does not provide any indication of whether an appliance supports a soft power off state that maintains a network connection. Hence, it is not possible for the plugin to identify whether an appliance that the API reports as `DISCONNECTED` has been intentionally switched off or has lost contact with the Home Connect servers for other reasons. The plugin prioritises technical accuracy and reports this state as `SERVICE_COMMUNICATION_FAILURE`, which the Apple Home app displays as `Not Responding`.
 
-The plugin does not offer a configuration option to "fake" an off state when an appliance disconnects it would misrepresent its true status. If the appliance has actual connectivity problems, it might still be powered on and running. Reporting a communication failure is the standard and correct HomeKit behaviour for an unreachable accessory.
+The plugin does not offer a configuration option to "fake" an off state when an appliance disconnects as it would misrepresent its true status. If the appliance has actual connectivity problems, it might still be powered on and running. Reporting a communication failure is the standard and correct HomeKit behaviour for an unreachable accessory.
 
 Most Home Connect appliances (like ovens or dishwashers) do maintain Wi-Fi connectivity when switched off, so reporting `Not Responding` only for those that disconnect correctly distinguishes them from appliances that remain reachable.
 
@@ -322,20 +327,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does changing the power state of my coffee maker result in a `409 Conflict` error? 🚧
-
-<!-- INCLUDES: issue-325-10f7 -->
-The error `409 Conflict` (often accompanied by `BSH.Common.Setting.PowerState currently not available or writable` or `SDK.Error.InvalidSettingState`) usually indicates that the **Remote Start** or **Remote Control** feature is disabled on the appliance's physical control panel.
-
-For safety and security reasons, many Home Connect appliances—particularly coffee makers—require this feature to be manually activated on the device itself before they will accept remote commands to turn on or off. Even if the plugin identifies the power state as a supported setting, the Home Connect API will reject write attempts until the physical setting is enabled.
-
-To resolve this:
-1. Locate the **Remote Start** or **Remote Control** setting in your appliance's settings menu or on its display.
-2. Ensure it is switched to **On**.
-3. Note that some appliances may require this to be re-enabled each time the door is opened or after a certain period of inactivity.
-
-While the API typically returns specific errors like `BSH.Common.Error.RemoteControlNotActive`, some firmware versions or appliance models may return the more generic `SDK.Error.InvalidSettingState` instead.
 
 ### Local/Remote Control
 
