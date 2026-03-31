@@ -81,7 +81,7 @@
     - [Why can I only control power and fan speed for my Home Connect air conditioner?](#why-can-i-only-control-power-and-fan-speed-for-my-home-connect-air-conditioner)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
-  - **[Notifications & Events](#notifications--events)**
+  - **[Notifications and Events](#notifications-and-events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
     - [How do I get notifications for events like a program finishing?](#how-do-i-get-notifications-for-events-like-a-program-finishing)
@@ -835,20 +835,24 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
-### Notifications & Events
+### Notifications and Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
 
-<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-aa32 issue-43-3f35 issue-45-b6c3 issue-56-1910 issue-132-49f7 issue-153-2cda -->
-Home Connect communicates many appliance states (such as a coffee maker's "Drip tray full", a washing machine's "iDos fill level poor", or a dishwasher's "Salt low" alert) as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous "Single Press" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.
+<!-- INCLUDES: issue-1-c1c9 issue-2-aadc issue-31-aa32 issue-43-3f35 issue-45-b6c3 issue-56-1910 issue-132-49f7 issue-153-2cda issue-323-6a46 -->
+Home Connect communicates many appliance states and notifications as **transient events** rather than persistent, queryable states. When an event occurs, it triggers an instantaneous "Single Press" on a `Stateless Programmable Switch` service. This mapping allows these events to be used as HomeKit automation triggers.
+
+Common examples of these events include:
+- **Dishwashers**: `Program Finished`, `Program Aborted`, `Salt Low`, or `Rinse Aid Low`.
+- **Coffee Makers**: `Drip tray full`.
+- **Laundry Appliances**: `iDos fill level poor`.
 
 This design is necessary for several reasons:
-
 1. **API Limitations**: The Home Connect API often does not allow the plugin to poll the current state of these alerts (e.g. after a reboot or reconnection). Because the actual state cannot be reliably determined at startup, using a persistent sensor (like a `Contact Sensor`) could lead to incorrect status displays if a "cleared" event was missed while the plugin was offline.
-2. **Inconsistent Reporting**: The API does not consistently report when an event condition clears. While some appliances might send an 'off' status, others simply stop sending the 'present' event with no standard timeout defined.
+2. **Inconsistent Reporting**: The API does not consistently report when an event condition clears. While some appliances might send an "off" status, others simply stop sending the "present" event with no standard timeout defined.
 3. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines sensors like `Contact Sensor` for continuous states. Mapping a momentary event to these services is technically incorrect.
 
-The Apple Home app only displays numeric labels (e.g. "Button 1") for these services. This is a design limitation of the Home app; while the HomeKit framework allows for descriptive labels (visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents, check the **Homebridge logs** during startup. These events can be disabled per-appliance in the plugin configuration if they are not required.
+The Apple Home app only displays numeric labels (e.g. "Button 1") for these services. This is a design limitation of the Home app; while the HomeKit framework allows for descriptive labels (visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents, check the **Homebridge logs** during startup. These events can be disabled per-appliance in the plugin configuration by disabling the `Event Buttons` feature.
 
 #### Why does the Home app show two (or more) tiles for one appliance?
 
@@ -857,7 +861,7 @@ This is a characteristic of how the Apple Home app handles different types of Ho
 
 The Apple Home app defaults to grouping most service types onto a single tile, but it typically places `Stateless Programmable Switch` services on a separate second tile. While you can toggle **Show as Separate Tiles** in the accessory settings to split them further, the Home app currently does not provide a way to merge these notification switches into the primary appliance tile.
 
-Note that this is purely a user interface display characteristic. Other HomeKit apps, such as *Eve* or *Home+*, may group these services differently. This grouping also has no effect on Siri voice control, which interacts with the underlying services directly. If you do not use these events for automations, you can disable them in the plugin configuration to prevent the extra tile from appearing.
+Note that this is purely a user interface display characteristic. Other HomeKit apps, such as *Eve* or *Home+*, may group these services differently. This grouping also has no effect on Siri voice control, which interacts with the underlying services directly. If you do not use these events for automations, you can disable the `Event Buttons` feature in the plugin configuration to prevent the extra tile from appearing.
 
 #### How do I get notifications for events like a program finishing?
 
@@ -865,34 +869,19 @@ Note that this is purely a user interface display characteristic. Other HomeKit 
 The `HomeKit Accessory Protocol (HAP)` does not support arbitrary notifications or a dedicated "program finished" sensor type. HomeKit only allows notifications for a limited set of pre-defined sensor types, such as `Motion Sensor`, `Smoke Sensor`, or `Contact Sensor`. Implementing a workaround by using these existing types would result in a poor user experience; for example, a user would receive a "smoke detected" alert when a dishwasher finishes, which is misleading and technically incorrect.
 
 To receive notifications, you have two main options:
-
 - **Official Home Connect App**: This is the most reliable method for detailed, text-based push notifications.
-- **HomeKit Automations**: You can trigger a notification indirectly by having the button event toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) accessory (such as a `Contact Sensor`) which *does* support native alerts.
+- **HomeKit Automations**: You can trigger a notification indirectly by having the `Event Button` for the event toggle a [homebridge-dummy](https://github.com/mpatfield/homebridge-dummy) accessory (such as a `Contact Sensor`) which *does* support native alerts.
 
 #### How can I disable HomeKit notifications for door events?
 
 <!-- INCLUDES: issue-43-682b issue-132-6b2c -->
 Door notifications for appliances like fridges or freezers are managed by the Apple Home app on a per-device basis. To disable them:
-
 1. Open the Apple **Home** app.
 2. Tap the **...** icon at the top of the screen and select **Home Settings**.
 3. Navigate to the **Doors** section.
 4. Locate the specific appliance accessory and toggle off **Activity Notifications**.
 
 Note that this setting must be configured separately on each iPhone or iPad where you want to silence the notifications. Alternatively, you can use the per-appliance configuration options in the plugin to remove the `Door` service entirely if you do not require its state information in HomeKit.
-
-#### 🚧 Why is there a multi-button switch appearing for my appliance in HomeKit? 🚧
-
-<!-- INCLUDES: issue-323-6a46 -->
-This is the `Event Buttons` feature, which maps specific appliance events to HomeKit `Stateless Programmable Switch` services. These buttons are designed to trigger HomeKit automations based on appliance status changes.
-
-For a dishwasher, these buttons typically correspond to:
-1. `Program Finished` (`BSH.Common.Event.ProgramFinished`)
-2. `Program Aborted` (`BSH.Common.Event.ProgramAborted`)
-3. `Salt Low` (`Dishcare.Dishwasher.Event.SaltNearlyEmpty`)
-4. `Rinse Aid Low` (`Dishcare.Dishwasher.Event.RinseAidNearlyEmpty`)
-
-If you do not want these buttons to appear in HomeKit, you can disable them in the plugin configuration for the specific appliance by setting the `Event Buttons` feature to `false` (or unchecking it in the Homebridge Settings UI).
 
 ### Siri
 
