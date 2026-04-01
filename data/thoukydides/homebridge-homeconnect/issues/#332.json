@@ -1,13 +1,5 @@
 {
     "issue_number": 332,
-    "updated_at": "2026-02-28T19:39:53.427Z",
-    "faq": [
-        {
-            "question": "Why do the logs contain TypeScript code snippets for unrecognised API values?",
-            "answer": "The plugin includes a diagnostic feature that identifies and logs Home Connect API options, settings, or values that are not yet explicitly defined in its internal data model. This information appears in the Homebridge logs as a block of TypeScript code (an `interface`) with specific lines marked as `(unrecognised)`.\n\nThese log entries are designed to assist in adding support for new appliance features or firmware updates. If you see these blocks in your logs:\n\n* Ensure you are running the latest version of the plugin, as support for the unrecognised values may have already been added.\n* If the logs persist on the latest version, please create a GitHub issue and include the complete log snippet. This provides the technical details required for the maintainer to update the plugin and expose the new functionality.",
-            "semantic_abstract": "The plugin generates diagnostic log entries containing TypeScript interface definitions when it detects Home Connect API options or values that are not currently defined in its data model. These 'unrecognised' snippets are intended to be shared in GitHub issues to facilitate the addition of support for new appliance features or firmware-specific capabilities.",
-            "confidence": "medium",
-            "hash": "73b2386f473fa7ca297c81a87eca455ff7067cd784bdcf066da29384dd00fb24"
-        }
-    ]
+    "updated_at": "2026-04-01T11:13:32.030Z",
+    "faq": []
 }
