@@ -1,13 +1,5 @@
 {
     "issue_number": 326,
-    "updated_at": "2026-02-28T18:53:51.204Z",
-    "faq": [
-        {
-            "question": "Why does the log show unrecognised Home Connect API values?",
-            "answer": "The plugin uses a predefined schema to map Home Connect API responses to HomeKit features. When an appliance reports a value not currently in this list - such as `Dishcare.Dishwasher.Program.MaxEfficient` - the plugin identifies it as `(unrecognised)`. This typically occurs when new appliance models are released or when manufacturer firmware updates introduce previously undocumented program keys or options. \n\nTo resolve this:\n1. Update to the latest version of the plugin, as support for new programs and options is added frequently.\n2. If the values remain unrecognised after an update, please open a GitHub issue and include the relevant log snippets. This diagnostic information is used to update the plugin's internal definitions and ensure full feature support for all appliances.",
-            "semantic_abstract": "The plugin implements a schema-based validation layer for Home Connect API interactions, logging any program keys or options that do not match known definitions. This diagnostic approach identifies new or changed API values from appliance firmware updates, facilitating their incorporation into the plugin's codebase to maintain feature parity.",
-            "confidence": "medium",
-            "hash": "59dbfbb1814fe87f5a9d5d16e05f2cfce0e8653c5caabb78685c424d21ad0f1c"
-        }
-    ]
+    "updated_at": "2026-04-01T09:50:48.662Z",
+    "faq": []
 }
