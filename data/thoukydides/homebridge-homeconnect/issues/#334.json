@@ -1,13 +1,12 @@
 {
     "issue_number": 334,
-    "updated_at": "2026-03-01T06:07:01.650Z",
+    "updated_at": "2026-04-01T15:56:51.984Z",
     "faq": [
         {
             "question": "Why can't I see or control the child lock for my appliance in the Apple Home app?",
-            "answer": "The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service. \n\nHowever, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**. \n\nOnce you have configured the child lock setting in a third-party app, you can include it in scenes or automations. These scenes will then be visible and controllable within the standard Apple Home app, providing a workaround for the display limitation.",
-            "semantic_abstract": "Home Connect child lock functionality is mapped to the HomeKit `Lock Physical Controls` characteristic on the Power `Switch` service. Because the native Apple Home app does not render this specific characteristic, users must employ third-party HomeKit applications to view or toggle the child lock state.",
-            "confidence": "high",
-            "hash": "56964cc341b7e932d8e562957eeedd0b4a90c46a946aec550208ff120ab6bac6"
+            "answer": "The child lock functionality is supported by the plugin and is mapped to the standard HomeKit `Lock Physical Controls` characteristic. This characteristic is attached to the appliance's Power `Switch` service.\n\nHowever, the Apple Home app does not currently display or allow control of the `Lock Physical Controls` characteristic. To access this feature, you must use a third-party HomeKit app, such as:\n* **Eve for HomeKit**\n* **Home+**\n* **Controller for HomeKit**\n\nWhen you toggle the child lock in a supported third-party app, you should see `SET Child lock enabled` or `SET Child lock disabled` in the Homebridge logs, confirming the command was sent to the appliance.",
+            "semantic_abstract": "The Home Connect `BSH.Common.Setting.ChildLock` setting is mapped to the standard HomeKit `Lock Physical Controls` characteristic on the appliance Power `Switch` service. Due to Apple Home app UI limitations, this characteristic is hidden from users, requiring third-party HomeKit software to expose the control functionality.",
+            "hash": "1d4cee53107ec5085ddf0e70d7d4f5d8b4946838322d7e953e45e796b5cb827f"
         }
     ]
 }
