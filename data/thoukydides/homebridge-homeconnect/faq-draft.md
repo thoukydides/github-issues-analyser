@@ -396,7 +396,7 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-326-59db issue-330-44ae issue-331-ce23 issue-332-73b2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-337-3b2d issue-344-04d9 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.
 
 When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
@@ -430,7 +430,7 @@ The Home Connect API is architected to support a single active program per appli
 
 #### Why does the log say a selected program is not supported by the Home Connect API?
 
-<!-- INCLUDES: issue-50-7106 issue-78-6bc5 issue-288-5cc2 issue-328-99fc -->
+<!-- INCLUDES: issue-50-7106 issue-78-6bc5 issue-288-5cc2 -->
 This warning typically occurs in two different contexts:
 
 - **Monitor-Only Programs**: Some appliances support maintenance cycles (such as rinsing, drum cleaning, or descaling) and user-configured favourites that the API allows the plugin to monitor but not control remotely. The plugin logs these when they are detected but cannot be started via HomeKit.
@@ -440,7 +440,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-49b8 issue-335-7107 issue-342-27bc -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-335-7107 issue-342-27bc -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:
@@ -592,6 +592,25 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
+
+#### 🚧 Why can't I trigger `MyCoffee` or other custom programmes on my coffee maker? 🚧
+
+<!-- INCLUDES: issue-328-b486 -->
+1. **API Limitations**: The Home Connect API often reports when a custom programme (such as `MyCoffee1` or various `CoffeeWorld` presets) is currently selected on the appliance. However, it may not advertise support for starting that programme remotely.
+2. **Device Support**: If a programme is not explicitly advertised as supported by the API for your specific appliance model, it cannot be triggered through the plugin. These programmes are typically restricted to being started via the physical appliance interface or the official Home Connect app.
+3. **Renaming Programmes**: Changing the display name of a programme on the coffee maker's control panel does not change the internal API key (e.g. `ConsumerProducts.CoffeeMaker.Program.MyCoffee.MyCoffee1`). The restriction is based on the API key and the manufacturer's permissions, so renaming will not enable remote control.
+
+#### 🚧 Why does my appliance stay stuck on `Waiting for features to finish initialising`? 🚧
+
+<!-- INCLUDES: issue-333-8d17 -->
+This message indicates that while the plugin has successfully identified the appliance in your Home Connect account, it is unable to retrieve its specific capabilities (such as `Power`, `Programs`, or `Child Lock`) from the Home Connect servers. This occurs when the appliance has lost its connection to the cloud, even if it appears to be on your local network.
+
+To resolve this, verify the appliance's cloud connectivity status using the official Home Connect mobile app:
+1. Ensure you can control the appliance via the official app while your mobile device's Wi-Fi is disabled (this forces the app to use the cloud connection rather than a local one).
+2. Check the appliance's **Settings** > **Network** section within the official app; it should show three green lines indicating a stable connection to the Home Connect servers.
+3. If the appliance is offline or showing a weak connection, try power-cycling the appliance or improving Wi-Fi coverage at its location.
+
+The plugin cannot initialise the HomeKit services for an appliance until it can successfully fetch these mandatory feature details from the API.
 
 ### Appliance Status and Connectivity
 
@@ -782,7 +801,6 @@ If multiple program switches appear with identical generic names (such as "Dryer
 
 #### Why can I not see or control the child lock for my appliance in the Apple Home app?
 
-<!-- INCLUDES: issue-334-5696 -->
 The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service. 
 
 However, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**.
@@ -834,6 +852,18 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
+
+#### 🚧 Why can't I see or control the child lock for my appliance in the Apple Home app? 🚧
+
+<!-- INCLUDES: issue-334-1d4c -->
+The child lock functionality is supported by the plugin and is mapped to the standard HomeKit `Lock Physical Controls` characteristic. This characteristic is attached to the appliance's Power `Switch` service.
+
+However, the Apple Home app does not currently display or allow control of the `Lock Physical Controls` characteristic. To access this feature, you must use a third-party HomeKit app, such as:
+* **Eve for HomeKit**
+* **Home+**
+* **Controller for HomeKit**
+
+When you toggle the child lock in a supported third-party app, you should see `SET Child lock enabled` or `SET Child lock disabled` in the Homebridge logs, confirming the command was sent to the appliance.
 
 ### Notifications and Events
 

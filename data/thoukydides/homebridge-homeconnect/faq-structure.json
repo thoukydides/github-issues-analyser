@@ -348,10 +348,6 @@
                                         "issue-314-d0cf",
                                         "issue-317-c7e3",
                                         "issue-320-0ddb",
-                                        "issue-326-59db",
-                                        "issue-330-44ae",
-                                        "issue-331-ce23",
-                                        "issue-332-73b2",
                                         "issue-337-3b2d",
                                         "issue-344-04d9",
                                         "issue-345-48d8",
@@ -414,8 +410,7 @@
                                     "included_ids": [
                                         "issue-50-7106",
                                         "issue-78-6bc5",
-                                        "issue-288-5cc2",
-                                        "issue-328-99fc"
+                                        "issue-288-5cc2"
                                     ]
                                 },
                                 {
@@ -427,7 +422,6 @@
                                         "issue-290-96f5",
                                         "issue-292-3212",
                                         "issue-315-b7f2",
-                                        "issue-333-49b8",
                                         "issue-335-7107",
                                         "issue-342-27bc",
                                         "issue-323-0be1",
@@ -550,7 +544,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 328,
+                                    "id": "issue-328-b486",
+                                    "question": "Why can't I trigger `MyCoffee` or other custom programmes on my coffee maker?",
+                                    "answer": "1. **API Limitations**: The Home Connect API often reports when a custom programme (such as `MyCoffee1` or various `CoffeeWorld` presets) is currently selected on the appliance. However, it may not advertise support for starting that programme remotely.\n2. **Device Support**: If a programme is not explicitly advertised as supported by the API for your specific appliance model, it cannot be triggered through the plugin. These programmes are typically restricted to being started via the physical appliance interface or the official Home Connect app.\n3. **Renaming Programmes**: Changing the display name of a programme on the coffee maker's control panel does not change the internal API key (e.g. `ConsumerProducts.CoffeeMaker.Program.MyCoffee.MyCoffee1`). The restriction is based on the API key and the manufacturer's permissions, so renaming will not enable remote control."
+                                },
+                                {
+                                    "issue_number": 333,
+                                    "id": "issue-333-8d17",
+                                    "question": "Why does my appliance stay stuck on `Waiting for features to finish initialising`?",
+                                    "answer": "This message indicates that while the plugin has successfully identified the appliance in your Home Connect account, it is unable to retrieve its specific capabilities (such as `Power`, `Programs`, or `Child Lock`) from the Home Connect servers. This occurs when the appliance has lost its connection to the cloud, even if it appears to be on your local network.\n\nTo resolve this, verify the appliance's cloud connectivity status using the official Home Connect mobile app:\n1. Ensure you can control the appliance via the official app while your mobile device's Wi-Fi is disabled (this forces the app to use the cloud connection rather than a local one).\n2. Check the appliance's **Settings** > **Network** section within the official app; it should show three green lines indicating a stable connection to the Home Connect servers.\n3. If the appliance is offline or showing a weak connection, try power-cycling the appliance or improving Wi-Fi coverage at its location.\n\nThe plugin cannot initialise the HomeKit services for an appliance until it can successfully fetch these mandatory feature details from the API."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -737,9 +744,7 @@
                                 {
                                     "question": "Why can I not see or control the child lock for my appliance in the Apple Home app?",
                                     "answer": "The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service. \n\nHowever, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**.",
-                                    "included_ids": [
-                                        "issue-334-5696"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why is the hood boost mode a separate switch instead of part of the fan speed control?",
@@ -786,7 +791,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 334,
+                                    "id": "issue-334-1d4c",
+                                    "question": "Why can't I see or control the child lock for my appliance in the Apple Home app?",
+                                    "answer": "The child lock functionality is supported by the plugin and is mapped to the standard HomeKit `Lock Physical Controls` characteristic. This characteristic is attached to the appliance's Power `Switch` service.\n\nHowever, the Apple Home app does not currently display or allow control of the `Lock Physical Controls` characteristic. To access this feature, you must use a third-party HomeKit app, such as:\n* **Eve for HomeKit**\n* **Home+**\n* **Controller for HomeKit**\n\nWhen you toggle the child lock in a supported third-party app, you should see `SET Child lock enabled` or `SET Child lock disabled` in the Homebridge logs, confirming the command was sent to the appliance."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
