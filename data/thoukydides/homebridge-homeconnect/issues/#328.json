@@ -1,13 +1,12 @@
 {
     "issue_number": 328,
-    "updated_at": "2026-02-28T16:47:03.776Z",
+    "updated_at": "2026-04-01T06:54:52.236Z",
     "faq": [
         {
-            "question": "Why are MyCoffee programs on my coffee maker reported as not supported?",
-            "answer": "If your logs indicate that a program like `ConsumerProducts.CoffeeMaker.Program.MyCoffee.MyCoffee1` is not supported, it is because the Home Connect API is not advertising support for that specific program. While the appliance may report that such a program is currently selected (for example, if you chose it manually on the machine), the API does not allow it to be triggered or controlled remotely.\n\nThis limitation typically applies to user-configurable or personalised programs. Changing the display name of the program on the appliance itself will not resolve this, as the internal API key used to identify the program remains unchanged. These programs can generally only be started via the physical controls on the appliance or through the official Home Connect smartphone app.",
-            "semantic_abstract": "Home Connect API constraints often prevent the remote selection of user-defined or personalised coffee maker programs, such as MyCoffee, despite the appliance reporting them as active via the event stream. This limitation is inherent to the API's advertised capabilities for specific hardware models and cannot be bypassed by renaming programs on the device.",
-            "confidence": "high",
-            "hash": "99fca94e31d597de805bc1f812d5320d70dcfb9f522de4381bc73aee9c45af78"
+            "question": "Why can't I trigger `MyCoffee` or other custom programmes on my coffee maker?",
+            "answer": "1. **API Limitations**: The Home Connect API often reports when a custom programme (such as `MyCoffee1` or various `CoffeeWorld` presets) is currently selected on the appliance. However, it may not advertise support for starting that programme remotely.\n2. **Device Support**: If a programme is not explicitly advertised as supported by the API for your specific appliance model, it cannot be triggered through the plugin. These programmes are typically restricted to being started via the physical appliance interface or the official Home Connect app.\n3. **Renaming Programmes**: Changing the display name of a programme on the coffee maker's control panel does not change the internal API key (e.g. `ConsumerProducts.CoffeeMaker.Program.MyCoffee.MyCoffee1`). The restriction is based on the API key and the manufacturer's permissions, so renaming will not enable remote control.",
+            "semantic_abstract": "Home Connect API constraints prevent the remote activation of user-defined 'MyCoffee' programmes, as the API frequently fails to advertise these as supported for remote execution despite reporting their status. Renaming these programmes on the physical device only modifies the display string and does not alter the underlying API key or bypass the restriction.",
+            "hash": "b486c8396aae1a0003056bae7f8cd2fbc2a1a4180909cd6fee63079c7f2b1e05"
         }
     ]
 }
