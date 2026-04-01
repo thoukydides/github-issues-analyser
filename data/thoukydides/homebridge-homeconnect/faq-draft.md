@@ -782,9 +782,10 @@ If multiple program switches appear with identical generic names (such as "Dryer
 
 #### Why can I not see or control the child lock for my appliance in the Apple Home app?
 
-The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service. 
+<!-- INCLUDES: issue-334-1d4c -->
+The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service.
 
-However, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**.
+However, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**. When you toggle the child lock in a supported third-party app, you should see `SET Child lock enabled` or `SET Child lock disabled` in the Homebridge logs, confirming the command was successfully sent to the appliance via the Home Connect API.
 
 #### Why is the hood boost mode a separate switch instead of part of the fan speed control?
 
@@ -833,18 +834,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why can't I see or control the child lock for my appliance in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-334-1d4c -->
-The child lock functionality is supported by the plugin and is mapped to the standard HomeKit `Lock Physical Controls` characteristic. This characteristic is attached to the appliance's Power `Switch` service.
-
-However, the Apple Home app does not currently display or allow control of the `Lock Physical Controls` characteristic. To access this feature, you must use a third-party HomeKit app, such as:
-* **Eve for HomeKit**
-* **Home+**
-* **Controller for HomeKit**
-
-When you toggle the child lock in a supported third-party app, you should see `SET Child lock enabled` or `SET Child lock disabled` in the Homebridge logs, confirming the command was sent to the appliance.
 
 ### Notifications and Events
 
