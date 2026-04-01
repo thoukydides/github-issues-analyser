@@ -411,12 +411,12 @@ Once added, the warning will disappear and the features will be correctly mapped
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-368-b5fa issue-380-03ac -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-368-b5fa issue-380-03ac -->
 The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable`:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
-- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
+- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API. Note that renaming a program on the physical control panel does not change its internal API identifier and will not bypass manufacturer-imposed remote control restrictions.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
 If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
@@ -430,17 +430,17 @@ The Home Connect API is architected to support a single active program per appli
 
 #### Why does the log say a selected program is not supported by the Home Connect API?
 
-<!-- INCLUDES: issue-50-7106 issue-78-6bc5 issue-288-5cc2 -->
+<!-- INCLUDES: issue-50-7106 issue-78-6bc5 issue-288-5cc2 issue-328-b486 -->
 This warning typically occurs in two different contexts:
 
-- **Monitor-Only Programs**: Some appliances support maintenance cycles (such as rinsing, drum cleaning, or descaling) and user-configured favourites that the API allows the plugin to monitor but not control remotely. The plugin logs these when they are detected but cannot be started via HomeKit.
+- **Monitor-Only Programs**: Some appliances support maintenance cycles (such as rinsing, drum cleaning, or descaling) and user-configured favourites that the API allows the plugin to monitor but not control remotely. Common examples include specific coffee programs (e.g. `MyCoffee` or `CoffeeWorld` presets) that may be visible in the API but are restricted to local operation. The plugin logs these when they are detected but cannot be started via HomeKit.
 - **Startup Timing**: You may see a transient warning during Homebridge startup or after clearing the cache. This happens if an appliance reports a program selection event before the plugin has finished loading the full list of supported programs from the API.
 
 This is often a known inconsistency in the Home Connect API's behaviour. When the plugin identifies this discrepancy, it deliberately avoids querying the API for further details to prevent invalid requests that would unnecessarily consume your daily API rate limit quota. In these cases, the messages are often cosmetic and the plugin will automatically refresh necessary details once initialisation is complete.
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-335-7107 issue-342-27bc -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-335-7107 issue-342-27bc -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:
@@ -592,25 +592,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why can't I trigger `MyCoffee` or other custom programmes on my coffee maker? 🚧
-
-<!-- INCLUDES: issue-328-b486 -->
-1. **API Limitations**: The Home Connect API often reports when a custom programme (such as `MyCoffee1` or various `CoffeeWorld` presets) is currently selected on the appliance. However, it may not advertise support for starting that programme remotely.
-2. **Device Support**: If a programme is not explicitly advertised as supported by the API for your specific appliance model, it cannot be triggered through the plugin. These programmes are typically restricted to being started via the physical appliance interface or the official Home Connect app.
-3. **Renaming Programmes**: Changing the display name of a programme on the coffee maker's control panel does not change the internal API key (e.g. `ConsumerProducts.CoffeeMaker.Program.MyCoffee.MyCoffee1`). The restriction is based on the API key and the manufacturer's permissions, so renaming will not enable remote control.
-
-#### 🚧 Why does my appliance stay stuck on `Waiting for features to finish initialising`? 🚧
-
-<!-- INCLUDES: issue-333-8d17 -->
-This message indicates that while the plugin has successfully identified the appliance in your Home Connect account, it is unable to retrieve its specific capabilities (such as `Power`, `Programs`, or `Child Lock`) from the Home Connect servers. This occurs when the appliance has lost its connection to the cloud, even if it appears to be on your local network.
-
-To resolve this, verify the appliance's cloud connectivity status using the official Home Connect mobile app:
-1. Ensure you can control the appliance via the official app while your mobile device's Wi-Fi is disabled (this forces the app to use the cloud connection rather than a local one).
-2. Check the appliance's **Settings** > **Network** section within the official app; it should show three green lines indicating a stable connection to the Home Connect servers.
-3. If the appliance is offline or showing a weak connection, try power-cycling the appliance or improving Wi-Fi coverage at its location.
-
-The plugin cannot initialise the HomeKit services for an appliance until it can successfully fetch these mandatory feature details from the API.
 
 ### Appliance Status and Connectivity
 
