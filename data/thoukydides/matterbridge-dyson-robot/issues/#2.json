@@ -1,13 +1,12 @@
 {
     "issue_number": 2,
-    "updated_at": "2026-03-05T07:10:30.202Z",
+    "updated_at": "2026-04-02T15:15:22.074Z",
     "faq": [
         {
-            "question": "Why are Dyson error codes such as `51C2` logged as unknown or missing from the smart home interface?",
-            "answer": "Warnings such as `Received unknown error code: 51C2` occur when a device reports a status code that has not yet been catalogued by the plugin. While these codes are added to the plugin's internal database as they are identified to reduce log noise, they are not currently exposed as actionable faults in Matter-compatible apps. This is a limitation of the **Matter 1.4 specification**, which lacks a standardised method for air purifiers to report granular hardware faults. Future updates to the Matter protocol may allow these codes to be properly mapped and displayed.",
-            "semantic_abstract": "Dyson air purifier hardware status codes (e.g. `51C2`) are logged by the plugin but remain unmapped to Matter attributes because the Matter 1.4 specification lacks a standardised fault-reporting cluster for this device category. This limitation prevents granular hardware errors from being exposed to Matter controllers even when the plugin correctly identifies the status code from the hardware's MQTT stream.",
-            "confidence": "high",
-            "hash": "a96e190b6423dfcfee5bf5bdbb4ae3ceb951b758022991d30ed73656bc836c30"
+            "question": "Why are specific Dyson device error codes or faults not visible in my Matter controller?",
+            "answer": "While the plugin can monitor and identify specific diagnostic codes (such as `51C2`) from the device MQTT stream, these are not currently exposed as active alerts or fault states in smart home platforms like HomeKit, Alexa, or Google Home. This is a limitation of the current Matter 1.4 specification, which does not provide a standardised mechanism or cluster for reporting diagnostic faults for air purifiers and fans. These codes are processed by the plugin for logging and internal state management but cannot be transmitted to a Matter controller until the specification is updated to support them.",
+            "semantic_abstract": "The Matter 1.4 specification lacks standardised clusters for reporting air purifier diagnostic faults, preventing the exposure of device-specific error codes from the Dyson MQTT stream to Matter controllers. This technical limitation means that while the plugin identifies and logs these codes, they cannot be surfaced as functional alerts or attributes within the Matter ecosystem.",
+            "hash": "64a41c20100ebcf8e5900c9d863ca6901118acaa37737ed10276e017285b5736"
         }
     ]
 }
