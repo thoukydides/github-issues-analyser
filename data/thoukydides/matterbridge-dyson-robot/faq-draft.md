@@ -46,10 +46,10 @@ Dyson robot vacuums perform many operations (such as controlling zone cleaning a
 
 #### Why are Dyson error codes and the sleep timer not visible in my Matter controller?
 
-<!-- INCLUDES: issue-1-749e -->
-Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, or `iuh3`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app).
+<!-- INCLUDES: issue-1-749e issue-2-64a4 -->
+Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, or `iuh3`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app or Google Home).
 
-The Matter specification does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.
+This is a limitation of the current Matter 1.4 specification, which does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.
 
 The plugin includes support for these fields in its internal definitions to provide a foundation for future compatibility if the Matter protocol expands. This ensures that the plugin can remain stable and keep the device reachable even when the appliance is reporting these internal codes.
 
@@ -59,11 +59,6 @@ The plugin includes support for these fields in its internal definitions to prov
 The Dyson Solarcycle Morph desk light (model `CD06`) is a Bluetooth-only device, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT-related fields such as `remoteBrokerType: 'wss'`, testing has confirmed that no traffic or control capability is actually exposed via Dyson's AWS IoT cloud gateway for these models. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to monitor or control the device.
-
-#### 🚧 Why are specific Dyson device error codes or faults not visible in my Matter controller? 🚧
-
-<!-- INCLUDES: issue-2-64a4 -->
-While the plugin can monitor and identify specific diagnostic codes (such as `51C2`) from the device MQTT stream, these are not currently exposed as active alerts or fault states in smart home platforms like HomeKit, Alexa, or Google Home. This is a limitation of the current Matter 1.4 specification, which does not provide a standardised mechanism or cluster for reporting diagnostic faults for air purifiers and fans. These codes are processed by the plugin for logging and internal state management but cannot be transmitted to a Matter controller until the specification is updated to support them.
 
 ## Matterbridge
 
