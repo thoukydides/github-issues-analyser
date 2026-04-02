@@ -593,6 +593,41 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
+#### 🚧 What should I do if the logs show `(unrecognised)` API keys or options? 🚧
+
+<!-- INCLUDES: issue-339-2bbb -->
+The plugin includes a diagnostic feature that identifies appliance options and values reported by the Home Connect API which are not yet known to the plugin. When these are encountered, a block of text formatted as a TypeScript interface is logged, with unknown elements marked as `(unrecognised)`.
+
+These logs do not indicate a malfunction. Instead, they identify appliance capabilities that can be added to the plugin. If you see these entries:
+1. Ensure you are using the latest version of the plugin.
+2. If the items remain unrecognised on the latest version, open a GitHub issue and provide the complete log block, including the `=======` separator lines. This allows the maintainer to update the plugin to support these specific features.
+
+#### 🚧 Why are some program options like `duration` missing for my Neff oven? 🚧
+
+<!-- INCLUDES: issue-340-bf6e -->
+Certain oven models, particularly Neff appliances with physical rotary dials, have a limitation in their firmware or the Home Connect public API that prevents them from being switched to the `On` state remotely. This results in a `409 Conflict` error with the key `SDK.Error.InvalidSettingState` and the description `BSH.Common.Setting.PowerState currently not available or writable` when the plugin attempts its initial discovery.
+
+Because the appliance must usually be `On` and idle to report its full range of program options, the plugin may only identify a subset of available settings. This plugin includes logic to better handle these devices by attempting to read program options even when the appliance reports an `Inactive` operation state. If you are still missing options:
+
+1. Manually switch the oven on using the physical controls (select a mode but do not start it, if possible).
+2. Wait a few minutes for any local control lockouts to expire (the `BSH.Common.Status.LocalControlActive` status will become `false`).
+3. Restart Homebridge or trigger the **Identify** routine (the **ID** button in the Eve app) to force a re-scan of supported programs.
+
+Note that the official Home Connect app uses a private API and may show capabilities, such as remote power-on, that are not accessible to third-party plugins.
+
+#### 🚧 Why does the plugin log TypeScript code blocks with `unrecognised` labels? 🚧
+
+<!-- INCLUDES: issue-344-c999 -->
+These log entries appear when the plugin encounters data from the Home Connect API that it does not currently recognise. This typically happens with newer appliance models or firmware updates that introduce manufacturer-specific features or undocumented program options. For example, some Washer-Dryer appliances use unique variants of options that are usually shared with standalone washers or dryers.
+
+The plugin is designed to identify these gaps and format them as code blocks to help users report them. If you see these in your logs:
+
+1. Copy the entire block starting from `// Union types` or `export interface`.
+2. Open a new issue on the GitHub repository.
+3. Provide the model number of your appliance and the copied log content.
+
+The maintainer uses this information to map the new API values to HomeKit, enabling support for those features in subsequent plugin updates.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
@@ -698,6 +733,29 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
+#### 🚧 Why does my appliance show as `Disconnected` or fail to complete initialisation? 🚧
+
+<!-- INCLUDES: issue-335-ff97 -->
+If the log shows `Appliance initialisation is taking longer than expected` or reports that the appliance is `Disconnected`, it typically means the appliance is not currently communicating with the Home Connect cloud servers. The plugin cannot fully configure the HomeKit services until it can retrieve the current state and capabilities via the API. To resolve this:
+
+1. Verify that the appliance can be controlled via the official Home Connect app while your mobile device's Wi-Fi is disabled (forcing the use of cellular data). If this fails, the issue is with the appliance's cloud connection rather than the plugin.
+2. Check the **Network** section within the appliance settings in the Home Connect app; it should indicate a stable connection with three green lines.
+3. Power cycle the appliance by disconnecting it from the mains power for a few minutes. This often forces the internal Wi-Fi module to re-establish a session with the BSH servers.
+
+#### 🚧 Why is my appliance stuck at "Waiting for features to finish initialising" even though the Home Connect app works? 🚧
+
+<!-- INCLUDES: issue-342-784e -->
+This behaviour typically occurs when the appliance reports a `connected: false` status to the public Home Connect API, even if it appears online and controllable within the official Home Connect app. The plugin requires a successful connection to the public API to retrieve appliance capabilities and map them to HomeKit services.
+
+The official app uses a private API that may maintain functionality even when the public API connection has stalled or crashed within the appliance's firmware. This mismatch causes the plugin to remain in a waiting state as it cannot read the necessary features (such as `Power`, `Door`, or `Programs`) to complete initialisation.
+
+To resolve this issue:
+1. Power cycle the appliance by unplugging it from the mains or switching off its circuit breaker for at least 30 seconds.
+2. Restore power and allow the appliance several minutes to reconnect to Wi-Fi and the cloud servers.
+3. Restart Homebridge.
+
+This process forces the appliance firmware to re-register its connection with the Home Connect cloud servers, which typically restores communication via the public API. If the issue persists after a power cycle, contact the Home Connect developer team for further assistance.
 
 ## Apple HomeKit
 
@@ -833,6 +891,23 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
+
+#### 🚧 How are fan speeds and the boost function on Siemens or Bosch hoods mapped to HomeKit? 🚧
+
+<!-- INCLUDES: issue-338-f65a -->
+The plugin maps the various fan speeds of Home Connect hoods to the HomeKit `RotationSpeed` characteristic in 20% increments:
+
+*   **20%**: Standard Stage 1 (`FanStage01`)
+*   **40%**: Standard Stage 2 (`FanStage02`)
+*   **60%**: Standard Stage 3 (`FanStage03`)
+*   **80%**: Intensive Stage 1 (`IntensiveStage1`)
+*   **100%**: Intensive Stage 2 (`IntensiveStage2`)
+
+Note that intensive levels typically have a hardware-defined timeout (e.g. 6 minutes), after which the appliance automatically reverts to Stage 3.
+
+For models that support a specific `Boost` option (such as the Siemens LC91BUR50), this is exposed as a separate **Boost** switch service rather than a 6th fan speed. This design choice reflects the unique behaviour of the hardware: while intensive stages always revert to Stage 3, the `Boost` option typically reverts to the **previous** speed after a very short duration (e.g. 20 seconds). 
+
+Users who do not wish to use the extra switch can hide it using the plugin's configuration settings.
 
 ### Notifications and Events
 
