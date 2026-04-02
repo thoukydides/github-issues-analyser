@@ -1,13 +1,12 @@
 {
     "issue_number": 335,
-    "updated_at": "2026-03-01T07:07:15.225Z",
+    "updated_at": "2026-04-02T06:19:05.121Z",
     "faq": [
         {
-            "question": "Why does my appliance show as Disconnected or fail to finish initialising in the logs?",
-            "answer": "If the logs show that the plugin has successfully authorised but the appliance remains `Disconnected` or displays the message `Appliance initialisation is taking longer than expected`, this usually indicates that the Home Connect servers cannot communicate with your appliance. The plugin is able to talk to the API, but the API cannot reach the hardware.\n\nTo troubleshoot this connectivity issue:\n1. Verify that you can control the appliance using the official Home Connect mobile app while your phone's Wi-Fi is disabled (using mobile data only). If the official app cannot control it, the plugin will not be able to either.\n2. Check the appliance settings within the Home Connect app under the **Network** section to ensure it shows a stable connection (typically indicated by three green lines).\n3. Power cycle the appliance by disconnecting it from the mains or using the circuit breaker to force a reconnection to the Home Connect servers.\n4. Consult the [Home Connect Server Status](https://homeconnect.thouky.co.uk) to rule out transient API outages.",
-            "semantic_abstract": "Appliance connectivity failures between the physical hardware and Home Connect cloud servers result in `Disconnected` status and stalled feature initialisation within the plugin. This state persists even when OAuth authorisation is successful, as the API acts as a gateway that cannot reach the end device. Resolving this requires verifying remote control via the official app on mobile data and potentially power-cycling the appliance to restore its cloud connection.",
-            "confidence": "high",
-            "hash": "710761ef849e7469c7544d24e2dc59ccb0440ef82717ab07f357b8225c896de8"
+            "question": "Why does my appliance show as `Disconnected` or fail to complete initialisation?",
+            "answer": "If the log shows `Appliance initialisation is taking longer than expected` or reports that the appliance is `Disconnected`, it typically means the appliance is not currently communicating with the Home Connect cloud servers. The plugin cannot fully configure the HomeKit services until it can retrieve the current state and capabilities via the API. To resolve this:\n\n1. Verify that the appliance can be controlled via the official Home Connect app while your mobile device's Wi-Fi is disabled (forcing the use of cellular data). If this fails, the issue is with the appliance's cloud connection rather than the plugin.\n2. Check the **Network** section within the appliance settings in the Home Connect app; it should indicate a stable connection with three green lines.\n3. Power cycle the appliance by disconnecting it from the mains power for a few minutes. This often forces the internal Wi-Fi module to re-establish a session with the BSH servers.",
+            "semantic_abstract": "Appliance-to-cloud connectivity failures prevent the Home Connect API from providing the necessary state information for plugin initialisation. This results in the plugin being unable to map services such as power, fan, or light control, leading to persistent `Disconnected` status logs.",
+            "hash": "ff977ffbf22946dcc3ddbc52e2c01537c69ffa2601a783be133baf84e773764b"
         }
     ]
 }
