@@ -348,8 +348,6 @@
                                         "issue-314-d0cf",
                                         "issue-317-c7e3",
                                         "issue-320-0ddb",
-                                        "issue-337-3b2d",
-                                        "issue-344-04d9",
                                         "issue-345-48d8",
                                         "issue-346-924f",
                                         "issue-347-c6a7",
@@ -424,8 +422,6 @@
                                         "issue-290-96f5",
                                         "issue-292-3212",
                                         "issue-315-b7f2",
-                                        "issue-335-7107",
-                                        "issue-342-27bc",
                                         "issue-323-0be1",
                                         "issue-329-638e",
                                         "issue-333-8d17"
@@ -741,9 +737,7 @@
                                 {
                                     "question": "Why is the hood boost mode a separate switch instead of part of the fan speed control?",
                                     "answer": "The plugin represents Home Connect hood functionality using a combination of a `Fan` service for speed control and a `Switch` service for the boost mode. This design reflects the different behaviours of these features in the appliance firmware:\n\n1. **Standard Speeds and Intensive Mode**: These are mapped to the HomeKit fan speed percentage steps. The highest fan speeds correspond to **intensive mode**, which run for a fixed period (e.g. 6 minutes) before automatically reverting to a specific lower speed.\n2. **Boost Mode**: On supported models the **Boost** option provides a higher fan speed for a very short duration (e.g. 20 seconds). Unlike intensive mode, when the boost period ends, the hood returns to the **previous** speed setting.\n\nBecause HomeKit fan speed controls represent a linear progression, incorporating a mode that reverts to an arbitrary previous state is not natively supported by the speed slider. Exposing `Boost` as a separate `Switch` better represents this hardware behaviour and allows it to be activated independently of the current speed. This `Switch` can be hidden in the plugin configuration if it is not required.",
-                                    "included_ids": [
-                                        "issue-338-61ea"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why is hood fan speed controlled using percentages instead of discrete levels?",
@@ -954,8 +948,6 @@
         "issue-239-6f85",
         "issue-256-069a",
         "issue-259-ff85",
-        "issue-340-77ce",
-        "issue-340-9a52",
         "issue-351-9e01",
         "issue-360-c5e9",
         "issue-365-e16b",
