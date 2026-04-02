@@ -1,5 +1,12 @@
 {
     "issue_number": 339,
-    "updated_at": "2026-03-01T08:52:43.662Z",
-    "faq": []
+    "updated_at": "2026-04-02T09:14:11.447Z",
+    "faq": [
+        {
+            "question": "What should I do if the logs show `(unrecognised)` API keys or options?",
+            "answer": "The plugin includes a diagnostic feature that identifies appliance options and values reported by the Home Connect API which are not yet known to the plugin. When these are encountered, a block of text formatted as a TypeScript interface is logged, with unknown elements marked as `(unrecognised)`.\n\nThese logs do not indicate a malfunction. Instead, they identify appliance capabilities that can be added to the plugin. If you see these entries:\n1. Ensure you are using the latest version of the plugin.\n2. If the items remain unrecognised on the latest version, open a GitHub issue and provide the complete log block, including the `=======` separator lines. This allows the maintainer to update the plugin to support these specific features.",
+            "semantic_abstract": "The plugin performs runtime discovery of Home Connect API schema elements, logging unmapped keys or values as `(unrecognised)` TypeScript interface definitions. This diagnostic mechanism allows for the identification and subsequent implementation of support for new appliance features or firmware-specific options within the HomeKit service mapping.",
+            "hash": "2bbbc83e67aed94ecce426759f8dcc07f8f71df26949100645e8deded94db039"
+        }
+    ]
 }
