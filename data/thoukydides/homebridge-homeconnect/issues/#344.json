@@ -1,13 +1,12 @@
 {
     "issue_number": 344,
-    "updated_at": "2026-03-01T11:40:25.519Z",
+    "updated_at": "2026-04-02T12:37:51.150Z",
     "faq": [
         {
-            "question": "Why does the log show unrecognised types or options for my appliance?",
-            "answer": "The plugin includes a discovery mechanism to identify program options and values returned by the Home Connect API that are not yet mapped or documented. This is common with newer appliance models or firmware updates that introduce specific variants of standard features, such as `LaundryCare.WasherDryer` identifiers instead of the usual `LaundryCare.Washer` or `LaundryCare.Dryer` versions.\n\nWhen these are detected, the plugin outputs a structured block of code-like definitions in the Homebridge logs, with entries marked as `(unrecognised)`. This is a deliberate design choice to assist in the identification and integration of new appliance features. If you see this output in your logs:\n\n1. Ensure you are running the latest version of the plugin, as support for those specific values may have already been added.\n2. If the values remain unrecognised, open a GitHub issue and provide the full content of the log block. This information is required for the maintainer to update the plugin definitions and support your appliance's specific functionality.",
-            "semantic_abstract": "The plugin implements a discovery mechanism that logs unrecognised Home Connect API identifiers, which frequently occur when appliances use non-standard or newer firmware-specific variants of program options. These log blocks provide the necessary technical definitions for the maintainer to manually map undocumented appliance features into the plugin's service logic.",
-            "confidence": "high",
-            "hash": "04d9fb061b907fde1791993b7e3cb44d41fe3d2f3aeb96bebac056dd4892310d"
+            "question": "Why does the plugin log TypeScript code blocks with `unrecognised` labels?",
+            "answer": "These log entries appear when the plugin encounters data from the Home Connect API that it does not currently recognise. This typically happens with newer appliance models or firmware updates that introduce manufacturer-specific features or undocumented program options. For example, some Washer-Dryer appliances use unique variants of options that are usually shared with standalone washers or dryers.\n\nThe plugin is designed to identify these gaps and format them as code blocks to help users report them. If you see these in your logs:\n\n1. Copy the entire block starting from `// Union types` or `export interface`.\n2. Open a new issue on the GitHub repository.\n3. Provide the model number of your appliance and the copied log content.\n\nThe maintainer uses this information to map the new API values to HomeKit, enabling support for those features in subsequent plugin updates.",
+            "semantic_abstract": "Undocumented Home Connect API schema elements, such as manufacturer-specific program options or enum values, are automatically identified by the plugin and logged as diagnostic TypeScript code blocks. This mechanism allows for the discovery and subsequent mapping of new appliance features that deviate from the standard documented API, such as unique Washer-Dryer program modes or drying targets.",
+            "hash": "c999d97f3bf11a96a24c578a3535dc8575f403ed8359b69e38cc1770ef6503f6"
         }
     ]
 }
