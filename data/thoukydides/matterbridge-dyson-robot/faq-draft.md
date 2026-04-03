@@ -7,7 +7,9 @@
   - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
   - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
 - **[Matterbridge](#matterbridge)**
-  - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
+  - **[New subcategory](#new-subcategory)**
+    - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
+  - **[Plugin Configuration and Updates](#plugin-configuration-and-updates)**
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -46,10 +48,10 @@ Dyson robot vacuums perform many operations (such as controlling zone cleaning a
 
 #### Why are Dyson error codes and the sleep timer not visible in my Matter controller?
 
-<!-- INCLUDES: issue-1-749e issue-2-64a4 -->
-Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, or `iuh3`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app or Google Home).
+<!-- INCLUDES: issue-2-64a4 -->
+Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, or `iuh3`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app).
 
-This is a limitation of the current Matter 1.4 specification, which does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.
+The Matter specification does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.
 
 The plugin includes support for these fields in its internal definitions to provide a foundation for future compatibility if the Matter protocol expands. This ensures that the plugin can remain stable and keep the device reachable even when the appliance is reporting these internal codes.
 
@@ -60,7 +62,14 @@ The Dyson Solarcycle Morph desk light (model `CD06`) is a Bluetooth-only device,
 
 While the MyDyson API includes MQTT-related fields such as `remoteBrokerType: 'wss'`, testing has confirmed that no traffic or control capability is actually exposed via Dyson's AWS IoT cloud gateway for these models. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to monitor or control the device.
 
+#### 🚧 Why are the sleep timer and device fault codes not available in my Matter controller? 🚧
+
+<!-- INCLUDES: issue-1-4ad6 -->
+While the plugin parses sleep timer data (`sltm`) and various hardware fault codes (such as `sen5` or `sen6`) from Dyson MQTT messages, these features are not currently exposed to Matter controllers. This is because the **Matter 1.4 specification** does not yet define standard clusters, attributes, or device types suitable for representing these specific functions. Support for these fields is maintained internally within the plugin to ensure clean logs and to facilitate future integration should the Matter specification expand to include them.
+
 ## Matterbridge
+
+### New subcategory
 
 #### Why does `matterbridge-dyson-robot` report an older version in logs after an update?
 
@@ -73,4 +82,11 @@ To ensure you are running the latest version:
 2. Check the version number reported in the log with a `[Dyson Robot]` prefix during startup; this is the definitive version of the plugin instance currently running.
 3. If the issue persists, uninstall and then reinstall the `matterbridge-dyson-robot` plugin to clear any cached files or lingering older files.
 
-<!-- EXCLUDED: issue-1-a002 issue-16-b5e2 issue-17-1ece issue-26-2ae8 -->
+### Plugin Configuration and Updates
+
+#### 🚧 Why does the plugin report configuration errors after updating to version 0.2.0 or later? 🚧
+
+<!-- INCLUDES: issue-1-59e4 -->
+Version 0.2.0 introduced a significant change to the configuration schema to accommodate MyDyson account support and AWS IoT integration. If you are upgrading from a version prior to 0.2.0, your configuration file may contain legacy or extraneous fields. Because the Matterbridge configuration editor does not always automatically prune old settings, you may see warnings regarding extraneous configuration values. It is recommended to recreate the configuration or manually remove deprecated fields to align with the current schema.
+
+<!-- EXCLUDED: issue-16-b5e2 issue-17-1ece issue-26-2ae8 -->
