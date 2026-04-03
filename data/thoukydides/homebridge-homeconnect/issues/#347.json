@@ -1,13 +1,12 @@
 {
     "issue_number": 347,
-    "updated_at": "2026-03-02T10:29:25.456Z",
+    "updated_at": "2026-04-03T11:53:04.594Z",
     "faq": [
         {
-            "question": "Why does the log show unrecognised Home Connect API keys or values?",
-            "answer": "The Home Connect API is used across a wide range of appliances from multiple manufacturers. As new models and firmware versions are released, they often introduce new program keys, settings, or event types that are not yet captured in the plugin's internal definitions. This is a normal part of the plugin's support for evolving hardware.\n\nWhen the plugin encounters an unknown key or value, it generates a log message with a pre-formatted block of code. To add support for these new values:\n1. Locate the block of code in the Homebridge logs between the `====` separators.\n2. Follow the link provided in the log message to create a new issue on GitHub.\n3. Paste the copied code into the issue and submit it.\n\nThis information allows the maintainer to update the plugin's schema and correctly expose the new appliance functionality to HomeKit.",
-            "semantic_abstract": "Home Connect appliances frequently introduce manufacturer-specific program keys and settings that are not yet captured in the plugin's internal schema. The plugin identifies these unknown identifiers during operation and provides a structured reporting mechanism, allowing the maintainer to map new appliance functionality to HomeKit services in subsequent releases.",
-            "confidence": "high",
-            "hash": "c6a75fe0a57bc49900a2b1fcf0481ebaf3773445cfdc6d10019f49823d76222a"
+            "question": "What does the log message `Home Connect API returned keys/values that are unrecognised` mean?",
+            "answer": "This message indicates that a Home Connect appliance has reported programs, settings, or states that are not yet defined within the plugin. This typically occurs when a new appliance model is released or when a firmware update introduces new functionality not previously seen by the plugin.\n\nTo help add support for these features:\n1. Review the plugin logs for a message containing a URL to create a new GitHub issue.\n2. Follow the link, which will pre-populate an issue report with the relevant appliance details.\n3. Locate the block of technical data in the logs following the warning (usually starting with `export type` or `export interface`) and paste it into the issue description.\n\nThe provided data allows for the update of the plugin's internal definitions. Once a new version of the plugin is released incorporating these keys, the warning will disappear and the new functionality will be accessible.",
+            "semantic_abstract": "Home Connect appliances frequently utilise undocumented or newly released API keys and values that are missing from the plugin's internal schema. Discrepancies between appliance firmware and the plugin's mapping definitions trigger log warnings to facilitate the integration of new programs and states into HomeKit services.",
+            "hash": "5f580d284975c39bfa5e6d27db35a14032fbd9edea025ec6c4ca8d060f8f9343"
         }
     ]
 }
