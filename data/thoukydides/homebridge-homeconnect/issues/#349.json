@@ -1,13 +1,12 @@
 {
     "issue_number": 349,
-    "updated_at": "2026-03-02T11:22:32.372Z",
+    "updated_at": "2026-04-03T13:37:49.049Z",
     "faq": [
         {
-            "question": "Why does the log show `(unrecognised)` for certain appliance options or values?",
-            "answer": "The Home Connect API frequently adds new enum values and options as new appliance models are released or firmware is updated. When the plugin detects a value that is not in its internal schema, it generates a log block containing the technical identifiers for those values, appended with the `(unrecognised)` label.\n\nThis is common with coffee makers (for example, `BeverageSize` or `AromaSelect` options) and dishwashers. While these values usually do not prevent the plugin from functioning, the specific feature (such as a specific drink size) may be missing from HomeKit until the value is added to the plugin.\n\nTo resolve this:\n1. Verify that you are using the latest version of the plugin, as missing values are regularly added.\n2. If the values are still marked as unrecognised, copy the entire log block including the `================` lines and open a new issue on GitHub. This data allows the maintainer to update the plugin's definitions to support the new features.",
-            "semantic_abstract": "Home Connect appliances periodically introduce new enum values and options that are not yet mapped in the plugin's schema, resulting in `(unrecognised)` annotations within the logs. These unknown values are captured in formatted log blocks to facilitate the manual update of the plugin's internal definitions for specific hardware features like coffee beverage sizes or program options.",
-            "confidence": "high",
-            "hash": "8e1ba918a7955966147fb6188418038ceba91797f6c8d6625e73e29d9a68a06d"
+            "question": "What should I do if the logs show `(unrecognised)` Home Connect API keys or values?",
+            "answer": "The plugin includes a discovery mechanism that identifies features, options, and values reported by the Home Connect API that are not yet included in its internal definitions. When this happens, it outputs a block of TypeScript-formatted code to the log, marking missing items with `(unrecognised)`. This is common with new appliance models (such as the Siemens CoffeeMaker `TQ705R03/02`) or firmware updates that introduce new functionality.\n\nIf you see these entries in your logs:\n\n1. Ensure you are running the latest version of the plugin, as support for new values is frequently added.\n2. If the values are still marked as unrecognised, copy the complete log block—including the `====` lines at the start and end.\n3. Open a new issue on GitHub and paste the log block. This provides the technical details required to map new appliance capabilities, such as coffee `BeverageSize` or specific program options, into HomeKit.",
+            "semantic_abstract": "The plugin identifies undocumented Home Connect API schema elements by comparing real-time appliance data against its internal definitions, highlighting unknown keys or enum values as `(unrecognised)`. This diagnostic logging facilitates the discovery of new appliance features—such as specific coffee programs or hardware-specific options—allowing them to be formally incorporated into the plugin's device mapping.",
+            "hash": "640324191ac81a74efdf722a7997310ca17dda75d436727b14d0d20c1ce99fa6"
         }
     ]
 }
