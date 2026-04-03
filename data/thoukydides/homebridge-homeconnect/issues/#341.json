@@ -1,13 +1,12 @@
 {
     "issue_number": 341,
-    "updated_at": "2026-03-01T14:46:46.085Z",
+    "updated_at": "2026-04-03T06:18:50.074Z",
     "faq": [
         {
-            "question": "How can I enable specific dishwasher options like `EfficientDry` or `EcoDry`?",
-            "answer": "Features like `EfficientDry` or `EcoDry` (technically `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API) are considered program options rather than individual HomeKit services. Because they must be set as part of a program's configuration rather than toggled independently, they are not exposed as standalone switches.\n\nTo use these options, you must manually define your dishwasher programs in your `config.json` instead of relying on the plugin to automatically discover them. This allows you to specify exactly which options should be active when that program is triggered. Detailed instructions on how to configure these can be found in the Programs section of the project Wiki.",
-            "semantic_abstract": "Dishwasher drying options such as EfficientDry and EcoDry are implemented as Home Connect program options rather than global appliance settings. These options require manual program configuration within the plugin settings to be exposed to HomeKit, as they cannot be toggled independently of a specific cleaning cycle.",
-            "confidence": "high",
-            "hash": "3673209fef4fb3fdaa401a6a9bfb56ab8b146d0735b971221e72ff979a6335a3"
+            "question": "Why can't I see a toggle for the `EfficientDry` (automatic door opening) feature on my Bosch or Siemens dishwasher?",
+            "answer": "The `EfficientDry` feature (technically known as `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API) is a program-specific option rather than a global setting or a standalone switch. Because it is an option for specific wash programs, it is not exposed as an individual HomeKit `Switch` service.\n\nTo use this feature, you must specify it within the `programs` configuration in your `config.json` file. This allows you to create a specific HomeKit switch for a program (e.g., Eco 50) with the `EcoDry` option enabled by default. Refer to the plugin documentation on **Programs** for technical details on how to add options to specific program definitions.",
+            "semantic_abstract": "Bosch and Siemens dishwasher `EfficientDry` functionality is implemented via the `Dishcare.Dishwasher.Option.EcoDry` program option in the Home Connect API. As a program-specific parameter rather than a global device state, it must be defined within the `programs` configuration array in `config.json` rather than being exposed as a standalone HomeKit `Switch` service.",
+            "hash": "4c61d2f3ad1dd4ca6671d067ba20a2c3e9ffa313b2b8ccdcc6a989b00ec3561a"
         }
     ]
 }
