@@ -1,13 +1,12 @@
 {
     "issue_number": 348,
-    "updated_at": "2026-03-02T08:25:23.720Z",
+    "updated_at": "2026-04-03T10:03:47.247Z",
     "faq": [
         {
-            "question": "Can the hood control buttons on a Home Connect hob be used to trigger HomeKit automations?",
-            "answer": "No, the physical buttons on a hob designed to control a hood are not exposed through the Home Connect API. The API does not provide any events or status updates when these buttons are pressed, which means the plugin cannot detect the interaction or expose it to HomeKit. This is a limitation of the Home Connect platform and appliance firmware rather than the plugin. Manufacturers typically design these buttons to communicate directly with compatible Home Connect hoods rather than broadcasting their state to the cloud API.",
-            "semantic_abstract": "Home Connect hobs featuring integrated hood control buttons do not broadcast button press events via the Home Connect API event stream. This API-level limitation prevents the mapping of physical hob controls to HomeKit button or switch services for wider automation purposes.",
-            "confidence": "high",
-            "hash": "2f9ea99fc05e1d5ec455aeec91bb96b9e6d150b96afdaa682c9026d30f4bbb3d"
+            "question": "Can the physical hood control buttons on a Home Connect hob be used in HomeKit?",
+            "answer": "The physical buttons on a Home Connect hob designed to control a hood (fan and light) cannot be exposed to HomeKit. This is because the Home Connect API does not currently emit events when these physical buttons are pressed.\n\nManufacturers typically design these controls to facilitate direct communication between compatible Home Connect appliances. Because these interactions are handled internally or through proprietary appliance-to-appliance protocols, they are not broadcast to the API event stream that the plugin monitors. \n\nIf you wish to see this functionality supported, you would need to contact [Home Connect support](https://developer.home-connect.com/support/contact) to request that these button presses be exposed via their API as events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for any changes to available event types.",
+            "semantic_abstract": "Home Connect API constraints prevent the exposure of physical appliance buttons as HomeKit services because the API does not emit events for these specific hardware interactions. This represents a platform limitation where inter-appliance communication, such as hob-to-hood control, occurs outside the accessible API event stream.",
+            "hash": "9294216bbd6eb616f5cc8f0db3baa89d67a1cf19b92ba3f021acc4ade88f6c6d"
         }
     ]
 }
