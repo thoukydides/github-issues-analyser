@@ -16,9 +16,10 @@
                             "entries": [
                                 {
                                     "question": "Why is the plugin not starting or failing to show an authorisation URL?",
-                                    "answer": "If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.\n\nFirst, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, the plugin is not being loaded. Common causes include:\n\n- **Incorrect Nesting**: Ensure the `HomeConnect` platform block is a separate top-level item within the `platforms` array and not accidentally nested inside another plugin's configuration.\n- **Missing Client ID**: The plugin requires the `clientid` property to be set. If missing, it will log an error and stop initialisation.\n- **Manual Editing Errors**: Structural JSON errors are common during manual editing. It is recommended to use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration.",
+                                    "answer": "If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform. The authorisation process uses the Home Connect Device Flow, which does not use pop-up windows or QR codes within the Homebridge interface; you must manually copy the provided URL from the logs and open it in a web browser.\n\nFirst, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, the plugin is not being loaded. Common causes include:\n\n- **Incorrect Nesting**: Ensure the `HomeConnect` platform block is a separate top-level item within the `platforms` array and not accidentally nested inside another plugin's configuration.\n- **Missing Client ID**: The plugin requires the `clientid` property to be set. If missing, it will log an error and stop initialisation.\n- **Manual Editing Errors**: Structural JSON errors are common during manual editing. It is recommended to use the **Settings** button on the **Plugins** page of the Homebridge Config UI X to manage configuration.",
                                     "included_ids": [
-                                        "issue-28-485b"
+                                        "issue-28-485b",
+                                        "issue-351-e214"
                                     ]
                                 },
                                 {
@@ -44,11 +45,12 @@
                                 },
                                 {
                                     "question": "Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?",
-                                    "answer": "Authorisation links and their associated device codes have a limited validity period. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.\n\nIf the authorisation fails:\n\n- **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.\n- **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI.\n- **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt.\n- **Single Use**: The `device_code` is invalidated as soon as it is successfully used. Do not attempt to reuse old authorisation URLs.",
+                                    "answer": "Authorisation links and their associated device codes have a limited validity period of 30 minutes. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.\n\nIf the authorisation fails:\n\n- **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.\n- **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI.\n- **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt. Restarting Homebridge is not typically required unless the auto-retry fails repeatedly.\n- **Single Use**: The `device_code` is invalidated as soon as it is successfully used. Do not attempt to reuse old authorisation URLs.",
                                     "included_ids": [
                                         "issue-97-4efe",
                                         "issue-125-fcc5",
-                                        "issue-151-2b8d"
+                                        "issue-151-2b8d",
+                                        "issue-351-e214"
                                     ]
                                 },
                                 {
@@ -60,7 +62,8 @@
                                         "issue-118-0a9e",
                                         "issue-121-d035",
                                         "issue-295-c09a",
-                                        "issue-299-6c02"
+                                        "issue-299-6c02",
+                                        "issue-351-e214"
                                     ]
                                 },
                                 {
@@ -83,22 +86,16 @@
                                     "included_ids": [
                                         "issue-311-261b"
                                     ]
-                                }
-                            ],
-                            "candidates": [
-                                {
-                                    "issue_number": 351,
-                                    "id": "issue-351-eb7a",
-                                    "question": "Why does authorisation fail with an `AggregateError` when running in Docker?",
-                                    "answer": "An `AggregateError` typically indicates a low-level network failure occurring before the plugin can reach the Home Connect servers. In Docker environments, this is frequently caused by DNS resolution issues or misconfigured IPv6 networking. The underlying HTTP library (`undici`) throws this error when it cannot resolve the API hostname or establish a socket connection.\n\nTo troubleshoot this:\n1. Ensure the container has functional DNS by checking `/etc/resolv.conf` or overriding the DNS server to a known-good resolver like `1.1.1.1` using the `--dns` flag.\n2. If your environment does not fully support IPv6, try disabling it for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or by configuring `/etc/gai.conf` to prefer IPv4.\n3. Verify outbound connectivity from within the container using `curl -v https://api.home-connect.com/security/oauth/device_authorization`.\n4. Check the logs for specific sub-errors like `ETIMEDOUT` or `ENETUNREACH`. Plugin version `v1.5.1` and later provide improved logging to expose these underlying error causes."
                                 },
                                 {
-                                    "issue_number": 351,
-                                    "id": "issue-351-e214",
-                                    "question": "How do I complete the Home Connect authorisation process?",
-                                    "answer": "The plugin uses the standard Home Connect Device Flow for authorisation. This process does not use pop-up windows or QR codes within the Homebridge interface. Instead, you must manually complete the following steps:\n\n1. Check the Homebridge logs or the plugin configuration editor for an authorisation message.\n2. Locate the provided URL and `user_code` (for example, `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).\n3. Manually visit that URL in a web browser.\n4. Log in with the SingleKey ID (email address) associated with your appliances and grant the requested permissions.\n\nOnce authorised on the website, the plugin will automatically detect the completion and finish the setup. This must typically be completed within 30 minutes. If the process is abandoned or the code expires, you must restart Homebridge to initiate a new authorisation attempt, as these requests are not automatically retried."
+                                    "question": "Why does authorisation fail with an `AggregateError` when running in Docker?",
+                                    "answer": "An `AggregateError` typically indicates a low-level network failure occurring before the plugin can reach the Home Connect servers. In Docker environments, this is frequently caused by DNS resolution issues or misconfigured IPv6 networking. The underlying HTTP library (`undici`) used by newer versions of the plugin throws this error when it cannot resolve the API hostname or establish a socket connection.\n\nTo troubleshoot this:\n\n- **Check DNS**: Ensure the container has functional DNS by checking `/etc/resolv.conf` or overriding the DNS server to a known-good resolver like `1.1.1.1` using the `--dns` flag.\n- **Disable IPv6**: If your environment does not fully support IPv6, try disabling it for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or by configuring `/etc/gai.conf` to prefer IPv4.\n- **Verify Connectivity**: Test outbound connectivity from within the container using `curl -v https://api.home-connect.com/security/oauth/device_authorization`.\n- **Underlying Errors**: Check the logs for specific sub-errors like `ETIMEDOUT` or `ENETUNREACH`. Plugin version `v1.5.1` and later provide improved logging to expose these underlying error causes.",
+                                    "included_ids": [
+                                        "issue-351-eb7a"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

@@ -11,6 +11,7 @@
     - [Why does authorisation fail with the error `client not authorized for this oauth flow (grant_type)`?](#why-does-authorisation-fail-with-the-error-client-not-authorized-for-this-oauth-flow-grant_type)
     - [Why does authorisation fail with a `403 Forbidden` error?](#why-does-authorisation-fail-with-a-403-forbidden-error)
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
+    - [Why does authorisation fail with an `AggregateError` when running in Docker?](#why-does-authorisation-fail-with-an-aggregateerror-when-running-in-docker)
   - **[Home Connect API Errors](#home-connect-api-errors)**
     - [Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?](#why-does-the-log-show-429-too-many-requests-1000-calls-in-1-day-reached-or-a-message-like-waiting--before-issuing-home-connect-api-request)
     - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
@@ -102,8 +103,8 @@
 
 #### Why is the plugin not starting or failing to show an authorisation URL?
 
-<!-- INCLUDES: issue-28-485b -->
-If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.
+<!-- INCLUDES: issue-28-485b issue-351-e214 -->
+If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform. The authorisation process uses the Home Connect Device Flow, which does not use pop-up windows or QR codes within the Homebridge interface; you must manually copy the provided URL from the logs and open it in a web browser.
 
 First, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, the plugin is not being loaded. Common causes include:
 
@@ -138,19 +139,19 @@ If the configuration is correct but errors persist, try deleting and recreating 
 
 #### Why does the authorisation link expire or fail with an `expired_token` or `invalid code` error?
 
-<!-- INCLUDES: issue-97-4efe issue-125-fcc5 issue-151-2b8d -->
-Authorisation links and their associated device codes have a limited validity period. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.
+<!-- INCLUDES: issue-97-4efe issue-125-fcc5 issue-151-2b8d issue-351-e214 -->
+Authorisation links and their associated device codes have a limited validity period of 30 minutes. If this window is exceeded, the Home Connect API will return errors such as `expired_token`, `the code entered is invalid or has expired`, or `Device authorization session not found`.
 
 If the authorisation fails:
 
 - **Propagation Delay**: New applications created in the Home Connect Developer Portal are not always active immediately. It can take up to an hour for a new `Client ID` to propagate to the production authorisation servers. Try again later.
 - **Check for Stale Links**: Ensure you are using the most recent URL from the Homebridge logs or the plugin configuration UI.
-- **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt.
+- **Wait for Auto-Retry**: The plugin handles these errors by waiting 60 seconds before automatically generating a new authorisation attempt. Restarting Homebridge is not typically required unless the auto-retry fails repeatedly.
 - **Single Use**: The `device_code` is invalidated as soon as it is successfully used. Do not attempt to reuse old authorisation URLs.
 
 #### Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?
 
-<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 issue-295-c09a issue-299-6c02 -->
+<!-- INCLUDES: issue-60-aba8 issue-82-1bfb issue-118-0a9e issue-121-d035 issue-295-c09a issue-299-6c02 issue-351-e214 -->
 These errors typically occur during the login process and are caused by account verification requirements or bugs in the SingleKey ID authorisation flow:
 
 - **Account State**: Ensure your SingleKey ID account is fully active. Open the official Home Connect mobile app and check for pending tasks, such as verifying your email address, migrating from an old Home Connect account to SingleKey ID, or accepting updated terms of use. The account must be fully functional in the official app before the plugin can authorise. It is sometimes necessary to log out of the app and log back in again to trigger account migration to complete.
@@ -187,28 +188,17 @@ Home Connect appliances registered in Mainland China operate on a separate infra
 
 This configuration ensures the plugin uses the dedicated `api.home-connect.cn` endpoint. Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
-#### 🚧 Why does authorisation fail with an `AggregateError` when running in Docker? 🚧
+#### Why does authorisation fail with an `AggregateError` when running in Docker?
 
 <!-- INCLUDES: issue-351-eb7a -->
-An `AggregateError` typically indicates a low-level network failure occurring before the plugin can reach the Home Connect servers. In Docker environments, this is frequently caused by DNS resolution issues or misconfigured IPv6 networking. The underlying HTTP library (`undici`) throws this error when it cannot resolve the API hostname or establish a socket connection.
+An `AggregateError` typically indicates a low-level network failure occurring before the plugin can reach the Home Connect servers. In Docker environments, this is frequently caused by DNS resolution issues or misconfigured IPv6 networking. The underlying HTTP library (`undici`) used by newer versions of the plugin throws this error when it cannot resolve the API hostname or establish a socket connection.
 
 To troubleshoot this:
-1. Ensure the container has functional DNS by checking `/etc/resolv.conf` or overriding the DNS server to a known-good resolver like `1.1.1.1` using the `--dns` flag.
-2. If your environment does not fully support IPv6, try disabling it for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or by configuring `/etc/gai.conf` to prefer IPv4.
-3. Verify outbound connectivity from within the container using `curl -v https://api.home-connect.com/security/oauth/device_authorization`.
-4. Check the logs for specific sub-errors like `ETIMEDOUT` or `ENETUNREACH`. Plugin version `v1.5.1` and later provide improved logging to expose these underlying error causes.
 
-#### 🚧 How do I complete the Home Connect authorisation process? 🚧
-
-<!-- INCLUDES: issue-351-e214 -->
-The plugin uses the standard Home Connect Device Flow for authorisation. This process does not use pop-up windows or QR codes within the Homebridge interface. Instead, you must manually complete the following steps:
-
-1. Check the Homebridge logs or the plugin configuration editor for an authorisation message.
-2. Locate the provided URL and `user_code` (for example, `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
-3. Manually visit that URL in a web browser.
-4. Log in with the SingleKey ID (email address) associated with your appliances and grant the requested permissions.
-
-Once authorised on the website, the plugin will automatically detect the completion and finish the setup. This must typically be completed within 30 minutes. If the process is abandoned or the code expires, you must restart Homebridge to initiate a new authorisation attempt, as these requests are not automatically retried.
+- **Check DNS**: Ensure the container has functional DNS by checking `/etc/resolv.conf` or overriding the DNS server to a known-good resolver like `1.1.1.1` using the `--dns` flag.
+- **Disable IPv6**: If your environment does not fully support IPv6, try disabling it for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or by configuring `/etc/gai.conf` to prefer IPv4.
+- **Verify Connectivity**: Test outbound connectivity from within the container using `curl -v https://api.home-connect.com/security/oauth/device_authorization`.
+- **Underlying Errors**: Check the logs for specific sub-errors like `ETIMEDOUT` or `ENETUNREACH`. Plugin version `v1.5.1` and later provide improved logging to expose these underlying error causes.
 
 ### Home Connect API Errors
 
