@@ -46,7 +46,7 @@ Dyson robot vacuums perform many operations (such as controlling zone cleaning a
 
 #### Why are Dyson error codes and the sleep timer not visible in my Matter controller?
 
-<!-- INCLUDES: issue-1-749e issue-2-a96e -->
+<!-- INCLUDES: issue-1-749e issue-2-64a4 -->
 Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, or `iuh3`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app).
 
 The Matter specification does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.
