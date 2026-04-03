@@ -280,7 +280,7 @@
                             "entries": [
                                 {
                                     "question": "Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?",
-                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.\n\nWhen the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped.",
+                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, often formatted as TypeScript `Union types` code and delimited by rows of `====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `====` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped.",
                                     "included_ids": [
                                         "issue-145-3b74",
                                         "issue-175-3d7e",
@@ -364,7 +364,10 @@
                                         "issue-373-0d05",
                                         "issue-377-3b83",
                                         "issue-379-2e76",
-                                        "issue-381-fa8e"
+                                        "issue-381-fa8e",
+                                        "issue-345-23b7",
+                                        "issue-347-5f58",
+                                        "issue-349-6403"
                                     ]
                                 },
                                 {
@@ -466,10 +469,11 @@
                                     ]
                                 },
                                 {
-                                    "question": "How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?",
-                                    "answer": "Home Connect distinguishes between global [settings](https://api-docs.home-connect.com/settings/) (like Child Lock) and program-specific [options](https://api-docs.home-connect.com/programs-and-options/) (like `HalfLoad`, `ExtraDry`, or `EfficientDry` / `EcoDry`). \n\nBecause these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.",
+                                    "question": "How can I enable dishwasher options like `EfficientDry`, `Half Load`, or `Extra Dry` in HomeKit?",
+                                    "answer": "Home Connect distinguishes between global settings (like Child Lock) and program-specific options (like `HalfLoad`, `ExtraDry`, or `EfficientDry`, which is technically `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API). \n\nBecause these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.",
                                     "included_ids": [
-                                        "issue-138-5e6c"
+                                        "issue-138-5e6c",
+                                        "issue-341-4c61"
                                     ]
                                 },
                                 {
@@ -545,32 +549,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 341,
-                                    "id": "issue-341-4c61",
-                                    "question": "Why can't I see a toggle for the `EfficientDry` (automatic door opening) feature on my Bosch or Siemens dishwasher?",
-                                    "answer": "The `EfficientDry` feature (technically known as `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API) is a program-specific option rather than a global setting or a standalone switch. Because it is an option for specific wash programs, it is not exposed as an individual HomeKit `Switch` service.\n\nTo use this feature, you must specify it within the `programs` configuration in your `config.json` file. This allows you to create a specific HomeKit switch for a program (e.g., Eco 50) with the `EcoDry` option enabled by default. Refer to the plugin documentation on **Programs** for technical details on how to add options to specific program definitions."
-                                },
-                                {
-                                    "issue_number": 345,
-                                    "id": "issue-345-23b7",
-                                    "question": "Why does the log contain blocks of code with `(unrecognised)` or `Union types` comments?",
-                                    "answer": "The plugin includes a diagnostic feature that monitors for appliance programs, options, or settings that are not yet recognised by its internal logic. This typically occurs when a manufacturer releases a new model or firmware update containing features that are not yet included in the official Home Connect API documentation.\n\nWhen the plugin encounters an unknown identifier, it generates a block of code in the logs (formatted as TypeScript `Union types`) to help identify the missing data. This allows users to report new functionality so it can be added to the plugin.\n\nIf you see these messages:\n1. Verify that you are running the latest version of the plugin, as support for new appliances and programs is added frequently.\n2. If the messages persist on the latest version, open a GitHub issue and provide the specific code block from the logs. This information is essential for mapping the new functionality and making it available in future updates."
-                                },
-                                {
-                                    "issue_number": 347,
-                                    "id": "issue-347-5f58",
-                                    "question": "What does the log message `Home Connect API returned keys/values that are unrecognised` mean?",
-                                    "answer": "This message indicates that a Home Connect appliance has reported programs, settings, or states that are not yet defined within the plugin. This typically occurs when a new appliance model is released or when a firmware update introduces new functionality not previously seen by the plugin.\n\nTo help add support for these features:\n1. Review the plugin logs for a message containing a URL to create a new GitHub issue.\n2. Follow the link, which will pre-populate an issue report with the relevant appliance details.\n3. Locate the block of technical data in the logs following the warning (usually starting with `export type` or `export interface`) and paste it into the issue description.\n\nThe provided data allows for the update of the plugin's internal definitions. Once a new version of the plugin is released incorporating these keys, the warning will disappear and the new functionality will be accessible."
-                                },
-                                {
-                                    "issue_number": 349,
-                                    "id": "issue-349-6403",
-                                    "question": "What should I do if the logs show `(unrecognised)` Home Connect API keys or values?",
-                                    "answer": "The plugin includes a discovery mechanism that identifies features, options, and values reported by the Home Connect API that are not yet included in its internal definitions. When this happens, it outputs a block of TypeScript-formatted code to the log, marking missing items with `(unrecognised)`. This is common with new appliance models (such as the Siemens CoffeeMaker `TQ705R03/02`) or firmware updates that introduce new functionality.\n\nIf you see these entries in your logs:\n\n1. Ensure you are running the latest version of the plugin, as support for new values is frequently added.\n2. If the values are still marked as unrecognised, copy the complete log block—including the `====` lines at the start and end.\n3. Open a new issue on GitHub and paste the log block. This provides the technical details required to map new appliance capabilities, such as coffee `BeverageSize` or specific program options, into HomeKit."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

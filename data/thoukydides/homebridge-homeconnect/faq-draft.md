@@ -42,7 +42,7 @@
     - [Why doesn't the plugin automatically turn on my coffee machine when I start a beverage program?](#why-doesnt-the-plugin-automatically-turn-on-my-coffee-machine-when-i-start-a-beverage-program)
     - [Why is the `Active Program` switch failing or unavailable in HomeKit?](#why-is-the-active-program-switch-failing-or-unavailable-in-homekit)
     - [How can I trigger the Identify function in the Eve app?](#how-can-i-trigger-the-identify-function-in-the-eve-app)
-    - [How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?](#how-can-i-enable-dishwasher-options-like-half-load-extra-dry-or-efficient-dry-in-homekit)
+    - [How can I enable dishwasher options like `EfficientDry`, `Half Load`, or `Extra Dry` in HomeKit?](#how-can-i-enable-dishwasher-options-like-efficientdry-half-load-or-extra-dry-in-homekit)
     - [Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?](#why-does-my-appliance-turn-on-automatically-switch-off-immediately-or-homebridge-startup-stall)
     - [Which settings are used for programs started without specific options?](#which-settings-are-used-for-programs-started-without-specific-options)
     - [How can I change the default duration or temperature for oven programs?](#how-can-i-change-the-default-duration-or-temperature-for-oven-programs)
@@ -404,16 +404,14 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-346-924f issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.
-
-When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-346-924f issue-347-5f58 issue-349-6403 issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, often formatted as TypeScript `Union types` code and delimited by rows of `====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
 If you observe these messages:
 
 1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
 2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
-3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
+3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `====` separators) into the **Log File** field of the issue template.
 
 Once added, the warning will disappear and the features will be correctly mapped.
 
@@ -515,10 +513,10 @@ To trigger the `Identify` mechanism within the Eve app:
 
 This will trigger the identification sequence on the physical appliance and force the plugin to refresh its cached data.
 
-#### How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?
+#### How can I enable dishwasher options like `EfficientDry`, `Half Load`, or `Extra Dry` in HomeKit?
 
-<!-- INCLUDES: issue-138-5e6c -->
-Home Connect distinguishes between global [settings](https://api-docs.home-connect.com/settings/) (like Child Lock) and program-specific [options](https://api-docs.home-connect.com/programs-and-options/) (like `HalfLoad`, `ExtraDry`, or `EfficientDry` / `EcoDry`). 
+<!-- INCLUDES: issue-138-5e6c issue-341-4c61 -->
+Home Connect distinguishes between global settings (like Child Lock) and program-specific options (like `HalfLoad`, `ExtraDry`, or `EfficientDry`, which is technically `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API). 
 
 Because these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.
 
@@ -601,47 +599,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 Why can't I see a toggle for the `EfficientDry` (automatic door opening) feature on my Bosch or Siemens dishwasher? 🚧
-
-<!-- INCLUDES: issue-341-4c61 -->
-The `EfficientDry` feature (technically known as `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API) is a program-specific option rather than a global setting or a standalone switch. Because it is an option for specific wash programs, it is not exposed as an individual HomeKit `Switch` service.
-
-To use this feature, you must specify it within the `programs` configuration in your `config.json` file. This allows you to create a specific HomeKit switch for a program (e.g., Eco 50) with the `EcoDry` option enabled by default. Refer to the plugin documentation on **Programs** for technical details on how to add options to specific program definitions.
-
-#### 🚧 Why does the log contain blocks of code with `(unrecognised)` or `Union types` comments? 🚧
-
-<!-- INCLUDES: issue-345-23b7 -->
-The plugin includes a diagnostic feature that monitors for appliance programs, options, or settings that are not yet recognised by its internal logic. This typically occurs when a manufacturer releases a new model or firmware update containing features that are not yet included in the official Home Connect API documentation.
-
-When the plugin encounters an unknown identifier, it generates a block of code in the logs (formatted as TypeScript `Union types`) to help identify the missing data. This allows users to report new functionality so it can be added to the plugin.
-
-If you see these messages:
-1. Verify that you are running the latest version of the plugin, as support for new appliances and programs is added frequently.
-2. If the messages persist on the latest version, open a GitHub issue and provide the specific code block from the logs. This information is essential for mapping the new functionality and making it available in future updates.
-
-#### 🚧 What does the log message `Home Connect API returned keys/values that are unrecognised` mean? 🚧
-
-<!-- INCLUDES: issue-347-5f58 -->
-This message indicates that a Home Connect appliance has reported programs, settings, or states that are not yet defined within the plugin. This typically occurs when a new appliance model is released or when a firmware update introduces new functionality not previously seen by the plugin.
-
-To help add support for these features:
-1. Review the plugin logs for a message containing a URL to create a new GitHub issue.
-2. Follow the link, which will pre-populate an issue report with the relevant appliance details.
-3. Locate the block of technical data in the logs following the warning (usually starting with `export type` or `export interface`) and paste it into the issue description.
-
-The provided data allows for the update of the plugin's internal definitions. Once a new version of the plugin is released incorporating these keys, the warning will disappear and the new functionality will be accessible.
-
-#### 🚧 What should I do if the logs show `(unrecognised)` Home Connect API keys or values? 🚧
-
-<!-- INCLUDES: issue-349-6403 -->
-The plugin includes a discovery mechanism that identifies features, options, and values reported by the Home Connect API that are not yet included in its internal definitions. When this happens, it outputs a block of TypeScript-formatted code to the log, marking missing items with `(unrecognised)`. This is common with new appliance models (such as the Siemens CoffeeMaker `TQ705R03/02`) or firmware updates that introduce new functionality.
-
-If you see these entries in your logs:
-
-1. Ensure you are running the latest version of the plugin, as support for new values is frequently added.
-2. If the values are still marked as unrecognised, copy the complete log block—including the `====` lines at the start and end.
-3. Open a new issue on GitHub and paste the log block. This provides the technical details required to map new appliance capabilities, such as coffee `BeverageSize` or specific program options, into HomeKit.
 
 ### Appliance Status and Connectivity
 
