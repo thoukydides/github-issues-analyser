@@ -34,6 +34,7 @@
   - **[Programs and Options](#programs-and-options)**
     - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-code-blocks)
     - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
+    - [Why are some program options like `duration` missing for my Neff oven or appliance with rotary dials?](#why-are-some-program-options-like-duration-missing-for-my-neff-oven-or-appliance-with-rotary-dials)
     - [Why are fan controls missing for my integrated venting hob?](#why-are-fan-controls-missing-for-my-integrated-venting-hob)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
     - [Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?](#why-is-my-appliance-stuck-during-initialisation-showing-as-not-responding-or-missing-all-options)
@@ -396,8 +397,8 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-48d8 issue-346-924f issue-347-c6a7 issue-349-8e1b issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features (such as unique variants of options for Washer-Dryer models), the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise.
 
 When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
@@ -416,10 +417,24 @@ The plugin dynamically discovers the capabilities of each appliance by querying 
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
+- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
 - **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API. Note that renaming a program on the physical control panel does not change its internal API identifier and will not bypass manufacturer-imposed remote control restrictions.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
 If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
+
+#### Why are some program options like `duration` missing for my Neff oven or appliance with rotary dials?
+
+<!-- INCLUDES: issue-340-bf6e -->
+Certain oven models, particularly Neff appliances with physical rotary dials, have a limitation in their firmware or the Home Connect public API that prevents them from being switched to the `On` state remotely. This results in a `409 Conflict` error (`SDK.Error.InvalidSettingState`) when the plugin attempts its initial discovery.
+
+Because the appliance must usually be `On` and idle to report its full range of program options, the plugin may only identify a subset of available settings. To resolve this:
+
+1. **Manual Activation**: Switch the oven on using the physical controls (select a mode but do not start it).
+2. **Wait for Lockout**: Ensure any local control lockouts have expired (the `BSH.Common.Status.LocalControlActive` status should be `false`).
+3. **Force Re-scan**: Restart Homebridge or trigger the **Identify** routine (the **ID** button in the Eve app) to force a re-scan of supported programs while the appliance is physically powered on.
+
+Note that the official Home Connect app uses a private API and may show capabilities, such as remote power-on, that are not accessible to third-party plugins.
 
 #### Why are fan controls missing for my integrated venting hob?
 
@@ -592,41 +607,6 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
-
-#### 🚧 What should I do if the logs show `(unrecognised)` API keys or options? 🚧
-
-<!-- INCLUDES: issue-339-2bbb -->
-The plugin includes a diagnostic feature that identifies appliance options and values reported by the Home Connect API which are not yet known to the plugin. When these are encountered, a block of text formatted as a TypeScript interface is logged, with unknown elements marked as `(unrecognised)`.
-
-These logs do not indicate a malfunction. Instead, they identify appliance capabilities that can be added to the plugin. If you see these entries:
-1. Ensure you are using the latest version of the plugin.
-2. If the items remain unrecognised on the latest version, open a GitHub issue and provide the complete log block, including the `=======` separator lines. This allows the maintainer to update the plugin to support these specific features.
-
-#### 🚧 Why are some program options like `duration` missing for my Neff oven? 🚧
-
-<!-- INCLUDES: issue-340-bf6e -->
-Certain oven models, particularly Neff appliances with physical rotary dials, have a limitation in their firmware or the Home Connect public API that prevents them from being switched to the `On` state remotely. This results in a `409 Conflict` error with the key `SDK.Error.InvalidSettingState` and the description `BSH.Common.Setting.PowerState currently not available or writable` when the plugin attempts its initial discovery.
-
-Because the appliance must usually be `On` and idle to report its full range of program options, the plugin may only identify a subset of available settings. This plugin includes logic to better handle these devices by attempting to read program options even when the appliance reports an `Inactive` operation state. If you are still missing options:
-
-1. Manually switch the oven on using the physical controls (select a mode but do not start it, if possible).
-2. Wait a few minutes for any local control lockouts to expire (the `BSH.Common.Status.LocalControlActive` status will become `false`).
-3. Restart Homebridge or trigger the **Identify** routine (the **ID** button in the Eve app) to force a re-scan of supported programs.
-
-Note that the official Home Connect app uses a private API and may show capabilities, such as remote power-on, that are not accessible to third-party plugins.
-
-#### 🚧 Why does the plugin log TypeScript code blocks with `unrecognised` labels? 🚧
-
-<!-- INCLUDES: issue-344-c999 -->
-These log entries appear when the plugin encounters data from the Home Connect API that it does not currently recognise. This typically happens with newer appliance models or firmware updates that introduce manufacturer-specific features or undocumented program options. For example, some Washer-Dryer appliances use unique variants of options that are usually shared with standalone washers or dryers.
-
-The plugin is designed to identify these gaps and format them as code blocks to help users report them. If you see these in your logs:
-
-1. Copy the entire block starting from `// Union types` or `export interface`.
-2. Open a new issue on the GitHub repository.
-3. Provide the model number of your appliance and the copied log content.
-
-The maintainer uses this information to map the new API values to HomeKit, enabling support for those features in subsequent plugin updates.
 
 ### Appliance Status and Connectivity
 
