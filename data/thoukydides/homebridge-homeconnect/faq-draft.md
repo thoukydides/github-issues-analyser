@@ -187,6 +187,29 @@ Home Connect appliances registered in Mainland China operate on a separate infra
 
 This configuration ensures the plugin uses the dedicated `api.home-connect.cn` endpoint. Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
+#### 🚧 Why does authorisation fail with an `AggregateError` when running in Docker? 🚧
+
+<!-- INCLUDES: issue-351-eb7a -->
+An `AggregateError` typically indicates a low-level network failure occurring before the plugin can reach the Home Connect servers. In Docker environments, this is frequently caused by DNS resolution issues or misconfigured IPv6 networking. The underlying HTTP library (`undici`) throws this error when it cannot resolve the API hostname or establish a socket connection.
+
+To troubleshoot this:
+1. Ensure the container has functional DNS by checking `/etc/resolv.conf` or overriding the DNS server to a known-good resolver like `1.1.1.1` using the `--dns` flag.
+2. If your environment does not fully support IPv6, try disabling it for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1` or by configuring `/etc/gai.conf` to prefer IPv4.
+3. Verify outbound connectivity from within the container using `curl -v https://api.home-connect.com/security/oauth/device_authorization`.
+4. Check the logs for specific sub-errors like `ETIMEDOUT` or `ENETUNREACH`. Plugin version `v1.5.1` and later provide improved logging to expose these underlying error causes.
+
+#### 🚧 How do I complete the Home Connect authorisation process? 🚧
+
+<!-- INCLUDES: issue-351-e214 -->
+The plugin uses the standard Home Connect Device Flow for authorisation. This process does not use pop-up windows or QR codes within the Homebridge interface. Instead, you must manually complete the following steps:
+
+1. Check the Homebridge logs or the plugin configuration editor for an authorisation message.
+2. Locate the provided URL and `user_code` (for example, `https://api.home-connect.com/security/oauth/device_verify?user_code=XXXX-XXXX`).
+3. Manually visit that URL in a web browser.
+4. Log in with the SingleKey ID (email address) associated with your appliances and grant the requested permissions.
+
+Once authorised on the website, the plugin will automatically detect the completion and finish the setup. This must typically be completed within 30 minutes. If the process is abandoned or the code expires, you must restart Homebridge to initiate a new authorisation attempt, as these requests are not automatically retried.
+
 ### Home Connect API Errors
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
@@ -589,6 +612,47 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
+#### 🚧 Why can't I see a toggle for the `EfficientDry` (automatic door opening) feature on my Bosch or Siemens dishwasher? 🚧
+
+<!-- INCLUDES: issue-341-4c61 -->
+The `EfficientDry` feature (technically known as `Dishcare.Dishwasher.Option.EcoDry` in the Home Connect API) is a program-specific option rather than a global setting or a standalone switch. Because it is an option for specific wash programs, it is not exposed as an individual HomeKit `Switch` service.
+
+To use this feature, you must specify it within the `programs` configuration in your `config.json` file. This allows you to create a specific HomeKit switch for a program (e.g., Eco 50) with the `EcoDry` option enabled by default. Refer to the plugin documentation on **Programs** for technical details on how to add options to specific program definitions.
+
+#### 🚧 Why does the log contain blocks of code with `(unrecognised)` or `Union types` comments? 🚧
+
+<!-- INCLUDES: issue-345-23b7 -->
+The plugin includes a diagnostic feature that monitors for appliance programs, options, or settings that are not yet recognised by its internal logic. This typically occurs when a manufacturer releases a new model or firmware update containing features that are not yet included in the official Home Connect API documentation.
+
+When the plugin encounters an unknown identifier, it generates a block of code in the logs (formatted as TypeScript `Union types`) to help identify the missing data. This allows users to report new functionality so it can be added to the plugin.
+
+If you see these messages:
+1. Verify that you are running the latest version of the plugin, as support for new appliances and programs is added frequently.
+2. If the messages persist on the latest version, open a GitHub issue and provide the specific code block from the logs. This information is essential for mapping the new functionality and making it available in future updates.
+
+#### 🚧 What does the log message `Home Connect API returned keys/values that are unrecognised` mean? 🚧
+
+<!-- INCLUDES: issue-347-5f58 -->
+This message indicates that a Home Connect appliance has reported programs, settings, or states that are not yet defined within the plugin. This typically occurs when a new appliance model is released or when a firmware update introduces new functionality not previously seen by the plugin.
+
+To help add support for these features:
+1. Review the plugin logs for a message containing a URL to create a new GitHub issue.
+2. Follow the link, which will pre-populate an issue report with the relevant appliance details.
+3. Locate the block of technical data in the logs following the warning (usually starting with `export type` or `export interface`) and paste it into the issue description.
+
+The provided data allows for the update of the plugin's internal definitions. Once a new version of the plugin is released incorporating these keys, the warning will disappear and the new functionality will be accessible.
+
+#### 🚧 What should I do if the logs show `(unrecognised)` Home Connect API keys or values? 🚧
+
+<!-- INCLUDES: issue-349-6403 -->
+The plugin includes a discovery mechanism that identifies features, options, and values reported by the Home Connect API that are not yet included in its internal definitions. When this happens, it outputs a block of TypeScript-formatted code to the log, marking missing items with `(unrecognised)`. This is common with new appliance models (such as the Siemens CoffeeMaker `TQ705R03/02`) or firmware updates that introduce new functionality.
+
+If you see these entries in your logs:
+
+1. Ensure you are running the latest version of the plugin, as support for new values is frequently added.
+2. If the values are still marked as unrecognised, copy the complete log block—including the `====` lines at the start and end.
+3. Open a new issue on GitHub and paste the log block. This provides the technical details required to map new appliance capabilities, such as coffee `BeverageSize` or specific program options, into HomeKit.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
@@ -694,6 +758,29 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
+#### 🚧 Why does my appliance show as `Disconnected` or fail to complete initialisation? 🚧
+
+<!-- INCLUDES: issue-335-ff97 -->
+If the log shows `Appliance initialisation is taking longer than expected` or reports that the appliance is `Disconnected`, it typically means the appliance is not currently communicating with the Home Connect cloud servers. The plugin cannot fully configure the HomeKit services until it can retrieve the current state and capabilities via the API. To resolve this:
+
+1. Verify that the appliance can be controlled via the official Home Connect app while your mobile device's Wi-Fi is disabled (forcing the use of cellular data). If this fails, the issue is with the appliance's cloud connection rather than the plugin.
+2. Check the **Network** section within the appliance settings in the Home Connect app; it should indicate a stable connection with three green lines.
+3. Power cycle the appliance by disconnecting it from the mains power for a few minutes. This often forces the internal Wi-Fi module to re-establish a session with the BSH servers.
+
+#### 🚧 Why is my appliance stuck at "Waiting for features to finish initialising" even though the Home Connect app works? 🚧
+
+<!-- INCLUDES: issue-342-784e -->
+This behaviour typically occurs when the appliance reports a `connected: false` status to the public Home Connect API, even if it appears online and controllable within the official Home Connect app. The plugin requires a successful connection to the public API to retrieve appliance capabilities and map them to HomeKit services.
+
+The official app uses a private API that may maintain functionality even when the public API connection has stalled or crashed within the appliance's firmware. This mismatch causes the plugin to remain in a waiting state as it cannot read the necessary features (such as `Power`, `Door`, or `Programs`) to complete initialisation.
+
+To resolve this issue:
+1. Power cycle the appliance by unplugging it from the mains or switching off its circuit breaker for at least 30 seconds.
+2. Restore power and allow the appliance several minutes to reconnect to Wi-Fi and the cloud servers.
+3. Restart Homebridge.
+
+This process forces the appliance firmware to re-register its connection with the Home Connect cloud servers, which typically restores communication via the public API. If the issue persists after a power cycle, contact the Home Connect developer team for further assistance.
 
 ## Apple HomeKit
 
@@ -829,6 +916,25 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
+
+#### 🚧 Can the physical hood control buttons on a Home Connect hob be used in HomeKit? 🚧
+
+<!-- INCLUDES: issue-348-9294 -->
+The physical buttons on a Home Connect hob designed to control a hood (fan and light) cannot be exposed to HomeKit. This is because the Home Connect API does not currently emit events when these physical buttons are pressed.
+
+Manufacturers typically design these controls to facilitate direct communication between compatible Home Connect appliances. Because these interactions are handled internally or through proprietary appliance-to-appliance protocols, they are not broadcast to the API event stream that the plugin monitors. 
+
+If you wish to see this functionality supported, you would need to contact [Home Connect support](https://developer.home-connect.com/support/contact) to request that these button presses be exposed via their API as events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for any changes to available event types.
+
+#### 🚧 Why is my appliance door classified as a security device in HomeKit? 🚧
+
+<!-- INCLUDES: issue-350-d626 -->
+Appliance doors are mapped to the HomeKit `Door` service because it is the most appropriate representation for the door status reported by the Home Connect API. This service type was selected for several reasons:
+
+1. It supports both monitoring and actuation. Some appliances allow the door to be opened or closed via the API, and the `Door` service supports this bidirectional control, whereas a sensor-based service (like `ContactSensor`) only allows monitoring.
+2. It ensures consistent behaviour across all appliance types supported by the plugin.
+
+While the Apple Home app groups all `Door` services under security devices, this is a cosmetic classification with no functional security implications for the appliance. The most notable side effect is that the Home app may enable notifications for door state changes by default. These notifications can be disabled for each specific appliance within its settings in the Apple Home app.
 
 ### Notifications & Events
 
