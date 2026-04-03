@@ -54,7 +54,7 @@
     - [Why is the power off function unavailable for my washing machine or dryer?](#why-is-the-power-off-function-unavailable-for-my-washing-machine-or-dryer)
   - **[Appliance Status and Connectivity](#appliance-status-and-connectivity)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
-    - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
+    - [Why is my appliance unresponsive, stuck in initialisation, or showing as offline in Homebridge?](#why-is-my-appliance-unresponsive-stuck-in-initialisation-or-showing-as-offline-in-homebridge)
     - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
     - [Why does my dishwasher trigger a `Program Finished` event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
@@ -616,18 +616,19 @@ To troubleshoot:
 3. Restart Homebridge to force the plugin to subscribe to a fresh event stream.
 4. Ensure your network configuration does not prematurely terminate long-lived TCP connections.
 
-#### Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?
+#### Why is my appliance unresponsive, stuck in initialisation, or showing as offline in Homebridge?
 
-<!-- INCLUDES: issue-40-61af issue-41-4190 issue-61-67ee issue-71-ad07 -->
-The official Home Connect mobile app can communicate with appliances via two distinct paths: a local network connection (when your phone and appliance are on the same Wi-Fi) and a private interface to the Home Connect cloud servers. All third-party integrations, including this plugin, are restricted to using the public cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection.
+<!-- INCLUDES: issue-40-61af issue-41-4190 issue-61-67ee issue-71-ad07 issue-335-ff97 issue-342-784e -->
+The official Home Connect mobile app communicates with appliances via a local network connection or a private interface to the Home Connect cloud servers. All third-party integrations, including this plugin, are restricted to the public cloud API. It is possible for an appliance to be controllable in the official app while its public API connection has stalled, causing it to appear `Disconnected` or stuck with log messages such as `Appliance initialisation is taking longer than expected` or `Waiting for features to finish initialising`.
 
-To diagnose and resolve this:
+The plugin cannot fully configure HomeKit services until it retrieves the appliance's capabilities (such as power, door, and programs) from the public API, which requires a successful `connected: true` state. To resolve this:
 
-1. **Test Cellular Connection**: Disable Wi-Fi on your mobile device to force the official Home Connect app to use cellular data. If the appliance becomes unresponsive in the app, the issue is with its connection to the Home Connect servers.
-2. **Verify Network Stages**: In the official app, navigate to the appliance settings and locate the **Network** section. Ensure that all three connection stages (**appliance-app**, **appliance-cloud**, and **app-cloud**) are active (typically shown by three green lines). If the line between the appliance and the cloud is red, the device is not communicating with the cloud servers.
-3. **Power Cycle**: Power cycle the appliance at the mains to force a reconnection to the Home Connect servers.
+1. **Test Cellular Connection**: Disable Wi-Fi on your mobile device. If the appliance becomes unresponsive in the official app, its connection to the Home Connect servers is broken.
+2. **Verify Network Stages**: In the official app settings, check the **Network** section. Ensure all three connection stages (appliance-app, appliance-cloud, and app-cloud) are active, typically indicated by three green lines.
+3. **Power Cycle**: Disconnect the appliance from the mains power for at least 30 seconds. This forces the appliance firmware to re-register its session with the cloud servers and usually restores the public API connection.
+4. **Restart Homebridge**: Force the plugin to attempt a fresh initialisation after the appliance has reconnected.
 
-Most connectivity issues are transient and will resolve themselves once the appliance reconnects to the servers or the cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.
+Most connectivity issues are transient and will resolve once the appliance cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.
 
 #### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
@@ -705,29 +706,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why does my appliance show as `Disconnected` or fail to complete initialisation? 🚧
-
-<!-- INCLUDES: issue-335-ff97 -->
-If the log shows `Appliance initialisation is taking longer than expected` or reports that the appliance is `Disconnected`, it typically means the appliance is not currently communicating with the Home Connect cloud servers. The plugin cannot fully configure the HomeKit services until it can retrieve the current state and capabilities via the API. To resolve this:
-
-1. Verify that the appliance can be controlled via the official Home Connect app while your mobile device's Wi-Fi is disabled (forcing the use of cellular data). If this fails, the issue is with the appliance's cloud connection rather than the plugin.
-2. Check the **Network** section within the appliance settings in the Home Connect app; it should indicate a stable connection with three green lines.
-3. Power cycle the appliance by disconnecting it from the mains power for a few minutes. This often forces the internal Wi-Fi module to re-establish a session with the BSH servers.
-
-#### 🚧 Why is my appliance stuck at "Waiting for features to finish initialising" even though the Home Connect app works? 🚧
-
-<!-- INCLUDES: issue-342-784e -->
-This behaviour typically occurs when the appliance reports a `connected: false` status to the public Home Connect API, even if it appears online and controllable within the official Home Connect app. The plugin requires a successful connection to the public API to retrieve appliance capabilities and map them to HomeKit services.
-
-The official app uses a private API that may maintain functionality even when the public API connection has stalled or crashed within the appliance's firmware. This mismatch causes the plugin to remain in a waiting state as it cannot read the necessary features (such as `Power`, `Door`, or `Programs`) to complete initialisation.
-
-To resolve this issue:
-1. Power cycle the appliance by unplugging it from the mains or switching off its circuit breaker for at least 30 seconds.
-2. Restore power and allow the appliance several minutes to reconnect to Wi-Fi and the cloud servers.
-3. Restart Homebridge.
-
-This process forces the appliance firmware to re-register its connection with the Home Connect cloud servers, which typically restores communication via the public API. If the issue persists after a power cycle, contact the Home Connect developer team for further assistance.
 
 ## Apple HomeKit
 

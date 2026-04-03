@@ -570,13 +570,15 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?",
-                                    "answer": "The official Home Connect mobile app can communicate with appliances via two distinct paths: a local network connection (when your phone and appliance are on the same Wi-Fi) and a private interface to the Home Connect cloud servers. All third-party integrations, including this plugin, are restricted to using the public cloud API. It is possible for an appliance to have a working local connection but a stalled cloud connection.\n\nTo diagnose and resolve this:\n\n1. **Test Cellular Connection**: Disable Wi-Fi on your mobile device to force the official Home Connect app to use cellular data. If the appliance becomes unresponsive in the app, the issue is with its connection to the Home Connect servers.\n2. **Verify Network Stages**: In the official app, navigate to the appliance settings and locate the **Network** section. Ensure that all three connection stages (**appliance-app**, **appliance-cloud**, and **app-cloud**) are active (typically shown by three green lines). If the line between the appliance and the cloud is red, the device is not communicating with the cloud servers.\n3. **Power Cycle**: Power cycle the appliance at the mains to force a reconnection to the Home Connect servers.\n\nMost connectivity issues are transient and will resolve themselves once the appliance reconnects to the servers or the cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.",
+                                    "question": "Why is my appliance unresponsive, stuck in initialisation, or showing as offline in Homebridge?",
+                                    "answer": "The official Home Connect mobile app communicates with appliances via a local network connection or a private interface to the Home Connect cloud servers. All third-party integrations, including this plugin, are restricted to the public cloud API. It is possible for an appliance to be controllable in the official app while its public API connection has stalled, causing it to appear `Disconnected` or stuck with log messages such as `Appliance initialisation is taking longer than expected` or `Waiting for features to finish initialising`.\n\nThe plugin cannot fully configure HomeKit services until it retrieves the appliance's capabilities (such as power, door, and programs) from the public API, which requires a successful `connected: true` state. To resolve this:\n\n1. **Test Cellular Connection**: Disable Wi-Fi on your mobile device. If the appliance becomes unresponsive in the official app, its connection to the Home Connect servers is broken.\n2. **Verify Network Stages**: In the official app settings, check the **Network** section. Ensure all three connection stages (appliance-app, appliance-cloud, and app-cloud) are active, typically indicated by three green lines.\n3. **Power Cycle**: Disconnect the appliance from the mains power for at least 30 seconds. This forces the appliance firmware to re-register its session with the cloud servers and usually restores the public API connection.\n4. **Restart Homebridge**: Force the plugin to attempt a fresh initialisation after the appliance has reconnected.\n\nMost connectivity issues are transient and will resolve once the appliance cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.",
                                     "included_ids": [
                                         "issue-40-61af",
                                         "issue-41-4190",
                                         "issue-61-67ee",
-                                        "issue-71-ad07"
+                                        "issue-71-ad07",
+                                        "issue-335-ff97",
+                                        "issue-342-784e"
                                     ]
                                 },
                                 {
@@ -643,20 +645,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 335,
-                                    "id": "issue-335-ff97",
-                                    "question": "Why does my appliance show as `Disconnected` or fail to complete initialisation?",
-                                    "answer": "If the log shows `Appliance initialisation is taking longer than expected` or reports that the appliance is `Disconnected`, it typically means the appliance is not currently communicating with the Home Connect cloud servers. The plugin cannot fully configure the HomeKit services until it can retrieve the current state and capabilities via the API. To resolve this:\n\n1. Verify that the appliance can be controlled via the official Home Connect app while your mobile device's Wi-Fi is disabled (forcing the use of cellular data). If this fails, the issue is with the appliance's cloud connection rather than the plugin.\n2. Check the **Network** section within the appliance settings in the Home Connect app; it should indicate a stable connection with three green lines.\n3. Power cycle the appliance by disconnecting it from the mains power for a few minutes. This often forces the internal Wi-Fi module to re-establish a session with the BSH servers."
-                                },
-                                {
-                                    "issue_number": 342,
-                                    "id": "issue-342-784e",
-                                    "question": "Why is my appliance stuck at \"Waiting for features to finish initialising\" even though the Home Connect app works?",
-                                    "answer": "This behaviour typically occurs when the appliance reports a `connected: false` status to the public Home Connect API, even if it appears online and controllable within the official Home Connect app. The plugin requires a successful connection to the public API to retrieve appliance capabilities and map them to HomeKit services.\n\nThe official app uses a private API that may maintain functionality even when the public API connection has stalled or crashed within the appliance's firmware. This mismatch causes the plugin to remain in a waiting state as it cannot read the necessary features (such as `Power`, `Door`, or `Programs`) to complete initialisation.\n\nTo resolve this issue:\n1. Power cycle the appliance by unplugging it from the mains or switching off its circuit breaker for at least 30 seconds.\n2. Restore power and allow the appliance several minutes to reconnect to Wi-Fi and the cloud servers.\n3. Restart Homebridge.\n\nThis process forces the appliance firmware to re-register its connection with the Home Connect cloud servers, which typically restores communication via the public API. If the issue persists after a power cycle, contact the Home Connect developer team for further assistance."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
