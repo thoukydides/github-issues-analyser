@@ -10,6 +10,7 @@
   - **[New subcategory](#new-subcategory)**
     - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
   - **[Plugin Configuration and Updates](#plugin-configuration-and-updates)**
+    - [Why does the plugin report configuration errors after updating to version 0.2.0 or later?](#why-does-the-plugin-report-configuration-errors-after-updating-to-version-020-or-later)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -79,9 +80,11 @@ To ensure you are running the latest version:
 
 ### Plugin Configuration and Updates
 
-#### 🚧 Why does the plugin report configuration errors after updating to version 0.2.0 or later? 🚧
+#### Why does the plugin report configuration errors after updating to version 0.2.0 or later?
 
 <!-- INCLUDES: issue-1-59e4 -->
-Version 0.2.0 introduced a significant change to the configuration schema to accommodate MyDyson account support and AWS IoT integration. If you are upgrading from a version prior to 0.2.0, your configuration file may contain legacy or extraneous fields. Because the Matterbridge configuration editor does not always automatically prune old settings, you may see warnings regarding extraneous configuration values. It is recommended to recreate the configuration or manually remove deprecated fields to align with the current schema.
+Version 0.2.0 introduced a significant change to the configuration schema to accommodate MyDyson account support and AWS IoT integration. If you are upgrading from a version prior to 0.2.0, your configuration file may contain legacy or extraneous fields.
+
+Because the Matterbridge configuration editor does not always automatically prune old settings, you may see warnings regarding extraneous configuration values. It is recommended to recreate the configuration or manually remove deprecated fields to align with the current schema.
 
 <!-- EXCLUDED: issue-16-b5e2 issue-17-1ece issue-26-2ae8 -->

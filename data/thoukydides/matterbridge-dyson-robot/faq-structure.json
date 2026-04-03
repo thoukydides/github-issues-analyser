@@ -75,15 +75,16 @@
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [],
-                            "candidates": [
+                            "entries": [
                                 {
-                                    "issue_number": 1,
-                                    "id": "issue-1-59e4",
                                     "question": "Why does the plugin report configuration errors after updating to version 0.2.0 or later?",
-                                    "answer": "Version 0.2.0 introduced a significant change to the configuration schema to accommodate MyDyson account support and AWS IoT integration. If you are upgrading from a version prior to 0.2.0, your configuration file may contain legacy or extraneous fields. Because the Matterbridge configuration editor does not always automatically prune old settings, you may see warnings regarding extraneous configuration values. It is recommended to recreate the configuration or manually remove deprecated fields to align with the current schema."
+                                    "answer": "Version 0.2.0 introduced a significant change to the configuration schema to accommodate MyDyson account support and AWS IoT integration. If you are upgrading from a version prior to 0.2.0, your configuration file may contain legacy or extraneous fields.\n\nBecause the Matterbridge configuration editor does not always automatically prune old settings, you may see warnings regarding extraneous configuration values. It is recommended to recreate the configuration or manually remove deprecated fields to align with the current schema.",
+                                    "included_ids": [
+                                        "issue-1-59e4"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
