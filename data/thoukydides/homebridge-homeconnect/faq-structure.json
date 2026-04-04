@@ -275,7 +275,7 @@
                             "entries": [
                                 {
                                     "question": "Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?",
-                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, often formatted as TypeScript `Union types` code and delimited by rows of `====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `====` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped.",
+                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, often formatted as TypeScript `Union types` or `interface` code (such as `StatusValues` or `SettingsValues` blocks) and delimited by rows of `====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `====` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped.",
                                     "included_ids": [
                                         "issue-145-3b74",
                                         "issue-175-3d7e",
@@ -358,7 +358,11 @@
                                         "issue-381-fa8e",
                                         "issue-345-23b7",
                                         "issue-347-5f58",
-                                        "issue-349-6403"
+                                        "issue-349-6403",
+                                        "issue-354-bd8b",
+                                        "issue-355-94db",
+                                        "issue-356-0fe3",
+                                        "issue-357-f6ae"
                                     ]
                                 },
                                 {
@@ -395,8 +399,10 @@
                                 },
                                 {
                                     "question": "Why are fan controls missing for my integrated venting hob?",
-                                    "answer": "Extractor fans integrated into hobs (venting hobs) are not exposed by the Home Connect API as controllable features.\n\nThe Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, e.g. the two cavities of dual ovens. The extractor fan in hood appliances operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), so a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API, which is not currently the case. Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance.",
-                                    "included_ids": []
+                                    "answer": "Extractor fans integrated into hobs (venting hobs) are not exposed by the Home Connect API as controllable features.\n\nThe Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, e.g. the two cavities of dual ovens. The extractor fan in hood appliances operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), so a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API, which is not currently the case.\n\nYou can verify the data provided by the API by checking the cached responses in `~/.homebridge/homebridge-homeconnect/persist`. If fan settings or a separate Hood appliance are not present in these files, the limitation resides with the Home Connect platform. Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance.",
+                                    "included_ids": [
+                                        "issue-363-c1e6"
+                                    ]
                                 },
                                 {
                                     "question": "Why does the log say a selected program is not supported by the Home Connect API?",
@@ -526,7 +532,8 @@
                                     "answer": "Certain Home Connect appliances or firmware versions may report non-standard power states such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are typically the result of bugs in the appliance firmware or transient faults within the Home Connect cloud servers, as they do not conform to the standard API specification.\n\nTo ensure plugin stability and correct HomeKit operation, the plugin treats both of these values as equivalent to `Off`.",
                                     "included_ids": [
                                         "issue-307-0bd5",
-                                        "issue-310-be9f"
+                                        "issue-310-be9f",
+                                        "issue-353-72a4"
                                     ]
                                 },
                                 {
@@ -537,44 +544,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 353,
-                                    "id": "issue-353-72a4",
-                                    "question": "Why does my appliance report `BSH.Common.EnumType.PowerState.Undefined` or `MainsOff` in the logs?",
-                                    "answer": "The Home Connect API occasionally returns undocumented values for the power state setting, such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are not part of the official API specification and are considered bugs in either the appliance firmware or the Home Connect cloud servers.\n\nThe plugin handles these non-standard values by treating them as a \"not on\" state. This allows the plugin to maintain a consistent internal state and correctly reflect the power status in HomeKit, even when the API provides invalid data. If the appliance is subsequently turned on, it is expected to report a valid `BSH.Common.EnumType.PowerState.On` value.\n\nThis behaviour is supported in current versions of the plugin. If you see these values flagged as unrecognised in your logs, ensure you are running the latest version of the plugin."
-                                },
-                                {
-                                    "issue_number": 354,
-                                    "id": "issue-354-bd8b",
-                                    "question": "Why does the log show `unrecognised` or `unexpected` API values like `BSH.Common.Status.InteriorIlluminationActive`?",
-                                    "answer": "The plugin identifies and logs any Home Connect API keys or values that it has not been programmed to handle. This typically occurs when a new appliance model or firmware update introduces functionality that has not yet been mapped within the plugin. These entries appear in the logs within a structured block, often formatted as a TypeScript interface (for example, `export interface StatusValues`).\n\nIf you see these messages:\n1. Update the plugin to the latest version, as support for new API values is frequently added in minor releases.\n2. If the values remain unrecognised on the latest version, open a GitHub issue and provide the complete log section between the `================` separators.\n\nReporting these values allows the maintainer to map new appliance features and ensure they are correctly exposed to HomeKit."
-                                },
-                                {
-                                    "issue_number": 355,
-                                    "id": "issue-355-94db",
-                                    "question": "Why does my log show `(unrecognised)` next to certain Home Connect API status values?",
-                                    "answer": "The `homebridge-homeconnect` plugin includes a diagnostic feature that identifies status and event keys reported by the Home Connect API which have not yet been mapped to specific HomeKit characteristics. These are displayed in the logs with the suffix `(unrecognised)`.\n\nThese entries are informative and do not indicate a failure. They typically appear when:\n* A newer appliance model, such as the Siemens Oven `HB734G1B1`, introduces features not previously encountered by the plugin.\n* A firmware update adds new status reporting capabilities.\n* The appliance uses manufacturer-specific keys that are not part of the standard Home Connect API documentation.\n\nIf you see `(unrecognised)` values for features you would like to see supported in HomeKit (such as `BSH.Common.Status.InteriorIlluminationActive` for oven lighting), please open an issue on GitHub. Ensure you include the complete log block between the `====` separators, as this provides the technical context needed to add support for the new feature."
-                                },
-                                {
-                                    "issue_number": 356,
-                                    "id": "issue-356-0fe3",
-                                    "question": "Why does the log contain a block of code with `(unrecognised)` comments?",
-                                    "answer": "The plugin maintains an internal dictionary of known Home Connect API keys, programs, and statuses to ensure it correctly interprets data from your appliances. When the plugin connects to a device that provides features not yet in this dictionary—such as a new model or an appliance with updated firmware—it logs a diagnostic block of code.\n\nThese entries are typically surrounded by `================` lines and include comments like `// (unrecognised)`. This is a deliberate feature designed to identify missing functionality rather than a software error. These blocks provide the maintainer with the exact identifiers needed to add support for those features.\n\nIf you see these blocks in your logs:\n1. Ensure you are running the latest version of the plugin, as the keys may have already been added.\n2. If the logs persist on the latest version, copy the entire section between the `====` separators.\n3. Open a new issue on GitHub, pasting the log snippet and specifying the manufacturer and model of your appliance."
-                                },
-                                {
-                                    "issue_number": 357,
-                                    "id": "issue-357-f6ae",
-                                    "question": "Why does the log contain blocks of code with `// (unrecognised)` or `// Union types` comments?",
-                                    "answer": "These log entries are generated when the plugin encounters data from the Home Connect API—such as programs, options, settings, or statuses—that has not yet been mapped within the plugin's internal definitions. This typically occurs with newer appliance models or firmware versions that introduce new functionality.\n\nTo help improve support for your appliance, please:\n1. Copy the entire block, including the header and footer lines consisting of `=` characters.\n2. Open a new issue on the GitHub repository.\n3. Provide the name and model of your appliance along with the copied log content.\n\nThis information allows the maintainer to update the plugin's schema to correctly handle these values in a future release."
-                                },
-                                {
-                                    "issue_number": 363,
-                                    "id": "issue-363-c1e6",
-                                    "question": "Why does the integrated extractor fan on my hob not appear in Homebridge?",
-                                    "answer": "The fan control for a hob with an integrated extractor (ventilation) is missing because the Home Connect API does not currently expose these controls. The API typically treats appliances as discrete types, specifically `Hob` or `Hood`. For an integrated appliance to show both sets of controls, the API would need to either:\n\n1. Expose the device as two separate virtual appliances (one `Hob` and one `Hood`).\n2. Include fan-related settings directly within the `Hob` appliance profile.\n\nSince BSH does not currently provide this data through their API for these hybrid models, the plugin cannot surface the fan controls. You can verify this by checking your cached API responses in `~/.homebridge/homebridge-homeconnect/persist`. If fan settings or a separate `Hood` appliance are missing from these files, the limitation is on the API side.\n\nWhile you can request support for these features from the [Home Connect developer team](https://developer.home-connect.com/support/contact), please be aware that additions to the API specification often take a significant amount of time to be implemented."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
