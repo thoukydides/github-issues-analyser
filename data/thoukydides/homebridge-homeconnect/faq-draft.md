@@ -77,7 +77,7 @@
     - [Why can I not see or control the child lock for my appliance in the Apple Home app?](#why-can-i-not-see-or-control-the-child-lock-for-my-appliance-in-the-apple-home-app)
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
-    - [Can the hood control buttons on a Home Connect hob be used to trigger HomeKit automations?](#can-the-hood-control-buttons-on-a-home-connect-hob-be-used-to-trigger-homekit-automations)
+    - [Can the physical hood control buttons on a Home Connect hob be used to trigger HomeKit automations?](#can-the-physical-hood-control-buttons-on-a-home-connect-hob-be-used-to-trigger-homekit-automations)
     - [Why can I only control power and fan speed for my Home Connect air conditioner?](#why-can-i-only-control-power-and-fan-speed-for-my-home-connect-air-conditioner)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
@@ -759,10 +759,10 @@ To maintain the integrity of voice control, this plugin exposes fridge and freez
 
 #### Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?
 
-<!-- INCLUDES: issue-303-180f issue-361-065e -->
-The plugin uses the `Door` service to represent appliance doors by design, as this is the most semantically accurate HomeKit service for the hardware. While many appliances only provide a read-only door status, the Home Connect API supports `Open Door` and `Partly Open Door` commands for specific high-end models. Mapping these to a `Door` service allows the plugin to expose this control functionality where supported; on other models, it remains a read-only sensor.
+<!-- INCLUDES: issue-303-180f issue-350-d626 issue-361-065e -->
+The plugin uses the HomeKit `Door` service to represent appliance doors by design, as it is the most semantically accurate representation and ensures consistent behaviour across all appliance types. Unlike a `Contact Sensor` which only allows for monitoring, the `Door` service supports bidirectional control. This allows the plugin to expose actuation functionality (e.g. `Open Door` or `Partly Open Door` commands) where supported by high-end appliance models, while remaining a read-only sensor on others.
 
-Because Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors, and receive automatic notifications when the door state changes. This is standard HomeKit behaviour and cannot be changed by the plugin. If this behaviour is not desired, you have two options:
+Because Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors. This is a cosmetic classification within the Home app with no functional security implications for the appliance. However, it often results in the Home app enabling notifications for door state changes by default. If this behaviour is not desired, you have two options:
 
 1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.
 2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.
@@ -812,9 +812,12 @@ The HomeKit Accessory Protocol (HAP) defines the `Rotation Speed` characteristic
 
 Direct control using discrete level numbers is not supported by the HomeKit fan service specification. Using percentages ensures that the fan works correctly with standard HomeKit sliders and provides consistent voice control across all Apple devices.
 
-#### Can the hood control buttons on a Home Connect hob be used to trigger HomeKit automations?
+#### Can the physical hood control buttons on a Home Connect hob be used to trigger HomeKit automations?
 
-No, the physical buttons on a hob designed to control a hood are not exposed through the Home Connect API. The API does not provide any events or status updates when these buttons are pressed, which means the plugin cannot detect the interaction or expose it to HomeKit. This is a limitation of the Home Connect platform and appliance firmware rather than the plugin. Manufacturers typically design these buttons to communicate directly with compatible Home Connect hoods rather than broadcasting their state to the cloud API.
+<!-- INCLUDES: issue-348-9294 -->
+No, the physical buttons on a hob designed to control a hood (fan and light) cannot be exposed to HomeKit. The Home Connect API does not currently emit any events or status updates when these physical buttons are pressed, meaning the plugin cannot detect the interaction.
+
+Manufacturers typically design these buttons to communicate directly with compatible appliances using proprietary appliance-to-appliance protocols. Because these interactions are handled internally, they are not broadcast to the API event stream monitored by the plugin. If you wish to see this supported, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) expose these button presses as API events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for updates to available event types.
 
 #### Why can I only control power and fan speed for my Home Connect air conditioner?
 
@@ -841,25 +844,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Can the physical hood control buttons on a Home Connect hob be used in HomeKit? 🚧
-
-<!-- INCLUDES: issue-348-9294 -->
-The physical buttons on a Home Connect hob designed to control a hood (fan and light) cannot be exposed to HomeKit. This is because the Home Connect API does not currently emit events when these physical buttons are pressed.
-
-Manufacturers typically design these controls to facilitate direct communication between compatible Home Connect appliances. Because these interactions are handled internally or through proprietary appliance-to-appliance protocols, they are not broadcast to the API event stream that the plugin monitors. 
-
-If you wish to see this functionality supported, you would need to contact [Home Connect support](https://developer.home-connect.com/support/contact) to request that these button presses be exposed via their API as events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for any changes to available event types.
-
-#### 🚧 Why is my appliance door classified as a security device in HomeKit? 🚧
-
-<!-- INCLUDES: issue-350-d626 -->
-Appliance doors are mapped to the HomeKit `Door` service because it is the most appropriate representation for the door status reported by the Home Connect API. This service type was selected for several reasons:
-
-1. It supports both monitoring and actuation. Some appliances allow the door to be opened or closed via the API, and the `Door` service supports this bidirectional control, whereas a sensor-based service (like `ContactSensor`) only allows monitoring.
-2. It ensures consistent behaviour across all appliance types supported by the plugin.
-
-While the Apple Home app groups all `Door` services under security devices, this is a cosmetic classification with no functional security implications for the appliance. The most notable side effect is that the Home app may enable notifications for door state changes by default. These notifications can be disabled for each specific appliance within its settings in the Apple Home app.
 
 ### Notifications & Events
 

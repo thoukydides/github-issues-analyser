@@ -704,10 +704,11 @@
                                 },
                                 {
                                     "question": "Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?",
-                                    "answer": "The plugin uses the `Door` service to represent appliance doors by design, as this is the most semantically accurate HomeKit service for the hardware. While many appliances only provide a read-only door status, the Home Connect API supports `Open Door` and `Partly Open Door` commands for specific high-end models. Mapping these to a `Door` service allows the plugin to expose this control functionality where supported; on other models, it remains a read-only sensor.\n\nBecause Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors, and receive automatic notifications when the door state changes. This is standard HomeKit behaviour and cannot be changed by the plugin. If this behaviour is not desired, you have two options:\n\n1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.\n2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.",
+                                    "answer": "The plugin uses the HomeKit `Door` service to represent appliance doors by design, as it is the most semantically accurate representation and ensures consistent behaviour across all appliance types. Unlike a `Contact Sensor` which only allows for monitoring, the `Door` service supports bidirectional control. This allows the plugin to expose actuation functionality (e.g. `Open Door` or `Partly Open Door` commands) where supported by high-end appliance models, while remaining a read-only sensor on others.\n\nBecause Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors. This is a cosmetic classification within the Home app with no functional security implications for the appliance. However, it often results in the Home app enabling notifications for door state changes by default. If this behaviour is not desired, you have two options:\n\n1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.\n2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.",
                                     "included_ids": [
                                         "issue-303-180f",
-                                        "issue-361-065e"
+                                        "issue-361-065e",
+                                        "issue-350-d626"
                                     ]
                                 },
                                 {
@@ -756,9 +757,11 @@
                                     ]
                                 },
                                 {
-                                    "question": "Can the hood control buttons on a Home Connect hob be used to trigger HomeKit automations?",
-                                    "answer": "No, the physical buttons on a hob designed to control a hood are not exposed through the Home Connect API. The API does not provide any events or status updates when these buttons are pressed, which means the plugin cannot detect the interaction or expose it to HomeKit. This is a limitation of the Home Connect platform and appliance firmware rather than the plugin. Manufacturers typically design these buttons to communicate directly with compatible Home Connect hoods rather than broadcasting their state to the cloud API.",
-                                    "included_ids": []
+                                    "question": "Can the physical hood control buttons on a Home Connect hob be used to trigger HomeKit automations?",
+                                    "answer": "No, the physical buttons on a hob designed to control a hood (fan and light) cannot be exposed to HomeKit. The Home Connect API does not currently emit any events or status updates when these physical buttons are pressed, meaning the plugin cannot detect the interaction.\n\nManufacturers typically design these buttons to communicate directly with compatible appliances using proprietary appliance-to-appliance protocols. Because these interactions are handled internally, they are not broadcast to the API event stream monitored by the plugin. If you wish to see this supported, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) expose these button presses as API events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for updates to available event types.",
+                                    "included_ids": [
+                                        "issue-348-9294"
+                                    ]
                                 },
                                 {
                                     "question": "Why can I only control power and fan speed for my Home Connect air conditioner?",
@@ -784,20 +787,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 348,
-                                    "id": "issue-348-9294",
-                                    "question": "Can the physical hood control buttons on a Home Connect hob be used in HomeKit?",
-                                    "answer": "The physical buttons on a Home Connect hob designed to control a hood (fan and light) cannot be exposed to HomeKit. This is because the Home Connect API does not currently emit events when these physical buttons are pressed.\n\nManufacturers typically design these controls to facilitate direct communication between compatible Home Connect appliances. Because these interactions are handled internally or through proprietary appliance-to-appliance protocols, they are not broadcast to the API event stream that the plugin monitors. \n\nIf you wish to see this functionality supported, you would need to contact [Home Connect support](https://developer.home-connect.com/support/contact) to request that these button presses be exposed via their API as events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for any changes to available event types."
-                                },
-                                {
-                                    "issue_number": 350,
-                                    "id": "issue-350-d626",
-                                    "question": "Why is my appliance door classified as a security device in HomeKit?",
-                                    "answer": "Appliance doors are mapped to the HomeKit `Door` service because it is the most appropriate representation for the door status reported by the Home Connect API. This service type was selected for several reasons:\n\n1. It supports both monitoring and actuation. Some appliances allow the door to be opened or closed via the API, and the `Door` service supports this bidirectional control, whereas a sensor-based service (like `ContactSensor`) only allows monitoring.\n2. It ensures consistent behaviour across all appliance types supported by the plugin.\n\nWhile the Apple Home app groups all `Door` services under security devices, this is a cosmetic classification with no functional security implications for the appliance. The most notable side effect is that the Home app may enable notifications for door state changes by default. These notifications can be disabled for each specific appliance within its settings in the Apple Home app."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
