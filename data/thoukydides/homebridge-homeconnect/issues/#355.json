@@ -1,13 +1,12 @@
 {
     "issue_number": 355,
-    "updated_at": "2026-03-03T06:03:58.486Z",
+    "updated_at": "2026-04-04T08:22:27.646Z",
     "faq": [
         {
-            "question": "Why does the log show `(unrecognised)` for some Home Connect API values?",
-            "answer": "The plugin includes a discovery mechanism that identifies status keys, settings, or events provided by the Home Connect API that are not yet defined in its internal schema. This frequently occurs with newer appliance models or firmware updates, such as Siemens ovens reporting `BSH.Common.Status.InteriorIlluminationActive`.\n\nThese log entries are not errors and do not affect the stability of the plugin. Instead, they provide the necessary technical information to add support for new features. If you see a log block containing `export interface` and `(unrecognised)` values, please open a GitHub issue and provide the complete section. This allows the maintainer to map these values to HomeKit characteristics in a future update.",
-            "semantic_abstract": "The plugin's runtime discovery identifies undocumented or new Home Connect API status keys, logging them as unrecognised TypeScript interface snippets. This process allows for the identification of manufacturer-specific features, such as interior illumination status, which can then be manually added to the plugin's schema to enable HomeKit support.",
-            "confidence": "high",
-            "hash": "88d91a8a579fedede64771b9c7d011de80bcdf1ef6181d966ed11af3be1f00af"
+            "question": "Why does my log show `(unrecognised)` next to certain Home Connect API status values?",
+            "answer": "The `homebridge-homeconnect` plugin includes a diagnostic feature that identifies status and event keys reported by the Home Connect API which have not yet been mapped to specific HomeKit characteristics. These are displayed in the logs with the suffix `(unrecognised)`.\n\nThese entries are informative and do not indicate a failure. They typically appear when:\n* A newer appliance model, such as the Siemens Oven `HB734G1B1`, introduces features not previously encountered by the plugin.\n* A firmware update adds new status reporting capabilities.\n* The appliance uses manufacturer-specific keys that are not part of the standard Home Connect API documentation.\n\nIf you see `(unrecognised)` values for features you would like to see supported in HomeKit (such as `BSH.Common.Status.InteriorIlluminationActive` for oven lighting), please open an issue on GitHub. Ensure you include the complete log block between the `====` separators, as this provides the technical context needed to add support for the new feature.",
+            "semantic_abstract": "Home Connect API status and event keys that are not yet implemented in the plugin are logged as `(unrecognised)` to assist in identifying new device capabilities. This diagnostic output occurs when appliance firmware exposes features, such as `InteriorIlluminationActive`, that lack an existing mapping to HomeKit services or characteristics.",
+            "hash": "94db119a06f518a18dc13f1311c0c02ca20f9a282fb40af912a2d0472850fbf7"
         }
     ]
 }
