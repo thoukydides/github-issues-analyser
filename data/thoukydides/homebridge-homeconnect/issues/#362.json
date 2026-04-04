@@ -1,13 +1,12 @@
 {
     "issue_number": 362,
-    "updated_at": "2026-03-05T09:00:21.462Z",
+    "updated_at": "2026-04-04T11:43:07.234Z",
     "faq": [
         {
-            "question": "Why are refrigerator or appliance lights mapped as lightbulbs instead of switches?",
-            "answer": "The Home Connect API defines appliance lights (such as internal refrigerator lights or hood lighting) as settings that often include more than just simple on/off functionality. These can support `Brightness`, `ColorTemperature`, or `Color` depending on the specific model and appliance type.\n\nThe plugin uses the HomeKit `Lightbulb` service for these features because:\n*   A `Switch` service does not support brightness or colour controls provided by the Home Connect API.\n*   It maintains a consistent mapping across all appliance types where lighting is a feature (e.g. extractor hoods and refrigerators).\n*   It allows for the full range of hardware capabilities, such as dimming, to be exposed to HomeKit.\n\nA side effect of this mapping is that Siri will include these appliance lights when you issue commands to turn off the lights in a specific room. If you do not want an appliance light to be controlled or grouped with your room lighting, you should disable that specific service in your Homebridge `config.json` file.",
-            "semantic_abstract": "Home Connect appliance lights are mapped to HomeKit `Lightbulb` services rather than `Switch` services to support brightness and colour settings provided by the API. This causes these services to be included in Siri room-wide lighting commands, a behaviour that can be managed by disabling the specific service in the plugin configuration.",
-            "confidence": "high",
-            "hash": "0e297d498a01cec8f302b0bc5acbf9b53c9ab6546bce70ba597cf28bf498c1bb"
+            "question": "Why are refrigerator internal lights mapped as Lightbulbs instead of Switches?",
+            "answer": "Appliance lights, including the internal and external lights of refrigerators, are mapped to HomeKit `Lightbulb` services rather than `Switch` services. This design choice ensures that the plugin can support the full range of capabilities exposed by the Home Connect API, such as brightness control (`Refrigeration.Common.Setting.Light.Internal.Brightness`) and colour temperature, which are not supported by the standard HomeKit `Switch` service.\n\nBecause HomeKit identifies these services as lights, they will respond to general Siri commands such as \"turn off the lights\" for a specific room. This is the intended behaviour to ensure consistency across all appliance types (such as hoods, where light control is expected to integrate with room lighting).\n\nIf you do not want an appliance light to be controlled as part of your HomeKit room lighting, you can disable that specific HomeKit service within the plugin configuration in your `config.json` file.",
+            "semantic_abstract": "Home Connect appliance lights are mapped to HomeKit `Lightbulb` services to support API features like brightness and colour control that are unavailable in `Switch` services. This mapping causes internal appliance lights to respond to global HomeKit light commands, representing a deliberate design choice for functional completeness and cross-device consistency.",
+            "hash": "e5253c4c15393c0d4a92aa780ff684b8ec4c53ba59ace5aa76718005e930c8d3"
         }
     ]
 }
