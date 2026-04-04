@@ -1,13 +1,12 @@
 {
     "issue_number": 353,
-    "updated_at": "2026-03-02T14:28:27.630Z",
+    "updated_at": "2026-04-04T06:12:30.733Z",
     "faq": [
         {
-            "question": "Why does the plugin log unrecognised `PowerState` values like `BSH.Common.EnumType.PowerState.Undefined`?",
-            "answer": "Certain Home Connect appliances or firmware versions may report non-standard power states such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are typically the result of bugs in the appliance firmware or the Home Connect cloud servers, as they do not conform to the standard API specification.\n\nTo ensure plugin stability and correct HomeKit operation, these specific values are handled as follows:\n\n*   `BSH.Common.EnumType.PowerState.Undefined` is treated as 'not on' (equivalent to `Off`).\n*   `BSH.Common.EnumType.PowerState.MainsOff` is also treated as `Off`.\n\nSupport for these non-standard values was introduced in v1.5.2. If you encounter similar unrecognised values in your logs, they are mapped to a safe default to prevent the plugin from malfunctioning while waiting for the appliance to report a valid state (such as `On`).",
-            "semantic_abstract": "Home Connect appliance firmware or cloud servers occasionally report non-standard power state enumerations such as `Undefined` or `MainsOff`. The plugin maps these invalid API values to a logical 'off' state to maintain HomeKit consistency and prevent unintended behaviour caused by unrecognised status codes.",
-            "confidence": "high",
-            "hash": "8beca7545bbb0a78ad7a7a9d4b163ab876acd195e6b5d4262be6cd8904258686"
+            "question": "Why does my appliance report `BSH.Common.EnumType.PowerState.Undefined` or `MainsOff` in the logs?",
+            "answer": "The Home Connect API occasionally returns undocumented values for the power state setting, such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are not part of the official API specification and are considered bugs in either the appliance firmware or the Home Connect cloud servers.\n\nThe plugin handles these non-standard values by treating them as a \"not on\" state. This allows the plugin to maintain a consistent internal state and correctly reflect the power status in HomeKit, even when the API provides invalid data. If the appliance is subsequently turned on, it is expected to report a valid `BSH.Common.EnumType.PowerState.On` value.\n\nThis behaviour is supported in current versions of the plugin. If you see these values flagged as unrecognised in your logs, ensure you are running the latest version of the plugin.",
+            "semantic_abstract": "Home Connect API and appliance firmware occasionally emit undocumented `PowerState` values such as `Undefined` or `MainsOff`, deviating from the official technical specification. The plugin maps these non-standard strings to a logical \"off\" state to maintain HomeKit status accuracy and prevent functional errors caused by unrecognised enumerated values.",
+            "hash": "72a49f675e95ef0dcf67b800bd9e692d3cdfb181ed974ffb93e816f17608aed1"
         }
     ]
 }
