@@ -200,6 +200,17 @@ To troubleshoot this:
 - **Verify Connectivity**: Test outbound connectivity from within the container using `curl -v https://api.home-connect.com/security/oauth/device_authorization`.
 - **Underlying Errors**: Check the logs for specific sub-errors like `ETIMEDOUT` or `ENETUNREACH`. Plugin version `v1.5.1` and later provide improved logging to expose these underlying error causes.
 
+#### 🚧 Why is the plugin configuration screen missing fields or the authorisation link? 🚧
+
+<!-- INCLUDES: issue-360-732a -->
+This plugin utilises a dynamic configuration schema that employs conditional logic to show or hide settings. This ensures that the interface remains clean by only showing options that are relevant to your current setup; for example, appliance-specific settings are hidden until the appliance has been discovered and authorised. This behaviour requires the **Homebridge Config UI X** to correctly process the schema's conditional rules.
+
+If the settings page appears empty or is missing the `clientid` field, consider the following:
+
+* **Update Homebridge Config UI X**: Ensure you are running the latest version of the Homebridge UI. Historically, certain versions (such as v5.6.0) contained bugs that prevented conditional fields from being displayed correctly.
+* **Check the Logs**: If the authorisation link or button is not visible in the settings UI, you can retrieve the necessary information from the Homebridge logs. Look for a `verification_uri` (the URL to visit) and a `user_code` (the code to enter). Visit the URL in your browser and enter the code to complete the Home Connect account linking process manually.
+* **Automatic Population**: Once the `clientid` is successfully provided and the account is linked, the configuration fields for your appliances will appear automatically in the settings UI.
+
 ### Home Connect API Errors
 
 #### Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?
@@ -404,7 +415,7 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-346-924f issue-347-5f58 issue-349-6403 issue-355-88d9 issue-356-30ea issue-357-c258 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-365-e16b issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, often formatted as TypeScript `Union types` code and delimited by rows of `====` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
 If you observe these messages:
@@ -430,7 +441,6 @@ If a program is unexpectedly missing, try powering the appliance on, manually se
 
 #### Why are fan controls missing for my integrated venting hob?
 
-<!-- INCLUDES: issue-363-2f13 -->
 Extractor fans integrated into hobs (venting hobs) are not exposed by the Home Connect API as controllable features.
 
 The Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, e.g. the two cavities of dual ovens. The extractor fan in hood appliances operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), so a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API, which is not currently the case. Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance.
@@ -588,7 +598,7 @@ If your hood does not respond when you toggle `Auto`, ensure the fan is also swi
 
 #### Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?
 
-<!-- INCLUDES: issue-307-0bd5 issue-310-be9f issue-353-8bec -->
+<!-- INCLUDES: issue-307-0bd5 issue-310-be9f -->
 Certain Home Connect appliances or firmware versions may report non-standard power states such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are typically the result of bugs in the appliance firmware or transient faults within the Home Connect cloud servers, as they do not conform to the standard API specification.
 
 To ensure plugin stability and correct HomeKit operation, the plugin treats both of these values as equivalent to `Off`.
@@ -599,6 +609,74 @@ To ensure plugin stability and correct HomeKit operation, the plugin treats both
 The ability to turn an appliance off is determined by the Home Connect API and the specific hardware. According to the official Home Connect API documentation, laundry appliances (washers, dryers, and washer-dryers) typically only support an `On` power state; they do not support being switched to `Off` or `Standby` remotely. This is likely due to these appliances using a physical power switch that also interrupts power to the Home Connect Wi-Fi module, instead of using a soft standby mode like other Home Connect devices.
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
+
+#### 🚧 Why does my appliance report `BSH.Common.EnumType.PowerState.Undefined` or `MainsOff` in the logs? 🚧
+
+<!-- INCLUDES: issue-353-72a4 -->
+The Home Connect API occasionally returns undocumented values for the power state setting, such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are not part of the official API specification and are considered bugs in either the appliance firmware or the Home Connect cloud servers.
+
+The plugin handles these non-standard values by treating them as a "not on" state. This allows the plugin to maintain a consistent internal state and correctly reflect the power status in HomeKit, even when the API provides invalid data. If the appliance is subsequently turned on, it is expected to report a valid `BSH.Common.EnumType.PowerState.On` value.
+
+This behaviour is supported in current versions of the plugin. If you see these values flagged as unrecognised in your logs, ensure you are running the latest version of the plugin.
+
+#### 🚧 Why does the log show `unrecognised` or `unexpected` API values like `BSH.Common.Status.InteriorIlluminationActive`? 🚧
+
+<!-- INCLUDES: issue-354-bd8b -->
+The plugin identifies and logs any Home Connect API keys or values that it has not been programmed to handle. This typically occurs when a new appliance model or firmware update introduces functionality that has not yet been mapped within the plugin. These entries appear in the logs within a structured block, often formatted as a TypeScript interface (for example, `export interface StatusValues`).
+
+If you see these messages:
+1. Update the plugin to the latest version, as support for new API values is frequently added in minor releases.
+2. If the values remain unrecognised on the latest version, open a GitHub issue and provide the complete log section between the `================` separators.
+
+Reporting these values allows the maintainer to map new appliance features and ensure they are correctly exposed to HomeKit.
+
+#### 🚧 Why does my log show `(unrecognised)` next to certain Home Connect API status values? 🚧
+
+<!-- INCLUDES: issue-355-94db -->
+The `homebridge-homeconnect` plugin includes a diagnostic feature that identifies status and event keys reported by the Home Connect API which have not yet been mapped to specific HomeKit characteristics. These are displayed in the logs with the suffix `(unrecognised)`.
+
+These entries are informative and do not indicate a failure. They typically appear when:
+* A newer appliance model, such as the Siemens Oven `HB734G1B1`, introduces features not previously encountered by the plugin.
+* A firmware update adds new status reporting capabilities.
+* The appliance uses manufacturer-specific keys that are not part of the standard Home Connect API documentation.
+
+If you see `(unrecognised)` values for features you would like to see supported in HomeKit (such as `BSH.Common.Status.InteriorIlluminationActive` for oven lighting), please open an issue on GitHub. Ensure you include the complete log block between the `====` separators, as this provides the technical context needed to add support for the new feature.
+
+#### 🚧 Why does the log contain a block of code with `(unrecognised)` comments? 🚧
+
+<!-- INCLUDES: issue-356-0fe3 -->
+The plugin maintains an internal dictionary of known Home Connect API keys, programs, and statuses to ensure it correctly interprets data from your appliances. When the plugin connects to a device that provides features not yet in this dictionary—such as a new model or an appliance with updated firmware—it logs a diagnostic block of code.
+
+These entries are typically surrounded by `================` lines and include comments like `// (unrecognised)`. This is a deliberate feature designed to identify missing functionality rather than a software error. These blocks provide the maintainer with the exact identifiers needed to add support for those features.
+
+If you see these blocks in your logs:
+1. Ensure you are running the latest version of the plugin, as the keys may have already been added.
+2. If the logs persist on the latest version, copy the entire section between the `====` separators.
+3. Open a new issue on GitHub, pasting the log snippet and specifying the manufacturer and model of your appliance.
+
+#### 🚧 Why does the log contain blocks of code with `// (unrecognised)` or `// Union types` comments? 🚧
+
+<!-- INCLUDES: issue-357-f6ae -->
+These log entries are generated when the plugin encounters data from the Home Connect API—such as programs, options, settings, or statuses—that has not yet been mapped within the plugin's internal definitions. This typically occurs with newer appliance models or firmware versions that introduce new functionality.
+
+To help improve support for your appliance, please:
+1. Copy the entire block, including the header and footer lines consisting of `=` characters.
+2. Open a new issue on the GitHub repository.
+3. Provide the name and model of your appliance along with the copied log content.
+
+This information allows the maintainer to update the plugin's schema to correctly handle these values in a future release.
+
+#### 🚧 Why does the integrated extractor fan on my hob not appear in Homebridge? 🚧
+
+<!-- INCLUDES: issue-363-c1e6 -->
+The fan control for a hob with an integrated extractor (ventilation) is missing because the Home Connect API does not currently expose these controls. The API typically treats appliances as discrete types, specifically `Hob` or `Hood`. For an integrated appliance to show both sets of controls, the API would need to either:
+
+1. Expose the device as two separate virtual appliances (one `Hob` and one `Hood`).
+2. Include fan-related settings directly within the `Hob` appliance profile.
+
+Since BSH does not currently provide this data through their API for these hybrid models, the plugin cannot surface the fan controls. You can verify this by checking your cached API responses in `~/.homebridge/homebridge-homeconnect/persist`. If fan settings or a separate `Hood` appliance are missing from these files, the limitation is on the API side.
+
+While you can request support for these features from the [Home Connect developer team](https://developer.home-connect.com/support/contact), please be aware that additions to the API specification often take a significant amount of time to be implemented.
 
 ### Appliance Status and Connectivity
 
@@ -729,7 +807,7 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-a64b -->
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 -->
 The plugin allows for granular control over which services are exposed to HomeKit, but there are some architectural constraints:
 
 1. **Core Services**: The main `Switch` service for the appliance power is fundamental and cannot be disabled.
@@ -759,7 +837,7 @@ To maintain the integrity of voice control, this plugin exposes fridge and freez
 
 #### Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?
 
-<!-- INCLUDES: issue-303-180f issue-350-d626 issue-361-065e -->
+<!-- INCLUDES: issue-303-180f issue-350-d626 -->
 The plugin uses the HomeKit `Door` service to represent appliance doors by design, as it is the most semantically accurate representation and ensures consistent behaviour across all appliance types. Unlike a `Contact Sensor` which only allows for monitoring, the `Door` service supports bidirectional control. This allows the plugin to expose actuation functionality (e.g. `Open Door` or `Partly Open Door` commands) where supported by high-end appliance models, while remaining a read-only sensor on others.
 
 Because Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors. This is a cosmetic classification within the Home app with no functional security implications for the appliance. However, it often results in the Home app enabling notifications for door state changes by default. If this behaviour is not desired, you have two options:
@@ -821,7 +899,6 @@ Manufacturers typically design these buttons to communicate directly with compat
 
 #### Why can I only control power and fan speed for my Home Connect air conditioner?
 
-<!-- INCLUDES: issue-346-68d7 -->
 The Home Connect API currently provides extremely limited support for air conditioning units. While basic operations like power and fan speed are available, the API lacks several critical capabilities required for a full HomeKit `Thermostat` or `HeaterCooler` service:
 - **Ambient Temperature and Humidity**: There is currently no API endpoint to read the current room temperature or humidity.
 - **Temperature Setpoints**: Although some internal keys exist, they are not officially supported for control via the public API.
@@ -831,7 +908,7 @@ Consequently, the plugin exposes air conditioners as a power **Switch** (to togg
 
 #### Why are appliance lights mapped as lightbulbs instead of switches?
 
-<!-- INCLUDES: issue-2-bdbd issue-84-6da7 issue-362-0e29 -->
+<!-- INCLUDES: issue-2-bdbd issue-84-6da7 -->
 The Home Connect API defines appliance lights (such as internal refrigerator lights or hood lighting) as settings that often include more than just simple on/off functionality. These can support `Brightness`, `ColorTemperature`, or `Color` depending on the specific model. The plugin uses the HomeKit `Lightbulb` service to allow for the full range of hardware capabilities to be exposed to HomeKit.
 
 Many models, particularly hoods, have a hardware-enforced minimum brightness of 10%. The Home Connect API reflects this limitation; dragging the brightness slider below this threshold in HomeKit will typically turn the light off entirely rather than dimming it further.
@@ -844,6 +921,66 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
+
+#### 🚧 Why can't I control the temperature or see humidity for my air conditioner? 🚧
+
+<!-- INCLUDES: issue-346-9fb5 -->
+The Home Connect API for `AirConditioner` appliances currently lacks support for temperature and humidity control. While the API can report the appliance's power state and fan settings, it does not provide endpoints for:
+
+*   Reading the current ambient temperature or humidity.
+*   Setting a target temperature setpoint.
+
+The plugin developer has confirmed with the Home Connect team that these features are not yet part of the public API specification. Until Home Connect extends the API to include these capabilities, the plugin cannot expose `Thermostat`, `HeaterCooler`, or `TemperatureSensor` services. Users must continue to use the official Home Connect app or the physical remote for temperature and humidity adjustments.
+
+#### 🚧 How are air conditioners mapped into HomeKit? 🚧
+
+<!-- INCLUDES: issue-346-373b -->
+Due to the absence of temperature and humidity data in the Home Connect API, air conditioners are mapped using a combination of `Switch` and `Fan` services rather than a single climate control service:
+
+*   **Power Switch**: A standard `Switch` service represents the appliance's `PowerState`, allowing it to be toggled between `On` and `Standby`.
+*   **Fan Control**: A `Fan` v2 service is used to manage the active program and fan-specific settings. This includes:
+    *   `Active` and `Current Fan State`: Indicating if the fan is running.
+    *   `Target Fan State`: Controlling whether the fan is in `Manual` or `Automatic` mode.
+    *   `Rotation Speed`: Adjusting the `FanSpeedPercentage` (1–100%).
+
+To avoid disrupting settings that the plugin cannot control, it typically preserves the program currently selected on the device (via the app or remote) rather than forcing a specific mode like `Cool` or `Heat`.
+
+#### 🚧 Why does my refrigerator door show up as a security device in HomeKit? 🚧
+
+<!-- INCLUDES: issue-361-a7d8 -->
+The plugin maps Home Connect door status to the HomeKit `Door` service. Apple HomeKit inherently categorises the `Door` service as a security-sensitive accessory. This results in the appliance appearing in the security category within the Home app, alongside items such as locks and alarms, and may trigger additional authentication requirements for some actions.
+
+This mapping is used to ensure consistency across the Home Connect platform. Although many appliances (like refrigerators) only report read-only door status, the Home Connect API provides commands for `Open Door` and `Partly Open Door` for other appliance types. The plugin uses the `Door` service for all compatible devices to support these capabilities where the hardware allows.
+
+If you do not want the door status to be exposed in this way, you have two options:
+1. Disable the door status functionality entirely within the plugin configuration settings (`config.json`).
+2. Use the **Event Buttons** (exposed as `Stateless Programmable Switch` services) for automation triggers. For example, many refrigerators support a `Refrigerator Door Alarm` event which can be used to trigger HomeKit automations without involving the security-categorised `Door` service.
+
+#### 🚧 Why are refrigerator internal lights mapped as Lightbulbs instead of Switches? 🚧
+
+<!-- INCLUDES: issue-362-e525 -->
+Appliance lights, including the internal and external lights of refrigerators, are mapped to HomeKit `Lightbulb` services rather than `Switch` services. This design choice ensures that the plugin can support the full range of capabilities exposed by the Home Connect API, such as brightness control (`Refrigeration.Common.Setting.Light.Internal.Brightness`) and colour temperature, which are not supported by the standard HomeKit `Switch` service.
+
+Because HomeKit identifies these services as lights, they will respond to general Siri commands such as "turn off the lights" for a specific room. This is the intended behaviour to ensure consistency across all appliance types (such as hoods, where light control is expected to integrate with room lighting).
+
+If you do not want an appliance light to be controlled as part of your HomeKit room lighting, you can disable that specific HomeKit service within the plugin configuration in your `config.json` file.
+
+#### 🚧 Why do disabled appliance features or services still appear in the Home app? 🚧
+
+<!-- INCLUDES: issue-364-0c67 -->
+This behaviour typically results from HomeKit caching and synchronisation issues rather than a fault within the plugin. When a feature is disabled in the configuration, the plugin removes the corresponding service from the accessory definition and Homebridge increments the configuration number (`CN`) to signal HomeKit to refresh its database. However, HomeKit's internal handling of these updates is sometimes unreliable, particularly when synchronising state across multiple home hubs (Apple TV or HomePod) and iOS devices via iCloud.
+
+There are two primary reasons why a disabled service might appear:
+1. **Homebridge caching**: As a dynamic platform plugin, Homebridge serialises the state of all accessories and services at shutdown. Upon restart, it restores this cached state *before* the plugin has the opportunity to apply the updated configuration. If a feature was recently disabled, it may briefly appear in HomeKit before the plugin removes it during the initialisation sequence.
+2. **HomeKit synchronisation lag**: Stale accessory definitions often persist within the HomeKit database on specific devices or hubs even after the plugin has deleted them. These entries often appear as unresponsive because the plugin is no longer providing updates for them.
+
+To resolve persistent stale entries, try the following steps:
+1. **Wait**: Cache synchronisation issues often resolve automatically within a few hours as iCloud updates propagate.
+2. **Restart Homebridge**: This is usually sufficient to trigger a clean refresh and update the configuration number.
+3. **Reboot the Home Hub**: Restarting your Apple TV or HomePod can force it to discard stale cached data.
+4. **iCloud Resynchronisation**: Sign out of iCloud on the affected home hub and sign back in to force a full database refresh.
+
+You can verify if the plugin is correctly removing services by checking the logs for messages such as `Removing obsolete service "<service name>"`. If you wish to investigate further, you can enable HomeKit Accessory Protocol debugging by running Homebridge with the environment variable `DEBUG=HAP-NodeJS:*`.
 
 ### Notifications & Events
 
@@ -949,4 +1086,4 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-360-c5e9 issue-365-e16b issue-375-b67d -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-365-e16b issue-375-b67d -->
