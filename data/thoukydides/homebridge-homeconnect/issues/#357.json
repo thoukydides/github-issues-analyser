@@ -1,13 +1,12 @@
 {
     "issue_number": 357,
-    "updated_at": "2026-03-03T07:55:41.516Z",
+    "updated_at": "2026-04-04T10:05:42.915Z",
     "faq": [
         {
-            "question": "Why are some programs or settings for my appliance listed as unrecognised in the logs?",
-            "answer": "Home Connect appliances frequently receive firmware updates or introduce new models with programmes, options, or status keys that are not yet documented in the official API or included in the plugin's internal definitions. When the plugin identifies these unknown keys, it logs them to assist in expanding support.\n\nIf you see entries marked as `unrecognised` in your logs:\n\n1. Ensure you are running the latest version of the plugin, as support for new values is added regularly (for example, many Siemens oven and coffee maker keys were added in `v1.5.5`).\n2. If the values remain unrecognised on the latest version, open a GitHub issue and provide the log section bounded by `===` lines. This allows the maintainer to update the plugin with the correct definitions for your specific appliance model.",
-            "semantic_abstract": "Home Connect API periodically introduces new appliance programs, options, and status keys that are not yet part of the plugin's internal schema. The plugin identifies these as `unrecognised` in the logs, necessitating an update to the plugin's key definitions to support the new functionality.",
-            "confidence": "high",
-            "hash": "c258c6265923fe6ef4f21e4b3d60f59e4a5312517416030190fb936a321f2ecf"
+            "question": "Why does the log contain blocks of code with `// (unrecognised)` or `// Union types` comments?",
+            "answer": "These log entries are generated when the plugin encounters data from the Home Connect API—such as programs, options, settings, or statuses—that has not yet been mapped within the plugin's internal definitions. This typically occurs with newer appliance models or firmware versions that introduce new functionality.\n\nTo help improve support for your appliance, please:\n1. Copy the entire block, including the header and footer lines consisting of `=` characters.\n2. Open a new issue on the GitHub repository.\n3. Provide the name and model of your appliance along with the copied log content.\n\nThis information allows the maintainer to update the plugin's schema to correctly handle these values in a future release.",
+            "semantic_abstract": "The plugin identifies undocumented Home Connect API keys and values during operation, generating formatted TypeScript-like blocks in the logs to highlight 'unrecognised' elements. This diagnostic output serves as a request for data to map new appliance programs, options, or status states into the plugin's core logic.",
+            "hash": "f6ae8b1dc7760967db85d5eb3810f6f35cfe7842fcc805dcc78931ae81aeea7a"
         }
     ]
 }
