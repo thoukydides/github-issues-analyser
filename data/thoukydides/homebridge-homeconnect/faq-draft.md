@@ -69,7 +69,7 @@
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
     - [Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?](#why-can-i-not-hide-certain-switches-or-why-do-they-remain-visible-or-unresponsive-after-being-disabled)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
-    - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
+    - [Why is my appliance door appearing as a security device instead of a contact sensor?](#why-is-my-appliance-door-appearing-as-a-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
     - [Why can I not set the alarm timer or `AlarmClock` setting on my appliance?](#why-can-i-not-set-the-alarm-timer-or-alarmclock-setting-on-my-appliance)
     - [Why do multiple services or programs appear with identical names in the Apple Home app?](#why-do-multiple-services-or-programs-appear-with-identical-names-in-the-apple-home-app)
@@ -721,22 +721,22 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 -->
-The plugin allows for granular control over which services are exposed to HomeKit, but there are some architectural constraints:
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 -->
+The plugin allows for granular control over which services are exposed to HomeKit, but there are some architectural and HomeKit-specific constraints:
 
 1. **Core Services**: The main `Switch` service for the appliance power is fundamental and cannot be disabled.
 2. **Optional Services**: Most other features, such as the `Active Program` switch or `Internal Light`, can be individually disabled in the plugin configuration. Note that disabling the `Active Program` switch also removes status indicators (`On`, `Status Active`, `Status Fault`) and the `Remaining Duration` characteristic.
 3. **Individual Programs**: The `Switch` services for individual programs can be completely customised with chosen programs and options.
 4. **Appliance Exclusion**: Whole appliances can be disabled to prevent them being exposed to HomeKit.
 
-If services remain visible in HomeKit (often appearing as "unresponsive") after you have configured them to be hidden, it is likely due to HomeKit's internal caching and synchronisation mechanisms rather than the plugin itself. When a feature is disabled, the plugin removes the service from the accessory definition, but HomeKit may retain a stale cached version across multiple hubs or iCloud-synced devices. To resolve persistent stale entries, try these steps in order:
+If services remain visible in HomeKit (often appearing as "unresponsive") after configuration, it is likely due to HomeKit's internal caching. As a dynamic platform plugin, Homebridge restores its cached state upon restart *before* the plugin can apply your updated configuration. While the plugin removes the service and increments the HomeKit configuration number (`CN`) to trigger a database refresh, iCloud synchronisation across multiple hubs and devices can be slow.
 
-- **Check the logs**: Verify the plugin is removing the service. You may see a message such as `Removing obsolete service "Internal Light"` if the service was restored from the Homebridge cache but is now disabled.
+To resolve persistent stale entries, try these steps:
+- **Check the logs**: Verify the plugin is removing the service. You may see a message such as `Removing obsolete service "Internal Light"`.
 - **Restart Homebridge**: This triggers a fresh configuration update to HomeKit.
 - **Wait**: Allow several hours for iCloud synchronisation to reconcile the state across all your devices.
-- **Reboot the Home Hub**: Restart your primary Apple TV or HomePod.
-- **Reset iCloud**: Sign out of iCloud on the Home Hub and sign back in.
-- **Remove the bridge**: As a last resort, remove the Homebridge bridge from HomeKit and re-add it.
+- **Reboot the Home Hub**: Restart your Apple TV or HomePod to force it to discard stale data.
+- **Debug HAP**: If issues persist, you can investigate further by running Homebridge with the environment variable `DEBUG=HAP-NodeJS:*` to monitor HomeKit Accessory Protocol communications.
 
 #### Why is temperature control not supported for fridges, freezers, or ovens?
 
@@ -749,15 +749,16 @@ The HomeKit Accessory Protocol (HAP) only defines standard temperature services 
 
 To maintain the integrity of voice control, this plugin exposes fridge and freezer modes (such as Super, Eco, Vacation, and Fresh modes) as individual `Switch` services instead of temperature controls. The plugin will only adopt new HomeKit services if Apple introduces specific appliance-grade definitions that do not conflict with ambient climate controls.
 
-#### Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?
+#### Why is my appliance door appearing as a security device instead of a contact sensor?
 
-<!-- INCLUDES: issue-303-180f issue-350-d626 -->
-The plugin uses the HomeKit `Door` service to represent appliance doors by design, as it is the most semantically accurate representation and ensures consistent behaviour across all appliance types. Unlike a `Contact Sensor` which only allows for monitoring, the `Door` service supports bidirectional control. This allows the plugin to expose actuation functionality (e.g. `Open Door` or `Partly Open Door` commands) where supported by high-end appliance models, while remaining a read-only sensor on others.
+<!-- INCLUDES: issue-303-180f issue-350-d626 issue-361-a7d8 -->
+The plugin uses the HomeKit `Door` service to represent appliance doors by design, as it is the most semantically accurate representation. Unlike a `Contact Sensor` which only allows for monitoring, the `Door` service supports bidirectional control. This allows the plugin to support actuation functionality (e.g. `Open Door` or `Partly Open Door` commands) on high-end models, while remaining a read-only sensor on others.
 
-Because Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors. This is a cosmetic classification within the Home app with no functional security implications for the appliance. However, it often results in the Home app enabling notifications for door state changes by default. If this behaviour is not desired, you have two options:
+Because Apple Home categorises all `Door` services as security-related, you may see the appliance grouped with locks or sensors in the Home app, and it may trigger notifications by default. If this behaviour is not desired, you have several options:
 
-1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.
-2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.
+1. **Disable notifications**: In the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.
+2. **Use Event Buttons**: Many appliances, such as refrigerators, support a `Refrigerator Door Alarm` event. You can use the `Stateless Programmable Switch` service associated with this event for automation triggers without involving the security-categorised `Door` service.
+3. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.
 
 #### Why does my fridge-freezer only show a single door status for all compartments?
 
@@ -813,12 +814,19 @@ Manufacturers typically design these buttons to communicate directly with compat
 
 #### Why can I only control power and fan speed for my Home Connect air conditioner?
 
-The Home Connect API currently provides extremely limited support for air conditioning units. While basic operations like power and fan speed are available, the API lacks several critical capabilities required for a full HomeKit `Thermostat` or `HeaterCooler` service:
-- **Ambient Temperature and Humidity**: There is currently no API endpoint to read the current room temperature or humidity.
-- **Temperature Setpoints**: Although some internal keys exist, they are not officially supported for control via the public API.
-- **Mode Selection**: Selection of cooling, heating, or auto programs is not fully exposed for external control.
+<!-- INCLUDES: issue-346-373b issue-346-9fb5 -->
+The Home Connect API currently provides extremely limited support for `AirConditioner` appliances. Crucial capabilities required for a full HomeKit `Thermostat` or `HeaterCooler` service are missing from the public API:
 
-Consequently, the plugin exposes air conditioners as a power **Switch** (to toggle between On and Standby) and a **Fan** (to control fan speed and toggle between manual and automatic modes). Adjusting the target temperature or switching between heat and cool modes must be done via the physical remote or the official Home Connect app.
+- **Ambient Temperature and Humidity**: There is no API endpoint to read the current room temperature or humidity.
+- **Temperature Setpoints**: No endpoints are provided to set a target temperature.
+- **Mode Selection**: Selection of cooling, heating, or auto programs is not fully exposed for control.
+
+Consequently, the plugin maps air conditioners using a combination of a power **Switch** (to toggle `PowerState` between `On` and `Standby`) and a **Fan v2** service. The Fan service manages:
+- `Active` and `Current Fan State`: Reporting if the fan is running.
+- `Target Fan State`: Toggling between `Manual` and `Automatic` modes.
+- `Rotation Speed`: Adjusting the `FanSpeedPercentage` (1–100%).
+
+To avoid disrupting settings it cannot control, the plugin preserves the program currently selected via the physical remote or official app.
 
 #### Why are appliance lights mapped as lightbulbs instead of switches?
 
@@ -836,40 +844,6 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
-#### 🚧 Why can't I control the temperature or see humidity for my air conditioner? 🚧
-
-<!-- INCLUDES: issue-346-9fb5 -->
-The Home Connect API for `AirConditioner` appliances currently lacks support for temperature and humidity control. While the API can report the appliance's power state and fan settings, it does not provide endpoints for:
-
-*   Reading the current ambient temperature or humidity.
-*   Setting a target temperature setpoint.
-
-The plugin developer has confirmed with the Home Connect team that these features are not yet part of the public API specification. Until Home Connect extends the API to include these capabilities, the plugin cannot expose `Thermostat`, `HeaterCooler`, or `TemperatureSensor` services. Users must continue to use the official Home Connect app or the physical remote for temperature and humidity adjustments.
-
-#### 🚧 How are air conditioners mapped into HomeKit? 🚧
-
-<!-- INCLUDES: issue-346-373b -->
-Due to the absence of temperature and humidity data in the Home Connect API, air conditioners are mapped using a combination of `Switch` and `Fan` services rather than a single climate control service:
-
-*   **Power Switch**: A standard `Switch` service represents the appliance's `PowerState`, allowing it to be toggled between `On` and `Standby`.
-*   **Fan Control**: A `Fan` v2 service is used to manage the active program and fan-specific settings. This includes:
-    *   `Active` and `Current Fan State`: Indicating if the fan is running.
-    *   `Target Fan State`: Controlling whether the fan is in `Manual` or `Automatic` mode.
-    *   `Rotation Speed`: Adjusting the `FanSpeedPercentage` (1–100%).
-
-To avoid disrupting settings that the plugin cannot control, it typically preserves the program currently selected on the device (via the app or remote) rather than forcing a specific mode like `Cool` or `Heat`.
-
-#### 🚧 Why does my refrigerator door show up as a security device in HomeKit? 🚧
-
-<!-- INCLUDES: issue-361-a7d8 -->
-The plugin maps Home Connect door status to the HomeKit `Door` service. Apple HomeKit inherently categorises the `Door` service as a security-sensitive accessory. This results in the appliance appearing in the security category within the Home app, alongside items such as locks and alarms, and may trigger additional authentication requirements for some actions.
-
-This mapping is used to ensure consistency across the Home Connect platform. Although many appliances (like refrigerators) only report read-only door status, the Home Connect API provides commands for `Open Door` and `Partly Open Door` for other appliance types. The plugin uses the `Door` service for all compatible devices to support these capabilities where the hardware allows.
-
-If you do not want the door status to be exposed in this way, you have two options:
-1. Disable the door status functionality entirely within the plugin configuration settings (`config.json`).
-2. Use the **Event Buttons** (exposed as `Stateless Programmable Switch` services) for automation triggers. For example, many refrigerators support a `Refrigerator Door Alarm` event which can be used to trigger HomeKit automations without involving the security-categorised `Door` service.
-
 #### 🚧 Why are refrigerator internal lights mapped as Lightbulbs instead of Switches? 🚧
 
 <!-- INCLUDES: issue-362-e525 -->
@@ -878,23 +852,6 @@ Appliance lights, including the internal and external lights of refrigerators, a
 Because HomeKit identifies these services as lights, they will respond to general Siri commands such as "turn off the lights" for a specific room. This is the intended behaviour to ensure consistency across all appliance types (such as hoods, where light control is expected to integrate with room lighting).
 
 If you do not want an appliance light to be controlled as part of your HomeKit room lighting, you can disable that specific HomeKit service within the plugin configuration in your `config.json` file.
-
-#### 🚧 Why do disabled appliance features or services still appear in the Home app? 🚧
-
-<!-- INCLUDES: issue-364-0c67 -->
-This behaviour typically results from HomeKit caching and synchronisation issues rather than a fault within the plugin. When a feature is disabled in the configuration, the plugin removes the corresponding service from the accessory definition and Homebridge increments the configuration number (`CN`) to signal HomeKit to refresh its database. However, HomeKit's internal handling of these updates is sometimes unreliable, particularly when synchronising state across multiple home hubs (Apple TV or HomePod) and iOS devices via iCloud.
-
-There are two primary reasons why a disabled service might appear:
-1. **Homebridge caching**: As a dynamic platform plugin, Homebridge serialises the state of all accessories and services at shutdown. Upon restart, it restores this cached state *before* the plugin has the opportunity to apply the updated configuration. If a feature was recently disabled, it may briefly appear in HomeKit before the plugin removes it during the initialisation sequence.
-2. **HomeKit synchronisation lag**: Stale accessory definitions often persist within the HomeKit database on specific devices or hubs even after the plugin has deleted them. These entries often appear as unresponsive because the plugin is no longer providing updates for them.
-
-To resolve persistent stale entries, try the following steps:
-1. **Wait**: Cache synchronisation issues often resolve automatically within a few hours as iCloud updates propagate.
-2. **Restart Homebridge**: This is usually sufficient to trigger a clean refresh and update the configuration number.
-3. **Reboot the Home Hub**: Restarting your Apple TV or HomePod can force it to discard stale cached data.
-4. **iCloud Resynchronisation**: Sign out of iCloud on the affected home hub and sign back in to force a full database refresh.
-
-You can verify if the plugin is correctly removing services by checking the logs for messages such as `Removing obsolete service "<service name>"`. If you wish to investigate further, you can enable HomeKit Accessory Protocol debugging by running Homebridge with the environment variable `DEBUG=HAP-NodeJS:*`.
 
 ### Notifications & Events
 
