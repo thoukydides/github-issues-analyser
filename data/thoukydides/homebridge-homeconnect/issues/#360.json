@@ -1,13 +1,12 @@
 {
     "issue_number": 360,
-    "updated_at": "2026-03-05T10:01:40.821Z",
+    "updated_at": "2026-04-04T12:01:56.746Z",
     "faq": [
         {
-            "question": "Why is the Client ID field or Authorise button missing from the Homebridge Config UI?",
-            "answer": "The visibility of several configuration fields in this plugin, including the `clientid` and specific appliance settings, depends on conditional logic within the configuration schema. A known regression in Homebridge Config UI `v5.6.0` prevents these conditional fields from being displayed correctly, often leaving the configuration page mostly blank.\n\nTo resolve this issue:\n1. Update Homebridge Config UI to version `v5.6.1` or later, which contains the fix for the schema rendering bug.\n2. If you cannot update immediately, you can manually add the `clientid` to your `config.json` file. Once the plugin starts with a valid ID, it will attempt authorisation, and you can follow the prompts in the Homebridge logs.\n3. Alternatively, downgrade Homebridge Config UI to version `v5.5.0`.",
-            "semantic_abstract": "Homebridge Config UI version 5.6.0 fails to render configuration fields that employ conditional schema logic, such as the `clientid` field and appliance-specific options. This platform-level regression requires an update to Homebridge Config UI version 5.6.1 or later to ensure the plugin settings are visible and interactive.",
-            "confidence": "high",
-            "hash": "c5e959697ee6d59e86cda6395c9bf127dec999b8d5777fbc9cbbd9b601db3b94"
+            "question": "Why is the plugin configuration screen missing fields or the authorisation link?",
+            "answer": "This plugin utilises a dynamic configuration schema that employs conditional logic to show or hide settings. This ensures that the interface remains clean by only showing options that are relevant to your current setup; for example, appliance-specific settings are hidden until the appliance has been discovered and authorised. This behaviour requires the **Homebridge Config UI X** to correctly process the schema's conditional rules.\n\nIf the settings page appears empty or is missing the `clientid` field, consider the following:\n\n* **Update Homebridge Config UI X**: Ensure you are running the latest version of the Homebridge UI. Historically, certain versions (such as v5.6.0) contained bugs that prevented conditional fields from being displayed correctly.\n* **Check the Logs**: If the authorisation link or button is not visible in the settings UI, you can retrieve the necessary information from the Homebridge logs. Look for a `verification_uri` (the URL to visit) and a `user_code` (the code to enter). Visit the URL in your browser and enter the code to complete the Home Connect account linking process manually.\n* **Automatic Population**: Once the `clientid` is successfully provided and the account is linked, the configuration fields for your appliances will appear automatically in the settings UI.",
+            "semantic_abstract": "The plugin implements a dynamic `config.schema.json` using conditional logic to manage field visibility for OAuth setup and appliance configuration. Incompatibilities with the Homebridge UI container can cause these fields to become inaccessible, requiring users to manually extract the Device Flow verification URI from the system logs.",
+            "hash": "732a29d670de153e06eb7d258dc7308faae880df9e85206ae66a15efd3f028fc"
         }
     ]
 }
