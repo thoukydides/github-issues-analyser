@@ -1,5 +1,12 @@
 {
     "issue_number": 354,
-    "updated_at": "2026-03-02T15:26:23.538Z",
-    "faq": []
+    "updated_at": "2026-04-04T07:28:38.136Z",
+    "faq": [
+        {
+            "question": "Why does the log show `unrecognised` or `unexpected` API values like `BSH.Common.Status.InteriorIlluminationActive`?",
+            "answer": "The plugin identifies and logs any Home Connect API keys or values that it has not been programmed to handle. This typically occurs when a new appliance model or firmware update introduces functionality that has not yet been mapped within the plugin. These entries appear in the logs within a structured block, often formatted as a TypeScript interface (for example, `export interface StatusValues`).\n\nIf you see these messages:\n1. Update the plugin to the latest version, as support for new API values is frequently added in minor releases.\n2. If the values remain unrecognised on the latest version, open a GitHub issue and provide the complete log section between the `================` separators.\n\nReporting these values allows the maintainer to map new appliance features and ensure they are correctly exposed to HomeKit.",
+            "semantic_abstract": "Home Connect appliances frequently transmit status keys or enum values that are not yet part of the plugin's internal definitions, resulting in `unrecognised` or `unexpected` log entries. These occurrences are captured in a structured TypeScript-like format to assist the maintainer in mapping new appliance features and firmware behaviours to HomeKit services.",
+            "hash": "bd8b8740563af6e4eef34c15d682440fd9a76e4ad75de80c9ca554a880d8ca31"
+        }
+    ]
 }
