@@ -339,7 +339,6 @@
                                         "issue-355-94db",
                                         "issue-356-0fe3",
                                         "issue-357-f6ae",
-                                        "issue-365-e16b",
                                         "issue-369-fc94",
                                         "issue-372-7a45",
                                         "issue-373-0d05",
@@ -376,7 +375,6 @@
                                         "issue-316-2b86",
                                         "issue-328-b486",
                                         "issue-340-bf6e",
-                                        "issue-368-b5fa",
                                         "issue-380-03ac"
                                     ]
                                 },
@@ -492,8 +490,7 @@
                                     "answer": "By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via Homebridge UI:\n\n- **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.\n- **Custom list of programs and options**: Use this to manually define which specific programs appear in HomeKit, and the options to use with each.\n- **A switch to start each appliance program** (default): Advertise all available programs using default options.",
                                     "included_ids": [
                                         "issue-49-35dc",
-                                        "issue-240-65b3",
-                                        "issue-368-4f23"
+                                        "issue-240-65b3"
                                     ]
                                 },
                                 {
@@ -527,7 +524,32 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 365,
+                                    "id": "issue-365-43b1",
+                                    "question": "Why does my Home Connect appliance report an `Unknown` program key in the logs?",
+                                    "answer": "Certain Home Connect appliances may occasionally report a `ProgramKey` value of `Unknown` via the API. This is typically a firmware quirk where the appliance provides an undocumented or transient status during specific operations or state transitions. The plugin handles this value as a valid but unmapped state to ensure system stability, though it does not represent a functional program that can be triggered or controlled via HomeKit."
+                                },
+                                {
+                                    "issue_number": 365,
+                                    "id": "issue-365-ec63",
+                                    "question": "Why does the log show `unrecognised` values for my appliance?",
+                                    "answer": "The plugin performs an automated check against the Home Connect API schema to identify values or features that are not yet explicitly handled by the current version of the code. If your logs contain flags for `unrecognised` values (such as `BSH.Common.Status.InteriorIlluminationActive`), it indicates that your appliance is reporting data that the plugin hasn't mapped yet.\n\n*   **Ensure you are on the latest version**: Many unrecognised values are addressed in plugin updates. If you have recently updated, the `unrecognised` flag might persist due to local caching; this should resolve itself as the cache is refreshed.\n*   **Schema discovery**: These log entries provide the technical identifiers (like `ProgramKey` or `StatusValues`) needed to add support for new appliance features in future releases."
+                                },
+                                {
+                                    "issue_number": 368,
+                                    "id": "issue-368-04c9",
+                                    "question": "Why does the log show that an appliance program is \"currently unavailable\"?",
+                                    "answer": "The Home Connect API dynamically reports the availability of specific programs based on the appliance's current operational state. It is common for certain programs—such as `LaundryCare.Washer.Program.DrumClean` on washing machines—to be flagged as \"currently unavailable\" during initialisation.\n\nThis is standard behaviour and typically occurs because the appliance's hardware state prevents that program from being selected at that moment. Reasons include:\n\n* The appliance is already running a cycle.\n* The appliance is powered off or in standby mode.\n* Safety conditions are not met (e.g. the door is open).\n* The program is restricted based on previous cycle history or sensor readings.\n\nThis message in the log is a direct reflection of data from the Home Connect API and does not indicate a defect in the plugin."
+                                },
+                                {
+                                    "issue_number": 368,
+                                    "id": "issue-368-ce7e",
+                                    "question": "Why does the log say \"Adding services for 0 programs\" even when the appliance supports them?",
+                                    "answer": "The plugin does not automatically create HomeKit switches for every program advertised by a Home Connect appliance. Each program you wish to control must be explicitly listed in your Homebridge `config.json` within the `programs` array for that specific accessory.\n\nIf the `programs` section is missing, empty, or contains identifiers that do not match those provided by the appliance, the plugin will report `Adding services for 0 programs`. To fix this:\n\n1. Check the plugin logs to find the correct program identifiers (e.g. `LaundryCare.Washer.Program.Cotton`).\n2. Add these identifiers to the `programs` array in your plugin configuration.\n3. Restart Homebridge to apply the changes.\n\nNote that the `Active Program` feature is a separate switch that provides control over whichever program is currently running, but it does not allow you to select specific programs."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -604,9 +626,7 @@
                                 {
                                     "question": "Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?",
                                     "answer": "Some refrigeration appliances, such as certain Thermador models, have been observed to always report the door as `Open`. They correctly trigger door open alarms, but do not generate events for changes to the door status itself. This suggests a firmware limitation or a bug in the Home Connect cloud service.\n\nTo troubleshoot and potentially work around this:\n\n1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.\n2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.\n3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.",
-                                    "included_ids": [
-                                        "issue-382-7d17"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Can I programmatically access data from the unofficial Home Connect status page?",
@@ -623,7 +643,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 382,
+                                    "id": "issue-382-45f9",
+                                    "question": "Why does my Thermador fridge or freezer always show the door as \"Open\" in HomeKit?",
+                                    "answer": "The plugin maps the Home Connect API `Open` state to the HomeKit `Door` service `Current Position` value of `100%`, and the `Closed` state to `0%`. This is the standard mapping defined by the HomeKit Accessory Protocol.\n\nOn some appliances, particularly Thermador FridgeFreezer models (such as the `T42BT120NS/08`), a firmware issue may cause the appliance to fail to update its combined door status (`BSH.Common.Status.DoorState`) via the API, even though the appliance correctly identifies the state internally to trigger door alarms. This results in HomeKit showing a static `Open` status that does not change when the physical door is closed.\n\nTo resolve this or investigate further:\n1. Verify if the door alarm correctly triggers in the official Home Connect app. If the alarm works but the status in HomeKit does not change, the issue is likely with the appliance firmware's API reporting.\n2. Configure the plugin to expose individual door services for specific compartments instead of the combined status. These individual statuses often update correctly even when the combined status is unresponsive. Relevant identifiers include:\n * `Refrigeration.Common.Status.Door.ChillerLeft` / `ChillerRight` \n * `Refrigeration.Common.Status.Door.Freezer` \n * `Refrigeration.Common.Status.Door.Refrigerator` \n * `Refrigeration.Common.Status.Door.FlexCompartment` \n3. If individual door statuses also fail to update, the behaviour should be reported to Home Connect Developer Support as it indicates a limitation in the appliance's firmware."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -943,7 +970,6 @@
         "issue-304-0ee0",
         "issue-351-e214",
         "issue-360-732a",
-        "issue-365-e16b",
         "issue-375-b67d"
     ],
     "source_hashes": {
