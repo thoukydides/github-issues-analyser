@@ -27,10 +27,10 @@
                         },
                         {
                             "question": "Why are Dyson error codes and the sleep timer not visible in my Matter controller?",
-                            "answer": "Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, `iuh3`, `sen5`, or `sen6`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app).\n\nThe **Matter 1.4 specification** does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.\n\nThe plugin includes support for these fields in its internal definitions to provide a foundation for future compatibility if the Matter protocol expands. This ensures that the plugin can remain stable and keep the device reachable even when the appliance is reporting these internal codes.",
+                            "answer": "Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, or `iuh3`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app).\n\nThe Matter specification does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.\n\nThe plugin includes support for these fields in its internal definitions to provide a foundation for future compatibility if the Matter protocol expands. This ensures that the plugin can remain stable and keep the device reachable even when the appliance is reporting these internal codes.",
                             "included_ids": [
-                                "issue-2-64a4",
-                                "issue-1-4ad6"
+                                "issue-1-4ad6",
+                                "issue-2-64a4"
                             ]
                         },
                         {
@@ -49,55 +49,30 @@
         {
             "heading": "Matterbridge",
             "preamble": "",
-            "partitions": [],
-            "subcategories": [
+            "partitions": [
                 {
-                    "heading": "New subcategory",
-                    "preamble": "",
-                    "partitions": [
+                    "entries": [
                         {
-                            "entries": [
-                                {
-                                    "question": "Why does `matterbridge-dyson-robot` report an older version in logs after an update?",
-                                    "answer": "Matterbridge might report that a plugin is up to date, but the plugin's own log entry during startup may show an older version number. This discrepancy occurs if Matterbridge is restarted before a plugin update has fully completed its installation or if the system is referencing a cached version of the plugin.\n\nTo ensure you are running the latest version:\n\n1. Allow sufficient time for the update to fully install before restarting Matterbridge.\n2. Check the version number reported in the log with a `[Dyson Robot]` prefix during startup; this is the definitive version of the plugin instance currently running.\n3. If the issue persists, uninstall and then reinstall the `matterbridge-dyson-robot` plugin to clear any cached files or lingering older files.",
-                                    "included_ids": [
-                                        "issue-16-09f2"
-                                    ]
-                                }
-                            ],
-                            "candidates": []
+                            "question": "Why does `matterbridge-dyson-robot` report an older version in logs after an update?",
+                            "answer": "Matterbridge might report that a plugin is up to date, but the plugin's own log entry during startup may show an older version number. This discrepancy occurs if Matterbridge is restarted before a plugin update has fully completed its installation or if the system is referencing a cached version of the plugin.\n\nTo ensure you are running the latest version:\n\n1. Allow sufficient time for the update to fully install before restarting Matterbridge.\n2. Check the version number reported in the log with a `[Dyson Robot]` prefix during startup; this is the definitive version of the plugin instance currently running.\n3. If the issue persists, uninstall and then reinstall the `matterbridge-dyson-robot` plugin to clear any cached files or lingering older files.",
+                            "included_ids": [
+                                "issue-16-09f2"
+                            ]
                         }
                     ],
-                    "subcategories": []
-                },
-                {
-                    "heading": "Plugin Configuration and Updates",
-                    "preamble": "",
-                    "partitions": [
-                        {
-                            "entries": [
-                                {
-                                    "question": "Why does the plugin report configuration errors after updating to version 0.2.0 or later?",
-                                    "answer": "Version 0.2.0 introduced a significant change to the configuration schema to accommodate MyDyson account support and AWS IoT integration. If you are upgrading from a version prior to 0.2.0, your configuration file may contain legacy or extraneous fields.\n\nBecause the Matterbridge configuration editor does not always automatically prune old settings, you may see warnings regarding extraneous configuration values. It is recommended to recreate the configuration or manually remove deprecated fields to align with the current schema.",
-                                    "included_ids": [
-                                        "issue-1-59e4"
-                                    ]
-                                }
-                            ],
-                            "candidates": []
-                        }
-                    ],
-                    "subcategories": []
+                    "candidates": []
                 }
-            ]
+            ],
+            "subcategories": []
         }
     ],
     "excluded_ids": [
+        "issue-1-59e4",
         "issue-16-b5e2",
         "issue-17-1ece",
         "issue-26-2ae8"
     ],
     "source_hashes": {
-        "faq": "8422ea7b646e6fa40688c4a6acca0196cf7a3a3169eec8f13996a56448977fec"
+        "faq": "8304489e5792169a007b9f6a5305f7102be60958d418026e7d41eca3aafc2f53"
     }
 }
