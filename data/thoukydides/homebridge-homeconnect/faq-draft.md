@@ -656,13 +656,19 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
 
-Some refrigeration appliances, such as certain Thermador models, have been observed to always report the door as `Open`. They correctly trigger door open alarms, but do not generate events for changes to the door status itself. This suggests a firmware limitation or a bug in the Home Connect cloud service.
+<!-- INCLUDES: issue-382-45f9 -->
+The plugin maps the Home Connect API `Open` state to the HomeKit `Door` service `Current Position` value of `100%`, and the `Closed` state to `0%`. On some appliances, particularly Thermador FridgeFreezer models (such as the `T42BT120NS/08`), a firmware issue may cause the appliance to fail to update its combined door status (`BSH.Common.Status.DoorState`) via the API, even though the appliance correctly identifies the state internally to trigger door alarms.
 
-To troubleshoot and potentially work around this:
+To troubleshoot and resolve this:
 
-1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.
-2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
-3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
+1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments. Configure the plugin to expose these specific door services, as they often update correctly even if the combined status does not. Relevant identifiers include:
+ - `Refrigeration.Common.Status.Door.ChillerLeft` / `ChillerRight` 
+ - `Refrigeration.Common.Status.Door.Freezer` 
+ - `Refrigeration.Common.Status.Door.Refrigerator` 
+ - `Refrigeration.Common.Status.Door.FlexCompartment` 
+2. **Verify door alarms**: Check if the door alarm correctly triggers in the official Home Connect app. If the alarm works but the HomeKit status remains static, it confirms an API reporting issue.
+3. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw events. If the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` while the door is physically closed, the fault lies with the cloud service or firmware.
+4. **Contact Support**: If individual statuses also fail to update, report the behaviour to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
 
 #### Can I programmatically access data from the unofficial Home Connect status page?
 
@@ -683,22 +689,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why does my Thermador fridge or freezer always show the door as "Open" in HomeKit? 🚧
-
-<!-- INCLUDES: issue-382-45f9 -->
-The plugin maps the Home Connect API `Open` state to the HomeKit `Door` service `Current Position` value of `100%`, and the `Closed` state to `0%`. This is the standard mapping defined by the HomeKit Accessory Protocol.
-
-On some appliances, particularly Thermador FridgeFreezer models (such as the `T42BT120NS/08`), a firmware issue may cause the appliance to fail to update its combined door status (`BSH.Common.Status.DoorState`) via the API, even though the appliance correctly identifies the state internally to trigger door alarms. This results in HomeKit showing a static `Open` status that does not change when the physical door is closed.
-
-To resolve this or investigate further:
-1. Verify if the door alarm correctly triggers in the official Home Connect app. If the alarm works but the status in HomeKit does not change, the issue is likely with the appliance firmware's API reporting.
-2. Configure the plugin to expose individual door services for specific compartments instead of the combined status. These individual statuses often update correctly even when the combined status is unresponsive. Relevant identifiers include:
- * `Refrigeration.Common.Status.Door.ChillerLeft` / `ChillerRight` 
- * `Refrigeration.Common.Status.Door.Freezer` 
- * `Refrigeration.Common.Status.Door.Refrigerator` 
- * `Refrigeration.Common.Status.Door.FlexCompartment` 
-3. If individual door statuses also fail to update, the behaviour should be reported to Home Connect Developer Support as it indicates a limitation in the appliance's firmware.
 
 ## Apple HomeKit
 
