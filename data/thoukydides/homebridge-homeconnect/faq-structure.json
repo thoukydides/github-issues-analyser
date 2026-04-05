@@ -258,7 +258,7 @@
                             "entries": [
                                 {
                                     "question": "Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?",
-                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped.",
+                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features (such as `BSH.Common.Status.InteriorIlluminationActive`), the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently. If you have recently updated, unrecognised flags may persist briefly due to local caching until the appliance state changes.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped.",
                                     "included_ids": [
                                         "issue-145-3b74",
                                         "issue-175-3d7e",
@@ -344,12 +344,13 @@
                                         "issue-373-0d05",
                                         "issue-377-3b83",
                                         "issue-379-2e76",
-                                        "issue-381-fa8e"
+                                        "issue-381-fa8e",
+                                        "issue-365-ec63"
                                     ]
                                 },
                                 {
                                     "question": "Why are some appliance features, programs, or options missing or unavailable?",
-                                    "answer": "The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable`:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
+                                    "answer": "The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.\n- **Program Specifics**: Maintenance cycles (such as `LaundryCare.Washer.Program.DrumClean`, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
                                     "included_ids": [
                                         "issue-1-d662",
                                         "issue-17-56af",
@@ -375,7 +376,8 @@
                                         "issue-316-2b86",
                                         "issue-328-b486",
                                         "issue-340-bf6e",
-                                        "issue-380-03ac"
+                                        "issue-380-03ac",
+                                        "issue-368-04c9"
                                     ]
                                 },
                                 {
@@ -486,11 +488,12 @@
                                     ]
                                 },
                                 {
-                                    "question": "How can I reduce the number of switches created for appliance programs?",
-                                    "answer": "By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via Homebridge UI:\n\n- **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.\n- **Custom list of programs and options**: Use this to manually define which specific programs appear in HomeKit, and the options to use with each.\n- **A switch to start each appliance program** (default): Advertise all available programs using default options.",
+                                    "question": "How can I configure which switches are created for appliance programs?",
+                                    "answer": "By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via Homebridge UI:\n\n- **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.\n- **Custom list of programs and options**: Use this to manually define which specific programs appear in HomeKit, and the options to use with each. **Note**: If you enable a custom list but do not add any identifiers (e.g. `LaundryCare.Washer.Program.Cotton`), the log will report `Adding services for 0 programs` and no program switches will appear.\n- **A switch to start each appliance program** (default): Advertise all available programs using default options.",
                                     "included_ids": [
                                         "issue-49-35dc",
-                                        "issue-240-65b3"
+                                        "issue-240-65b3",
+                                        "issue-368-ce7e"
                                     ]
                                 },
                                 {
@@ -508,12 +511,13 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why does the plugin log unrecognised `PowerState` values like `Undefined` or `MainsOff`?",
-                                    "answer": "Certain Home Connect appliances or firmware versions may report non-standard power states such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are typically the result of bugs in the appliance firmware or transient faults within the Home Connect cloud servers, as they do not conform to the standard API specification.\n\nTo ensure plugin stability and correct HomeKit operation, the plugin treats both of these values as equivalent to `Off`.",
+                                    "question": "Why does the plugin log unrecognised status values like `Undefined`, `MainsOff`, or `Unknown`?",
+                                    "answer": "Certain Home Connect appliances or firmware versions may report non-standard values for power states or program keys, such as `BSH.Common.EnumType.PowerState.Undefined`, `MainsOff`, or a `ProgramKey` of `Unknown`. These values are typically the result of firmware quirks or transient states during specific operations that do not conform to the standard API specification.\n\nTo ensure plugin stability and correct HomeKit operation, the plugin treats these as follows:\n- **Power States**: `Undefined` and `MainsOff` are treated as equivalent to `Off`.\n- **Program Keys**: `Unknown` is handled as a valid but unmapped state. It does not represent a functional program that can be triggered or controlled via HomeKit.",
                                     "included_ids": [
                                         "issue-307-0bd5",
                                         "issue-310-be9f",
-                                        "issue-353-72a4"
+                                        "issue-353-72a4",
+                                        "issue-365-43b1"
                                     ]
                                 },
                                 {
@@ -524,32 +528,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 365,
-                                    "id": "issue-365-43b1",
-                                    "question": "Why does my Home Connect appliance report an `Unknown` program key in the logs?",
-                                    "answer": "Certain Home Connect appliances may occasionally report a `ProgramKey` value of `Unknown` via the API. This is typically a firmware quirk where the appliance provides an undocumented or transient status during specific operations or state transitions. The plugin handles this value as a valid but unmapped state to ensure system stability, though it does not represent a functional program that can be triggered or controlled via HomeKit."
-                                },
-                                {
-                                    "issue_number": 365,
-                                    "id": "issue-365-ec63",
-                                    "question": "Why does the log show `unrecognised` values for my appliance?",
-                                    "answer": "The plugin performs an automated check against the Home Connect API schema to identify values or features that are not yet explicitly handled by the current version of the code. If your logs contain flags for `unrecognised` values (such as `BSH.Common.Status.InteriorIlluminationActive`), it indicates that your appliance is reporting data that the plugin hasn't mapped yet.\n\n*   **Ensure you are on the latest version**: Many unrecognised values are addressed in plugin updates. If you have recently updated, the `unrecognised` flag might persist due to local caching; this should resolve itself as the cache is refreshed.\n*   **Schema discovery**: These log entries provide the technical identifiers (like `ProgramKey` or `StatusValues`) needed to add support for new appliance features in future releases."
-                                },
-                                {
-                                    "issue_number": 368,
-                                    "id": "issue-368-04c9",
-                                    "question": "Why does the log show that an appliance program is \"currently unavailable\"?",
-                                    "answer": "The Home Connect API dynamically reports the availability of specific programs based on the appliance's current operational state. It is common for certain programs—such as `LaundryCare.Washer.Program.DrumClean` on washing machines—to be flagged as \"currently unavailable\" during initialisation.\n\nThis is standard behaviour and typically occurs because the appliance's hardware state prevents that program from being selected at that moment. Reasons include:\n\n* The appliance is already running a cycle.\n* The appliance is powered off or in standby mode.\n* Safety conditions are not met (e.g. the door is open).\n* The program is restricted based on previous cycle history or sensor readings.\n\nThis message in the log is a direct reflection of data from the Home Connect API and does not indicate a defect in the plugin."
-                                },
-                                {
-                                    "issue_number": 368,
-                                    "id": "issue-368-ce7e",
-                                    "question": "Why does the log say \"Adding services for 0 programs\" even when the appliance supports them?",
-                                    "answer": "The plugin does not automatically create HomeKit switches for every program advertised by a Home Connect appliance. Each program you wish to control must be explicitly listed in your Homebridge `config.json` within the `programs` array for that specific accessory.\n\nIf the `programs` section is missing, empty, or contains identifiers that do not match those provided by the appliance, the plugin will report `Adding services for 0 programs`. To fix this:\n\n1. Check the plugin logs to find the correct program identifiers (e.g. `LaundryCare.Washer.Program.Cotton`).\n2. Add these identifiers to the `programs` array in your plugin configuration.\n3. Restart Homebridge to apply the changes.\n\nNote that the `Active Program` feature is a separate switch that provides control over whichever program is currently running, but it does not allow you to select specific programs."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
