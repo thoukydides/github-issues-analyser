@@ -656,7 +656,6 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-382-45f9 -->
 The plugin maps the Home Connect API `Open` state to the HomeKit `Door` service `Current Position` value of `100%`, and the `Closed` state to `0%`. On some appliances, particularly Thermador FridgeFreezer models (such as the `T42BT120NS/08`), a firmware issue may cause the appliance to fail to update its combined door status (`BSH.Common.Status.DoorState`) via the API, even though the appliance correctly identifies the state internally to trigger door alarms.
 
 To troubleshoot and resolve this:
@@ -689,6 +688,17 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
+#### 🚧 Why does my Thermador fridge always show as open in HomeKit even when it is closed? 🚧
+
+<!-- INCLUDES: issue-382-d685 -->
+The plugin maps Home Connect API door states to the HomeKit `Door` service `Current Position` characteristic according to the official HomeKit specification: `0%` indicates fully closed and `100%` indicates fully open. For some high-end refrigeration appliances, specifically certain Thermador FridgeFreezer models, the appliance firmware may fail to update the combined door state (`BSH.Common.Status.DoorState`) via the API, causing it to remain stuck at `Open` (`100%`).
+
+This is often an appliance firmware or API-side limitation because the device may correctly trigger door alarms (`Refrigeration.FridgeFreezer.Event.DoorAlarmRefrigerator`) while failing to update the status field. To resolve this, you can configure the plugin to expose the individual door statuses instead of the combined state. These individual components usually report correctly even when the combined status is unreliable:
+
+1. Enable the plugin's **Log Debug as Info** option or set the `DEBUG=*` environment variable to verify the raw API values.
+2. In the plugin configuration, expose the specific door services relevant to your model, such as `Refrigeration.Common.Status.Door.Refrigerator`, `Refrigeration.Common.Status.Door.Freezer`, or `Refrigeration.Common.Status.Door.ChillerLeft` / `ChillerRight`.
+3. If the raw API values for these specific doors are also incorrect, the issue must be reported to Home Connect Developer Support for a potential firmware fix.
 
 ## Apple HomeKit
 
