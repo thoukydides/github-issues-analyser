@@ -66,7 +66,8 @@
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
-    - [Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?](#why-can-i-not-hide-certain-switches-or-why-do-they-remain-visible-or-unresponsive-after-being-disabled)
+    - [Why is it not possible to disable the Power switch service for my appliance?](#why-is-it-not-possible-to-disable-the-power-switch-service-for-my-appliance)
+    - [Why do disabled switches still appear or remain unresponsive in HomeKit?](#why-do-disabled-switches-still-appear-or-remain-unresponsive-in-homekit)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
@@ -711,21 +712,22 @@ The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined w
 
 Although HAP includes a `Service Label Index` characteristic, it is specifically intended for ordering `Stateless Programmable Switch` services and is not officially supported or respected by apps for other service types. Technical attempts to influence the order—such as marking the power switch as a `Primary` service or using `Linked` services to group controls—have proven inconsistent across different applications. In some cases, these changes actually made the Apple Home app's ordering less predictable. Most third-party HomeKit apps, such as *Eve*, *Home+*, and *Hesperus*, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.
 
-#### Why can I not hide certain switches, or why do they remain visible or unresponsive after being disabled?
+#### Why is it not possible to disable the Power switch service for my appliance?
+
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 issue-383-54fb -->
+The Power switch service is a mandatory component for all supported appliances because it performs critical functions beyond simple power control. Firstly, it manages **Connection Status Reporting** by setting the `SERVICE_COMMUNICATION_FAILURE` status when an appliance disconnects from the Home Connect servers. If this service were disabled, the Home app would continue to show the last known state rather than correctly indicating that the accessory is "No Response".
+
+Secondly, the Power service is used to **host secondary controls** such as `ProgramMode`, `SetDuration`, and `LockPhysicalControls` (Child Lock). Disabling the service would implicitly remove these features from the HomeKit interface. While the plugin provides granular control over most optional services, the Power switch is considered a core service essential for maintaining a reliable and accurate representation of the appliance's state.
+
+#### Why do disabled switches still appear or remain unresponsive in HomeKit?
 
 <!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 -->
-The plugin allows for granular control over which services are exposed to HomeKit, but there are some architectural and HomeKit-specific constraints:
+The plugin allows for granular control over which services are exposed to HomeKit. While the core Power switch is mandatory, most other features—such as the `Active Program` switch, `Internal Light`, and individual program switches—can be disabled or customised in the plugin configuration. Note that disabling the `Active Program` switch also removes status indicators (`On`, `Status Active`, `Status Fault`) and the `Remaining Duration` characteristic.
 
-1. **Core Services**: The main `Switch` service for the appliance power is fundamental and cannot be disabled.
-2. **Optional Services**: Most other features, such as the `Active Program` switch or `Internal Light`, can be individually disabled in the plugin configuration. Note that disabling the `Active Program` switch also removes status indicators (`On`, `Status Active`, `Status Fault`) and the `Remaining Duration` characteristic.
-3. **Individual Programs**: The `Switch` services for individual programs can be completely customised with chosen programs and options.
-4. **Appliance Exclusion**: Whole appliances can be disabled to prevent them being exposed to HomeKit.
+If services remain visible in HomeKit (often appearing as "No Response") after being disabled, it is typically due to HomeKit's internal caching. As a dynamic platform plugin, Homebridge restores its cached state upon restart *before* the plugin can apply your updated configuration. While the plugin removes the service and increments the configuration number to trigger a refresh, iCloud synchronisation can be slow. To resolve persistent stale entries:
 
-If services remain visible in HomeKit (often appearing as "unresponsive") after configuration, it is likely due to HomeKit's internal caching. As a dynamic platform plugin, Homebridge restores its cached state upon restart *before* the plugin can apply your updated configuration. While the plugin removes the service and increments the HomeKit configuration number (`CN`) to trigger a database refresh, iCloud synchronisation across multiple hubs and devices can be slow.
-
-To resolve persistent stale entries, try these steps:
-- **Check the logs**: Verify the plugin is removing the service. You may see a message such as `Removing obsolete service "Internal Light"` if the service was restored from the Homebridge cache but is now disabled.
-- **Restart Homebridge**: This triggers a fresh configuration update to HomeKit.
+- **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service "Internal Light"`).
+- **Restart Homebridge**: This triggers a fresh configuration update.
 - **Wait**: Allow several hours for iCloud synchronisation to reconcile the state across all your devices.
 - **Reboot the Home Hub**: Restart your primary Apple TV or HomePod.
 - **Reset iCloud**: Sign out of iCloud on the Home Hub and sign back in.
@@ -835,16 +837,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why is it not possible to disable the Power switch service for my appliance? 🚧
-
-<!-- INCLUDES: issue-383-54fb -->
-The Power switch service is a mandatory component for all supported appliances because it performs critical functions beyond simple power control:
-
-1. **Connection Status Reporting**: This service is responsible for setting the `SERVICE_COMMUNICATION_FAILURE` status when an appliance disconnects from the Home Connect servers. If this service were disabled, the Home app would continue to show the last known state (stale data) rather than correctly indicating that the accessory is "No Response".
-2. **Hosting Secondary Controls**: The Power service frequently hosts additional characteristics such as `ProgramMode`, `SetDuration`, and `LockPhysicalControls` (Child Lock). Disabling the service would implicitly remove these features from the HomeKit interface.
-
-While the desire for a simplified Home app UI is understood, especially for appliances primarily controlled via specific program switches, the current architecture requires this service to maintain reliable status reporting. There is ongoing consideration for experimental feature flags that might eventually allow users to disable the Power switch if they are willing to accept the loss of connectivity reporting and associated controls.
 
 ### Notifications & Events
 
