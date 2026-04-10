@@ -1,0 +1,12 @@
+{
+    "issue_number": 383,
+    "updated_at": "2026-04-10T11:32:52.906Z",
+    "faq": [
+        {
+            "question": "Why can I not disable or hide the `Power` switch for my dishwasher or oven?",
+            "answer": "The `Power` switch is currently a mandatory service for Home Connect appliances and cannot be disabled via the `features` configuration. This is because the plugin's internal architecture treats the power state as a fundamental dependency for other features, such as remote start, child lock, and programme management.\n\nIn the Apple Home app, child services of a bridged accessory (such as the individual switches for `Power`, `Door`, and `Active Program`) cannot be hidden or reordered. Consequently, even if you prefer to control your appliance exclusively through specific programme switches, the `Power` toggle will remain visible within the accessory's detail view due to these platform UI constraints.",
+            "semantic_abstract": "The `Power` state of Home Connect appliances is exposed as a mandatory HomeKit `Switch` service because it functions as a core dependency for other features such as remote start and programme selection. This architectural requirement, combined with Apple Home's inability to hide specific child services on bridged accessories, prevents the `Power` toggle from being disabled in the plugin configuration.",
+            "hash": "27b9f59d1b3acaaa8a3878aefd07d7cb493791c6dc10050f7e892bc33c73efbf"
+        }
+    ]
+}
