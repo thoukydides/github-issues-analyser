@@ -1,12 +1,12 @@
 {
     "issue_number": 383,
-    "updated_at": "2026-04-10T11:32:52.906Z",
+    "updated_at": "2026-04-10T14:03:32.960Z",
     "faq": [
         {
-            "question": "Why can I not disable or hide the `Power` switch for my dishwasher or oven?",
-            "answer": "The `Power` switch is currently a mandatory service for Home Connect appliances and cannot be disabled via the `features` configuration. This is because the plugin's internal architecture treats the power state as a fundamental dependency for other features, such as remote start, child lock, and programme management.\n\nIn the Apple Home app, child services of a bridged accessory (such as the individual switches for `Power`, `Door`, and `Active Program`) cannot be hidden or reordered. Consequently, even if you prefer to control your appliance exclusively through specific programme switches, the `Power` toggle will remain visible within the accessory's detail view due to these platform UI constraints.",
-            "semantic_abstract": "The `Power` state of Home Connect appliances is exposed as a mandatory HomeKit `Switch` service because it functions as a core dependency for other features such as remote start and programme selection. This architectural requirement, combined with Apple Home's inability to hide specific child services on bridged accessories, prevents the `Power` toggle from being disabled in the plugin configuration.",
-            "hash": "27b9f59d1b3acaaa8a3878aefd07d7cb493791c6dc10050f7e892bc33c73efbf"
+            "question": "Why is it not possible to disable the Power switch service for my appliance?",
+            "answer": "The Power switch is a mandatory service within the plugin architecture and cannot be disabled via the `features` configuration. This design choice is based on several critical technical requirements:\n\n1. **Connection Status Reporting**: The Power service is the primary mechanism used to report the appliance's connectivity. When an appliance disconnects from the Home Connect servers, this service sets the `SERVICE_COMMUNICATION_FAILURE` status. This ensures that the Home app correctly displays the accessory as Not Responding. Without this service, other characteristics (such as door sensors or program switches) would continue to show their last known state, providing misleading information when the device is actually offline.\n\n2. **Hosting Dependent Characteristics**: The Power service also acts as the host for several other HomeKit characteristics, including `ProgramMode`, `SetDuration`, and `LockPhysicalControls` (Child Lock). Disabling the Power switch would inadvertently hide these features, as they lack a standalone service to reside in.\n\nWhile this may result in a more cluttered interface in the Apple Home app, especially for appliances primarily controlled via program switches, these dependencies are necessary to ensure the plugin remains reliable and accurately reflects the device state.",
+            "semantic_abstract": "The Power switch service is mandatory because it serves as the host for the `SERVICE_COMMUNICATION_FAILURE` status, ensuring HomeKit correctly identifies when an appliance is offline. Additionally, it hosts dependent characteristics like `ProgramMode` and `LockPhysicalControls`, making its removal technically incompatible with accurate state reporting and full feature exposure.",
+            "hash": "7a8fb1660acff8387503bf474fd6223945b65e57cc47fc028544488e80af11e4"
         }
     ]
 }
