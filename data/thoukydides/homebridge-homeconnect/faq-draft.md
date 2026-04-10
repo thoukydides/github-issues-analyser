@@ -836,6 +836,16 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
+#### 🚧 Why is it not possible to disable the Power switch service for my appliance? 🚧
+
+<!-- INCLUDES: issue-383-54fb -->
+The Power switch service is a mandatory component for all supported appliances because it performs critical functions beyond simple power control:
+
+1. **Connection Status Reporting**: This service is responsible for setting the `SERVICE_COMMUNICATION_FAILURE` status when an appliance disconnects from the Home Connect servers. If this service were disabled, the Home app would continue to show the last known state (stale data) rather than correctly indicating that the accessory is "No Response".
+2. **Hosting Secondary Controls**: The Power service frequently hosts additional characteristics such as `ProgramMode`, `SetDuration`, and `LockPhysicalControls` (Child Lock). Disabling the service would implicitly remove these features from the HomeKit interface.
+
+While the desire for a simplified Home app UI is understood, especially for appliances primarily controlled via specific program switches, the current architecture requires this service to maintain reliable status reporting. There is ongoing consideration for experimental feature flags that might eventually allow users to disable the Power switch if they are willing to accept the loss of connectivity reporting and associated controls.
+
 ### Notifications & Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
