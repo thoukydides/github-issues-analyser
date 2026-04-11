@@ -197,7 +197,7 @@ No manual intervention is required; the plugin will automatically resume communi
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-374-e780 issue-378-832c -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-374-e780 issue-378-832c issue-384-665e -->
 The Home Connect API uses `409 Conflict` errors for a variety of failures that result in a request being rejected. Common sub-errors include:
 
 - `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
@@ -212,7 +212,7 @@ The Home Connect API uses `409 Conflict` errors for a variety of failures that r
 
 - `SDK.Error.WrongOperationState`: This indicates that the appliance is in an incorrect state for the requested operation, such as attempting to start a program while another is already running or if the appliance is currently performing a self-cleaning cycle.
 
-- `SDK.Error.ProgramNotAvailable`: This is returned when you attempt to start a program that the API considers unavailable for remote execution. This may be due to appliance settings, safety features (e.g. local control active), or firmware bugs.
+- `SDK.Error.ProgramNotAvailable`: This indicates that the appliance is in a state where it cannot provide its list of available programs or start them. This occurs when an appliance is currently running an active cycle, being operated manually via its physical controls, or experiencing transient communication issues. Certain maintenance programs like `DrumClean` may also be reported as unavailable due to firmware restrictions.
 
 - `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggled together.
 
@@ -220,13 +220,14 @@ For details of other `409` errors refer to the [Home Connect API Errors](https:/
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
+<!-- INCLUDES: issue-251-672a -->
 The physical power button on some Home Connect appliances (most commonly washing machines and tumble dryers) disconnects power from their internal Wi-Fi module. When this occurs, the Home Connect API cannot distinguish between the appliance being switched off, disconnected from the mains, or losing its internet connection.
 
-The API does not provide any indication of whether an appliance supports a soft power off state that maintains a network connection. Hence, it is not possible for the plugin to identify whether an appliance that the API reports as `DISCONNECTED` has been intentionally switched off or has lost contact with the Home Connect servers for other reasons. The plugin prioritises technical accuracy and reports this state as `SERVICE_COMMUNICATION_FAILURE`, which the Apple Home app displays as `Not Responding`.
+The API does not provide any indication of whether an appliance supports a soft power off state that maintains a network connection. Hence, it is not possible for the plugin to identify whether an appliance that the API reports as `DISCONNECTED` has been intentionally switched off or has lost contact with the Home Connect servers. The plugin prioritises technical accuracy and reports this state as `SERVICE_COMMUNICATION_FAILURE`, which the Apple Home app displays as `Not Responding`.
 
-The plugin does not offer a configuration option to "fake" an off state when an appliance disconnects as it would misrepresent its true status. If the appliance has actual connectivity problems, it might still be powered on and running. Reporting a communication failure is the standard and correct HomeKit behaviour for an unreachable accessory.
+If you prefer the appliance to show as **Off** rather than **Not Responding** when unreachable, you can enable the experimental **Disconnected as Off** feature in the plugin configuration (available since v1.9.0).
 
-Most Home Connect appliances (like ovens or dishwashers) do maintain Wi-Fi connectivity when switched off, so reporting `Not Responding` only for those that disconnect correctly distinguishes them from appliances that remain reachable.
+Reporting a communication failure remains the default as it is the standard and correct HomeKit behaviour for an unreachable accessory. Most Home Connect appliances (like ovens or dishwashers) do maintain Wi-Fi connectivity when switched off, so reporting `Not Responding` for those that disconnect correctly distinguishes them from appliances that remain reachable.
 
 #### Why does the power button not work or return a `BSH.Common.Error.WriteRequest.Busy` error?
 
@@ -312,30 +313,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does my Home Connect appliance show as `Not Responding` in HomeKit when switched off? 🚧
-
-<!-- INCLUDES: issue-251-672a -->
-Certain Home Connect appliances, particularly washing machines and tumble dryers, completely disconnect from the Home Connect servers when their physical power button is pressed. This acts as an internal mains disconnection rather than a standby state.
-
-The Home Connect API cannot distinguish between a deliberate power-off via the front panel, a complete loss of power, or a network/cloud connectivity failure. In all these scenarios, the appliance is simply reported as unreachable. By default, the plugin maps this state to a `SERVICE_COMMUNICATION_FAILURE`, which HomeKit displays as **Not Responding**.
-
-To change this behaviour, you can enable the experimental **Disconnected as Off** feature:
-
-1. Ensure you are running version `v1.9.0` or later of the plugin.
-2. Enable the `Disconnected as Off` option in the plugin configuration.
-3. When enabled, any appliance that is unreachable via the Home Connect API will be reported to HomeKit as being in the **Off** state instead of triggering a communication failure warning.
-
-#### 🚧 Why does my appliance show `[409 Conflict] Program currently not available [SDK.Error.ProgramNotAvailable]`? 🚧
-
-<!-- INCLUDES: issue-384-665e -->
-The `409 Conflict` error with the code `SDK.Error.ProgramNotAvailable` is a message returned directly by the Home Connect API. It indicates that the appliance is currently in a state where it cannot provide its list of available programs to the plugin. This typically occurs because:
-
-* The appliance is currently running an active cycle.
-* The appliance is being operated manually via its physical controls or local menu, which may lock the API.
-* There is a transient communication issue between the appliance and the Home Connect cloud servers.
-
-In most cases, this is a temporary condition. The plugin will attempt to refresh the program list again later, or you can restart Homebridge once the appliance is idle. Additionally, specific programs, such as `DrumClean`, may be reported as unavailable even when others are listed; this is usually due to device-specific firmware restrictions or the API limiting access to maintenance-related cycles.
 
 ### Local/Remote Control
 
