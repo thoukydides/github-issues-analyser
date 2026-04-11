@@ -1,0 +1,12 @@
+{
+    "issue_number": 384,
+    "updated_at": "2026-04-11T11:45:06.211Z",
+    "faq": [
+        {
+            "question": "Why does my Home Connect appliance log a `409 Conflict` error and `SDK.Error.ProgramNotAvailable`?",
+            "answer": "The `409 Conflict` error, specifically `SDK.Error.ProgramNotAvailable`, is returned by the Home Connect API when the appliance is in a state that prevents it from providing its list of available programs or options.\n\nCommon reasons for this state include:\n* The appliance is switched off or in a deep sleep/standby mode.\n* A program is already running or is currently paused.\n* The appliance's \"Remote Start\" functionality is not enabled or has been deactivated.\n\nThe plugin must successfully fetch the list of programs during its initialisation to map them to HomeKit services. If the API returns this error, the plugin will log that it is adding services for 0 programs. To fix this, ensure the appliance is powered on and in a ready/idle state, then restart Homebridge to trigger a new discovery attempt.",
+            "semantic_abstract": "The Home Connect API returns a `409 Conflict` status with `SDK.Error.ProgramNotAvailable` when an appliance is in a state, such as power-off or an active cycle, that restricts access to its program list. This API constraint prevents the plugin from successfully retrieving program metadata during initialisation, leading to the absence of program-related HomeKit services.",
+            "hash": "7eab2b5d18e5aa3bec860f8ceccc78cb8b83aabb04ff01fedeba752a54495b25"
+        }
+    ]
+}
