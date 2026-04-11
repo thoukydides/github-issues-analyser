@@ -1,12 +1,12 @@
 {
     "issue_number": 384,
-    "updated_at": "2026-04-11T11:45:06.211Z",
+    "updated_at": "2026-04-11T14:21:15.655Z",
     "faq": [
         {
-            "question": "Why does my Home Connect appliance log a `409 Conflict` error and `SDK.Error.ProgramNotAvailable`?",
-            "answer": "The `409 Conflict` error, specifically `SDK.Error.ProgramNotAvailable`, is returned by the Home Connect API when the appliance is in a state that prevents it from providing its list of available programs or options.\n\nCommon reasons for this state include:\n* The appliance is switched off or in a deep sleep/standby mode.\n* A program is already running or is currently paused.\n* The appliance's \"Remote Start\" functionality is not enabled or has been deactivated.\n\nThe plugin must successfully fetch the list of programs during its initialisation to map them to HomeKit services. If the API returns this error, the plugin will log that it is adding services for 0 programs. To fix this, ensure the appliance is powered on and in a ready/idle state, then restart Homebridge to trigger a new discovery attempt.",
-            "semantic_abstract": "The Home Connect API returns a `409 Conflict` status with `SDK.Error.ProgramNotAvailable` when an appliance is in a state, such as power-off or an active cycle, that restricts access to its program list. This API constraint prevents the plugin from successfully retrieving program metadata during initialisation, leading to the absence of program-related HomeKit services.",
-            "hash": "7eab2b5d18e5aa3bec860f8ceccc78cb8b83aabb04ff01fedeba752a54495b25"
+            "question": "Why does my appliance show `[409 Conflict] Program currently not available [SDK.Error.ProgramNotAvailable]`?",
+            "answer": "The `409 Conflict` error with the code `SDK.Error.ProgramNotAvailable` is a message returned directly by the Home Connect API. It indicates that the appliance is currently in a state where it cannot provide its list of available programs to the plugin. This typically occurs because:\n\n* The appliance is currently running an active cycle.\n* The appliance is being operated manually via its physical controls or local menu, which may lock the API.\n* There is a transient communication issue between the appliance and the Home Connect cloud servers.\n\nIn most cases, this is a temporary condition. The plugin will attempt to refresh the program list again later, or you can restart Homebridge once the appliance is idle. Additionally, specific programs, such as `DrumClean`, may be reported as unavailable even when others are listed; this is usually due to device-specific firmware restrictions or the API limiting access to maintenance-related cycles.",
+            "semantic_abstract": "The Home Connect API returns an `SDK.Error.ProgramNotAvailable` (HTTP 409) when an appliance's state, such as an active cycle or local manual control, prevents the enumeration of available programs. This API-level constraint results in the plugin being unable to initialise program-specific HomeKit services until the appliance returns to an idle or compatible state.",
+            "hash": "665e98af272668c7dee0acc096ad45d2638242050fb54456ae1ca7ea8fa81f39"
         }
     ]
 }
