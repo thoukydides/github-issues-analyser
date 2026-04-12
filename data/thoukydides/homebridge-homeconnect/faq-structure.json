@@ -666,13 +666,14 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why do disabled services still appear or remain unresponsive in HomeKit?",
-                                    "answer": "The plugin allows for granular control over which services are exposed to HomeKit. If services remain visible in HomeKit (often appearing as \"No Response\") after being disabled, it is typically due to HomeKit's internal caching. As a dynamic platform plugin, Homebridge restores its cached state upon restart *before* the plugin can apply your updated configuration. While the plugin removes the service and increments the configuration number to trigger a refresh, iCloud synchronisation can be slow. To resolve persistent stale entries:\n\n- **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service \"Internal Light\"`).\n- **Restart Homebridge**: This triggers a fresh configuration update.\n- **Wait**: Allow several hours for iCloud synchronisation to reconcile the state across all your devices.\n- **Reboot the Home Hub**: Restart your primary Apple TV or HomePod.\n- **Reset iCloud**: Sign out of iCloud on the Home Hub and sign back in.\n- **Remove the bridge**: As a last resort, remove the Homebridge bridge from HomeKit and re-add it.",
+                                    "question": "Why do disabled services still appear, or why do service names disappear after I change the configuration?",
+                                    "answer": "The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale \"No Response\" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.\n\nTo resolve persistent state or UI inconsistencies:\n\n- **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service \"Internal Light\"`).\n- **Manual restoration**: Open the settings for an affected service in the Home app and check if a missing name can be manually restored.\n- **Restart Homebridge**: This triggers a fresh configuration update and increments the configuration number.\n- **Re-index the accessory**: If issues persist, you may need to force HomeKit to re-index the device. Remove the accessory or its child bridge from Homebridge, clear the Homebridge cached accessories for that bridge, and then re-add it.\n- **Wait and Reboot**: Allow several hours for iCloud to reconcile the state across all devices. Restarting your primary Home Hub (Apple TV or HomePod) or signing out and back into iCloud on the hub can also help.",
                                     "included_ids": [
                                         "issue-57-124f",
                                         "issue-77-e342",
                                         "issue-124-45f8",
-                                        "issue-364-0c67"
+                                        "issue-364-0c67",
+                                        "issue-383-cf24"
                                     ]
                                 },
                                 {
@@ -717,7 +718,7 @@
                                 },
                                 {
                                     "question": "Why can I not see or control the child lock for my appliance in the Apple Home app?",
-                                    "answer": "The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service.\n\nHowever, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**.",
+                                    "answer": "The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service.\n\nHowever, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**. Note that if you disable the `Power` switch service in the plugin configuration, the child lock control will also be removed.",
                                     "included_ids": [
                                         "issue-334-1d4c"
                                     ]
@@ -766,22 +767,16 @@
                                     "included_ids": [
                                         "issue-366-0e9c"
                                     ]
-                                }
-                            ],
-                            "candidates": [
-                                {
-                                    "issue_number": 383,
-                                    "id": "issue-383-b676",
-                                    "question": "What functionality is lost if the Power switch service is disabled for an appliance?",
-                                    "answer": "The Power switch can be disabled for individual appliances by setting `\"Power\": false` within the `features` section of the device configuration. However, this service acts as a host for several other characteristics that are not easily mapped elsewhere. Disabling the Power switch will also remove access to:\n\n* **Child Lock controls** (`LockPhysicalControls`)\n* **Program Duration remaining** (`SetDuration`)\n* **Program Mode status** (`ProgramMode`)\n\nNote that while this service was originally used to report the connectivity status of the appliance, the plugin now handles this via an `OnGet` override for all characteristics. This ensures that the accessory will still correctly show as \"No Response\" in the Home app if it disconnects from the Home Connect servers, even if the Power switch itself is hidden."
                                 },
                                 {
-                                    "issue_number": 383,
-                                    "id": "issue-383-cf24",
-                                    "question": "Why do service names or labels disappear in the Home app after changing the `features` configuration?",
-                                    "answer": "HomeKit is designed for accessories with a static set of services. When you modify the `features` configuration to remove a service (such as disabling a specific dishwasher program or the Power switch), the Home app or HomeKit synchronization can become confused. This often results in service labels disappearing or being replaced by generic names.\n\nTo resolve these UI inconsistencies:\n1. Open the settings for the affected service in the Home app and check if the name can be manually restored.\n2. If the issue persists, you may need to force HomeKit to re-index the accessory. This is best achieved by removing the accessory or its child bridge from Homebridge, clearing the Homebridge cached accessories for that bridge, and then re-adding it.\n3. In some cases, adding programs back one by one after a cache clear can help HomeKit correctly associate the names."
+                                    "question": "What functionality is lost if the `Power` switch service is disabled for an appliance?",
+                                    "answer": "The `Power` switch can be disabled for individual appliances by setting `\"Power\": false` within the `features` section of the device configuration. However, this service acts as a host for several HomeKit characteristics that cannot be easily mapped elsewhere. Disabling the `Power` switch will also remove access to:\n\n- **Child Lock controls** (`LockPhysicalControls` characteristic)\n- **Program Duration** (`SetDuration` characteristic)\n- **Program Mode status** (`ProgramMode` characteristic)\n\nNote that disabling the `Power` switch does not affect the plugin's ability to report the connectivity status of the appliance. The plugin uses an `OnGet` override for all characteristics to ensure that an accessory will correctly show as \"No Response\" in the Home app if it disconnects from the Home Connect servers, even if the `Power` switch itself is hidden.",
+                                    "included_ids": [
+                                        "issue-383-b676"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
