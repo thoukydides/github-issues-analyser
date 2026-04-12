@@ -45,7 +45,7 @@
     - [Which settings are used for programs started without specific options?](#which-settings-are-used-for-programs-started-without-specific-options)
     - [How can I change the default duration or temperature for oven programs?](#how-can-i-change-the-default-duration-or-temperature-for-oven-programs)
     - [Why is the scheduled start time for my appliance program not being honoured?](#why-is-the-scheduled-start-time-for-my-appliance-program-not-being-honoured)
-    - [How can I configure which switches are created for appliance programs?](#how-can-i-configure-which-switches-are-created-for-appliance-programs)
+    - [How can I reduce the number of switches created for appliance programs?](#how-can-i-reduce-the-number-of-switches-created-for-appliance-programs)
     - [What does the log message `Using expired cache result` mean?](#what-does-the-log-message-using-expired-cache-result-mean)
     - [Why does setting my hood fan to `Auto` in the Home app not immediately turn it on?](#why-does-setting-my-hood-fan-to-auto-in-the-home-app-not-immediately-turn-it-on)
     - [Why does the plugin log unrecognised status values like `Undefined`, `MainsOff`, or `Unknown`?](#why-does-the-plugin-log-unrecognised-status-values-like-undefined-mainsoff-or-unknown)
@@ -66,8 +66,7 @@
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
-    - [Why is it not possible to disable the Power switch service for my appliance?](#why-is-it-not-possible-to-disable-the-power-switch-service-for-my-appliance)
-    - [Why do disabled switches still appear or remain unresponsive in HomeKit?](#why-do-disabled-switches-still-appear-or-remain-unresponsive-in-homekit)
+    - [Why do disabled services still appear or remain unresponsive in HomeKit?](#why-do-disabled-services-still-appear-or-remain-unresponsive-in-homekit)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
@@ -225,7 +224,7 @@ The physical power button on some Home Connect appliances (most commonly washing
 
 The API does not provide any indication of whether an appliance supports a soft power off state that maintains a network connection. Hence, it is not possible for the plugin to identify whether an appliance that the API reports as `DISCONNECTED` has been intentionally switched off or has lost contact with the Home Connect servers. The plugin prioritises technical accuracy and reports this state as `SERVICE_COMMUNICATION_FAILURE`, which the Apple Home app displays as `Not Responding`.
 
-If you prefer the appliance to show as **Off** rather than **Not Responding** when unreachable, you can enable the experimental **Disconnected as Off** feature in the plugin configuration (available since v1.9.0).
+If you prefer the appliance to show as **Off** rather than **Not Responding** when unreachable, you can enable the experimental `Disconnected as Off` feature in the plugin configuration.
 
 Reporting a communication failure remains the default as it is the standard and correct HomeKit behaviour for an unreachable accessory. Most Home Connect appliances (like ovens or dishwashers) do maintain Wi-Fi connectivity when switched off, so reporting `Not Responding` for those that disconnect correctly distinguishes them from appliances that remain reachable.
 
@@ -383,11 +382,11 @@ The plugin is designed to handle these interruptions by automatically attempting
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
 <!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-354-bd8b issue-355-94db issue-356-0fe3 issue-357-f6ae issue-365-ec63 issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e -->
-The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features (such as `BSH.Common.Status.InteriorIlluminationActive`), the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
+The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
 If you observe these messages:
 
-1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently. If you have recently updated, unrecognised flags may persist briefly due to local caching until the appliance state changes.
+1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
 2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
 3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
 
@@ -401,7 +400,7 @@ The plugin dynamically discovers the capabilities of each appliance by querying 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
 - **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
-- **Program Specifics**: Maintenance cycles (such as `LaundryCare.Washer.Program.DrumClean`, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
+- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
 If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
@@ -535,13 +534,13 @@ To resolve this:
 2. Ensure the operating system or container environment is set to your correct local time zone.
 3. If you cannot change the system-wide settings, you can explicitly set the time zone for the Homebridge process by configuring the `TZ` environment variable (for example, `TZ=Europe/London`).
 
-#### How can I configure which switches are created for appliance programs?
+#### How can I reduce the number of switches created for appliance programs?
 
 <!-- INCLUDES: issue-49-35dc issue-240-65b3 issue-368-ce7e -->
 By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via Homebridge UI:
 
 - **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.
-- **Custom list of programs and options**: Use this to manually define which specific programs appear in HomeKit, and the options to use with each. **Note**: If you enable a custom list but do not add any identifiers (e.g. `LaundryCare.Washer.Program.Cotton`), the log will report `Adding services for 0 programs` and no program switches will appear.
+- **Custom list of programs and options**: Use this to manually define which specific programs appear in HomeKit, and the options to use with each.
 - **A switch to start each appliance program** (default): Advertise all available programs using default options.
 
 #### What does the log message `Using expired cache result` mean?
@@ -567,11 +566,9 @@ If your hood does not respond when you toggle `Auto`, ensure the fan is also swi
 #### Why does the plugin log unrecognised status values like `Undefined`, `MainsOff`, or `Unknown`?
 
 <!-- INCLUDES: issue-307-0bd5 issue-310-be9f issue-353-72a4 issue-365-43b1 -->
-Certain Home Connect appliances or firmware versions may report non-standard values for power states or program keys, such as `BSH.Common.EnumType.PowerState.Undefined`, `MainsOff`, or a `ProgramKey` of `Unknown`. These values are typically the result of firmware quirks or transient states during specific operations that do not conform to the standard API specification.
+Certain Home Connect appliances or firmware versions may report non-standard power states such as `BSH.Common.EnumType.PowerState.Undefined` or `BSH.Common.EnumType.PowerState.MainsOff`. These values are typically the result of firmware quirks or transient states during specific operations that do not conform to the standard API specification.
 
-To ensure plugin stability and correct HomeKit operation, the plugin treats these as follows:
-- **Power States**: `Undefined` and `MainsOff` are treated as equivalent to `Off`.
-- **Program Keys**: `Unknown` is handled as a valid but unmapped state. It does not represent a functional program that can be triggered or controlled via HomeKit.
+To ensure plugin stability and correct HomeKit operation, the plugin treats both of these values as equivalent to `Off`.
 
 #### Why is the power off function unavailable for my washing machine or dryer?
 
@@ -659,18 +656,13 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 #### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
 
 <!-- INCLUDES: issue-382-d685 -->
-The plugin maps the Home Connect API `Open` state to the HomeKit `Door` service `Current Position` value of `100%`, and the `Closed` state to `0%`. On some high-end refrigeration appliances, particularly Thermador FridgeFreezer models (such as the `T42BT120NS/08`), a firmware issue may cause the appliance to fail to update its combined door status (`BSH.Common.Status.DoorState`) via the API, even though the appliance correctly identifies the state internally.
+Some refrigeration appliances, such as certain Thermador models, have been observed to always report the door as `Open`. They correctly trigger door open alarms, but do not generate events for changes to the door status itself. This suggests a firmware limitation or a bug in the Home Connect cloud service.
 
-To troubleshoot and resolve this:
+To troubleshoot and potentially work around this:
 
-1. **Verify door alarms**: Check if the door alarm correctly triggers in the official Home Connect app or the physical appliance interface. If the alarm works (e.g. `Refrigeration.FridgeFreezer.Event.DoorAlarmRefrigerator`) but the HomeKit status remains static, it confirms an API reporting issue.
-2. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments. Configure the plugin to expose these specific door services, as they often update correctly even if the combined status does not. Relevant identifiers include:
- - `Refrigeration.Common.Status.Door.ChillerLeft` / `ChillerRight` 
- - `Refrigeration.Common.Status.Door.Freezer` 
- - `Refrigeration.Common.Status.Door.Refrigerator` 
- - `Refrigeration.Common.Status.Door.FlexCompartment` 
-3. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw events. If the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` while the door is physically closed, the fault lies with the cloud service or firmware.
-4. **Contact Support**: If individual statuses also fail to update, report the behaviour to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
+1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.
+2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
+3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
 
 #### Can I programmatically access data from the unofficial Home Connect status page?
 
@@ -712,19 +704,10 @@ The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined w
 
 Although HAP includes a `Service Label Index` characteristic, it is specifically intended for ordering `Stateless Programmable Switch` services and is not officially supported or respected by apps for other service types. Technical attempts to influence the order—such as marking the power switch as a `Primary` service or using `Linked` services to group controls—have proven inconsistent across different applications. In some cases, these changes actually made the Apple Home app's ordering less predictable. Most third-party HomeKit apps, such as *Eve*, *Home+*, and *Hesperus*, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.
 
-#### Why is it not possible to disable the Power switch service for my appliance?
-
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 issue-383-54fb -->
-The Power switch service is a mandatory component for all supported appliances because it performs critical functions beyond simple power control. Firstly, it manages **Connection Status Reporting** by setting the `SERVICE_COMMUNICATION_FAILURE` status when an appliance disconnects from the Home Connect servers. If this service were disabled, the Home app would continue to show the last known state rather than correctly indicating that the accessory is "No Response".
-
-Secondly, the Power service is used to **host secondary controls** such as `ProgramMode`, `SetDuration`, and `LockPhysicalControls` (Child Lock). Disabling the service would implicitly remove these features from the HomeKit interface. While the plugin provides granular control over most optional services, the Power switch is considered a core service essential for maintaining a reliable and accurate representation of the appliance's state.
-
-#### Why do disabled switches still appear or remain unresponsive in HomeKit?
+#### Why do disabled services still appear or remain unresponsive in HomeKit?
 
 <!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 -->
-The plugin allows for granular control over which services are exposed to HomeKit. While the core Power switch is mandatory, most other features—such as the `Active Program` switch, `Internal Light`, and individual program switches—can be disabled or customised in the plugin configuration. Note that disabling the `Active Program` switch also removes status indicators (`On`, `Status Active`, `Status Fault`) and the `Remaining Duration` characteristic.
-
-If services remain visible in HomeKit (often appearing as "No Response") after being disabled, it is typically due to HomeKit's internal caching. As a dynamic platform plugin, Homebridge restores its cached state upon restart *before* the plugin can apply your updated configuration. While the plugin removes the service and increments the configuration number to trigger a refresh, iCloud synchronisation can be slow. To resolve persistent stale entries:
+The plugin allows for granular control over which services are exposed to HomeKit. If services remain visible in HomeKit (often appearing as "No Response") after being disabled, it is typically due to HomeKit's internal caching. As a dynamic platform plugin, Homebridge restores its cached state upon restart *before* the plugin can apply your updated configuration. While the plugin removes the service and increments the configuration number to trigger a refresh, iCloud synchronisation can be slow. To resolve persistent stale entries:
 
 - **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service "Internal Light"`).
 - **Restart Homebridge**: This triggers a fresh configuration update.
@@ -942,4 +925,4 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-e214 issue-360-732a issue-375-b67d -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-e214 issue-360-732a issue-375-b67d issue-383-54fb -->
