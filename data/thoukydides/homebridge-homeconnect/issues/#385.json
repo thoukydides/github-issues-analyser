@@ -1,12 +1,12 @@
 {
     "issue_number": 385,
-    "updated_at": "2026-04-13T09:21:50.059Z",
+    "updated_at": "2026-04-13T11:04:29.047Z",
     "faq": [
         {
-            "question": "Why does my freezer door always show as open in HomeKit?",
-            "answer": "This is a known issue with the Home Connect API or appliance firmware where the generic door status (`BSH.Common.Status.DoorState`) is incorrectly reported as `Open`, even when the appliance correctly reports its specific compartment door status (e.g. `Refrigeration.Common.Status.Door.Freezer`) as `Closed`.\n\nTo resolve this, you must manually configure the plugin to use the more specific door status key for your freezer:\n\n1. Open the plugin configuration in the Homebridge UI.\n2. Locate the settings for the affected Freezer appliance.\n3. In the **Features** section, disable the generic `Door` service.\n4. Enable the `Freezer Door` service instead.\n5. Save the configuration and restart Homebridge.\n\nThis specific mapping is not enabled by default because older appliances or firmware versions may not support the refrigeration-specific door keys and rely solely on the generic status key.",
-            "semantic_abstract": "Home Connect API and firmware inconsistencies cause some freezer models to report an incorrect generic door state while maintaining a correct compartment-specific state. The plugin addresses this by allowing users to bypass the generic `BSH.Common.Status.DoorState` in favour of the `Refrigeration.Common.Status.Door.Freezer` characteristic via manual feature configuration.",
-            "hash": "54e36b1904dd91af4816600e58fa8cc49b833cc8ed13f931dc63f9bf9588559f"
+            "question": "Why does my freezer door always show as open in HomeKit when it is closed?",
+            "answer": "This behaviour is caused by a firmware or Home Connect API bug observed on certain Siemens and Bosch freezer models (such as the `GU21NADE0`). The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when the physical door is closed. \n\nTo resolve this, the plugin provides an alternative feature that uses a more specific API status key. If you are experiencing this issue, you should update the plugin to at least version 1.9.1 and adjust your configuration:\n\n1. Open the Homebridge UI and navigate to the plugin settings for Home Connect.\n2. Locate the configuration for the affected freezer appliance.\n3. In the **Features** section:\n   - Disable the generic `Door` service.\n   - Enable the `Freezer Door` service instead.\n\nThis alternative service uses the `Refrigeration.Common.Status.Door.Freezer` status, which typically remains accurate on models where the generic status is broken. This is not the default setting because older appliances or firmware versions may not support the refrigeration-specific status key.",
+            "semantic_abstract": "Certain Siemens and Bosch freezer models exhibit a firmware quirk where the generic `BSH.Common.Status.DoorState` API key incorrectly reports an open state. This requires a configuration change to map the HomeKit `Door` service to the specific `Refrigeration.Common.Status.Door.Freezer` API key to restore accurate status reporting.",
+            "hash": "c6dc9c38172e0a62959aa9a80cef816a84b0c7fa48e5e7334afffa2e6be1f580"
         }
     ]
 }
