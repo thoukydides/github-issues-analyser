@@ -1,0 +1,12 @@
+{
+    "issue_number": 385,
+    "updated_at": "2026-04-13T09:21:50.059Z",
+    "faq": [
+        {
+            "question": "Why does my freezer door always show as open in HomeKit?",
+            "answer": "This is a known issue with the Home Connect API or appliance firmware where the generic door status (`BSH.Common.Status.DoorState`) is incorrectly reported as `Open`, even when the appliance correctly reports its specific compartment door status (e.g. `Refrigeration.Common.Status.Door.Freezer`) as `Closed`.\n\nTo resolve this, you must manually configure the plugin to use the more specific door status key for your freezer:\n\n1. Open the plugin configuration in the Homebridge UI.\n2. Locate the settings for the affected Freezer appliance.\n3. In the **Features** section, disable the generic `Door` service.\n4. Enable the `Freezer Door` service instead.\n5. Save the configuration and restart Homebridge.\n\nThis specific mapping is not enabled by default because older appliances or firmware versions may not support the refrigeration-specific door keys and rely solely on the generic status key.",
+            "semantic_abstract": "Home Connect API and firmware inconsistencies cause some freezer models to report an incorrect generic door state while maintaining a correct compartment-specific state. The plugin addresses this by allowing users to bypass the generic `BSH.Common.Status.DoorState` in favour of the `Refrigeration.Common.Status.Door.Freezer` characteristic via manual feature configuration.",
+            "hash": "54e36b1904dd91af4816600e58fa8cc49b833cc8ed13f931dc63f9bf9588559f"
+        }
+    ]
+}
