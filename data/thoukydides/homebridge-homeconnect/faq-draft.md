@@ -53,7 +53,7 @@
   - **[Appliance Status and Connectivity](#appliance-status-and-connectivity)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
-    - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
+    - [Why do my appliances disappear or behave inconsistently in the Home app?](#why-do-my-appliances-disappear-or-behave-inconsistently-in-the-home-app)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
     - [Why does my dishwasher trigger a `Program Finished` event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
     - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
@@ -61,7 +61,6 @@
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
     - [Can I programmatically access data from the unofficial Home Connect status page?](#can-i-programmatically-access-data-from-the-unofficial-home-connect-status-page)
-    - [Why do Home Connect appliances disappear or lose their Favourites status in the Home app?](#why-do-home-connect-appliances-disappear-or-lose-their-favourites-status-in-the-home-app)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
@@ -608,12 +607,17 @@ To diagnose and resolve this:
 
 Most connectivity issues are transient and will resolve once the appliance cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.
 
-#### Why do my appliances remain visible in the Home app when they are turned off or offline?
+#### Why do my appliances disappear or behave inconsistently in the Home app?
 
 <!-- INCLUDES: issue-52-1e99 -->
-The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as an appliance is associated with your account in the Home Connect API, it will persist in HomeKit. Being unreachable or powered off does not trigger the removal of the accessory from HomeKit, but the Home app will display it as **No Response**. Dynamically adding and removing appliances from HomeKit based on their connectivity would result in loss of user configuration, such as their name, location, scenes, and automations.
+The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi, though they may display as **No Response** if unreachable. Dynamically removing accessories based on connectivity would result in the loss of user configuration, such as custom names, room assignments, scenes, and automations.
 
-If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing, this may be due to a synchronisation issue within HomeKit or the Homebridge cache. This can often be resolved by removing the bridge from the Home app, clearing the Homebridge cache files, and then re-adding the bridge.
+If accessories spontaneously disappear, reappear, or lose their configuration, it is usually due to one of the following:
+
+1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory. When the API later reports the appliance again, it is recreated as a new accessory, losing all previous HomeKit settings.
+2. **HomeKit Cache Issues**: Local database corruption within Apple Home or Homebridge can lead to inconsistent UI behaviour where devices move or vanish.
+
+To resolve this, check the Home Connect API status. If the behaviour is persistent, perform a clean reset by removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before re-pairing.
 
 #### Why does the log show a program running or time remaining when my appliance is off?
 
@@ -656,49 +660,19 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-382-d685 -->
-Some refrigeration appliances, such as certain Thermador models, have been observed to always report the door as `Open`. They correctly trigger door open alarms, but do not generate events for changes to the door status itself. This suggests a firmware limitation or a bug in the Home Connect cloud service.
+<!-- INCLUDES: issue-382-d685 issue-385-c6dc -->
+This behaviour is often caused by firmware or API bugs on certain models (observed on Thermador refrigeration and Siemens/Bosch freezers like the `GU21NADE0`). The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when physically closed.
 
-To troubleshoot and potentially work around this:
+To troubleshoot and resolve this:
 
-1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.
-2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
-3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
+1. **Configure Specific Services**: For freezer models affected by this (typically requiring plugin v1.9.1 or later), navigate to the plugin settings for the affected appliance. In the **Features** section, disable the generic `Door` service and enable the `Freezer Door` service instead. This uses the `Refrigeration.Common.Status.Door.Freezer` key, which is often accurate when the generic status is broken.
+2. **Expose Compartment Services**: Some appliances report combined status as well as individual statuses for compartments (e.g. `ChillerLeft`, `Refrigerator`). Expose these specific services as they may update correctly.
+3. **Verify API Values**: Enable **Log Debug as Info** to confirm if the plugin is receiving incorrect values from the server. If the raw API values remain stuck at `Open` while the door is physically closed, the issue should be reported to Home Connect Developer Support for a firmware fix.
 
 #### Can I programmatically access data from the unofficial Home Connect status page?
 
 <!-- INCLUDES: issue-306-2022 -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes and is integrated into the plugin configuration UI. There is no public API for this data. The maintainer does not support or allow programmatic scraping or frequent polling of the status page for use in third-party scripts or automations; such activity may result in the requesting IP being blocked.
-
-#### Why do Home Connect appliances disappear or lose their Favourites status in the Home app?
-
-<!-- INCLUDES: issue-52-1e99 -->
-The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.
-
-If accessories spontaneously disappear, reappear, or lose their HomeKit configuration (e.g. room assignments, custom names, scenes, or automations) it is usually due to one of the following:
-
-1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations are lost.
-2. **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.
-
-To resolve these issues:
-
-- Check the Home Connect API status to rule out cloud service disruptions.
-- If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why does my freezer door always show as open in HomeKit when it is closed? 🚧
-
-<!-- INCLUDES: issue-385-c6dc -->
-This behaviour is caused by a firmware or Home Connect API bug observed on certain Siemens and Bosch freezer models (such as the `GU21NADE0`). The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when the physical door is closed. 
-
-To resolve this, the plugin provides an alternative feature that uses a more specific API status key. If you are experiencing this issue, you should update the plugin to at least version 1.9.1 and adjust your configuration:
-
-1. Open the Homebridge UI and navigate to the plugin settings for Home Connect.
-2. Locate the configuration for the affected freezer appliance.
-3. In the **Features** section:
-   - Disable the generic `Door` service.
-   - Enable the `Freezer Door` service instead.
-
-This alternative service uses the `Refrigeration.Common.Status.Door.Freezer` status, which typically remains accurate on models where the generic status is broken. This is not the default setting because older appliances or firmware versions may not support the refrigeration-specific status key.
 
 ## Apple HomeKit
 
