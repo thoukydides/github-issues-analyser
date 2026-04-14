@@ -660,7 +660,6 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-382-d685 issue-385-c6dc -->
 This behaviour is often caused by firmware or API bugs on certain models (observed on Thermador refrigeration and Siemens/Bosch freezers like the `GU21NADE0`). The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when physically closed.
 
 To troubleshoot and resolve this:
@@ -673,6 +672,36 @@ To troubleshoot and resolve this:
 
 <!-- INCLUDES: issue-306-2022 -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes and is integrated into the plugin configuration UI. There is no public API for this data. The maintainer does not support or allow programmatic scraping or frequent polling of the status page for use in third-party scripts or automations; such activity may result in the requesting IP being blocked.
+
+#### 🚧 Why does my fridge or freezer always show the door as Open in HomeKit even when it is closed? 🚧
+
+<!-- INCLUDES: issue-382-3c33 -->
+This behaviour is typically caused by appliance firmware failing to update the combined `DoorState` value in the Home Connect API, even if the appliance's internal sensors and door alarms are functioning correctly. 
+
+In accordance with the HomeKit Accessory Protocol Specification, the plugin maps the Home Connect API states as follows:
+* `Open`: `100%` (Open)
+* `Closed`: `0%` (Closed)
+* `Locked`: `0%` (Closed)
+
+If your appliance is consistently reporting `Open` regardless of the physical door position, it is likely that the API is not emitting the necessary events. You can attempt the following workarounds:
+
+1. **Expose individual doors**: Refrigerator-class appliances often provide specific status values for individual compartments (e.g., `ChillerLeft`, `ChillerRight`, `FlexCompartment`, `Freezer`, or `Refrigerator`). Configure the plugin to expose these individual door services, as they may update correctly even when the combined status is stuck.
+2. **Verify with debug logs**: Enable the **Log Debug as Info** option in the plugin configuration to check the raw API values. If the API is reporting the state incorrectly, the issue lies with the appliance firmware or the Home Connect cloud service.
+3. **Contact Support**: If individual doors also fail to report correctly, contact [Home Connect Customer Service](https://www.home-connect.com/global/service/contact-customer-service/service) to request a firmware fix. You will need to provide your Home Connect account email and the appliance ID (`haID`).
+
+#### 🚧 Why does my Siemens freezer always show the door as open in HomeKit? 🚧
+
+<!-- INCLUDES: issue-385-bb01 -->
+Some Home Connect freezer models (such as the Siemens `GU21NADE0`) have a firmware or API bug where they incorrectly report the generic door state (`BSH.Common.Status.DoorState`) as `Open`, even when the door is closed. These same appliances often correctly report the specific freezer door state (`Refrigeration.Common.Status.Door.Freezer`).
+
+To resolve this, you can configure the plugin to use the specific freezer door state instead of the generic one:
+
+1. Ensure you are using version 1.9.1 or later of the plugin.
+2. Open the plugin configuration for the affected freezer appliance.
+3. Disable the standard `Door` feature.
+4. Enable the `Freezer Door` feature.
+
+It is also recommended to contact Home Connect customer service to report the issue for your specific model. Provide them with your appliance's `haId` (found in the plugin logs) and the email address associated with your Home Connect account, as this behaviour is caused by a fault in the appliance firmware or the Home Connect API.
 
 ## Apple HomeKit
 
