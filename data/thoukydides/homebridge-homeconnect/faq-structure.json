@@ -351,7 +351,7 @@
                                 },
                                 {
                                     "question": "Why are some appliance features, programs, or options missing or unavailable?",
-                                    "answer": "The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable` in the logs:\n\n- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.\n- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.\n- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
+                                    "answer": "The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:\n\n- **Operational Status**: A program may be reported as supported (advertised) but currently unavailable if the appliance is powered off, busy, a cycle is already running, or a door is open.\n- **Maintenance Cycles**: Some programs, such as `DrumClean` on washing machines, are only made available by the appliance firmware after a specific number of usage cycles have been completed. Others (rinsing, descaling) may be blocked if required consumables (salt, rinse aid, water, coffee beans) are missing.\n- **Private API Limitations**: The official Home Connect app and partners like IFTTT use a private API. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.\n- **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.\n- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.\n- **Program Specifics**: User-defined programs and certain maintenance cycles are frequently restricted or not advertised with full configuration options via the public API.\n\nIf a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
                                     "included_ids": [
                                         "issue-1-d662",
                                         "issue-17-56af",
@@ -378,7 +378,8 @@
                                         "issue-328-b486",
                                         "issue-340-bf6e",
                                         "issue-368-04c9",
-                                        "issue-380-03ac"
+                                        "issue-380-03ac",
+                                        "issue-386-9bb3"
                                     ]
                                 },
                                 {
@@ -529,14 +530,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 386,
-                                    "id": "issue-386-9bb3",
-                                    "question": "Why does the log show some programs as advertised by the appliance but currently unavailable?",
-                                    "answer": "The plugin queries the Home Connect API to determine which programs are supported by an appliance and which are currently available for selection. If a program is \"advertised\" but \"unavailable\", it indicates that the appliance firmware is explicitly reporting that the program cannot be started in its current state.\n\nThis is standard behaviour and occurs for several reasons:\n* **Appliance state**: Certain programs may be disabled while the door is open, or if another cycle is already in progress.\n* **Maintenance cycles**: Some programs, such as `DrumClean` (`LaundryCare.Washer.Program.DrumClean`) on washing machines, may only be made available by the appliance after a specific number of usage cycles have been completed.\n* **Safety constraints**: The appliance may prevent specific programs from being selected based on internal sensor data or safety logic.\n\nThe plugin logs this information to provide visibility into why specific programs are missing from the HomeKit interface. When the appliance state changes and the Home Connect API marks the program as available, it will automatically be exposed to HomeKit."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
