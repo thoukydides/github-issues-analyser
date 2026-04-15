@@ -577,6 +577,18 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
+#### 🚧 Why does the log show some programs as advertised by the appliance but currently unavailable? 🚧
+
+<!-- INCLUDES: issue-386-9bb3 -->
+The plugin queries the Home Connect API to determine which programs are supported by an appliance and which are currently available for selection. If a program is "advertised" but "unavailable", it indicates that the appliance firmware is explicitly reporting that the program cannot be started in its current state.
+
+This is standard behaviour and occurs for several reasons:
+* **Appliance state**: Certain programs may be disabled while the door is open, or if another cycle is already in progress.
+* **Maintenance cycles**: Some programs, such as `DrumClean` (`LaundryCare.Washer.Program.DrumClean`) on washing machines, may only be made available by the appliance after a specific number of usage cycles have been completed.
+* **Safety constraints**: The appliance may prevent specific programs from being selected based on internal sensor data or safety logic.
+
+The plugin logs this information to provide visibility into why specific programs are missing from the HomeKit interface. When the appliance state changes and the Home Connect API marks the program as available, it will automatically be exposed to HomeKit.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
