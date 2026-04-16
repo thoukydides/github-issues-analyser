@@ -59,7 +59,7 @@
     - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
     - [Why does the log periodically show `Found X appliances (0 added, 0 removed)`?](#why-does-the-log-periodically-show-found-x-appliances-0-added-0-removed)
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
-    - [Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
+    - [Why does my refrigerator or freezer always show as open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
     - [Can I programmatically access data from the unofficial Home Connect status page?](#can-i-programmatically-access-data-from-the-unofficial-home-connect-status-page)
     - [Why do Home Connect appliances disappear or lose their Favourites status in the Home app?](#why-do-home-connect-appliances-disappear-or-lose-their-favourites-status-in-the-home-app)
 - **[Apple HomeKit](#apple-homekit)**
@@ -394,8 +394,8 @@ Once added, the warning will disappear and the features will be correctly mapped
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-04c9 issue-380-03ac -->
-The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API rather than using hardcoded lists. Several factors can cause features to be missing or appear as `currently unavailable` in the logs:
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-04c9 issue-380-03ac issue-386-9bb3 -->
+The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
@@ -653,14 +653,14 @@ The Home Connect API currently restricts door control functionality to specific 
 
 In HomeKit, the `Door` service for dishwashers is therefore read-only. It will correctly indicate whether the door is open or closed and provide status updates when manually operated, but it cannot be used to trigger the door to open. This is a limitation of the Home Connect API rather than the plugin itself.
 
-#### Why does my refrigerator or freezer always show as Open in HomeKit even when it is closed?
+#### Why does my refrigerator or freezer always show as open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-382-d685 -->
-Some refrigeration appliances, such as certain Thermador models, have been observed to always report the door as `Open`. They correctly trigger door open alarms, but do not generate events for changes to the door status itself. This suggests a firmware limitation or a bug in the Home Connect cloud service.
+<!-- INCLUDES: issue-382-3c33 issue-385-bb01 -->
+This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models. The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when physically closed.
 
 To troubleshoot and potentially work around this:
 
-1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they may update correctly even if the combined status does not.
+1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they often update correctly even if the combined status does not.
 2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
 3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
 
@@ -706,15 +706,16 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 -->
-The plugin allows for granular control over which services are exposed to HomeKit. If services remain visible in HomeKit (often appearing as "No Response") after being disabled, it is typically due to HomeKit's internal caching. As a dynamic platform plugin, Homebridge restores its cached state upon restart *before* the plugin can apply your updated configuration. While the plugin removes the service and increments the configuration number to trigger a refresh, iCloud synchronisation can be slow. To resolve persistent stale entries:
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 issue-383-cf24 -->
+The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale "No Response" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.
+
+To resolve persistent state or UI inconsistencies:
 
 - **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service "Internal Light"`).
-- **Restart Homebridge**: This triggers a fresh configuration update.
-- **Wait**: Allow several hours for iCloud synchronisation to reconcile the state across all your devices.
-- **Reboot the Home Hub**: Restart your primary Apple TV or HomePod.
-- **Reset iCloud**: Sign out of iCloud on the Home Hub and sign back in.
-- **Remove the bridge**: As a last resort, remove the Homebridge bridge from HomeKit and re-add it.
+- **Manual restoration**: Open the settings for an affected service in the Home app and check if a missing name can be manually restored.
+- **Restart Homebridge**: This triggers a fresh configuration update and increments the configuration number.
+- **Re-index the accessory**: If issues persist, you may need to force HomeKit to re-index the device. Remove the accessory or its child bridge from Homebridge, clear the Homebridge cached accessories for that bridge, and then re-add it.
+- **Wait and Reboot**: Allow several hours for iCloud to reconcile the state across all devices. Restarting your primary Home Hub (Apple TV or HomePod) or signing out and back into iCloud on the hub can also help.
 
 #### Why is temperature control not supported for fridges, freezers, or ovens?
 
@@ -925,4 +926,4 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-e214 issue-360-732a issue-375-b67d issue-383-54fb -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-e214 issue-360-732a issue-375-b67d issue-383-b676 -->

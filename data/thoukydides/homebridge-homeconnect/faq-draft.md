@@ -53,7 +53,7 @@
   - **[Appliance Status and Connectivity](#appliance-status-and-connectivity)**
     - [Why does my appliance status appear stuck or show as offline in HomeKit?](#why-does-my-appliance-status-appear-stuck-or-show-as-offline-in-homekit)
     - [Why is my appliance unresponsive or reported as offline in Homebridge but working in the official app?](#why-is-my-appliance-unresponsive-or-reported-as-offline-in-homebridge-but-working-in-the-official-app)
-    - [Why do my appliances disappear or behave inconsistently in the Home app?](#why-do-my-appliances-disappear-or-behave-inconsistently-in-the-home-app)
+    - [Why do my appliances remain visible in the Home app when they are turned off or offline?](#why-do-my-appliances-remain-visible-in-the-home-app-when-they-are-turned-off-or-offline)
     - [Why does the log show a program running or time remaining when my appliance is off?](#why-does-the-log-show-a-program-running-or-time-remaining-when-my-appliance-is-off)
     - [Why does my dishwasher trigger a `Program Finished` event when it reconnects?](#why-does-my-dishwasher-trigger-a-program-finished-event-when-it-reconnects)
     - [Why is the log filling up with oven `Event STATUS` temperature messages?](#why-is-the-log-filling-up-with-oven-event-status-temperature-messages)
@@ -61,11 +61,12 @@
     - [Why is the dishwasher door control read-only in HomeKit?](#why-is-the-dishwasher-door-control-read-only-in-homekit)
     - [Why does my refrigerator or freezer always show as open in HomeKit even when it is closed?](#why-does-my-refrigerator-or-freezer-always-show-as-open-in-homekit-even-when-it-is-closed)
     - [Can I programmatically access data from the unofficial Home Connect status page?](#can-i-programmatically-access-data-from-the-unofficial-home-connect-status-page)
+    - [Why do Home Connect appliances disappear or lose their Favourites status in the Home app?](#why-do-home-connect-appliances-disappear-or-lose-their-favourites-status-in-the-home-app)
 - **[Apple HomeKit](#apple-homekit)**
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
-    - [Why do disabled services still appear, or why do service names disappear after I change the configuration?](#why-do-disabled-services-still-appear-or-why-do-service-names-disappear-after-i-change-the-configuration)
+    - [Why do disabled services still appear or remain unresponsive in HomeKit?](#why-do-disabled-services-still-appear-or-remain-unresponsive-in-homekit)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
@@ -78,7 +79,6 @@
     - [Why can I only control power and fan speed for my Home Connect air conditioner?](#why-can-i-only-control-power-and-fan-speed-for-my-home-connect-air-conditioner)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
-    - [What functionality is lost if the `Power` switch service is disabled for an appliance?](#what-functionality-is-lost-if-the-power-switch-service-is-disabled-for-an-appliance)
   - **[Notifications & Events](#notifications--events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
@@ -397,12 +397,11 @@ Once added, the warning will disappear and the features will be correctly mapped
 <!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-04c9 issue-380-03ac issue-386-9bb3 -->
 The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:
 
-- **Operational Status**: A program may be reported as supported (advertised) but currently unavailable if the appliance is powered off, busy, a cycle is already running, or a door is open.
-- **Maintenance Cycles**: Some programs, such as `DrumClean` on washing machines, are only made available by the appliance firmware after a specific number of usage cycles have been completed. Others (rinsing, descaling) may be blocked if required consumables (salt, rinse aid, water, coffee beans) are missing.
-- **Private API Limitations**: The official Home Connect app and partners like IFTTT use a private API. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
+- **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
-- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
-- **Program Specifics**: User-defined programs and certain maintenance cycles are frequently restricted or not advertised with full configuration options via the public API.
+- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
+- **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
+- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
 If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
 
@@ -608,17 +607,12 @@ To diagnose and resolve this:
 
 Most connectivity issues are transient and will resolve once the appliance cloud service stabilises. You can also check the [Home Connect Server Status (unofficial)](https://homeconnect.thouky.co.uk) for platform-wide outages.
 
-#### Why do my appliances disappear or behave inconsistently in the Home app?
+#### Why do my appliances remain visible in the Home app when they are turned off or offline?
 
 <!-- INCLUDES: issue-52-1e99 -->
-The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi, though they may display as **No Response** if unreachable. Dynamically removing accessories based on connectivity would result in the loss of user configuration, such as custom names, room assignments, scenes, and automations.
+The plugin synchronises accessories based on the list of appliances registered to your Home Connect account. As long as an appliance is associated with your account in the Home Connect API, it will persist in HomeKit. Being unreachable or powered off does not trigger the removal of the accessory from HomeKit, but the Home app will display it as **No Response**. Dynamically adding and removing appliances from HomeKit based on their connectivity would result in loss of user configuration, such as their name, location, scenes, and automations.
 
-If accessories spontaneously disappear, reappear, or lose their configuration, it is usually due to one of the following:
-
-1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory. When the API later reports the appliance again, it is recreated as a new accessory, losing all previous HomeKit settings.
-2. **HomeKit Cache Issues**: Local database corruption within Apple Home or Homebridge can lead to inconsistent UI behaviour where devices move or vanish.
-
-To resolve this, check the Home Connect API status. If the behaviour is persistent, perform a clean reset by removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before re-pairing.
+If you observe inconsistent behaviour, such as devices unexpectedly appearing or disappearing, this may be due to a synchronisation issue within HomeKit or the Homebridge cache. This can often be resolved by removing the bridge from the Home app, clearing the Homebridge cache files, and then re-adding the bridge.
 
 #### Why does the log show a program running or time remaining when my appliance is off?
 
@@ -662,19 +656,33 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 #### Why does my refrigerator or freezer always show as open in HomeKit even when it is closed?
 
 <!-- INCLUDES: issue-382-3c33 issue-385-bb01 -->
-This behaviour is often caused by firmware or API bugs on certain models (e.g. Siemens `GU21NADE0` or various Thermador refrigeration units). The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when physically closed. The plugin maps these API states to HomeKit door percentages: `Open` as 100%, and both `Closed` and `Locked` as 0%.
+This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models. The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when physically closed.
 
-To troubleshoot and resolve this:
+To troubleshoot and potentially work around this:
 
-1. **Use Specific Door Features**: For freezer models (requires plugin v1.9.1+), navigate to the appliance settings in the plugin configuration. Disable the generic `Door` feature and enable the `Freezer Door` feature instead. This uses the `Refrigeration.Common.Status.Door.Freezer` key, which often reports correctly when the generic status is broken.
-2. **Expose Compartment Services**: Refrigerators often provide individual status values for different sections (e.g. `ChillerLeft`, `ChillerRight`, `FlexCompartment`, `Refrigerator`). Enabling these specific services may provide an accurate status even when the combined door state is stuck.
-3. **Verify API Values**: Enable **Log Debug as Info** to confirm if the plugin is receiving incorrect values from the server. If the raw API values remain stuck at `Open` while the door is physically closed, the issue lies with the appliance firmware.
-4. **Report to Home Connect**: Contact [Home Connect Customer Service](https://www.home-connect.com/global/service/contact-customer-service/service) to request a firmware fix. Provide them with your appliance ID (`haId`), which can be found in the plugin logs, and the email address for your Home Connect account.
+1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they often update correctly even if the combined status does not.
+2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.
+3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.
 
 #### Can I programmatically access data from the unofficial Home Connect status page?
 
 <!-- INCLUDES: issue-306-2022 -->
 No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk/) page is provided solely for manual diagnostic purposes and is integrated into the plugin configuration UI. There is no public API for this data. The maintainer does not support or allow programmatic scraping or frequent polling of the status page for use in third-party scripts or automations; such activity may result in the requesting IP being blocked.
+
+#### Why do Home Connect appliances disappear or lose their Favourites status in the Home app?
+
+<!-- INCLUDES: issue-52-1e99 -->
+The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.
+
+If accessories spontaneously disappear, reappear, or lose their HomeKit configuration (e.g. room assignments, custom names, scenes, or automations) it is usually due to one of the following:
+
+1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations are lost.
+2. **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.
+
+To resolve these issues:
+
+- Check the Home Connect API status to rule out cloud service disruptions.
+- If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
 
 ## Apple HomeKit
 
@@ -696,7 +704,7 @@ The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined w
 
 Although HAP includes a `Service Label Index` characteristic, it is specifically intended for ordering `Stateless Programmable Switch` services and is not officially supported or respected by apps for other service types. Technical attempts to influence the order—such as marking the power switch as a `Primary` service or using `Linked` services to group controls—have proven inconsistent across different applications. In some cases, these changes actually made the Apple Home app's ordering less predictable. Most third-party HomeKit apps, such as *Eve*, *Home+*, and *Hesperus*, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.
 
-#### Why do disabled services still appear, or why do service names disappear after I change the configuration?
+#### Why do disabled services still appear or remain unresponsive in HomeKit?
 
 <!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 issue-383-cf24 -->
 The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale "No Response" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.
@@ -756,7 +764,7 @@ If multiple program switches appear with identical generic names (such as "Dryer
 <!-- INCLUDES: issue-334-1d4c -->
 The plugin supports the child lock setting (internally `BSH.Common.Setting.ChildLock`) by mapping it to the standard HomeKit `Lock Physical Controls` characteristic on the appliance's Power `Switch` service.
 
-However, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**. Note that if you disable the `Power` switch service in the plugin configuration, the child lock control will also be removed.
+However, the official Apple Home app does not currently display or provide controls for this specific characteristic on many appliance types. To view the status or toggle the child lock, you must use a third-party HomeKit app such as **Eve**, **Home+**, or **Controller for HomeKit**.
 
 #### Why is the hood boost mode a separate switch instead of part of the fan speed control?
 
@@ -813,17 +821,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### What functionality is lost if the `Power` switch service is disabled for an appliance?
-
-<!-- INCLUDES: issue-383-b676 -->
-The `Power` switch can be disabled for individual appliances by setting `"Power": false` within the `features` section of the device configuration. However, this service acts as a host for several HomeKit characteristics that cannot be easily mapped elsewhere. Disabling the `Power` switch will also remove access to:
-
-- **Child Lock controls** (`LockPhysicalControls` characteristic)
-- **Program Duration** (`SetDuration` characteristic)
-- **Program Mode status** (`ProgramMode` characteristic)
-
-Note that disabling the `Power` switch does not affect the plugin's ability to report the connectivity status of the appliance. The plugin uses an `OnGet` override for all characteristics to ensure that an accessory will correctly show as "No Response" in the Home app if it disconnects from the Home Connect servers, even if the `Power` switch itself is hidden.
 
 ### Notifications & Events
 
@@ -929,4 +926,4 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-e214 issue-360-732a issue-375-b67d -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-e214 issue-360-732a issue-375-b67d issue-383-b676 -->
