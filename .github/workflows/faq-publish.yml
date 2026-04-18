@@ -23,10 +23,10 @@ jobs:
 
     steps:
       - name: Checkout analyser repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Checkout Wiki repository ${{ matrix.repo }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository:   ${{ matrix.repo }}.wiki
           path:         wiki
