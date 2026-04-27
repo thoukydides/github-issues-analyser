@@ -706,16 +706,18 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 -->
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 issue-383-2a8a -->
 The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale "No Response" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.
+
+Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because this service is traditionally responsible for hosting accessory metadata and reporting `SERVICE_COMMUNICATION_FAILURE` when an appliance disconnects from the Home Connect servers. Although the plugin (since v1.9.0) attempts to propagate this status via other services if the Power switch is missing, the structural change to the accessory can still trigger persistent display bugs.
 
 To resolve persistent state or UI inconsistencies:
 
+- **Check the settings**: Open the settings for an unlabelled service in the Home app and check if the name can be manually restored.
 - **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service "Internal Light"`).
-- **Manual restoration**: Open the settings for an affected service in the Home app and check if a missing name can be manually restored.
-- **Restart Homebridge**: This triggers a fresh configuration update and increments the configuration number.
-- **Re-index the accessory**: If issues persist, you may need to force HomeKit to re-index the device. Remove the accessory or its child bridge from Homebridge, clear the Homebridge cached accessories for that bridge, and then re-add it.
-- **Wait and Reboot**: Allow several hours for iCloud to reconcile the state across all devices. Restarting your primary Home Hub (Apple TV or HomePod) or signing out and back into iCloud on the hub can also help.
+- **Restart Homebridge**: This triggers a fresh configuration update and increments the accessory's configuration number.
+- **Clear cache or re-index**: If issues persist, you may need to force HomeKit to re-index the device. Clear the Homebridge cached accessories for the affected appliance. If this fails, remove the accessory or its child bridge from Homebridge and re-add it.
+- **Wait and Reboot**: Allow several hours for iCloud to reconcile the state across all devices. Restarting your primary Home Hub (Apple TV or HomePod) can also help.
 
 #### Why is temperature control not supported for fridges, freezers, or ovens?
 
@@ -821,18 +823,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why does my appliance show `Not Responding` or lose service names after disabling the Power switch? 🚧
-
-<!-- INCLUDES: issue-383-2a8a -->
-While the plugin allows disabling the Power switch by setting `"Power": false` in the `features` configuration, doing so on an already-paired accessory can cause HomeKit to become desynchronised. The Home app is designed for stable accessories and often fails to update correctly when a service (like the Power switch) is removed from an existing accessory.
-
-Furthermore, the Power service is traditionally responsible for hosting metadata and reporting the `SERVICE_COMMUNICATION_FAILURE` status when an appliance disconnects from the Home Connect servers. Although the plugin (since v1.9.0) attempts to propagate this status via other characteristics, the structural change to the accessory can trigger persistent caching issues in HomeKit.
-
-If you experience missing labels or response errors after disabling the Power switch, try the following:
-1. Check the settings for the unlabelled service in the Home app and try to manually restore the name.
-2. Clear the Homebridge accessory cache for that specific device.
-3. Remove the plugin or the affected appliance and re-add it as a new child bridge to force HomeKit to rebuild its internal database for the accessory.
 
 ### Notifications & Events
 

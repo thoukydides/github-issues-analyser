@@ -669,12 +669,13 @@
                                 },
                                 {
                                     "question": "Why do disabled services still appear or remain unresponsive in HomeKit?",
-                                    "answer": "The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale \"No Response\" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.\n\nTo resolve persistent state or UI inconsistencies:\n\n- **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service \"Internal Light\"`).\n- **Manual restoration**: Open the settings for an affected service in the Home app and check if a missing name can be manually restored.\n- **Restart Homebridge**: This triggers a fresh configuration update and increments the configuration number.\n- **Re-index the accessory**: If issues persist, you may need to force HomeKit to re-index the device. Remove the accessory or its child bridge from Homebridge, clear the Homebridge cached accessories for that bridge, and then re-add it.\n- **Wait and Reboot**: Allow several hours for iCloud to reconcile the state across all devices. Restarting your primary Home Hub (Apple TV or HomePod) or signing out and back into iCloud on the hub can also help.",
+                                    "answer": "The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale \"No Response\" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.\n\nDisabling the `Power` switch (`\"Power\": false`) is particularly likely to cause issues because this service is traditionally responsible for hosting accessory metadata and reporting `SERVICE_COMMUNICATION_FAILURE` when an appliance disconnects from the Home Connect servers. Although the plugin (since v1.9.0) attempts to propagate this status via other services if the Power switch is missing, the structural change to the accessory can still trigger persistent display bugs.\n\nTo resolve persistent state or UI inconsistencies:\n\n- **Check the settings**: Open the settings for an unlabelled service in the Home app and check if the name can be manually restored.\n- **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service \"Internal Light\"`).\n- **Restart Homebridge**: This triggers a fresh configuration update and increments the accessory's configuration number.\n- **Clear cache or re-index**: If issues persist, you may need to force HomeKit to re-index the device. Clear the Homebridge cached accessories for the affected appliance. If this fails, remove the accessory or its child bridge from Homebridge and re-add it.\n- **Wait and Reboot**: Allow several hours for iCloud to reconcile the state across all devices. Restarting your primary Home Hub (Apple TV or HomePod) can also help.",
                                     "included_ids": [
                                         "issue-57-124f",
                                         "issue-77-e342",
                                         "issue-124-45f8",
-                                        "issue-364-0c67"
+                                        "issue-364-0c67",
+                                        "issue-383-2a8a"
                                     ]
                                 },
                                 {
@@ -770,14 +771,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 383,
-                                    "id": "issue-383-2a8a",
-                                    "question": "Why does my appliance show `Not Responding` or lose service names after disabling the Power switch?",
-                                    "answer": "While the plugin allows disabling the Power switch by setting `\"Power\": false` in the `features` configuration, doing so on an already-paired accessory can cause HomeKit to become desynchronised. The Home app is designed for stable accessories and often fails to update correctly when a service (like the Power switch) is removed from an existing accessory.\n\nFurthermore, the Power service is traditionally responsible for hosting metadata and reporting the `SERVICE_COMMUNICATION_FAILURE` status when an appliance disconnects from the Home Connect servers. Although the plugin (since v1.9.0) attempts to propagate this status via other characteristics, the structural change to the accessory can trigger persistent caching issues in HomeKit.\n\nIf you experience missing labels or response errors after disabling the Power switch, try the following:\n1. Check the settings for the unlabelled service in the Home app and try to manually restore the name.\n2. Clear the Homebridge accessory cache for that specific device.\n3. Remove the plugin or the affected appliance and re-add it as a new child bridge to force HomeKit to rebuild its internal database for the accessory."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
