@@ -11,61 +11,44 @@
                     "entries": [
                         {
                             "question": "Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?",
-                            "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored. When Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise, the validation fails and prevents the plugin from starting.\n\nTo resolve this, ensure you are running the latest version of the plugin, as support for new device capabilities and structural variations is frequently added. If the error persists, please check the logs for the specific validation failure and provide a full debug log in a GitHub issue so the new API structures can be correctly mapped.",
-                            "included_ids": []
+                            "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities (such as `ReadyOffDock`) are identified and correctly implemented rather than silently ignored.\n\nWhen Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise (e.g. `response[x].connectedConfiguration.firmware.capabilities[y] is not a valid enum value`), the validation fails to prevent unpredictable behaviour. To resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide the JSON response snippet in a GitHub issue so the new API structures can be correctly mapped.",
+                            "included_ids": [
+                                "issue-17-fe91"
+                            ]
                         },
                         {
-                            "question": "What information should I collect to enable support for a new Dyson models?",
-                            "answer": "Most Dyson connected products use MQTT messages to control their basic functionality and provide status. Please use the `opendyson` tool to capture a full MQTT message log whilst exercising as much of the device's functionality as possible, e.g. adjusting every setting of an air purifier or performing a full clean with a robot vacuum:\n\n1. Install `opendyson`, e.g. if `Go` is installed and configured:  \n   `go install github.com/libdyson-wg/opendyson`\n2. Login to your MyDyson account:  \n   `opendyson login`\n3. Identify devices and retrieve their connection credentials:  \n   `opendyson devices`\n4. Capture an MQTT message log:  \n   `opendyson listen SERIALNUMBER` (with the device's actual serial number substituted)\n5. Paste or attach the output of `opendyson devices` and `opendyson listen` into the **Additional Information** section of the issue (as text, not a screenshot).\n\nDyson robot vacuums perform many operations (such as controlling zone cleaning and viewing cleaned area maps) via the MyDyson API instead of using MQTT messages. Please use a tool like Proxyman to capture examples of these HTTPS requests and their responses:\n\n1. Install [Proxyman](https://apps.apple.com/gb/app/proxyman/id1551292695). (The free edition is sufficient.) \n2. Run `Proxyman`, and on its **More** tab follow the instructions to install and trust the root certificate. \n3. Under **SSL Proxying List** add `appapi.cp.dyson.com` and enable it. \n4. Start the VPN and ensure `Ready to intercept` is displayed.\n5. Launch the MyDyson app and select `appapi.cp.dyson.com` in Proxyman. \n6. Switch back to the MyDyson app and try all basic functionality (power levels, \"All areas\" clean, zone cleaning, and viewing maps).\n7. Return to Proxyman, click on the cog icon, select **Share**, and then **Save to Files**. Attach the resulting `.proxymanlogv2` file to the issue.",
+                            "question": "What is the status of support for newer Dyson robot models like the 360 Heurist, 360 Vis Nav, or Spot+Scrub Ai (RB05)?",
+                            "answer": "Support for newer Dyson robot models is a work in progress, as they employ significantly different cloud API capability schemas and MQTT message formats compared to the older 360 Eye. \n\nModels like the 360 Heurist and 360 Vis Nav may currently show missing telemetry (such as `batteryChargeLevel` or `faults`) because they use new fields like `activeFaults` and `currentCleaningStrategy`. The Dyson Spot+Scrub Ai (RB05) currently has a placeholder implementation; while basic start/stop functionality may work, advanced features such as mopping controls, dock maintenance, or specific cleaning strategies are not yet supported. Full support for these models depends on community contributions of debug logs to map their unique capabilities to Matter attributes.",
                             "included_ids": [
-                                "issue-16-b67c"
+                                "issue-13-4541",
+                                "issue-17-01c1"
+                            ]
+                        },
+                        {
+                            "question": "What information should I collect to enable support for a new Dyson model or missing features?",
+                            "answer": "The information required depends on the device type and the specific feature being requested:\n\n1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data.\n\n2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.\n\n3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` in your configuration and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record a log while the device completes a cycle (e.g. a full clean) and submit the output via a GitHub issue.",
+                            "included_ids": [
+                                "issue-16-b67c",
+                                "issue-13-4541"
                             ]
                         },
                         {
                             "question": "Why are Dyson error codes and the sleep timer not visible in my Matter controller?",
-                            "answer": "Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, `ste1`, or `iuh3`), and sleep timer data (`sltm`) via their MQTT stream. While the plugin identifies and parses these values for diagnostic purposes and to ensure clean logs, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app).\n\nThe Matter specification does not provide standardised clusters or attributes for reporting specific air purifier hardware faults or a sleep timer. For detailed maintenance alerts or troubleshooting of specific hardware errors, you should refer to the MyDyson app or the device's physical display.\n\nThe plugin includes support for these fields in its internal definitions to provide a foundation for future compatibility if the Matter protocol expands. This ensures that the plugin can remain stable and keep the device reachable even when the appliance is reporting these internal codes.",
+                            "answer": "Dyson appliances report internal status, specific fault codes (such as `51C2`, `ercd`, or `iuh3`), and sleep timer data (`sltm`) via MQTT. While the plugin identifies and parses these values for diagnostics and logging, they are not surfaced as interactive controls or alerts in Matter controllers (such as the Apple Home app).\n\nThis is primarily due to limitations in the Matter specification, which does not currently provide standardised clusters or attributes for reporting detailed hardware diagnostics or sleep timers for the Air Purifier device category. For detailed maintenance alerts or troubleshooting specific hardware errors, you should refer to the MyDyson app or the device's physical display.",
                             "included_ids": [
-                                "issue-1-4ad6"
+                                "issue-1-4ad6",
+                                "issue-2-e183"
                             ]
                         },
                         {
                             "question": "Why isn't my Dyson Solarcycle Morph desk light supported?",
-                            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) is a Bluetooth-only device, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).\n\nWhile the MyDyson API includes MQTT-related fields such as `remoteBrokerType: 'wss'`, testing has confirmed that no traffic or control capability is actually exposed via Dyson's AWS IoT cloud gateway for these models. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to monitor or control the device.",
-                            "included_ids": []
+                            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi.\n\nWhile the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. From version `1.9.1` onwards, the plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.",
+                            "included_ids": [
+                                "issue-19-1b2e"
+                            ]
                         }
                     ],
-                    "candidates": [
-                        {
-                            "issue_number": 13,
-                            "id": "issue-13-4541",
-                            "question": "Why does my Dyson 360 Heurist or Vis Nav show errors or missing telemetry data?",
-                            "answer": "Support for newer Dyson robot models, including the 360 Heurist and 360 Vis Nav, is a work in progress. These models employ significantly different cloud API capability schemas and MQTT message formats compared to the older 360 Eye. For example, they may omit standard fields such as `batteryChargeLevel` or `faults` in favour of new fields like `activeFaults` and `currentCleaningStrategy`.\n\nTo assist the maintainer in fully mapping these states to Matter attributes, you can provide diagnostic telemetry:\n1. Enable `debug` in your plugin configuration.\n2. Add `Log MQTT Payloads as JSON` to the `debugFeatures` array.\n3. Record a log while the robot completes a full cleaning cycle, including interactions like pausing the device or removing the dustbin.\n4. Submit this log via a GitHub issue for analysis."
-                        },
-                        {
-                            "issue_number": 17,
-                            "id": "issue-17-fe91",
-                            "question": "Why does the plugin fail to start with `Unexpected structure of Dyson cloud API response`?",
-                            "answer": "This error occurs when the plugin encounters a device capability, model identifier, or response structure from the Dyson Cloud API that is not yet defined in its internal schema. The plugin employs strict validation to ensure that all data provided by the API is correctly understood and handled. This design choice prevents unpredictable behaviour and allows for the precise identification of new features or API changes introduced by Dyson. \n\nIf you encounter this error:\n1. Ensure the plugin is updated to the latest version, as support for new capabilities (such as `ReadyOffDock` or new robot models) is added frequently.\n2. Review the logs for the specific validation failure, for example: `response[x].connectedConfiguration.firmware.capabilities[y] is not a valid enum value`.\n3. Report the log output, including the JSON response snippet provided in the error log, so the missing definitions can be added to the plugin."
-                        },
-                        {
-                            "issue_number": 17,
-                            "id": "issue-17-01c1",
-                            "question": "What is the level of support for the Dyson Spot+Scrub Ai (RB05)?",
-                            "answer": "The Dyson Spot+Scrub Ai (RB05) currently has a placeholder implementation in the plugin. While basic functionality like starting or stopping a clean may work, more advanced features unique to this model—such as mopping controls, dock maintenance, or specific cleaning strategies—are not yet supported. \n\nFull support requires capturing HTTPS traffic and MQTT logs from the MyDyson app to reverse-engineer the specific communication protocol used by this model. Because the maintainers do not have access to this specific hardware, implementation relies on community contributions of debug logs to map the device's unique capabilities."
-                        },
-                        {
-                            "issue_number": 19,
-                            "id": "issue-19-1b2e",
-                            "question": "Why is my Dyson Solarcycle Morph desk light not supported by the plugin?",
-                            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are not supported because they use Bluetooth Low Energy (BLE) for communication rather than Wi-Fi. This is indicated in the device manifest by the `connectionCategory: 'lecOnly'` field.\n\nWhile the Dyson cloud API may provide MQTT configuration details for these devices, investigations have shown that no control traffic or state updates are actually transmitted via the Dyson MQTT gateway for these models. Since the plugin requires either local Wi-Fi connectivity or a functional cloud MQTT bridge to interact with appliances, it cannot control BLE-only devices.\n\nFrom version `1.9.1` onwards, the plugin is designed to identify these devices in your MyDyson account and gracefully ignore them. This ensures that the presence of an unsupported light does not prevent the plugin from starting or affect the operation of other supported Wi-Fi-enabled appliances, such as air purifiers or robot vacuums."
-                        },
-                        {
-                            "issue_number": 2,
-                            "id": "issue-2-e183",
-                            "question": "Why are Dyson error codes such as `51C2` not visible in my Matter controller?",
-                            "answer": "Dyson appliances report various internal status and error codes (for example `51C2`) over MQTT. The plugin identifies these codes to maintain device state and provide diagnostic information in the logs, but they are not currently exposed as actionable faults to Matter controllers like Apple Home or Google Home. This limitation is due to the Matter specification, which does not yet define a standard method for reporting detailed hardware diagnostics for the Air Purifier device category. For specific information regarding appliance faults or maintenance needs, refer to the official MyDyson app."
-                        }
-                    ]
+                    "candidates": []
                 }
             ],
             "subcategories": []
