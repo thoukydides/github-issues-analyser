@@ -706,7 +706,7 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 issue-383-2a8a -->
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 -->
 The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale "No Response" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.
 
 Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because this service is traditionally responsible for hosting accessory metadata and reporting `SERVICE_COMMUNICATION_FAILURE` when an appliance disconnects from the Home Connect servers. Although the plugin (since v1.9.0) attempts to propagate this status via other services if the Power switch is missing, the structural change to the accessory can still trigger persistent display bugs.
