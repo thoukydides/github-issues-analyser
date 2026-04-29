@@ -1,12 +1,12 @@
 {
     "issue_number": 2,
-    "updated_at": "2026-04-02T15:15:22.074Z",
+    "updated_at": "2026-04-29T09:51:37.106Z",
     "faq": [
         {
-            "question": "Why are specific Dyson device error codes or faults not visible in my Matter controller?",
-            "answer": "While the plugin can monitor and identify specific diagnostic codes (such as `51C2`) from the device MQTT stream, these are not currently exposed as active alerts or fault states in smart home platforms like HomeKit, Alexa, or Google Home. This is a limitation of the current Matter 1.4 specification, which does not provide a standardised mechanism or cluster for reporting diagnostic faults for air purifiers and fans. These codes are processed by the plugin for logging and internal state management but cannot be transmitted to a Matter controller until the specification is updated to support them.",
-            "semantic_abstract": "The Matter 1.4 specification lacks standardised clusters for reporting air purifier diagnostic faults, preventing the exposure of device-specific error codes from the Dyson MQTT stream to Matter controllers. This technical limitation means that while the plugin identifies and logs these codes, they cannot be surfaced as functional alerts or attributes within the Matter ecosystem.",
-            "hash": "64a41c20100ebcf8e5900c9d863ca6901118acaa37737ed10276e017285b5736"
+            "question": "Why are Dyson error codes such as `51C2` not visible in my Matter controller?",
+            "answer": "Dyson appliances report various internal status and error codes (for example `51C2`) over MQTT. The plugin identifies these codes to maintain device state and provide diagnostic information in the logs, but they are not currently exposed as actionable faults to Matter controllers like Apple Home or Google Home. This limitation is due to the Matter specification, which does not yet define a standard method for reporting detailed hardware diagnostics for the Air Purifier device category. For specific information regarding appliance faults or maintenance needs, refer to the official MyDyson app.",
+            "semantic_abstract": "Matter specification limitations prevent the mapping of internal Dyson hardware error codes to standard Matter attributes for Air Purifier devices. While the plugin logs these codes for technical diagnostics, the underlying protocol lacks the necessary clusters to surface detailed manufacturer-specific faults in Matter-compatible platforms.",
+            "hash": "e18343f1d6384ab6be491e334312050c6d154c6fb2fa257bae10d063f83f6b5a"
         }
     ]
 }
