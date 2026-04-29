@@ -1,18 +1,18 @@
 {
     "issue_number": 17,
-    "updated_at": "2026-03-07T08:47:36.488Z",
+    "updated_at": "2026-04-29T14:30:03.502Z",
     "faq": [
         {
-            "question": "Why does the plugin fail to start with the error `Unexpected structure of Dyson cloud API response`?",
-            "answer": "This error occurs because the plugin performs strict validation of all data received from the Dyson Cloud API. This is a deliberate design choice to ensure that any changes to the API or the introduction of new appliance capabilities are identified and correctly implemented rather than ignored. When Dyson releases a new model or a firmware update that includes data fields or values (such as new entries in the `capabilities` list) that the plugin does not yet recognise, the validation fails and prevents the plugin from starting.\n\nTo resolve this:\n1. Ensure you are running the latest version of the plugin, as support for new fields is added frequently.\n2. If the error persists, check the logs for the specific validation failure (for example, `response[0].connectedConfiguration... is not a valid enum value`).\n3. Open a GitHub issue and include the full log output. The logs contain the raw API response which allows the maintainer to update the internal schemas to accommodate the new data.",
-            "semantic_abstract": "The plugin utilises strict schema validation for Dyson Cloud API responses to detect new hardware capabilities or API revisions. When undocumented fields or values are encountered, the plugin intentionally prevents startup to ensure data integrity and prompt the integration of new features.",
-            "hash": "fc66ef64c66691c8dc95bb4717aa94e8e712950164738d82273e171b9d16192a"
+            "question": "Why does the plugin fail to start with `Unexpected structure of Dyson cloud API response`?",
+            "answer": "This error occurs when the plugin encounters a device capability, model identifier, or response structure from the Dyson Cloud API that is not yet defined in its internal schema. The plugin employs strict validation to ensure that all data provided by the API is correctly understood and handled. This design choice prevents unpredictable behaviour and allows for the precise identification of new features or API changes introduced by Dyson. \n\nIf you encounter this error:\n1. Ensure the plugin is updated to the latest version, as support for new capabilities (such as `ReadyOffDock` or new robot models) is added frequently.\n2. Review the logs for the specific validation failure, for example: `response[x].connectedConfiguration.firmware.capabilities[y] is not a valid enum value`.\n3. Report the log output, including the JSON response snippet provided in the error log, so the missing definitions can be added to the plugin.",
+            "semantic_abstract": "Strict schema validation of Dyson Cloud API responses causes plugin startup failures when undocumented device capabilities or response structures are encountered, ensuring data integrity and facilitating the identification of new firmware features for official support.",
+            "hash": "fe914435c5723db32a2b3eabeb8c85371c5be1b161cea634592accd042484333"
         },
         {
-            "question": "Is the Dyson Spot+Scrub Ai (RB05) fully supported?",
-            "answer": "The Dyson Spot+Scrub Ai (RB05) currently has placeholder support. While basic vacuuming functionality is expected to work in version 1.8.3 and later, model-specific features such as mopping, directed cleaning, or dock maintenance are not yet implemented. \n\nBecause the maintainers do not have physical access to this specific hardware, adding full support requires collaboration with owners to capture and analyse HTTPS and MQTT traffic from the MyDyson app while the robot is in use. If you wish to assist in expanding support for this model, please check the project's GitHub issues for details on providing the necessary diagnostic logs.",
-            "semantic_abstract": "The Dyson Spot+Scrub Ai (RB05) is currently integrated with placeholder functionality, supporting basic vacuuming but lacking advanced features such as mopping. Development of full support is constrained by the absence of documented API and MQTT communication protocols for this specific appliance model.",
-            "hash": "1ececed065b6aab7f2d9a2502fff98ab7fcb2cee2fe8b4e9abcfa1045f5cefe0"
+            "question": "What is the level of support for the Dyson Spot+Scrub Ai (RB05)?",
+            "answer": "The Dyson Spot+Scrub Ai (RB05) currently has a placeholder implementation in the plugin. While basic functionality like starting or stopping a clean may work, more advanced features unique to this model—such as mopping controls, dock maintenance, or specific cleaning strategies—are not yet supported. \n\nFull support requires capturing HTTPS traffic and MQTT logs from the MyDyson app to reverse-engineer the specific communication protocol used by this model. Because the maintainers do not have access to this specific hardware, implementation relies on community contributions of debug logs to map the device's unique capabilities.",
+            "semantic_abstract": "The Dyson Spot+Scrub Ai (RB05) model operates with limited placeholder functionality due to undocumented API and MQTT command structures, requiring protocol analysis of mobile app traffic to implement model-specific features like mopping and dock management.",
+            "hash": "01c1a14533d0f93a74aa919feb6dfedae859848dce6f53a54948ffadbdfebddc"
         }
     ]
 }
