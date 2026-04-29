@@ -1,12 +1,12 @@
 {
     "issue_number": 19,
-    "updated_at": "2026-03-07T08:49:47.132Z",
+    "updated_at": "2026-04-29T16:18:58.694Z",
     "faq": [
         {
-            "question": "Why isn't my Dyson Solarcycle Morph desk light supported?",
-            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) is a Bluetooth-only device, indicated by the `connectionCategory: 'lecOnly'` field in the Dyson cloud manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable on the local network via Wi-Fi (`wifiOnly` or `lecAndWifi`).\n\nWhile the Dyson API manifest for these lights may include MQTT-related fields such as `remoteBrokerType: 'wss'`, testing has confirmed that no traffic or control capability is actually exposed via Dyson's AWS IoT cloud gateway for these models. Without a local network interface or a functional cloud MQTT shadow, there is no technical pathway for the plugin to monitor or control the device.\n\nFrom version 1.9.1 onwards, the plugin is designed to gracefully ignore these Bluetooth-only devices during the initialisation manifest check, allowing other supported hardware (like robot vacuums or air purifiers) to function correctly.",
-            "semantic_abstract": "Dyson Solarcycle Morph desk lights utilise Bluetooth-only connectivity (indicated as `lecOnly` in API manifests), preventing local network access required for Matter bridging. Although the Dyson cloud API provides MQTT metadata for these devices, they do not expose actionable state or control via the cloud gateway, resulting in a hardware-based limitation that precludes support.",
-            "hash": "951c062185ea6fdac9d97c1100d487713e0dba65742c37d93bff45d12df1f1c0"
+            "question": "Why is my Dyson Solarcycle Morph desk light not supported by the plugin?",
+            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are not supported because they use Bluetooth Low Energy (BLE) for communication rather than Wi-Fi. This is indicated in the device manifest by the `connectionCategory: 'lecOnly'` field.\n\nWhile the Dyson cloud API may provide MQTT configuration details for these devices, investigations have shown that no control traffic or state updates are actually transmitted via the Dyson MQTT gateway for these models. Since the plugin requires either local Wi-Fi connectivity or a functional cloud MQTT bridge to interact with appliances, it cannot control BLE-only devices.\n\nFrom version `1.9.1` onwards, the plugin is designed to identify these devices in your MyDyson account and gracefully ignore them. This ensures that the presence of an unsupported light does not prevent the plugin from starting or affect the operation of other supported Wi-Fi-enabled appliances, such as air purifiers or robot vacuums.",
+            "semantic_abstract": "Dyson Solarcycle Morph lighting products use Bluetooth Low Energy (BLE) instead of Wi-Fi, resulting in a `lecOnly` connection category that lacks functional MQTT cloud gateway integration. This hardware limitation prevents remote control via the plugin, which requires Wi-Fi or MQTT connectivity. The plugin identifies and ignores these devices to maintain compatibility with other supported Wi-Fi-connected appliances.",
+            "hash": "1b2edcf3653817f75aee39a4be416fa6eae54a0ac5d1371602ca74cca9b433d5"
         }
     ]
 }
