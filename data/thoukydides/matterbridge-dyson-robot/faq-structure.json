@@ -77,15 +77,16 @@
             "preamble": "",
             "partitions": [
                 {
-                    "entries": [],
-                    "candidates": [
+                    "entries": [
                         {
-                            "issue_number": 13,
-                            "id": "issue-13-160a",
                             "question": "Why does the plugin still log details for appliances I have blacklisted?",
-                            "answer": "It is expected behaviour to see all appliances linked to your MyDyson account mentioned in the startup logs. The plugin must first query the Dyson cloud API to retrieve a full manifest of all devices to determine their models and communication requirements. The `entityBlackList` and `entityWhiteList` filters are applied after this initial discovery phase, just before the plugin registers devices as Matter endpoints. Consequently, even devices excluded from being bridged will appear during the initialisation and account-authorisation logs."
+                            "answer": "It is expected behaviour to see all appliances linked to your MyDyson account mentioned in the startup logs. The plugin must first query the Dyson cloud API to retrieve a full manifest of all devices to determine their models and communication requirements.\n\nThe `entityBlackList` and `entityWhiteList` filters are applied after this initial discovery phase, just before the plugin registers devices as Matter endpoints. Consequently, even devices excluded from being bridged will appear during the initialisation and account-authorisation logs.",
+                            "included_ids": [
+                                "issue-13-160a"
+                            ]
                         }
-                    ]
+                    ],
+                    "candidates": []
                 }
             ],
             "subcategories": []

@@ -10,6 +10,7 @@
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
+  - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -68,9 +69,11 @@ To ensure you are running the latest version:
 
 ## Appliance Discovery and Filtering
 
-#### 🚧 Why does the plugin still log details for appliances I have blacklisted? 🚧
+#### Why does the plugin still log details for appliances I have blacklisted?
 
 <!-- INCLUDES: issue-13-160a -->
-It is expected behaviour to see all appliances linked to your MyDyson account mentioned in the startup logs. The plugin must first query the Dyson cloud API to retrieve a full manifest of all devices to determine their models and communication requirements. The `entityBlackList` and `entityWhiteList` filters are applied after this initial discovery phase, just before the plugin registers devices as Matter endpoints. Consequently, even devices excluded from being bridged will appear during the initialisation and account-authorisation logs.
+It is expected behaviour to see all appliances linked to your MyDyson account mentioned in the startup logs. The plugin must first query the Dyson cloud API to retrieve a full manifest of all devices to determine their models and communication requirements.
+
+The `entityBlackList` and `entityWhiteList` filters are applied after this initial discovery phase, just before the plugin registers devices as Matter endpoints. Consequently, even devices excluded from being bridged will appear during the initialisation and account-authorisation logs.
 
 <!-- EXCLUDED: issue-1-59e4 issue-16-b5e2 issue-26-2ae8 -->
