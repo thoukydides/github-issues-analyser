@@ -577,6 +577,17 @@ The ability to turn an appliance off is determined by the Home Connect API and t
 
 You can verify the capabilities of your specific appliance by checking the Homebridge logs during startup. The plugin queries each appliance for its supported power states and will log `Cannot be switched off` if the hardware only permits the `On` state via the API.
 
+#### 🚧 How do I disable the Power switch for my appliance and what are the consequences? 🚧
+
+<!-- INCLUDES: issue-383-4c04 -->
+The Power switch service can be disabled for individual appliances to reduce UI clutter in HomeKit. This is achieved by adding `"Power": false` to the `features` object within the appliance's configuration.
+
+While this simplifies the HomeKit interface, users should be aware of several technical consequences:
+
+1. **Dependent features are disabled**: Several other features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`. 
+2. **Reduced status feedback**: Without the Power service and its associated characteristics (such as those indicating program mode or duration), HomeKit has fewer data points to trigger status updates. If a transient error occurs—such as HomeKit accidentally sending a duplicate command to start an already running program—the accessory may show a `No Response` or `Not Responding` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
+3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app's cache, sometimes resulting in missing labels or incorrectly merged tiles. If names or labels disappear after disabling the Power switch, it is recommended to remove the accessory or the child bridge from Homebridge and re-add it to flush the HomeKit cache.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?

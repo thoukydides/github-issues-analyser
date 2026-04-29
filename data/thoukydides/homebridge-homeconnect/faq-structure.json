@@ -530,7 +530,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 383,
+                                    "id": "issue-383-4c04",
+                                    "question": "How do I disable the Power switch for my appliance and what are the consequences?",
+                                    "answer": "The Power switch service can be disabled for individual appliances to reduce UI clutter in HomeKit. This is achieved by adding `\"Power\": false` to the `features` object within the appliance's configuration.\n\nWhile this simplifies the HomeKit interface, users should be aware of several technical consequences:\n\n1. **Dependent features are disabled**: Several other features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`. \n2. **Reduced status feedback**: Without the Power service and its associated characteristics (such as those indicating program mode or duration), HomeKit has fewer data points to trigger status updates. If a transient error occurs—such as HomeKit accidentally sending a duplicate command to start an already running program—the accessory may show a `No Response` or `Not Responding` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.\n3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app's cache, sometimes resulting in missing labels or incorrectly merged tiles. If names or labels disappear after disabling the Power switch, it is recommended to remove the accessory or the child bridge from Homebridge and re-add it to flush the HomeKit cache."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
