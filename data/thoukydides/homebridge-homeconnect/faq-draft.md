@@ -760,10 +760,12 @@ To maintain the integrity of voice control, this plugin exposes fridge and freez
 
 #### Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?
 
-<!-- INCLUDES: issue-303-180f issue-361-a7d8 -->
+<!-- INCLUDES: issue-303-180f issue-350-ead0 issue-361-a7d8 -->
 The plugin uses the `Door` service to represent appliance doors by design, as this is the most semantically accurate HomeKit service for the hardware. While many appliances only provide a read-only door status, the Home Connect API supports `Open Door` and `Partly Open Door` commands for specific high-end models. Mapping these to a `Door` service allows the plugin to expose this control functionality where supported; on other models, it remains a read-only sensor.
 
-Because Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors, and receive automatic notifications when the door state changes. This is standard HomeKit behaviour and cannot be changed by the plugin. If this behaviour is not desired, you have two options:
+The `Door` service is the only HomeKit service type that allows for both status monitoring and active control (actuation). Using a simpler sensor-based service, such as a `Contact Sensor`, would prevent the plugin from supporting remote door opening on appliances that offer it.
+
+Because Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or garage doors, and receive automatic notifications when the door state changes. This is standard HomeKit behaviour and cannot be changed by the plugin. If this behaviour is not desired, you have two options:
 
 1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.
 2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.
@@ -851,15 +853,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why does my appliance door appear as a security device in the Apple Home app? 🚧
-
-<!-- INCLUDES: issue-350-ead0 -->
-The plugin uses the HomeKit `Door` service to represent the doors of all supported appliances. This is a deliberate design decision to ensure consistency and to support the full capabilities of the Home Connect API.
-
-While many appliances only report whether their door is open or closed, some high-end models support remote opening or closing. The `Door` service is the only HomeKit service type that allows for both status monitoring and active control (actuation). Using a simpler sensor-based service would prevent the plugin from supporting remote door control on appliances that offer it.
-
-Because the Apple Home app automatically groups all `Door` services under the security category, appliance doors are displayed alongside locks and garage doors. This classification is a behaviour of the Apple Home app itself and cannot be changed by the plugin. The primary functional side effect is that notifications may be enabled by default when the door state changes; these can be disabled individually within the accessory settings in the Home app.
 
 ### Notifications & Events
 
