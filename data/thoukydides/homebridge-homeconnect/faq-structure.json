@@ -48,8 +48,7 @@
                                     "included_ids": [
                                         "issue-97-4efe",
                                         "issue-125-fcc5",
-                                        "issue-151-2b8d",
-                                        "issue-351-e214"
+                                        "issue-151-2b8d"
                                     ]
                                 },
                                 {
@@ -61,8 +60,7 @@
                                         "issue-118-0a9e",
                                         "issue-121-d035",
                                         "issue-295-c09a",
-                                        "issue-299-6c02",
-                                        "issue-351-e214"
+                                        "issue-299-6c02"
                                     ]
                                 },
                                 {
@@ -80,7 +78,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 351,
+                                    "id": "issue-351-729d",
+                                    "question": "Why does the authorisation fail with `AggregateError` during the initial setup?",
+                                    "answer": "An `AggregateError` during the initial authorisation process typically indicates a network-level failure occurring before the request can reach the Home Connect servers. This is often caused by DNS resolution issues or routing problems, particularly within Docker container environments.\n\nTo diagnose and resolve this issue:\n1. **Verify network connectivity**: Test whether the environment can reach the API by running `curl -v https://api.home-connect.com/security/oauth/device_authorization` from within the same environment (e.g. inside the Docker container).\n2. **Check DNS configuration**: Ensure your container or host has a functional DNS resolver. You may need to override the default DNS in Docker using `--dns 1.1.1.1` or check the contents of `/etc/resolv.conf`.\n3. **Address IPv6 issues**: Node.js and the `undici` library used by the plugin can sometimes fail when IPv6 is partially enabled but not correctly routed. Try the following:\n   - Disable IPv6 for the container using `--sysctl net.ipv6.conf.all.disable_ipv6=1`.\n   - Configure the environment to prefer IPv4 by modifying `/etc/gai.conf` to include `precedence ::ffff:0:0/96 100`.\n   - Increase the DNS resolution timeout by setting the environment variable `NODE_OPTIONS=\"--network-family-autoselection-attempt-timeout=500\"`.\n4. **Try Host networking**: If using Docker, try running the container in `host` network mode to bypass virtual bridge networking issues.\n\nNote that the plugin does not use pop-up windows or QR codes for authorisation. You must manually copy the URL and `user_code` printed in the Homebridge logs or configuration UI into your web browser while logged into your Home Connect account."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -157,8 +162,7 @@
                                     "included_ids": [
                                         "issue-50-4e01",
                                         "issue-137-3fe8",
-                                        "issue-276-249a",
-                                        "issue-351-eb7a"
+                                        "issue-276-249a"
                                     ]
                                 },
                                 {
@@ -385,9 +389,7 @@
                                 {
                                     "question": "Why are fan controls missing for my integrated venting hob?",
                                     "answer": "Extractor fans integrated into hobs (venting hobs) are not exposed by the Home Connect API as controllable features.\n\nThe Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, e.g. the two cavities of dual ovens. The extractor fan in hood appliances operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), so a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API, which is not currently the case. Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance.",
-                                    "included_ids": [
-                                        "issue-363-c1e6"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does the log say a selected program is not supported by the Home Connect API?",
@@ -537,7 +539,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 363,
+                                    "id": "issue-363-0abc",
+                                    "question": "Why is the integrated extractor fan on my hob not appearing in Homebridge?",
+                                    "answer": "Home Connect treats hobs and extractor fans as two distinct appliance types. For hobs with integrated ventilation, the Home Connect API should ideally represent the unit as two separate devices: a `Hob` and a `Hood`.\n\nIf only the `Hob` appears in Homebridge and no fan controls are visible, it is because the Home Connect API has not exposed the ventilation functionality for that specific model. This is a limitation of the third-party API and cannot be resolved within the plugin code. The plugin can only expose features and services that are provided by the official Home Connect API for your appliance.\n\nTo address this limitation:\n1. Verify the functionality is missing from the API by checking the cached responses in `~/.homebridge/homebridge-homeconnect/persist` (see the plugin Wiki for details on these files).\n2. Contact the Home Connect developer team directly via their [support contact form](https://developer.home-connect.com/support/contact) to request that the integrated fan be exposed as a separate `Hood` appliance.\n\nNote that updates to the Home Connect API to support new appliance features can take a significant amount of time to be implemented by the manufacturer."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -615,8 +624,7 @@
                                     "question": "Why does my refrigerator or freezer always show as open in HomeKit even when it is closed?",
                                     "answer": "This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models. The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when physically closed.\n\nTo troubleshoot and potentially work around this:\n\n1. **Expose individual door services**: Some appliances report a combined status as well as individual statuses for different compartments (e.g. `ChillerLeft`, `Freezer`, `Refrigerator`). Configure the plugin to expose these specific door services, as they often update correctly even if the combined status does not.\n2. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. This confirms if the plugin is receiving `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` from the server while the door is physically closed.\n3. **Contact Support**: If the raw API values are incorrect, the issue should be reported to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) as it likely requires a firmware fix.",
                                     "included_ids": [
-                                        "issue-382-3c33",
-                                        "issue-385-bb01"
+                                        "issue-382-3c33"
                                     ]
                                 },
                                 {
@@ -634,7 +642,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 385,
+                                    "id": "issue-385-2b18",
+                                    "question": "Why does my freezer always show the door as open or report an incorrect `BSH.Common.Status.DoorState`?",
+                                    "answer": "Some freezer models may incorrectly report the generic door status as `Open` via the Home Connect API, even when the door is physically closed. This is typically a firmware or API-level bug where the appliance provides the correct status only through a device-specific key (`Refrigeration.Common.Status.Door.Freezer`) rather than the standard one.\n\nTo resolve this, you must override the default door mapping in the plugin configuration for that specific appliance:\n1. Navigate to the appliance-specific settings in the plugin configuration.\n2. Disable the generic `Door` feature.\n3. Enable the `Freezer Door` feature.\n\nThis forces the plugin to monitor the specific freezer door state instead of the incorrect generic state. Affected users are encouraged to report this behaviour to Home Connect customer service with their appliance model and account details to assist in a permanent firmware fix."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -696,7 +711,6 @@
                                     "answer": "The plugin uses the `Door` service to represent appliance doors by design, as this is the most semantically accurate HomeKit service for the hardware. While many appliances only provide a read-only door status, the Home Connect API supports `Open Door` and `Partly Open Door` commands for specific high-end models. Mapping these to a `Door` service allows the plugin to expose this control functionality where supported; on other models, it remains a read-only sensor.\n\nBecause Apple Home categorises all `Door` services as security-related accessories, you may see the appliance grouped with locks or sensors, and receive automatic notifications when the door state changes. This is standard HomeKit behaviour and cannot be changed by the plugin. If this behaviour is not desired, you have two options:\n\n1. **Disable notifications**: Within the Apple Home app, navigate to **Home Settings** > **Doors** and toggle off notifications for the specific appliance door.\n2. **Disable the service**: You can completely hide the `Door` service within the plugin configuration for that appliance.",
                                     "included_ids": [
                                         "issue-303-180f",
-                                        "issue-350-d626",
                                         "issue-361-a7d8"
                                     ]
                                 },
@@ -777,7 +791,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 350,
+                                    "id": "issue-350-ead0",
+                                    "question": "Why does my appliance door appear as a security device in the Apple Home app?",
+                                    "answer": "The plugin uses the HomeKit `Door` service to represent the doors of all supported appliances. This is a deliberate design decision to ensure consistency and to support the full capabilities of the Home Connect API.\n\nWhile many appliances only report whether their door is open or closed, some high-end models support remote opening or closing. The `Door` service is the only HomeKit service type that allows for both status monitoring and active control (actuation). Using a simpler sensor-based service would prevent the plugin from supporting remote door control on appliances that offer it.\n\nBecause the Apple Home app automatically groups all `Door` services under the security category, appliance doors are displayed alongside locks and garage doors. This classification is a behaviour of the Apple Home app itself and cannot be changed by the plugin. The primary functional side effect is that notifications may be enabled by default when the door state changes; these can be disabled individually within the accessory settings in the Home app."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -909,7 +930,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 360,
+                                    "id": "issue-360-b285",
+                                    "question": "Why are some configuration options, like the Client ID or appliance settings, missing from the UI?",
+                                    "answer": "The plugin uses dynamic configuration schemas to manage the wide variety of settings available for different Home Connect appliances. To prevent the interface from becoming overwhelmed, many fields are hidden until they become relevant. For example, settings for specific appliances are only shown after the plugin has successfully authenticated with the Home Connect API and discovered your devices.\n\nIf you are performing a first-time installation and cannot see the `clientid` field, ensure you are using the latest version of **Homebridge Config UI X**. The plugin relies on the web interface's support for conditional logic (specifically `functionBody` conditions) to show and hide these fields correctly. If these fields do not appear, it is usually indicative of an issue with the Homebridge UI engine rather than the plugin itself. As a temporary measure, the plugin logs will indicate if required values like `clientid` are missing, which can be manually added to your `config.json` if the graphical interface is not functioning correctly."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -952,8 +980,6 @@
         "issue-298-1c85",
         "issue-300-7e4a",
         "issue-304-0ee0",
-        "issue-351-e214",
-        "issue-360-732a",
         "issue-375-b67d"
     ],
     "source_hashes": {
