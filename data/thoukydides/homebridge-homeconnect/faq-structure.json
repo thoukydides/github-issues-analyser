@@ -911,16 +911,16 @@
                                     "included_ids": [
                                         "issue-53-27e2"
                                     ]
+                                },
+                                {
+                                    "question": "Why are some configuration options, such as the Client ID, missing from the settings UI?",
+                                    "answer": "The plugin uses dynamic configuration schemas to manage the wide variety of settings available for different Home Connect appliances. To prevent the interface from becoming overwhelmed, many fields are hidden until they become relevant. For example, settings for specific appliances are only shown after the plugin has successfully authenticated with the Home Connect API and discovered your devices.\n\nIf you are performing a first-time installation and cannot see the `clientid` field, ensure you are using the latest version of **Homebridge Config UI X**. The plugin relies on the web interface's support for conditional logic (specifically `functionBody` conditions) to show and hide these fields correctly. If these fields do not appear, it is usually indicative of an issue with the Homebridge UI engine rather than the plugin itself. As a temporary measure, the plugin logs will indicate if required values like `clientid` are missing, which can be manually added to your `config.json` if the graphical interface is not functioning correctly.",
+                                    "included_ids": [
+                                        "issue-360-b285"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 360,
-                                    "id": "issue-360-b285",
-                                    "question": "Why are some configuration options, like the Client ID or appliance settings, missing from the UI?",
-                                    "answer": "The plugin uses dynamic configuration schemas to manage the wide variety of settings available for different Home Connect appliances. To prevent the interface from becoming overwhelmed, many fields are hidden until they become relevant. For example, settings for specific appliances are only shown after the plugin has successfully authenticated with the Home Connect API and discovered your devices.\n\nIf you are performing a first-time installation and cannot see the `clientid` field, ensure you are using the latest version of **Homebridge Config UI X**. The plugin relies on the web interface's support for conditional logic (specifically `functionBody` conditions) to show and hide these fields correctly. If these fields do not appear, it is usually indicative of an issue with the Homebridge UI engine rather than the plugin itself. As a temporary measure, the plugin logs will indicate if required values like `clientid` are missing, which can be manually added to your `config.json` if the graphical interface is not functioning correctly."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

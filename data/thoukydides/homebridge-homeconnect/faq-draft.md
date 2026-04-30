@@ -95,6 +95,7 @@
     - [Why are features available in the official app or IFTTT missing from this plugin?](#why-are-features-available-in-the-official-app-or-ifttt-missing-from-this-plugin)
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
+    - [Why are some configuration options, such as the Client ID, missing from the settings UI?](#why-are-some-configuration-options-such-as-the-client-id-missing-from-the-settings-ui)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -958,7 +959,7 @@ To resolve this issue:
 
 This error is often transient and may also be resolved by simply restarting the host system or retrying the installation via the Homebridge Config UI interface.
 
-#### 🚧 Why are some configuration options, like the Client ID or appliance settings, missing from the UI? 🚧
+#### Why are some configuration options, such as the Client ID, missing from the settings UI?
 
 <!-- INCLUDES: issue-360-b285 -->
 The plugin uses dynamic configuration schemas to manage the wide variety of settings available for different Home Connect appliances. To prevent the interface from becoming overwhelmed, many fields are hidden until they become relevant. For example, settings for specific appliances are only shown after the plugin has successfully authenticated with the Home Connect API and discovered your devices.
