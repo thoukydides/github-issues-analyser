@@ -388,8 +388,10 @@
                                 },
                                 {
                                     "question": "Why are fan controls missing for my integrated venting hob?",
-                                    "answer": "Extractor fans integrated into hobs (venting hobs) are not exposed by the Home Connect API as controllable features.\n\nThe Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, e.g. the two cavities of dual ovens. The extractor fan in hood appliances operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), so a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API, which is not currently the case. Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance.",
-                                    "included_ids": []
+                                    "answer": "The Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, such as the two cavities of dual ovens. Because extractor fans operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API.\n\nIf your venting hob does not appear as two distinct appliances, it is a limitation of the third-party API and cannot be resolved within the plugin code. You can verify if the functionality is being exposed by inspecting the cached API responses in `~/.homebridge/homebridge-homeconnect/persist`. Affected users should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate hood appliance. Note that updates to the Home Connect API to support new features can take a significant amount of time to be implemented.",
+                                    "included_ids": [
+                                        "issue-363-0abc"
+                                    ]
                                 },
                                 {
                                     "question": "Why does the log say a selected program is not supported by the Home Connect API?",
@@ -452,7 +454,7 @@
                                 },
                                 {
                                     "question": "How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?",
-                                    "answer": "Home Connect distinguishes between global [settings](https://api-docs.home-connect.com/settings/) (like Child Lock) and program-specific [options](https://api-docs.home-connect.com/programs-and-options/) (like `HalfLoad`, `ExtraDry`, or `EfficientDry` / `EcoDry`). \n\nBecause these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.",
+                                    "answer": "Home Connect distinguishes between global settings (like Child Lock) and program-specific options (like `HalfLoad`, `ExtraDry`, or `EfficientDry` / `EcoDry`). \n\nBecause these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.",
                                     "included_ids": [
                                         "issue-138-5e6c",
                                         "issue-341-4c61"
@@ -539,14 +541,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 363,
-                                    "id": "issue-363-0abc",
-                                    "question": "Why is the integrated extractor fan on my hob not appearing in Homebridge?",
-                                    "answer": "Home Connect treats hobs and extractor fans as two distinct appliance types. For hobs with integrated ventilation, the Home Connect API should ideally represent the unit as two separate devices: a `Hob` and a `Hood`.\n\nIf only the `Hob` appears in Homebridge and no fan controls are visible, it is because the Home Connect API has not exposed the ventilation functionality for that specific model. This is a limitation of the third-party API and cannot be resolved within the plugin code. The plugin can only expose features and services that are provided by the official Home Connect API for your appliance.\n\nTo address this limitation:\n1. Verify the functionality is missing from the API by checking the cached responses in `~/.homebridge/homebridge-homeconnect/persist` (see the plugin Wiki for details on these files).\n2. Contact the Home Connect developer team directly via their [support contact form](https://developer.home-connect.com/support/contact) to request that the integrated fan be exposed as a separate `Hood` appliance.\n\nNote that updates to the Home Connect API to support new appliance features can take a significant amount of time to be implemented by the manufacturer."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

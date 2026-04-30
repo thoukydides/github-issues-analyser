@@ -424,9 +424,10 @@ If a program is unexpectedly missing, try powering the appliance on, manually se
 
 #### Why are fan controls missing for my integrated venting hob?
 
-Extractor fans integrated into hobs (venting hobs) are not exposed by the Home Connect API as controllable features.
+<!-- INCLUDES: issue-363-0abc -->
+The Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, such as the two cavities of dual ovens. Because extractor fans operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API.
 
-The Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, e.g. the two cavities of dual ovens. The extractor fan in hood appliances operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), so a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API, which is not currently the case. Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance.
+If your venting hob does not appear as two distinct appliances, it is a limitation of the third-party API and cannot be resolved within the plugin code. You can verify if the functionality is being exposed by inspecting the cached API responses in `~/.homebridge/homebridge-homeconnect/persist`. Affected users should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate hood appliance. Note that updates to the Home Connect API to support new features can take a significant amount of time to be implemented.
 
 #### Why does the log say a selected program is not supported by the Home Connect API?
 
@@ -509,7 +510,7 @@ This will trigger the identification sequence on the physical appliance and forc
 #### How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?
 
 <!-- INCLUDES: issue-138-5e6c issue-341-4c61 -->
-Home Connect distinguishes between global [settings](https://api-docs.home-connect.com/settings/) (like Child Lock) and program-specific [options](https://api-docs.home-connect.com/programs-and-options/) (like `HalfLoad`, `ExtraDry`, or `EfficientDry` / `EcoDry`). 
+Home Connect distinguishes between global settings (like Child Lock) and program-specific options (like `HalfLoad`, `ExtraDry`, or `EfficientDry` / `EcoDry`). 
 
 Because these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.
 
@@ -603,19 +604,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why is the integrated extractor fan on my hob not appearing in Homebridge? 🚧
-
-<!-- INCLUDES: issue-363-0abc -->
-Home Connect treats hobs and extractor fans as two distinct appliance types. For hobs with integrated ventilation, the Home Connect API should ideally represent the unit as two separate devices: a `Hob` and a `Hood`.
-
-If only the `Hob` appears in Homebridge and no fan controls are visible, it is because the Home Connect API has not exposed the ventilation functionality for that specific model. This is a limitation of the third-party API and cannot be resolved within the plugin code. The plugin can only expose features and services that are provided by the official Home Connect API for your appliance.
-
-To address this limitation:
-1. Verify the functionality is missing from the API by checking the cached responses in `~/.homebridge/homebridge-homeconnect/persist` (see the plugin Wiki for details on these files).
-2. Contact the Home Connect developer team directly via their [support contact form](https://developer.home-connect.com/support/contact) to request that the integrated fan be exposed as a separate `Hood` appliance.
-
-Note that updates to the Home Connect API to support new appliance features can take a significant amount of time to be implemented by the manufacturer.
 
 ### Appliance Status and Connectivity
 
