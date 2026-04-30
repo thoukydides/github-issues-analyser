@@ -10,6 +10,7 @@
     - [Why does authorisation fail with `access_denied`, `device authorization session has expired`, or `login session expired`?](#why-does-authorisation-fail-with-access_denied-device-authorization-session-has-expired-or-login-session-expired)
     - [Why does authorisation fail with a `403 Forbidden` error?](#why-does-authorisation-fail-with-a-403-forbidden-error)
     - [How do I configure the plugin for a Home Connect account in Mainland China?](#how-do-i-configure-the-plugin-for-a-home-connect-account-in-mainland-china)
+    - [Why does authorisation fail with an `AggregateError`?](#why-does-authorisation-fail-with-an-aggregateerror)
   - **[Home Connect API Errors](#home-connect-api-errors)**
     - [Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?](#why-does-the-log-show-429-too-many-requests-1000-calls-in-1-day-reached-or-a-message-like-waiting--before-issuing-home-connect-api-request)
     - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
@@ -178,12 +179,13 @@ Home Connect appliances registered in Mainland China operate on a separate infra
 
 This configuration ensures the plugin uses the dedicated `api.home-connect.cn` endpoint. Note that the China Mainland server may use different login credentials, such as a mobile number, which is supported once the plugin is directed to the correct regional endpoint.
 
-#### 🚧 Why does the authorisation fail with `AggregateError` during the initial setup? 🚧
+#### Why does authorisation fail with an `AggregateError`?
 
 <!-- INCLUDES: issue-351-729d -->
 An `AggregateError` during the initial authorisation process typically indicates a network-level failure occurring before the request can reach the Home Connect servers. This is often caused by DNS resolution issues or routing problems, particularly within Docker container environments.
 
 To diagnose and resolve this issue:
+
 1. **Verify network connectivity**: Test whether the environment can reach the API by running `curl -v https://api.home-connect.com/security/oauth/device_authorization` from within the same environment (e.g. inside the Docker container).
 2. **Check DNS configuration**: Ensure your container or host has a functional DNS resolver. You may need to override the default DNS in Docker using `--dns 1.1.1.1` or check the contents of `/etc/resolv.conf`.
 3. **Address IPv6 issues**: Node.js and the `undici` library used by the plugin can sometimes fail when IPv6 is partially enabled but not correctly routed. Try the following:
@@ -191,8 +193,6 @@ To diagnose and resolve this issue:
    - Configure the environment to prefer IPv4 by modifying `/etc/gai.conf` to include `precedence ::ffff:0:0/96 100`.
    - Increase the DNS resolution timeout by setting the environment variable `NODE_OPTIONS="--network-family-autoselection-attempt-timeout=500"`.
 4. **Try Host networking**: If using Docker, try running the container in `host` network mode to bypass virtual bridge networking issues.
-
-Note that the plugin does not use pop-up windows or QR codes for authorisation. You must manually copy the URL and `user_code` printed in the Homebridge logs or configuration UI into your web browser while logged into your Home Connect account.
 
 ### Home Connect API Errors
 
