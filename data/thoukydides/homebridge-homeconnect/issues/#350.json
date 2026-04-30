@@ -1,12 +1,12 @@
 {
     "issue_number": 350,
-    "updated_at": "2026-04-03T11:03:07.332Z",
+    "updated_at": "2026-04-30T07:38:45.334Z",
     "faq": [
         {
-            "question": "Why is my appliance door classified as a security device in HomeKit?",
-            "answer": "Appliance doors are mapped to the HomeKit `Door` service because it is the most appropriate representation for the door status reported by the Home Connect API. This service type was selected for several reasons:\n\n1. It supports both monitoring and actuation. Some appliances allow the door to be opened or closed via the API, and the `Door` service supports this bidirectional control, whereas a sensor-based service (like `ContactSensor`) only allows monitoring.\n2. It ensures consistent behaviour across all appliance types supported by the plugin.\n\nWhile the Apple Home app groups all `Door` services under security devices, this is a cosmetic classification with no functional security implications for the appliance. The most notable side effect is that the Home app may enable notifications for door state changes by default. These notifications can be disabled for each specific appliance within its settings in the Apple Home app.",
-            "semantic_abstract": "The plugin maps appliance doors to the HomeKit `Door` service rather than a sensor service to support both status monitoring and remote control capabilities provided by the Home Connect API. This choice causes the Apple Home app to categorise the appliance as a security device and enable notifications by default, which is a platform-specific cosmetic grouping that can be managed via notification settings.",
-            "hash": "d626a225a449de02cae94de4b4818f6f8b89c15b2b5fbc2e831a48658ebe22ce"
+            "question": "Why does my appliance door appear as a security device in the Apple Home app?",
+            "answer": "The plugin uses the HomeKit `Door` service to represent the doors of all supported appliances. This is a deliberate design decision to ensure consistency and to support the full capabilities of the Home Connect API.\n\nWhile many appliances only report whether their door is open or closed, some high-end models support remote opening or closing. The `Door` service is the only HomeKit service type that allows for both status monitoring and active control (actuation). Using a simpler sensor-based service would prevent the plugin from supporting remote door control on appliances that offer it.\n\nBecause the Apple Home app automatically groups all `Door` services under the security category, appliance doors are displayed alongside locks and garage doors. This classification is a behaviour of the Apple Home app itself and cannot be changed by the plugin. The primary functional side effect is that notifications may be enabled by default when the door state changes; these can be disabled individually within the accessory settings in the Home app.",
+            "semantic_abstract": "The plugin maps Home Connect appliance doors to the HomeKit `Door` service to support both status monitoring and remote actuation capabilities provided by the API. This service mapping causes the Apple Home app to automatically categorise the appliance door as a security device, as the `Door` service is natively grouped with security-related accessories.",
+            "hash": "ead0861a16fe5a81c66163589aa05eb5e30629839ac4494e18148de5a5199abe"
         }
     ]
 }
