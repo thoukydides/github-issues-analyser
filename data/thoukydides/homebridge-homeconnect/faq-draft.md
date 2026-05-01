@@ -21,7 +21,7 @@
     - [Why am I seeing network errors like `EAI_AGAIN`, `ENOTFOUND`, `ETIMEDOUT`, or `ENETUNREACH`?](#why-am-i-seeing-network-errors-like-eai_again-enotfound-etimedout-or-enetunreach)
     - [Why is the log flooded with errors during a Home Connect outage?](#why-is-the-log-flooded-with-errors-during-a-home-connect-outage)
     - [Why does my multi-cavity oven show a `BSH.Common.Error.InvalidUIDValue` error?](#why-does-my-multi-cavity-oven-show-a-bshcommonerrorinvaliduidvalue-error)
-    - [Why does starting the Silence program on my dishwasher fail?](#why-does-starting-the-silence-program-on-my-dishwasher-fail)
+    - [Why does starting the Silence program on my dishwasher fail or return a `409 Conflict` error?](#why-does-starting-the-silence-program-on-my-dishwasher-fail-or-return-a-409-conflict-error)
     - [How can I refresh appliance capabilities or resolve stale program information?](#how-can-i-refresh-appliance-capabilities-or-resolve-stale-program-information)
   - **[Local/Remote Control](#localremote-control)**
     - [Why does my appliance show `No Response` when I try to start a program?](#why-does-my-appliance-show-no-response-when-i-try-to-start-a-program)
@@ -309,13 +309,17 @@ This error typically occurs with multi-cavity appliances where only the main ove
 
 The plugin handles this gracefully by ignoring the error and disabling program control for the unsupported cavity. This is an issue with the Home Connect API's device enumeration, which is occasionally addressed by manufacturer server-side updates.
 
-#### Why does starting the Silence program on my dishwasher fail?
+#### Why does starting the Silence program on my dishwasher fail or return a `409 Conflict` error?
 
-Some dishwasher appliances offer both a dedicated **Silence** program (e.g. `NightWash`) and a **Silence on Demand** option that modifies other programs. The Home Connect API restricts appliances to one active program at a time.
+<!-- INCLUDES: issue-374-bbfe -->
+The error `409 Conflict` (specifically `SDK.Error.WrongOperationState`) occurs when trying to activate a silence feature while a cycle is already running. This is due to the technical distinction the Home Connect API makes between programs and options:
 
-If you attempt to start the `NightWash` program while another program is already running, the API returns a `409 Conflict` error with `SDK.Error.WrongOperationState`.
+1. **Programs** (e.g. `Dishcare.Dishwasher.Program.NightWash`): These are complete cleaning cycles. Only one program can be active at a time; the API will reject an attempt to start a new program while another is already in progress.
+2. **Options** (e.g. `Dishcare.Dishwasher.Option.SilenceOnDemand`): These are modifiers for a program. The 30-minute silence feature in the official Home Connect app is typically implemented as a program option, not a standalone program.
 
-This plugin supports starting a new program with the `SilenceOnDemand` option if configured, but it does not map program options to dedicated HomeKit services for modification of an already running program. This is a deliberate design choice because the API does not clearly signal which options can be validly modified dynamically.
+The plugin supports including these options when you **start** a program via HomeKit. However, it does not support changing options dynamically once a cycle has already begun. This is a deliberate design choice because the API does not generally permit dynamic modification of options mid-cycle and provides no clear indication of which specific options are safe to change. Furthermore, there is no reliable way to map dynamic, mid-cycle option changes into the standard HomeKit service and characteristic model.
+
+To use the silence feature, you must either start the dedicated `NightWash` program when the appliance is idle or include the relevant option at the time the primary program is initially triggered.
 
 #### How can I refresh appliance capabilities or resolve stale program information?
 
@@ -329,22 +333,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does activating dishwasher silence mode mid-cycle fail with a `409 Conflict` error? 🚧
-
-<!-- INCLUDES: issue-374-bbfe -->
-The error `409 Conflict` occurs because the appliance is not in a `Ready` state. In the Home Connect system, there is a technical distinction between programs and options:
-
-1.  **Programs** (e.g. `Dishcare.Dishwasher.Program.NightWash`): These are complete cleaning cycles. Only one program can be active at a time; you cannot start a new program (like the NightWash program) while another cycle is already running.
-2.  **Options** (e.g. `Dishcare.Dishwasher.Option.SilenceOnDemand`): These are modifiers for a program. The 30-minute silence feature in the official Home Connect app is implemented as a program option, not a standalone program.
-
-The plugin supports including these options when you **start** a program via HomeKit. However, it does not support changing options dynamically once a cycle has already begun. This is a deliberate design choice based on several factors:
-
-*   The Home Connect API does not generally permit dynamic modification of options mid-cycle.
-*   The API provides no clear indication of which specific options are safe to change once a program has started.
-*   There is no reliable way to map dynamic, mid-cycle option changes into the standard HomeKit service and characteristic model.
-
-To use the silence feature, you must include the relevant option at the time the program is initially triggered. Details on configuring program options can be found in the plugin documentation.
 
 ### Local/Remote Control
 

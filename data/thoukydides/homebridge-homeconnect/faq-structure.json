@@ -177,9 +177,11 @@
                                     "included_ids": []
                                 },
                                 {
-                                    "question": "Why does starting the Silence program on my dishwasher fail?",
-                                    "answer": "Some dishwasher appliances offer both a dedicated **Silence** program (e.g. `NightWash`) and a **Silence on Demand** option that modifies other programs. The Home Connect API restricts appliances to one active program at a time.\n\nIf you attempt to start the `NightWash` program while another program is already running, the API returns a `409 Conflict` error with `SDK.Error.WrongOperationState`.\n\nThis plugin supports starting a new program with the `SilenceOnDemand` option if configured, but it does not map program options to dedicated HomeKit services for modification of an already running program. This is a deliberate design choice because the API does not clearly signal which options can be validly modified dynamically.",
-                                    "included_ids": []
+                                    "question": "Why does starting the Silence program on my dishwasher fail or return a `409 Conflict` error?",
+                                    "answer": "The error `409 Conflict` (specifically `SDK.Error.WrongOperationState`) occurs when trying to activate a silence feature while a cycle is already running. This is due to the technical distinction the Home Connect API makes between programs and options:\n\n1. **Programs** (e.g. `Dishcare.Dishwasher.Program.NightWash`): These are complete cleaning cycles. Only one program can be active at a time; the API will reject an attempt to start a new program while another is already in progress.\n2. **Options** (e.g. `Dishcare.Dishwasher.Option.SilenceOnDemand`): These are modifiers for a program. The 30-minute silence feature in the official Home Connect app is typically implemented as a program option, not a standalone program.\n\nThe plugin supports including these options when you **start** a program via HomeKit. However, it does not support changing options dynamically once a cycle has already begun. This is a deliberate design choice because the API does not generally permit dynamic modification of options mid-cycle and provides no clear indication of which specific options are safe to change. Furthermore, there is no reliable way to map dynamic, mid-cycle option changes into the standard HomeKit service and characteristic model.\n\nTo use the silence feature, you must either start the dedicated `NightWash` program when the appliance is idle or include the relevant option at the time the primary program is initially triggered.",
+                                    "included_ids": [
+                                        "issue-374-bbfe"
+                                    ]
                                 },
                                 {
                                     "question": "How can I refresh appliance capabilities or resolve stale program information?",
@@ -190,14 +192,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 374,
-                                    "id": "issue-374-bbfe",
-                                    "question": "Why does activating dishwasher silence mode mid-cycle fail with a `409 Conflict` error?",
-                                    "answer": "The error `409 Conflict` occurs because the appliance is not in a `Ready` state. In the Home Connect system, there is a technical distinction between programs and options:\n\n1.  **Programs** (e.g. `Dishcare.Dishwasher.Program.NightWash`): These are complete cleaning cycles. Only one program can be active at a time; you cannot start a new program (like the NightWash program) while another cycle is already running.\n2.  **Options** (e.g. `Dishcare.Dishwasher.Option.SilenceOnDemand`): These are modifiers for a program. The 30-minute silence feature in the official Home Connect app is implemented as a program option, not a standalone program.\n\nThe plugin supports including these options when you **start** a program via HomeKit. However, it does not support changing options dynamically once a cycle has already begun. This is a deliberate design choice based on several factors:\n\n*   The Home Connect API does not generally permit dynamic modification of options mid-cycle.\n*   The API provides no clear indication of which specific options are safe to change once a program has started.\n*   There is no reliable way to map dynamic, mid-cycle option changes into the standard HomeKit service and characteristic model.\n\nTo use the silence feature, you must include the relevant option at the time the program is initially triggered. Details on configuring program options can be found in the plugin documentation."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
