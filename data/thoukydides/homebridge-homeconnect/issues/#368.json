@@ -1,18 +1,18 @@
 {
     "issue_number": 368,
-    "updated_at": "2026-04-05T08:17:11.293Z",
+    "updated_at": "2026-05-01T09:21:17.481Z",
     "faq": [
         {
-            "question": "Why does the log show that an appliance program is \"currently unavailable\"?",
-            "answer": "The Home Connect API dynamically reports the availability of specific programs based on the appliance's current operational state. It is common for certain programs—such as `LaundryCare.Washer.Program.DrumClean` on washing machines—to be flagged as \"currently unavailable\" during initialisation.\n\nThis is standard behaviour and typically occurs because the appliance's hardware state prevents that program from being selected at that moment. Reasons include:\n\n* The appliance is already running a cycle.\n* The appliance is powered off or in standby mode.\n* Safety conditions are not met (e.g. the door is open).\n* The program is restricted based on previous cycle history or sensor readings.\n\nThis message in the log is a direct reflection of data from the Home Connect API and does not indicate a defect in the plugin.",
-            "semantic_abstract": "Home Connect appliance program availability is dynamically determined by the API based on real-time operational states and safety interlocks, leading to \"currently unavailable\" log entries for restricted programs like `DrumClean`. This status represents an API-level functional constraint rather than a plugin defect.",
-            "hash": "04c9fd7291f169bd5994cac13bd29766d5df5492eb5e42722a99bfebec10704f"
+            "question": "Why does the log show that some programs are `currently unavailable`?",
+            "answer": "Home Connect appliances dynamically report the availability of programs based on the current state of the device. For instance, a `DrumClean` program may be unavailable if the door is open or if another cycle is already active.\n\nThese log entries reflect the real-time status provided by the Home Connect API and do not indicate a bug or a configuration error. The plugin only exposes programs that the appliance reports as available during initialisation or when the list is refreshed.",
+            "semantic_abstract": "Home Connect appliances report program availability based on real-time operational states, such as door position or active cycles, which the plugin reflects in its logs. These status updates are direct representations of API data rather than indications of plugin or connectivity failures.",
+            "hash": "f393a424d63d63b6f74a1fa205c1057b86f4595ec40af9c182538534c638aa7a"
         },
         {
-            "question": "Why does the log say \"Adding services for 0 programs\" even when the appliance supports them?",
-            "answer": "The plugin does not automatically create HomeKit switches for every program advertised by a Home Connect appliance. Each program you wish to control must be explicitly listed in your Homebridge `config.json` within the `programs` array for that specific accessory.\n\nIf the `programs` section is missing, empty, or contains identifiers that do not match those provided by the appliance, the plugin will report `Adding services for 0 programs`. To fix this:\n\n1. Check the plugin logs to find the correct program identifiers (e.g. `LaundryCare.Washer.Program.Cotton`).\n2. Add these identifiers to the `programs` array in your plugin configuration.\n3. Restart Homebridge to apply the changes.\n\nNote that the `Active Program` feature is a separate switch that provides control over whichever program is currently running, but it does not allow you to select specific programs.",
-            "semantic_abstract": "Homebridge-homeconnect requires explicit mapping of appliance program identifiers to the `programs` configuration array to generate HomeKit switches, defaulting to zero services if the configuration is omitted or incorrect. This design choice separates general appliance control from specific program selection.",
-            "hash": "ce7e2a865e2960a92c901ab9525a2e3fb300cfd49c3c8223f12a2cd35d3b9ac6"
+            "question": "Why does the log say `Adding services for 0 programs` even though available programs were found?",
+            "answer": "To avoid cluttering the Home app and exceeding HomeKit service limits, the plugin does not automatically create services for every program an appliance supports. Users must explicitly configure which programs they want to appear as switches in HomeKit by adding them to the `programs` array in the appliance's configuration.\n\nIf this section is empty, the plugin will report that zero program services have been added, even if the appliance advertises multiple available programs. Note that this is distinct from the `Active Program` feature, which provides a single switch to monitor or stop the currently running program.",
+            "semantic_abstract": "Individual appliance programs require explicit manual mapping in the plugin configuration to be exposed as HomeKit services, preventing automatic service exhaustion. In the absence of a defined `programs` list, the plugin initialises with zero program-specific switches while still supporting general features like the `Active Program` service.",
+            "hash": "1ecfa24e0016db84afa2b00408551348b5ad5094bdd043f0e1a8ed909db5d3b6"
         }
     ]
 }
