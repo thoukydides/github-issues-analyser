@@ -917,16 +917,16 @@
                                     "included_ids": [
                                         "issue-360-b285"
                                     ]
+                                },
+                                {
+                                    "question": "Why do configuration settings like name prefixes revert or fail to save in the Homebridge UI?",
+                                    "answer": "This behaviour is typically caused by updates to the Homebridge UI's underlying form rendering engine (specifically the `ng-formworks` library) that introduced breaking changes in how conditional configuration schemas are processed. This can result in settings reverting to their default values, appearing blank, or being duplicated within the settings interface.\n\nTo resolve this:\n\n1. Ensure you are running `homebridge-homeconnect` version 1.7.0 or later, which implements specific workarounds for these UI limitations.\n2. If the issue persists, you can manually configure these settings by editing the `config.json` file directly.\n\nThe structure for name prefixes in `config.json` is as follows:\n\n```json\n\"names\": {\n  \"prefix\": {\n    \"programs\": true,\n    \"other\": false\n  }\n}\n```\n\nIn this configuration:\n- `programs`: When `true`, appliance program names are prefixed with the appliance name.\n- `other`: When `true`, other service names (such as doors, events, or switches) are prefixed with the appliance name.",
+                                    "included_ids": [
+                                        "issue-375-b5c7"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 375,
-                                    "id": "issue-375-b5c7",
-                                    "question": "Why do configuration settings like name prefixes revert or fail to save in the Homebridge UI?",
-                                    "answer": "Recent updates to the Homebridge UI's underlying form rendering engine (specifically the `ng-formworks` library) introduced breaking changes in how conditional configuration schemas are processed. This can cause settings to revert to their default values immediately after being modified, result in duplicated options, or cause values to appear blank even when they are set in the configuration.\n\nTo address this behaviour:\n1. Ensure you are running `homebridge-homeconnect` version 1.7.0 or later, which implements several workarounds for these UI limitations.\n2. If you are using an older version of the plugin, you may need to downgrade the Homebridge UI to version 5.5.0, which was the last version to handle the schema correctly without workarounds.\n3. Alternatively, you can configure these settings manually by editing the `config.json` file. The structure for name prefixes is as follows:\n\n```json\n\"names\": {\n  \"prefix\": {\n    \"programs\": true,\n    \"other\": false\n  }\n}\n```\n\nIn this configuration:\n- `programs` (boolean): When `true`, appliance program names are prefixed with the appliance name.\n- `other` (boolean): When `true`, other service names (such as doors, events, or switches) are prefixed with the appliance name."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
