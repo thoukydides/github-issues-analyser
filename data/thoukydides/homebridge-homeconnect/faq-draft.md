@@ -214,7 +214,7 @@ No manual intervention is required; the plugin will automatically resume communi
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-374-e780 issue-378-832c issue-384-665e -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-378-832c issue-384-665e -->
 The Home Connect API uses `409 Conflict` errors for a variety of failures that result in a request being rejected. Common sub-errors include:
 
 - `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
@@ -311,7 +311,6 @@ The plugin handles this gracefully by ignoring the error and disabling program c
 
 #### Why does starting the Silence program on my dishwasher fail?
 
-<!-- INCLUDES: issue-374-e780 -->
 Some dishwasher appliances offer both a dedicated **Silence** program (e.g. `NightWash`) and a **Silence on Demand** option that modifies other programs. The Home Connect API restricts appliances to one active program at a time.
 
 If you attempt to start the `NightWash` program while another program is already running, the API returns a `409 Conflict` error with `SDK.Error.WrongOperationState`.
@@ -330,6 +329,22 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
+
+#### 🚧 Why does activating dishwasher silence mode mid-cycle fail with a `409 Conflict` error? 🚧
+
+<!-- INCLUDES: issue-374-bbfe -->
+The error `409 Conflict` occurs because the appliance is not in a `Ready` state. In the Home Connect system, there is a technical distinction between programs and options:
+
+1.  **Programs** (e.g. `Dishcare.Dishwasher.Program.NightWash`): These are complete cleaning cycles. Only one program can be active at a time; you cannot start a new program (like the NightWash program) while another cycle is already running.
+2.  **Options** (e.g. `Dishcare.Dishwasher.Option.SilenceOnDemand`): These are modifiers for a program. The 30-minute silence feature in the official Home Connect app is implemented as a program option, not a standalone program.
+
+The plugin supports including these options when you **start** a program via HomeKit. However, it does not support changing options dynamically once a cycle has already begun. This is a deliberate design choice based on several factors:
+
+*   The Home Connect API does not generally permit dynamic modification of options mid-cycle.
+*   The API provides no clear indication of which specific options are safe to change once a program has started.
+*   There is no reliable way to map dynamic, mid-cycle option changes into the standard HomeKit service and characteristic model.
+
+To use the silence feature, you must include the relevant option at the time the program is initially triggered. Details on configuring program options can be found in the plugin documentation.
 
 ### Local/Remote Control
 
@@ -412,7 +427,7 @@ Once added, the warning will disappear and the features will be correctly mapped
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-04c9 issue-380-03ac issue-386-9bb3 -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-380-03ac issue-386-9bb3 -->
 The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
@@ -554,7 +569,7 @@ To resolve this:
 
 #### How can I reduce the number of switches created for appliance programs?
 
-<!-- INCLUDES: issue-49-35dc issue-240-65b3 issue-368-ce7e -->
+<!-- INCLUDES: issue-49-35dc issue-240-65b3 -->
 By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via Homebridge UI:
 
 - **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.
@@ -605,6 +620,20 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
+
+#### 🚧 Why does the log show that some programs are `currently unavailable`? 🚧
+
+<!-- INCLUDES: issue-368-f393 -->
+Home Connect appliances dynamically report the availability of programs based on the current state of the device. For instance, a `DrumClean` program may be unavailable if the door is open or if another cycle is already active.
+
+These log entries reflect the real-time status provided by the Home Connect API and do not indicate a bug or a configuration error. The plugin only exposes programs that the appliance reports as available during initialisation or when the list is refreshed.
+
+#### 🚧 Why does the log say `Adding services for 0 programs` even though available programs were found? 🚧
+
+<!-- INCLUDES: issue-368-1ecf -->
+To avoid cluttering the Home app and exceeding HomeKit service limits, the plugin does not automatically create services for every program an appliance supports. Users must explicitly configure which programs they want to appear as switches in HomeKit by adding them to the `programs` array in the appliance's configuration.
+
+If this section is empty, the plugin will report that zero program services have been added, even if the appliance advertises multiple available programs. Note that this is distinct from the `Active Program` feature, which provides a single switch to monitor or stop the currently running program.
 
 ### Appliance Status and Connectivity
 
@@ -684,7 +713,7 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer show as open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-382-3c33 issue-385-2b18 -->
+<!-- INCLUDES: issue-385-2b18 -->
 This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models. The appliance incorrectly reports the generic `BSH.Common.Status.DoorState` as `Open` even when physically closed.
 
 To troubleshoot and resolve this:
@@ -713,6 +742,20 @@ To resolve these issues:
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
 
+#### 🚧 Why does my Home Connect refrigerator door always show as open in HomeKit even when it is closed? 🚧
+
+<!-- INCLUDES: issue-382-1601 -->
+This behaviour typically indicates that the appliance firmware is failing to update its status via the Home Connect API, even if the appliance itself is aware of the door position (for example, if the refrigerator's own door alarm still functions correctly). The plugin handles door states for all appliances using a standard mapping that follows the HomeKit Accessory Protocol Specification:
+
+* `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` maps to `100%` (Open)
+* `BSH.Common.EnumType.DoorState.Closed` or `Refrigeration.Common.EnumType.Door.States.Closed` maps to `0%` (Closed)
+
+If your appliance is stuck reporting a single state despite physical changes, consider the following steps:
+
+1. **Check individual door services**: Many refrigeration appliances (especially multi-door models from brands like Thermador or Bosch) expose individual status values for different compartments such as `ChillerLeft`, `ChillerRight`, `FlexCompartment`, `Freezer`, and `Refrigerator`. You can configure the plugin to expose these as separate HomeKit services, which may report correctly even if the combined `DoorState` is stuck.
+2. **Enable debug logging**: Verify the raw values being sent by the API. If the API consistently reports `Open` regardless of the door's physical state, the issue lies with the appliance firmware or the Home Connect cloud service.
+3. **Contact Support**: If the API is not emitting correct events, contact [Home Connect Customer Service](https://www.home-connect.com/global/service/contact-customer-service/service). Provide your appliance model number and the email address associated with your Home Connect account to request a firmware investigation.
+
 ## Apple HomeKit
 
 ### HomeKit Accessories, Services, and Characteristics
@@ -735,7 +778,7 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-0c67 -->
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 -->
 The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale "No Response" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.
 
 Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because this service is traditionally responsible for hosting accessory metadata and reporting `SERVICE_COMMUNICATION_FAILURE` when an appliance disconnects from the Home Connect servers. Although the plugin (since v1.9.0) attempts to propagate this status via other services if the Power switch is missing, the structural change to the accessory can still trigger persistent display bugs.
@@ -855,6 +898,25 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
+#### 🚧 Why do disabled appliance features still appear in the Home app? 🚧
+
+<!-- INCLUDES: issue-364-d738 -->
+When a feature is disabled in the plugin configuration, the plugin removes the corresponding service from the HomeKit accessory. However, HomeKit or Homebridge caching can sometimes cause these disabled features to remain visible or reappear, often as unresponsive.
+
+There are two main reasons for this behaviour:
+
+1. **Homebridge caching**: As a dynamic platform plugin, Homebridge saves the state of all accessories and services to disk. On startup, Homebridge restores this cached state before the plugin has the opportunity to apply the current configuration. If you have recently disabled a feature, it may briefly appear in HomeKit until the plugin identifies it as obsolete and removes it. This removal is logged as `Removing obsolete service "..."`. After one successful restart and save, it should no longer appear on subsequent Homebridge starts.
+2. **HomeKit and iCloud synchronisation**: HomeKit maintains its own cache of accessory definitions, which is synchronised across home hubs (like Apple TV or HomePod) and iOS devices via iCloud. Even when the plugin correctly signals a change, HomeKit's internal update process can be unreliable. This is a platform-level issue that affects both Homebridge and native HomeKit devices.
+
+If disabled features persist, try the following steps:
+* **Wait**: Cache synchronisation often resolves itself within a few hours.
+* **Restart Homebridge**: This triggers a fresh advertisement of the current accessory state.
+* **Reboot your home hub**: Restarting the active Apple TV or HomePod can force a cache refresh.
+* **Sign out of iCloud**: On the home hub, sign out and back in to force a full resynchronisation.
+* **Remove and re-add the bridge**: As a last resort, remove the Homebridge bridge from the Home app and add it again. Note that this will delete existing automations and scenes associated with those devices.
+
+The plugin does not use workarounds like randomising service identifiers to force updates, as this would break existing HomeKit automations and scenes.
+
 ### Notifications & Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
@@ -966,4 +1028,27 @@ The plugin uses dynamic configuration schemas to manage the wide variety of sett
 
 If you are performing a first-time installation and cannot see the `clientid` field, ensure you are using the latest version of **Homebridge Config UI X**. The plugin relies on the web interface's support for conditional logic (specifically `functionBody` conditions) to show and hide these fields correctly. If these fields do not appear, it is usually indicative of an issue with the Homebridge UI engine rather than the plugin itself. As a temporary measure, the plugin logs will indicate if required values like `clientid` are missing, which can be manually added to your `config.json` if the graphical interface is not functioning correctly.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-375-b67d -->
+#### 🚧 Why do configuration settings like name prefixes revert or fail to save in the Homebridge UI? 🚧
+
+<!-- INCLUDES: issue-375-b5c7 -->
+Recent updates to the Homebridge UI's underlying form rendering engine (specifically the `ng-formworks` library) introduced breaking changes in how conditional configuration schemas are processed. This can cause settings to revert to their default values immediately after being modified, result in duplicated options, or cause values to appear blank even when they are set in the configuration.
+
+To address this behaviour:
+1. Ensure you are running `homebridge-homeconnect` version 1.7.0 or later, which implements several workarounds for these UI limitations.
+2. If you are using an older version of the plugin, you may need to downgrade the Homebridge UI to version 5.5.0, which was the last version to handle the schema correctly without workarounds.
+3. Alternatively, you can configure these settings manually by editing the `config.json` file. The structure for name prefixes is as follows:
+
+```json
+"names": {
+  "prefix": {
+    "programs": true,
+    "other": false
+  }
+}
+```
+
+In this configuration:
+- `programs` (boolean): When `true`, appliance program names are prefixed with the appliance name.
+- `other` (boolean): When `true`, other service names (such as doors, events, or switches) are prefixed with the appliance name.
+
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 -->
