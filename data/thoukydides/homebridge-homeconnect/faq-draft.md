@@ -740,18 +740,24 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 -->
-The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service (such as a specific program or the `Power` switch), it can lead to stale "No Response" entries or disappearing service labels in the Apple Home app due to internal caching and slow iCloud synchronisation.
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 -->
+The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service, it can lead to stale "No Response" entries or disappearing service labels.
 
-Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because this service is traditionally responsible for hosting accessory metadata and reporting `SERVICE_COMMUNICATION_FAILURE` when an appliance disconnects from the Home Connect servers. Although the plugin (since v1.9.0) attempts to propagate this status via other services if the Power switch is missing, the structural change to the accessory can still trigger persistent display bugs.
+This occurs for two main reasons:
+1. **Homebridge caching**: As a dynamic platform plugin, Homebridge saves the state of accessories to disk. On startup, it restores this state before the plugin applies the current configuration. If a feature was recently disabled, it may briefly appear until the plugin logs `Removing obsolete service "..."`.
+2. **HomeKit and iCloud synchronisation**: HomeKit maintains an internal cache across home hubs (Apple TV or HomePod) and iOS devices. Syncing changes via iCloud can be unreliable, leading to persistent display bugs.
 
-To resolve persistent state or UI inconsistencies:
+Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because this service is traditionally responsible for hosting accessory metadata and reporting connection failures. Since v1.9.0, the plugin attempts to propagate this status via other services, but structural changes can still trigger UI inconsistencies.
 
-- **Check the settings**: Open the settings for an unlabelled service in the Home app and check if the name can be manually restored.
-- **Check the logs**: Verify the plugin is removing the service (e.g. `Removing obsolete service "Internal Light"`).
-- **Restart Homebridge**: This triggers a fresh configuration update and increments the accessory's configuration number.
-- **Clear cache or re-index**: If issues persist, you may need to force HomeKit to re-index the device. Clear the Homebridge cached accessories for the affected appliance. If this fails, remove the accessory or its child bridge from Homebridge and re-add it.
-- **Wait and Reboot**: Allow several hours for iCloud to reconcile the state across all devices. Restarting your primary Home Hub (Apple TV or HomePod) can also help.
+To resolve persistent issues:
+- **Wait**: Cache synchronisation often resolves within a few hours.
+- **Verify Logs**: Check for `Removing obsolete service` messages.
+- **Restart Homebridge**: This triggers a fresh advertisement of the current state.
+- **Reboot Home Hubs**: Restarting the active Apple TV or HomePod can force a refresh.
+- **Sign out of iCloud**: On the home hub, sign out and back in to force a full resynchronisation.
+- **Clear Cache or Re-add**: Clear Homebridge cached accessories for the appliance. If this fails, remove and re-add the bridge (note: this deletes associated automations and scenes).
+
+The plugin does not use workarounds like randomising service identifiers to force updates, as this would break existing HomeKit automations and scenes.
 
 #### Why is temperature control not supported for fridges, freezers, or ovens?
 
@@ -859,25 +865,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why do disabled appliance features still appear in the Home app? 🚧
-
-<!-- INCLUDES: issue-364-d738 -->
-When a feature is disabled in the plugin configuration, the plugin removes the corresponding service from the HomeKit accessory. However, HomeKit or Homebridge caching can sometimes cause these disabled features to remain visible or reappear, often as unresponsive.
-
-There are two main reasons for this behaviour:
-
-1. **Homebridge caching**: As a dynamic platform plugin, Homebridge saves the state of all accessories and services to disk. On startup, Homebridge restores this cached state before the plugin has the opportunity to apply the current configuration. If you have recently disabled a feature, it may briefly appear in HomeKit until the plugin identifies it as obsolete and removes it. This removal is logged as `Removing obsolete service "..."`. After one successful restart and save, it should no longer appear on subsequent Homebridge starts.
-2. **HomeKit and iCloud synchronisation**: HomeKit maintains its own cache of accessory definitions, which is synchronised across home hubs (like Apple TV or HomePod) and iOS devices via iCloud. Even when the plugin correctly signals a change, HomeKit's internal update process can be unreliable. This is a platform-level issue that affects both Homebridge and native HomeKit devices.
-
-If disabled features persist, try the following steps:
-* **Wait**: Cache synchronisation often resolves itself within a few hours.
-* **Restart Homebridge**: This triggers a fresh advertisement of the current accessory state.
-* **Reboot your home hub**: Restarting the active Apple TV or HomePod can force a cache refresh.
-* **Sign out of iCloud**: On the home hub, sign out and back in to force a full resynchronisation.
-* **Remove and re-add the bridge**: As a last resort, remove the Homebridge bridge from the Home app and add it again. Note that this will delete existing automations and scenes associated with those devices.
-
-The plugin does not use workarounds like randomising service identifiers to force updates, as this would break existing HomeKit automations and scenes.
 
 ### Notifications & Events
 
