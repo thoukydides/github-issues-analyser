@@ -415,14 +415,14 @@ Once added, the warning will disappear and the features will be correctly mapped
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-380-03ac issue-386-9bb3 -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-f393 issue-380-03ac issue-386-9bb3 -->
 The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
 - **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
 - **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
-- **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
+- **Operational Status**: A program may be reported as supported but `currently unavailable` if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
 If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
 
@@ -557,12 +557,14 @@ To resolve this:
 
 #### How can I reduce the number of switches created for appliance programs?
 
-<!-- INCLUDES: issue-49-35dc issue-240-65b3 -->
+<!-- INCLUDES: issue-49-35dc issue-240-65b3 issue-368-1ecf -->
 By default, the plugin creates individual `Switch` services for every supported program. For complex appliances, this can clutter the HomeKit interface. You can modify this behaviour in the plugin configuration via Homebridge UI:
 
 - **No individual program switches**: Enable this option in the appliance settings to hide all program switches. This does not affect state monitoring or basic power controls.
 - **Custom list of programs and options**: Use this to manually define which specific programs appear in HomeKit, and the options to use with each.
 - **A switch to start each appliance program** (default): Advertise all available programs using default options.
+
+If you choose to hide all program switches or if the configuration for specific programs is empty, the plugin will log `Adding services for 0 programs` during startup. This is expected behaviour and does not indicate a failure to discover programs; it simply means the plugin has been instructed not to create individual switches for them. The `Active Program` switch (if enabled) will still function to monitor or stop the currently running program.
 
 #### What does the log message `Using expired cache result` mean?
 
@@ -608,20 +610,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why does the log show that some programs are `currently unavailable`? 🚧
-
-<!-- INCLUDES: issue-368-f393 -->
-Home Connect appliances dynamically report the availability of programs based on the current state of the device. For instance, a `DrumClean` program may be unavailable if the door is open or if another cycle is already active.
-
-These log entries reflect the real-time status provided by the Home Connect API and do not indicate a bug or a configuration error. The plugin only exposes programs that the appliance reports as available during initialisation or when the list is refreshed.
-
-#### 🚧 Why does the log say `Adding services for 0 programs` even though available programs were found? 🚧
-
-<!-- INCLUDES: issue-368-1ecf -->
-To avoid cluttering the Home app and exceeding HomeKit service limits, the plugin does not automatically create services for every program an appliance supports. Users must explicitly configure which programs they want to appear as switches in HomeKit by adding them to the `programs` array in the appliance's configuration.
-
-If this section is empty, the plugin will report that zero program services have been added, even if the appliance advertises multiple available programs. Note that this is distinct from the `Active Program` feature, which provides a single switch to monitor or stop the currently running program.
 
 ### Appliance Status and Connectivity
 
