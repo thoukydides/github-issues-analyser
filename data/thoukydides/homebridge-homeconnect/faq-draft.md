@@ -614,6 +614,17 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why do some appliance status values or settings appear as `(unrecognised)` in the logs? 🚧
+
+<!-- INCLUDES: issue-389-3f8f -->
+When the Home Connect API transmits data that the plugin has not yet been programmed to handle, it is logged with an `(unrecognised)` label. This typically occurs for one of three reasons:
+
+1. **Pending Plugin Updates**: New appliance features or API keys are frequently released by manufacturers. For example, the `BSH.Common.Status.InteriorIlluminationActive` status was added to the plugin to support lighting status on compatible coffee makers and ovens. Ensure the plugin is updated to the latest version to support the widest range of features.
+2. **Unsupported HomeKit Services**: Some data points provided by the API do not have a logical equivalent in the HomeKit ecosystem. An example is the various `BeverageCounter` statistics (such as `BeverageCounterCoffee`); because HomeKit lacks a standard characteristic for cumulative counters, this information is not exposed to the Home app.
+3. **Internal Telemetry**: Certain technical status values are used by the manufacturer for diagnostics and do not provide actionable controls or useful information for home automation.
+
+If you identify an unmapped value that corresponds to a controllable feature or a useful sensor state, verify it persists on the latest plugin version before requesting support.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
