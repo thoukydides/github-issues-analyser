@@ -452,10 +452,12 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-5197 -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
-Note that the official Home Connect app uses a private API and may still appear to show the appliance as online while the public API used by this plugin reports it as offline. To resolve this, perform the following diagnostic steps:
+It is important to note that the official Home Connect app can communicate with appliances using the local network when they are on the same Wi-Fi. This means the official app may appear functional even if the appliance has lost its connection to the manufacturer's cloud servers or if the cloud API itself is experiencing issues. In contrast, this plugin relies entirely on the cloud-based public API. Consequently, the official app might report the appliance as online while the public API reports it as offline. 
+
+To further diagnose this, enable **Debug Logging** and restart Homebridge. The logs will reveal if the API specifically reports the appliance as `Disconnected` or if requests to retrieve its capabilities are failing with specific error codes. To resolve this, perform the following diagnostic steps:
 
 1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.
 2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If this fails, the appliance is not correctly connected to the cloud servers.
@@ -617,19 +619,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why does my appliance show Waiting for features to finish initialising in the logs and remain unresponsive in HomeKit? 🚧
-
-<!-- INCLUDES: issue-390-5197 -->
-This message indicates that the plugin is unable to retrieve the current state or capabilities of the appliance from the Home Connect API. Without this information, the plugin cannot safely create or update HomeKit services, resulting in accessories that appear but do not respond.
-
-There are two primary reasons why initialisation may stall at this stage:
-1. The appliance is reported as disconnected from the Home Connect cloud servers. 
-2. The API is failing to return appliance capability or state data during the feature discovery process.
-
-It is important to note that the official Home Connect app can communicate with appliances using the local network when they are on the same Wi-Fi. This means the app may work perfectly even if the appliance has lost its connection to the manufacturer's cloud servers or if the cloud API is experiencing issues. The plugin, however, relies entirely on the cloud API.
-
-To diagnose this further, enable debug logging and restart Homebridge. The logs will reveal if the API specifically reports the appliance as `Disconnected` or if requests to retrieve its capabilities are failing with specific error codes.
 
 ### Appliance Status and Connectivity
 
