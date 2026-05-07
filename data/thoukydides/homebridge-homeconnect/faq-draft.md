@@ -618,6 +618,19 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why does my appliance show Waiting for features to finish initialising in the logs and remain unresponsive in HomeKit? 🚧
+
+<!-- INCLUDES: issue-390-5197 -->
+This message indicates that the plugin is unable to retrieve the current state or capabilities of the appliance from the Home Connect API. Without this information, the plugin cannot safely create or update HomeKit services, resulting in accessories that appear but do not respond.
+
+There are two primary reasons why initialisation may stall at this stage:
+1. The appliance is reported as disconnected from the Home Connect cloud servers. 
+2. The API is failing to return appliance capability or state data during the feature discovery process.
+
+It is important to note that the official Home Connect app can communicate with appliances using the local network when they are on the same Wi-Fi. This means the app may work perfectly even if the appliance has lost its connection to the manufacturer's cloud servers or if the cloud API is experiencing issues. The plugin, however, relies entirely on the cloud API.
+
+To diagnose this further, enable debug logging and restart Homebridge. The logs will reveal if the API specifically reports the appliance as `Disconnected` or if requests to retrieve its capabilities are failing with specific error codes.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?

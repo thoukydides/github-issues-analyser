@@ -542,7 +542,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 390,
+                                    "id": "issue-390-5197",
+                                    "question": "Why does my appliance show Waiting for features to finish initialising in the logs and remain unresponsive in HomeKit?",
+                                    "answer": "This message indicates that the plugin is unable to retrieve the current state or capabilities of the appliance from the Home Connect API. Without this information, the plugin cannot safely create or update HomeKit services, resulting in accessories that appear but do not respond.\n\nThere are two primary reasons why initialisation may stall at this stage:\n1. The appliance is reported as disconnected from the Home Connect cloud servers. \n2. The API is failing to return appliance capability or state data during the feature discovery process.\n\nIt is important to note that the official Home Connect app can communicate with appliances using the local network when they are on the same Wi-Fi. This means the app may work perfectly even if the appliance has lost its connection to the manufacturer's cloud servers or if the cloud API is experiencing issues. The plugin, however, relies entirely on the cloud API.\n\nTo diagnose this further, enable debug logging and restart Homebridge. The logs will reveal if the API specifically reports the appliance as `Disconnected` or if requests to retrieve its capabilities are failing with specific error codes."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
