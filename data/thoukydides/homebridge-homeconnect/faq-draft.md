@@ -35,7 +35,7 @@
     - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
     - [Why are fan controls missing for my integrated venting hob?](#why-are-fan-controls-missing-for-my-integrated-venting-hob)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
-    - [Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?](#why-is-my-appliance-stuck-during-initialisation-showing-as-not-responding-or-missing-all-options)
+    - [Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?](#why-is-my-appliance-stuck-at-waiting-for-features-to-finish-initialising-showing-as-not-responding-or-displaying-unresponsive-tiles)
     - [Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?](#why-do-i-see-an-invalidstepsize-or-sdkerrorinvalidoptionvalue-error)
     - [Why are Pause and Resume features missing or inconsistent?](#why-are-pause-and-resume-features-missing-or-inconsistent)
     - [Why doesn't the plugin automatically turn on my coffee machine when I start a beverage program?](#why-doesnt-the-plugin-automatically-turn-on-my-coffee-machine-when-i-start-a-beverage-program)
@@ -450,23 +450,24 @@ This warning typically occurs in two different contexts:
 
 This is often a known inconsistency in the Home Connect API's behaviour. When the plugin identifies this discrepancy, it deliberately avoids querying the API for further details to prevent invalid requests that would unnecessarily consume your daily API rate limit quota. In these cases, the messages are often cosmetic and the plugin will automatically refresh necessary details once initialisation is complete.
 
-#### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
+#### Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 -->
-The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-0b7a -->
+The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. Common error messages include `HCA domain error` or code `H4684`, which often signify that the appliance is not correctly registered with the Home Connect cloud—frequently after hardware repairs or factory resets. When initialisation stalls, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
-It is important to note that the official Home Connect app can communicate with appliances using the local network when they are on the same Wi-Fi. This means the official app may appear functional even if the appliance has lost its connection to the manufacturer's cloud servers or if the cloud API itself is experiencing issues. In contrast, this plugin relies entirely on the cloud-based public API. Consequently, the official app might report the appliance as online while the public API reports it as offline. 
+Several factors can contribute to this state:
+- **Cloud versus Local Connectivity**: The official Home Connect app can communicate using the local network. However, this plugin relies entirely on the cloud-based public API. An appliance may appear functional in the official app via a local connection while being disconnected from the cloud servers. If the public API reports the device as disconnected, the plugin will wait for a valid response before configuring HomeKit services.
+- **Stale HomeKit Accessories**: HomeKit caches accessory definitions from previous successful sessions. If the plugin fails to complete initialisation, it cannot update these definitions. This results in the Home app displaying numerous unresponsive tiles that do not reflect your current configuration.
 
-To further diagnose this, enable **Debug Logging** and restart Homebridge. The logs will reveal if the API specifically reports the appliance as `Disconnected` or if requests to retrieve its capabilities are failing with specific error codes. To resolve this, perform the following diagnostic steps:
-
+To resolve this, perform the following diagnostic steps:
 1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.
 2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If this fails, the appliance is not correctly connected to the cloud servers.
-3. **Verify App Connectivity Status**: Within the official Home Connect app, check the appliance's network settings. A fully functional connection is typically indicated by **three green lines**.
-4. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.
-5. **Power Cycle**: Disconnect the appliance from the mains power (unplug it or turn off the circuit breaker) for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
-6. **Restart Homebridge**: Once the appliance has reconnected to Wi-Fi, restart Homebridge to trigger a fresh initialisation sequence.
-7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
-8. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.
+3. **Verify App Connectivity Status**: Within the official app, check the appliance's network settings. A fully functional connection is typically indicated by **three green lines**.
+4. **Confirm Consumables and Maintenance**: Verify that all requirements (cleaning, refills) are met and the door is closed.
+5. **Power Cycle**: Disconnect the appliance from the mains power for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
+6. **Restart Homebridge**: Once the appliance has reconnected, restart Homebridge to trigger a fresh initialisation sequence.
+7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file.
+8. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network. If the UI remains cluttered, consider configuring the plugin to expose features as separate tiles rather than combined services to reset the HomeKit view.
 
 #### Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?
 
@@ -619,18 +620,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why does the plugin hang at `Waiting for features to finish initialising` and show many unresponsive tiles? 🚧
-
-<!-- INCLUDES: issue-390-0b7a -->
-This behaviour typically indicates that the Home Connect API is unable to provide appliance capability data, often due to a discrepancy between local and cloud connectivity.
-
-* **Cloud versus Local Connectivity**: The official Home Connect app can control appliances using local network communication. However, this plugin relies entirely on the Home Connect cloud API. An appliance might appear online in the official app via a local connection while being disconnected from the cloud servers required by the plugin.
-* **Initialisation and Discovery**: During startup, the plugin attempts to discover the appliance's features, such as `Power`, `Door`, and available `Programs`. If the API reports the device as disconnected or fails to return this data, the plugin will wait indefinitely for a valid response before it can proceed to configure HomeKit services.
-* **Stale HomeKit Accessories**: HomeKit caches accessory and service definitions from previous successful sessions. If the plugin fails to complete initialisation, it cannot send the necessary updates to HomeKit to remove or modify these services. This results in the Home app displaying numerous unresponsive tiles that do not reflect your current configuration, even if you have attempted to disable those features.
-* **API Errors**: Errors such as `HCA domain error` or code `H4684` usually signify that the appliance is not correctly registered with the Home Connect cloud, which is common after hardware repairs or factory resets.
-
-To resolve these issues, confirm that the appliance is controllable via the official app while your mobile device is using a cellular connection (to verify cloud access). If the Home app interface remains cluttered or unreliable, consider configuring the plugin to expose features as separate tiles rather than combined services.
 
 ### Appliance Status and Connectivity
 
