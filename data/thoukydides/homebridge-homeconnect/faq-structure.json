@@ -415,8 +415,7 @@
                                         "issue-315-b7f2",
                                         "issue-323-0be1",
                                         "issue-329-638e",
-                                        "issue-333-8d17",
-                                        "issue-390-5197"
+                                        "issue-333-8d17"
                                     ]
                                 },
                                 {
@@ -543,7 +542,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 390,
+                                    "id": "issue-390-0b7a",
+                                    "question": "Why does the plugin hang at `Waiting for features to finish initialising` and show many unresponsive tiles?",
+                                    "answer": "This behaviour typically indicates that the Home Connect API is unable to provide appliance capability data, often due to a discrepancy between local and cloud connectivity.\n\n* **Cloud versus Local Connectivity**: The official Home Connect app can control appliances using local network communication. However, this plugin relies entirely on the Home Connect cloud API. An appliance might appear online in the official app via a local connection while being disconnected from the cloud servers required by the plugin.\n* **Initialisation and Discovery**: During startup, the plugin attempts to discover the appliance's features, such as `Power`, `Door`, and available `Programs`. If the API reports the device as disconnected or fails to return this data, the plugin will wait indefinitely for a valid response before it can proceed to configure HomeKit services.\n* **Stale HomeKit Accessories**: HomeKit caches accessory and service definitions from previous successful sessions. If the plugin fails to complete initialisation, it cannot send the necessary updates to HomeKit to remove or modify these services. This results in the Home app displaying numerous unresponsive tiles that do not reflect your current configuration, even if you have attempted to disable those features.\n* **API Errors**: Errors such as `HCA domain error` or code `H4684` usually signify that the appliance is not correctly registered with the Home Connect cloud, which is common after hardware repairs or factory resets.\n\nTo resolve these issues, confirm that the appliance is controllable via the official app while your mobile device is using a cellular connection (to verify cloud access). If the Home app interface remains cluttered or unreliable, consider configuring the plugin to expose features as separate tiles rather than combined services."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -621,7 +627,6 @@
                                     "question": "Why does my refrigerator or freezer show as open in HomeKit even when it is closed?",
                                     "answer": "This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models (such as those from Bosch or Thermador). Even if the appliance's internal door alarm functions correctly, it may incorrectly report the generic `BSH.Common.Status.DoorState` as `Open` to the Home Connect cloud service.\n\nTo troubleshoot and resolve this:\n\n1. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. The plugin maps `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` to the HomeKit Open (100%) state and `Closed` to the Closed (0%) state. If the logs show `Open` while the door is physically closed, the issue is external to the plugin.\n2. **Override default mapping**: In the appliance-specific settings within the plugin configuration, disable the generic `Door` feature and instead enable the specific compartment door features. These specific keys (such as `Freezer Door`, `Refrigerator Door`, `Chiller Left Door`, `Chiller Right Door`, or `Flex Compartment Door`) often report the correct state even when the aggregate status is broken.\n3. **Contact Support**: If the raw API values are incorrect, report the issue to [Home Connect Developer Support](https://developer.home-connect.com/support/contact) with your appliance model and account details, as it likely requires a firmware fix.",
                                     "included_ids": [
-                                        "issue-385-2b18",
                                         "issue-382-1601"
                                     ]
                                 },
@@ -640,7 +645,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 385,
+                                    "id": "issue-385-ce20",
+                                    "question": "Why does my Siemens freezer door always show as open in HomeKit?",
+                                    "answer": "Certain Siemens and Bosch freezer models (such as the `GU21NADE0`) have a firmware bug where the generic door status API key `BSH.Common.Status.DoorState` is incorrectly reported as `Open` via the Home Connect API, even when the appliance is closed and correctly displayed in the official app. This causes HomeKit to show a persistent open status.\n\nTo resolve this, use the specific freezer door status as a workaround:\n1. Ensure you are using plugin version `v1.9.1` or later.\n2. Open your Homebridge configuration for the affected freezer appliance.\n3. Disable the generic `Door` feature.\n4. Enable the `Freezer Door` feature instead.\n\nWhile this configuration workaround bypasses the incorrect API data, the underlying issue is a known firmware problem. Home Connect has indicated that firmware updates are being released for affected models to fix the generic door state reporting."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []

@@ -452,7 +452,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck during initialisation, showing as `Not Responding`, or missing all options?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-5197 -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When this occurs the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 It is important to note that the official Home Connect app can communicate with appliances using the local network when they are on the same Wi-Fi. This means the official app may appear functional even if the appliance has lost its connection to the manufacturer's cloud servers or if the cloud API itself is experiencing issues. In contrast, this plugin relies entirely on the cloud-based public API. Consequently, the official app might report the appliance as online while the public API reports it as offline. 
@@ -620,6 +620,18 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why does the plugin hang at `Waiting for features to finish initialising` and show many unresponsive tiles? 🚧
+
+<!-- INCLUDES: issue-390-0b7a -->
+This behaviour typically indicates that the Home Connect API is unable to provide appliance capability data, often due to a discrepancy between local and cloud connectivity.
+
+* **Cloud versus Local Connectivity**: The official Home Connect app can control appliances using local network communication. However, this plugin relies entirely on the Home Connect cloud API. An appliance might appear online in the official app via a local connection while being disconnected from the cloud servers required by the plugin.
+* **Initialisation and Discovery**: During startup, the plugin attempts to discover the appliance's features, such as `Power`, `Door`, and available `Programs`. If the API reports the device as disconnected or fails to return this data, the plugin will wait indefinitely for a valid response before it can proceed to configure HomeKit services.
+* **Stale HomeKit Accessories**: HomeKit caches accessory and service definitions from previous successful sessions. If the plugin fails to complete initialisation, it cannot send the necessary updates to HomeKit to remove or modify these services. This results in the Home app displaying numerous unresponsive tiles that do not reflect your current configuration, even if you have attempted to disable those features.
+* **API Errors**: Errors such as `HCA domain error` or code `H4684` usually signify that the appliance is not correctly registered with the Home Connect cloud, which is common after hardware repairs or factory resets.
+
+To resolve these issues, confirm that the appliance is controllable via the official app while your mobile device is using a cellular connection (to verify cloud access). If the Home app interface remains cluttered or unreliable, consider configuring the plugin to expose features as separate tiles rather than combined services.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
@@ -698,7 +710,7 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer show as open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-382-1601 issue-385-2b18 -->
+<!-- INCLUDES: issue-382-1601 -->
 This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models (such as those from Bosch or Thermador). Even if the appliance's internal door alarm functions correctly, it may incorrectly report the generic `BSH.Common.Status.DoorState` as `Open` to the Home Connect cloud service.
 
 To troubleshoot and resolve this:
@@ -726,6 +738,19 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
+#### 🚧 Why does my Siemens freezer door always show as open in HomeKit? 🚧
+
+<!-- INCLUDES: issue-385-ce20 -->
+Certain Siemens and Bosch freezer models (such as the `GU21NADE0`) have a firmware bug where the generic door status API key `BSH.Common.Status.DoorState` is incorrectly reported as `Open` via the Home Connect API, even when the appliance is closed and correctly displayed in the official app. This causes HomeKit to show a persistent open status.
+
+To resolve this, use the specific freezer door status as a workaround:
+1. Ensure you are using plugin version `v1.9.1` or later.
+2. Open your Homebridge configuration for the affected freezer appliance.
+3. Disable the generic `Door` feature.
+4. Enable the `Freezer Door` feature instead.
+
+While this configuration workaround bypasses the incorrect API data, the underlying issue is a known firmware problem. Home Connect has indicated that firmware updates are being released for affected models to fix the generic door state reporting.
 
 ## Apple HomeKit
 
