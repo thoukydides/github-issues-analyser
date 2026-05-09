@@ -463,7 +463,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. Common error messages include `HCA domain error` or code `H4684`, which often signify that the appliance is not correctly registered with the Home Connect cloud—frequently after hardware repairs or factory resets. When initialisation stalls, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Several factors can contribute to this state:
@@ -631,16 +631,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why is the plugin stuck "Waiting for features to finish initialising"? 🚧
-
-<!-- INCLUDES: issue-390-64e2 -->
-This state occurs when the Home Connect API reports that an appliance is not currently in a usable state. The plugin requires successful feature discovery to determine which HomeKit services and characteristics can be supported. If this process does not complete, there are two primary causes:
-
-1.  **Cloud Connectivity**: The appliance is reported as disconnected from the Home Connect servers. Note that the official Home Connect app can communicate with appliances over a local network, whereas this plugin depends entirely on the cloud-based API. An appliance might work in the official app while still being disconnected from the cloud.
-2.  **API Data Failure**: The API is failing to return appliance capability or state data during the discovery phase.
-
-To resolve this, ensure the appliance has a stable connection to the Home Connect cloud servers. You may need to reset the network connection on the appliance itself. Successful operation via the official app while using mobile data (with Wi-Fi disabled) is a good test of cloud connectivity.
 
 ### Appliance Status and Connectivity
 

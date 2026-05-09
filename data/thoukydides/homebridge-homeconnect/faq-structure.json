@@ -430,7 +430,8 @@
                                         "issue-315-b7f2",
                                         "issue-323-0be1",
                                         "issue-329-638e",
-                                        "issue-333-8d17"
+                                        "issue-333-8d17",
+                                        "issue-390-64e2"
                                     ]
                                 },
                                 {
@@ -557,14 +558,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 390,
-                                    "id": "issue-390-64e2",
-                                    "question": "Why is the plugin stuck \"Waiting for features to finish initialising\"?",
-                                    "answer": "This state occurs when the Home Connect API reports that an appliance is not currently in a usable state. The plugin requires successful feature discovery to determine which HomeKit services and characteristics can be supported. If this process does not complete, there are two primary causes:\n\n1.  **Cloud Connectivity**: The appliance is reported as disconnected from the Home Connect servers. Note that the official Home Connect app can communicate with appliances over a local network, whereas this plugin depends entirely on the cloud-based API. An appliance might work in the official app while still being disconnected from the cloud.\n2.  **API Data Failure**: The API is failing to return appliance capability or state data during the discovery phase.\n\nTo resolve this, ensure the appliance has a stable connection to the Home Connect cloud servers. You may need to reset the network connection on the appliance itself. Successful operation via the official app while using mobile data (with Wi-Fi disabled) is a good test of cloud connectivity."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
