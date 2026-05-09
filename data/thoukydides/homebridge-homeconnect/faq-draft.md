@@ -710,14 +710,14 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer show as open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-385-ce20 -->
-This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models from Bosch, Siemens (such as the `GU21NADE0`), or Thermador. Even if the appliance's internal door alarm functions correctly, it may incorrectly report the generic `BSH.Common.Status.DoorState` as `Open` to the Home Connect cloud service.
+<!-- INCLUDES: issue-382-cf6b issue-385-ce20 -->
+This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models from Bosch, Siemens (such as the `GU21NADE0`), or Thermador. Although the appliance hardware correctly detects the door state—often confirmed by the internal door alarm functioning correctly—the firmware fails to update the generic `BSH.Common.Status.DoorState` value exposed via the Home Connect API.
 
 To troubleshoot and resolve this:
 
 1. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. The plugin maps `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` to the HomeKit Open (100%) state and `Closed` to the Closed (0%) state. If the logs show `Open` while the door is physically closed, the issue is external to the plugin.
 2. **Override default mapping**: In the appliance-specific settings within the plugin configuration (available in `v1.9.1` and later), disable the generic `Door` feature and instead enable the specific compartment door features. These specific keys (such as `Freezer Door`, `Refrigerator Door`, `Chiller Left Door`, `Chiller Right Door`, or `Flex Compartment Door`) often report the correct state even when the aggregate status is broken.
-3. **Firmware updates**: Home Connect has acknowledged this issue for certain models and is releasing firmware updates. Ensure your appliance firmware is up to date via the official Home Connect app. If the raw API values remain incorrect despite current firmware, report the issue to [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
+3. **Firmware updates**: Home Connect has acknowledged this issue for certain models and is releasing firmware updates. Ensure your appliance firmware is up to date via the official Home Connect app. If the problem persists despite current firmware, you can contact [Home Connect Customer Service](https://www.home-connect.com/global/service/contact-customer-service/service) with your appliance's model number and the email address associated with your Home Connect account to request assistance.
 
 #### Can I programmatically access data from the unofficial Home Connect status page?
 
@@ -738,18 +738,6 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
-
-#### 🚧 Why does my Home Connect refrigerator or freezer always show as having an open door in HomeKit? 🚧
-
-<!-- INCLUDES: issue-382-cf6b -->
-This issue is typically caused by a firmware bug in certain refrigeration appliances (fridge, freezer, or fridge-freezer) from manufacturers like Thermador, Bosch, and Siemens. The appliance hardware correctly detects the door state—verified by the fact that the door alarm still triggers correctly—but the firmware fails to update the door status value (`BSH.Common.Status.DoorState`) exposed via the Home Connect API. As a result, the plugin receives a persistent `Open` state.
-
-Home Connect developer support has confirmed this is a known issue that requires a firmware update for the affected appliance. Some models have already received fixes, while others are pending.
-
-**Actionable Steps:**
-1. Check the official Home Connect app for any available firmware updates for your appliance.
-2. Try exposing individual door services instead of the combined door state. Many refrigeration appliances support specific statuses such as `Refrigeration.Common.Status.Door.Refrigerator` or `Refrigeration.Common.Status.Door.Freezer`. These individual sensors may continue to report correctly even when the combined status is stuck.
-3. If the appliance firmware remains outdated and the individual sensors do not work, you can contact [Home Connect Customer Service](https://www.home-connect.com/global/service/contact-customer-service/service). Provide them with your appliance's model number and the email address associated with your Home Connect account to request assistance with a firmware update.
 
 ## Apple HomeKit
 
