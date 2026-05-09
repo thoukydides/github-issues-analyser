@@ -119,8 +119,7 @@
                                         "issue-303-eee7",
                                         "issue-325-10f7",
                                         "issue-378-832c",
-                                        "issue-384-665e",
-                                        "issue-388-9312"
+                                        "issue-384-665e"
                                     ]
                                 },
                                 {
@@ -193,7 +192,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 388,
+                                    "id": "issue-388-9f4d",
+                                    "question": "Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`?",
+                                    "answer": "This error, specifically mentioning `Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when trying to start a program or change the fan speed of a hood.\n\nEven if the boost feature is not supported by your appliance or enabled in the plugin configuration, the Home Connect server may incorrectly require a default value for this internal option and fail when it cannot find one. This is a server-side failure that cannot be addressed by plugin changes or configuration adjustments. While the official Home Connect app may still work (as it often uses different API paths or local network communication), the cloud API used by third-party integrations like Homebridge is affected.\n\nUsers encountering this issue should:\n\n1. Contact Home Connect customer service via their official service channels.\n2. Provide your account username and the exact error message: `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`.\n\nDeveloper support typically requires end-users to report these issues via standard customer service before they will investigate appliance-specific API failures."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -415,8 +421,7 @@
                                         "issue-315-b7f2",
                                         "issue-323-0be1",
                                         "issue-329-638e",
-                                        "issue-333-8d17",
-                                        "issue-390-0b7a"
+                                        "issue-333-8d17"
                                     ]
                                 },
                                 {
@@ -543,7 +548,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 390,
+                                    "id": "issue-390-64e2",
+                                    "question": "Why is the plugin stuck \"Waiting for features to finish initialising\"?",
+                                    "answer": "This state occurs when the Home Connect API reports that an appliance is not currently in a usable state. The plugin requires successful feature discovery to determine which HomeKit services and characteristics can be supported. If this process does not complete, there are two primary causes:\n\n1.  **Cloud Connectivity**: The appliance is reported as disconnected from the Home Connect servers. Note that the official Home Connect app can communicate with appliances over a local network, whereas this plugin depends entirely on the cloud-based API. An appliance might work in the official app while still being disconnected from the cloud.\n2.  **API Data Failure**: The API is failing to return appliance capability or state data during the discovery phase.\n\nTo resolve this, ensure the appliance has a stable connection to the Home Connect cloud servers. You may need to reset the network connection on the appliance itself. Successful operation via the official app while using mobile data (with Wi-Fi disabled) is a good test of cloud connectivity."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -621,7 +633,6 @@
                                     "question": "Why does my refrigerator or freezer show as open in HomeKit even when it is closed?",
                                     "answer": "This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models from Bosch, Siemens (such as the `GU21NADE0`), or Thermador. Even if the appliance's internal door alarm functions correctly, it may incorrectly report the generic `BSH.Common.Status.DoorState` as `Open` to the Home Connect cloud service.\n\nTo troubleshoot and resolve this:\n\n1. **Enable debug logging**: Use the **Log Debug as Info** option to see the raw values being returned by the API. The plugin maps `BSH.Common.EnumType.DoorState.Open` or `Refrigeration.Common.EnumType.Door.States.Open` to the HomeKit Open (100%) state and `Closed` to the Closed (0%) state. If the logs show `Open` while the door is physically closed, the issue is external to the plugin.\n2. **Override default mapping**: In the appliance-specific settings within the plugin configuration (available in `v1.9.1` and later), disable the generic `Door` feature and instead enable the specific compartment door features. These specific keys (such as `Freezer Door`, `Refrigerator Door`, `Chiller Left Door`, `Chiller Right Door`, or `Flex Compartment Door`) often report the correct state even when the aggregate status is broken.\n3. **Firmware updates**: Home Connect has acknowledged this issue for certain models and is releasing firmware updates. Ensure your appliance firmware is up to date via the official Home Connect app. If the raw API values remain incorrect despite current firmware, report the issue to [Home Connect Developer Support](https://developer.home-connect.com/support/contact).",
                                     "included_ids": [
-                                        "issue-382-1601",
                                         "issue-385-ce20"
                                     ]
                                 },
@@ -640,7 +651,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 382,
+                                    "id": "issue-382-cf6b",
+                                    "question": "Why does my Home Connect refrigerator or freezer always show as having an open door in HomeKit?",
+                                    "answer": "This issue is typically caused by a firmware bug in certain refrigeration appliances (fridge, freezer, or fridge-freezer) from manufacturers like Thermador, Bosch, and Siemens. The appliance hardware correctly detects the door state—verified by the fact that the door alarm still triggers correctly—but the firmware fails to update the door status value (`BSH.Common.Status.DoorState`) exposed via the Home Connect API. As a result, the plugin receives a persistent `Open` state.\n\nHome Connect developer support has confirmed this is a known issue that requires a firmware update for the affected appliance. Some models have already received fixes, while others are pending.\n\n**Actionable Steps:**\n1. Check the official Home Connect app for any available firmware updates for your appliance.\n2. Try exposing individual door services instead of the combined door state. Many refrigeration appliances support specific statuses such as `Refrigeration.Common.Status.Door.Refrigerator` or `Refrigeration.Common.Status.Door.Freezer`. These individual sensors may continue to report correctly even when the combined status is stuck.\n3. If the appliance firmware remains outdated and the individual sensors do not work, you can contact [Home Connect Customer Service](https://www.home-connect.com/global/service/contact-customer-service/service). Provide them with your appliance's model number and the email address associated with your Home Connect account to request assistance with a firmware update."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -929,7 +947,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 390,
+                                    "id": "issue-390-23ae",
+                                    "question": "Why does the plugin fail to start with a \"programs[0].name is missing\" configuration error?",
+                                    "answer": "This error typically indicates that the saved configuration contains invalid entries, often resulting from changes in how the Homebridge UI handles configuration data. This was specifically observed following updates to the `ng-frameworks` library used by the Homebridge interface.\n\nEven if the plugin has been updated to a version containing compatibility workarounds, existing configuration files may still contain these invalid fragments. To fix this:\n\n1. Open the Homebridge UI.\n2. Navigate to the plugin configuration for `homebridge-homeconnect`.\n3. Click the **Save** button without necessarily making any changes.\n\nThis action re-serialises the configuration into the correct format, removing the missing property errors and allowing the plugin to start normally."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []

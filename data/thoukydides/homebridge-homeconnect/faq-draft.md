@@ -215,7 +215,7 @@ No manual intervention is required; the plugin will automatically resume communi
 
 #### Why does my appliance show a `409 Conflict` error?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-378-832c issue-384-665e issue-388-9312 -->
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-378-832c issue-384-665e -->
 The Home Connect API uses `409 Conflict` errors for a variety of failures that result in a request being rejected. Common sub-errors include:
 
 - `SDK.Error.HomeAppliance.Connection.Initialization.Failed`: This indicates that the appliance is not connected to the Home Connect cloud servers. Note that the official Home Connect app may still function by communicating directly via your local Wi-Fi network, whereas this plugin is restricted to using the official cloud API. To troubleshoot:
@@ -337,6 +337,20 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
 
+#### 🚧 Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`? 🚧
+
+<!-- INCLUDES: issue-388-9f4d -->
+This error, specifically mentioning `Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when trying to start a program or change the fan speed of a hood.
+
+Even if the boost feature is not supported by your appliance or enabled in the plugin configuration, the Home Connect server may incorrectly require a default value for this internal option and fail when it cannot find one. This is a server-side failure that cannot be addressed by plugin changes or configuration adjustments. While the official Home Connect app may still work (as it often uses different API paths or local network communication), the cloud API used by third-party integrations like Homebridge is affected.
+
+Users encountering this issue should:
+
+1. Contact Home Connect customer service via their official service channels.
+2. Provide your account username and the exact error message: `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`.
+
+Developer support typically requires end-users to report these issues via standard customer service before they will investigate appliance-specific API failures.
+
 ### Local/Remote Control
 
 #### Why does my appliance show `No Response` when I try to start a program?
@@ -452,7 +466,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-0b7a -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. Common error messages include `HCA domain error` or code `H4684`, which often signify that the appliance is not correctly registered with the Home Connect cloud—frequently after hardware repairs or factory resets. When initialisation stalls, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Several factors can contribute to this state:
@@ -621,6 +635,16 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why is the plugin stuck "Waiting for features to finish initialising"? 🚧
+
+<!-- INCLUDES: issue-390-64e2 -->
+This state occurs when the Home Connect API reports that an appliance is not currently in a usable state. The plugin requires successful feature discovery to determine which HomeKit services and characteristics can be supported. If this process does not complete, there are two primary causes:
+
+1.  **Cloud Connectivity**: The appliance is reported as disconnected from the Home Connect servers. Note that the official Home Connect app can communicate with appliances over a local network, whereas this plugin depends entirely on the cloud-based API. An appliance might work in the official app while still being disconnected from the cloud.
+2.  **API Data Failure**: The API is failing to return appliance capability or state data during the discovery phase.
+
+To resolve this, ensure the appliance has a stable connection to the Home Connect cloud servers. You may need to reset the network connection on the appliance itself. Successful operation via the official app while using mobile data (with Wi-Fi disabled) is a good test of cloud connectivity.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
@@ -699,7 +723,7 @@ In HomeKit, the `Door` service for dishwashers is therefore read-only. It will c
 
 #### Why does my refrigerator or freezer show as open in HomeKit even when it is closed?
 
-<!-- INCLUDES: issue-382-1601 issue-385-ce20 -->
+<!-- INCLUDES: issue-385-ce20 -->
 This behaviour is often caused by firmware or API bugs on certain refrigeration appliance models from Bosch, Siemens (such as the `GU21NADE0`), or Thermador. Even if the appliance's internal door alarm functions correctly, it may incorrectly report the generic `BSH.Common.Status.DoorState` as `Open` to the Home Connect cloud service.
 
 To troubleshoot and resolve this:
@@ -727,6 +751,18 @@ To resolve these issues:
 
 - Check the Home Connect API status to rule out cloud service disruptions.
 - If the behaviour is persistent, perform a clean reset of the integration. This involves removing the affected accessories (or the entire bridge) from the Home app, stopping Homebridge, and deleting the `persist` and `accessories` cache files before restarting and re-pairing.
+
+#### 🚧 Why does my Home Connect refrigerator or freezer always show as having an open door in HomeKit? 🚧
+
+<!-- INCLUDES: issue-382-cf6b -->
+This issue is typically caused by a firmware bug in certain refrigeration appliances (fridge, freezer, or fridge-freezer) from manufacturers like Thermador, Bosch, and Siemens. The appliance hardware correctly detects the door state—verified by the fact that the door alarm still triggers correctly—but the firmware fails to update the door status value (`BSH.Common.Status.DoorState`) exposed via the Home Connect API. As a result, the plugin receives a persistent `Open` state.
+
+Home Connect developer support has confirmed this is a known issue that requires a firmware update for the affected appliance. Some models have already received fixes, while others are pending.
+
+**Actionable Steps:**
+1. Check the official Home Connect app for any available firmware updates for your appliance.
+2. Try exposing individual door services instead of the combined door state. Many refrigeration appliances support specific statuses such as `Refrigeration.Common.Status.Door.Refrigerator` or `Refrigeration.Common.Status.Door.Freezer`. These individual sensors may continue to report correctly even when the combined status is stuck.
+3. If the appliance firmware remains outdated and the individual sensors do not work, you can contact [Home Connect Customer Service](https://www.home-connect.com/global/service/contact-customer-service/service). Provide them with your appliance's model number and the email address associated with your Home Connect account to request assistance with a firmware update.
 
 ## Apple HomeKit
 
@@ -1011,5 +1047,18 @@ The structure for name prefixes in `config.json` is as follows:
 In this configuration:
 - `programs`: When `true`, appliance program names are prefixed with the appliance name.
 - `other`: When `true`, other service names (such as doors, events, or switches) are prefixed with the appliance name.
+
+#### 🚧 Why does the plugin fail to start with a "programs[0].name is missing" configuration error? 🚧
+
+<!-- INCLUDES: issue-390-23ae -->
+This error typically indicates that the saved configuration contains invalid entries, often resulting from changes in how the Homebridge UI handles configuration data. This was specifically observed following updates to the `ng-frameworks` library used by the Homebridge interface.
+
+Even if the plugin has been updated to a version containing compatibility workarounds, existing configuration files may still contain these invalid fragments. To fix this:
+
+1. Open the Homebridge UI.
+2. Navigate to the plugin configuration for `homebridge-homeconnect`.
+3. Click the **Save** button without necessarily making any changes.
+
+This action re-serialises the configuration into the correct format, removing the missing property errors and allowing the plugin to start normally.
 
 <!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 -->
