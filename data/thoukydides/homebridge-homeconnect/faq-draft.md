@@ -97,7 +97,7 @@
   - **[Plugin Installation and Configuration](#plugin-installation-and-configuration)**
     - [Why do I get an `npm ERR! ENOTEMPTY` error when installing or updating the plugin?](#why-do-i-get-an-npm-err-enotempty-error-when-installing-or-updating-the-plugin)
     - [Why are some configuration options, such as the Client ID, missing from the settings UI?](#why-are-some-configuration-options-such-as-the-client-id-missing-from-the-settings-ui)
-    - [Why do configuration settings like name prefixes revert or fail to save in the Homebridge UI?](#why-do-configuration-settings-like-name-prefixes-revert-or-fail-to-save-in-the-homebridge-ui)
+    - [Why do configuration settings revert or cause `programs[0].name is missing` errors?](#why-do-configuration-settings-revert-or-cause-programs0name-is-missing-errors)
 <!-- TOC-END -->
 
 ## Home Connect
@@ -998,15 +998,16 @@ The plugin uses dynamic configuration schemas to manage the wide variety of sett
 
 If you are performing a first-time installation and cannot see the `clientid` field, ensure you are using the latest version of **Homebridge Config UI X**. The plugin relies on the web interface's support for conditional logic (specifically `functionBody` conditions) to show and hide these fields correctly. If these fields do not appear, it is usually indicative of an issue with the Homebridge UI engine rather than the plugin itself. As a temporary measure, the plugin logs will indicate if required values like `clientid` are missing, which can be manually added to your `config.json` if the graphical interface is not functioning correctly.
 
-#### Why do configuration settings like name prefixes revert or fail to save in the Homebridge UI?
+#### Why do configuration settings revert or cause `programs[0].name is missing` errors?
 
-<!-- INCLUDES: issue-375-b5c7 -->
-This behaviour is typically caused by updates to the Homebridge UI's underlying form rendering engine (specifically the `ng-formworks` library) that introduced breaking changes in how conditional configuration schemas are processed. This can result in settings reverting to their default values, appearing blank, or being duplicated within the settings interface.
+<!-- INCLUDES: issue-375-b5c7 issue-390-23ae -->
+This behaviour is typically caused by updates to the Homebridge UI underlying form rendering engine (specifically the `ng-formworks` library) that introduced breaking changes in how conditional configuration schemas are processed. This can result in settings reverting to default values, appearing blank, or causing the plugin to fail to start with errors such as `programs[0].name is missing`. Even if the plugin has been updated to a version containing compatibility workarounds, existing configuration files may still contain invalid fragments.
 
 To resolve this:
 
 1. Ensure you are running `homebridge-homeconnect` version 1.7.0 or later, which implements specific workarounds for these UI limitations.
-2. If the issue persists, you can manually configure these settings by editing the `config.json` file directly.
+2. Open the plugin configuration in the Homebridge UI and click the **Save** button. This action re-serialises the configuration into the correct format, even if no changes were manually made. This typically removes missing property errors and allows the plugin to start normally.
+3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly.
 
 The structure for name prefixes in `config.json` is as follows:
 
@@ -1022,18 +1023,5 @@ The structure for name prefixes in `config.json` is as follows:
 In this configuration:
 - `programs`: When `true`, appliance program names are prefixed with the appliance name.
 - `other`: When `true`, other service names (such as doors, events, or switches) are prefixed with the appliance name.
-
-#### 🚧 Why does the plugin fail to start with a "programs[0].name is missing" configuration error? 🚧
-
-<!-- INCLUDES: issue-390-23ae -->
-This error typically indicates that the saved configuration contains invalid entries, often resulting from changes in how the Homebridge UI handles configuration data. This was specifically observed following updates to the `ng-frameworks` library used by the Homebridge interface.
-
-Even if the plugin has been updated to a version containing compatibility workarounds, existing configuration files may still contain these invalid fragments. To fix this:
-
-1. Open the Homebridge UI.
-2. Navigate to the plugin configuration for `homebridge-homeconnect`.
-3. Click the **Save** button without necessarily making any changes.
-
-This action re-serialises the configuration into the correct format, removing the missing property errors and allowing the plugin to start normally.
 
 <!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 -->
