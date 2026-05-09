@@ -14,6 +14,7 @@
   - **[Home Connect API Errors](#home-connect-api-errors)**
     - [Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?](#why-does-the-log-show-429-too-many-requests-1000-calls-in-1-day-reached-or-a-message-like-waiting--before-issuing-home-connect-api-request)
     - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
+    - [Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`?](#why-does-my-hood-return-a-409-conflict-error-with-sdkerrormissingoptionvalue)
     - [Why does my appliance show as `Not Responding` in the Home app when turned off?](#why-does-my-appliance-show-as-not-responding-in-the-home-app-when-turned-off)
     - [Why does the power button not work or return a `BSH.Common.Error.WriteRequest.Busy` error?](#why-does-the-power-button-not-work-or-return-a-bshcommonerrorwriterequestbusy-error)
     - [What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?](#what-do-gateway-timeout-proxy-error-or-timeout-on-home-connect-subsystem-messages-mean)
@@ -226,8 +227,6 @@ The Home Connect API uses `409 Conflict` errors for a variety of failures that r
 
 - `SDK.Error.InvalidSettingState`: This occurs when a setting is currently read-only or unavailable. It is often caused by inconsistencies in the API regarding power state capabilities (common with fridges, freezers, and hobs). It can also indicate that **Remote Start** or **Remote Control** has been disabled in the appliance's physical settings menu. While the API usually returns specific errors like `BSH.Common.Error.RemoteControlNotActive`, some appliances (particularly coffee makers) return `SDK.Error.InvalidSettingState` instead. On other appliances, it frequently indicates a maintenance message is displayed on the physical screen (e.g. "Change water filter" or "Descaling required") that requires manual confirmation before remote control can resume.
 
-- `SDK.Error.MissingOptionValue`: This is typically a Home Connect API server-side regression, most commonly observed with hoods (e.g. `Cooking.Common.Option.Hood.Boost`). It occurs when the API server expects a value for an internal program option that it has not correctly advertised as supported for your specific model. As the plugin only sends options that the API declares as supported, it cannot resolve this conflict. If encountered, verify the appliance works in the official app and report the specific error message to [Home Connect support](https://www.home-connect.com/global/service/contact-customer-service/service).
-
 - `SDK.Error.UnsupportedProgram`: This occurs when you attempt to start a program that is not exposed via the official Home Connect API for your specific model. The official app and physical control panel often support programs that have not yet been made available to third-party integrations. This is a platform limitation that should be reported to Home Connect support.
 
 - `SDK.Error.WrongOperationState`: This indicates that the appliance is in an incorrect state for the requested operation, such as attempting to start a program while another is already running or if the appliance is currently performing a self-cleaning cycle.
@@ -237,6 +236,18 @@ The Home Connect API uses `409 Conflict` errors for a variety of failures that r
 - `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggled together.
 
 For details of other `409` errors refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
+
+#### Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`?
+
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-378-832c issue-384-665e issue-388-9f4d -->
+This error, typically mentioning `Cooking.Common.Option.Hood.Boost`, is a known Home Connect API server-side regression. It occurs when the API server incorrectly requires a value for an internal option that it has not correctly advertised as supported for your specific model. Because the plugin only sends options that the API declares as supported, it cannot resolve this conflict on its own.
+
+Even if the boost feature is not supported by your appliance or enabled in the plugin configuration, the Home Connect server may fail the request when it cannot locate a default value. This is a platform failure that cannot be addressed by plugin changes or configuration adjustments. While the official Home Connect app may function (as it often uses different API paths or local network communication), the cloud API used by third-party integrations like Homebridge is affected.
+
+**What you should do**:
+1. Contact Home Connect customer service via their official service channels.
+2. Provide your account username and the exact error message: `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`.
+3. Mention that this affects third-party API integrations; developer support typically requires a report through standard customer service before they will investigate appliance-specific API failures.
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
@@ -336,20 +347,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`? 🚧
-
-<!-- INCLUDES: issue-388-9f4d -->
-This error, specifically mentioning `Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when trying to start a program or change the fan speed of a hood.
-
-Even if the boost feature is not supported by your appliance or enabled in the plugin configuration, the Home Connect server may incorrectly require a default value for this internal option and fail when it cannot find one. This is a server-side failure that cannot be addressed by plugin changes or configuration adjustments. While the official Home Connect app may still work (as it often uses different API paths or local network communication), the cloud API used by third-party integrations like Homebridge is affected.
-
-Users encountering this issue should:
-
-1. Contact Home Connect customer service via their official service channels.
-2. Provide your account username and the exact error message: `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`.
-
-Developer support typically requires end-users to report these issues via standard customer service before they will investigate appliance-specific API failures.
 
 ### Local/Remote Control
 
