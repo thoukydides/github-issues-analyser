@@ -134,8 +134,7 @@
                                         "issue-303-eee7",
                                         "issue-325-10f7",
                                         "issue-378-832c",
-                                        "issue-384-665e",
-                                        "issue-388-9f4d"
+                                        "issue-384-665e"
                                     ]
                                 },
                                 {
@@ -208,7 +207,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 388,
+                                    "id": "issue-388-3992",
+                                    "question": "Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue` for `Cooking.Common.Option.Hood.Boost`?",
+                                    "answer": "This error indicates a server-side regression within the Home Connect API infrastructure, typically occurring when attempting to start a venting programme on certain hood models. \n\nThe error message `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost` implies that the Home Connect server is internally requiring a default value for a \"Boost\" feature that it simultaneously claims the appliance does not support. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start the programme. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.\n\nIf you encounter this error, you should:\n1. Verify if the hood can be controlled via the official Home Connect app (which may use different, private APIs or a direct local connection).\n2. Report the issue directly to Home Connect customer service, providing your account username and the specific error message including the `Cooking.Common.Option.Hood.Boost` key. This is a fault in the third-party API that requires a fix from their development team."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
