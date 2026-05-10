@@ -239,8 +239,8 @@ For details of other `409` errors refer to the [Home Connect API Errors](https:/
 
 #### Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`?
 
-<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-378-832c issue-384-665e -->
-This error, typically mentioning `Cooking.Common.Option.Hood.Boost`, is a known Home Connect API server-side regression. It occurs when the API server incorrectly requires a value for an internal option that it has not correctly advertised as supported for your specific model. Because the plugin only sends options that the API declares as supported, it cannot resolve this conflict on its own.
+<!-- INCLUDES: issue-1-2d19 issue-22-defe issue-113-9491 issue-149-6678 issue-155-8156 issue-303-eee7 issue-325-10f7 issue-378-832c issue-384-665e issue-388-3992 -->
+This error, typically mentioning `Cooking.Common.Option.Hood.Boost`, is a known Home Connect API server-side regression that often occurs when starting a program on certain hood models. It occurs when the API server incorrectly requires a value for an internal option that it has not correctly advertised as supported for your specific model. Because the plugin only sends options that the API declares as supported, it cannot resolve this conflict on its own.
 
 Even if the boost feature is not supported by your appliance or enabled in the plugin configuration, the Home Connect server may fail the request when it cannot locate a default value. This is a platform failure that cannot be addressed by plugin changes or configuration adjustments. While the official Home Connect app may function (as it often uses different API paths or local network communication), the cloud API used by third-party integrations like Homebridge is affected.
 
@@ -347,17 +347,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue` for `Cooking.Common.Option.Hood.Boost`? 🚧
-
-<!-- INCLUDES: issue-388-3992 -->
-This error indicates a server-side regression within the Home Connect API infrastructure, typically occurring when attempting to start a venting programme on certain hood models. 
-
-The error message `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost` implies that the Home Connect server is internally requiring a default value for a "Boost" feature that it simultaneously claims the appliance does not support. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start the programme. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.
-
-If you encounter this error, you should:
-1. Verify if the hood can be controlled via the official Home Connect app (which may use different, private APIs or a direct local connection).
-2. Report the issue directly to Home Connect customer service, providing your account username and the specific error message including the `Cooking.Common.Option.Hood.Boost` key. This is a fault in the third-party API that requires a fix from their development team.
 
 ### Local/Remote Control
 
