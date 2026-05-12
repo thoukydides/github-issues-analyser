@@ -11,6 +11,9 @@ import { JSONSchema } from 'zod/v4/core';
 // Default model
 const DEFAULT_MODEL = 'gemini-3-flash-preview';
 
+// Base URL for routing requests via a Cloudflare AI Gateway proxy
+const BASE_URL = 'https://www.thouky.co.uk/api/github-actions/ai/google-ai-studio';
+
 // Prompt file format
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const makeMessageSchema = <T extends string>(role: T) => z.strictObject({
@@ -35,7 +38,7 @@ export async function geminiInference<T extends ZodType>(promptPath: string, var
     // Create a client
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY not set');
-    const ai = new GoogleGenAI({ apiKey });
+    const ai = new GoogleGenAI({ apiKey, httpOptions: { baseUrl: BASE_URL }});
 
     // Parse the prompt and prepare the input messages
     const prompt = readPrompt(promptPath);
