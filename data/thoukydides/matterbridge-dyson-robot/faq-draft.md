@@ -3,7 +3,6 @@
 <!-- TOC-START -->
 - **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**
   - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
-  - [What is the status of support for newer Dyson robot models like the 360 Heurist, 360 Vis Nav, or Spot+Scrub Ai (RB05)?](#what-is-the-status-of-support-for-newer-dyson-robot-models-like-the-360-heurist-360-vis-nav-or-spotscrub-ai-rb05)
   - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
   - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
   - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
@@ -18,16 +17,9 @@
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
 <!-- INCLUDES: issue-17-fe91 -->
-The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities (such as `ReadyOffDock`) are identified and correctly implemented rather than silently ignored.
+The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored. When Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise, the validation fails which prevents the plugin from starting.
 
-When Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise (e.g. `response[x].connectedConfiguration.firmware.capabilities[y] is not a valid enum value`), the validation fails to prevent unpredictable behaviour. To resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide the JSON response snippet in a GitHub issue so the new API structures can be correctly mapped.
-
-#### What is the status of support for newer Dyson robot models like the 360 Heurist, 360 Vis Nav, or Spot+Scrub Ai (RB05)?
-
-<!-- INCLUDES: issue-13-4541 issue-17-01c1 -->
-Support for newer Dyson robot models is a work in progress, as they employ significantly different cloud API capability schemas and MQTT message formats compared to the older 360 Eye. 
-
-Models like the 360 Heurist and 360 Vis Nav may currently show missing telemetry (such as `batteryChargeLevel` or `faults`) because they use new fields like `activeFaults` and `currentCleaningStrategy`. The Dyson Spot+Scrub Ai (RB05) currently has a placeholder implementation; while basic start/stop functionality may work, advanced features such as mopping controls, dock maintenance, or specific cleaning strategies are not yet supported. Full support for these models depends on community contributions of debug logs to map their unique capabilities to Matter attributes.
+To resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide a full debug log in a GitHub issue so the new API structures can be correctly mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
@@ -50,9 +42,9 @@ This is primarily due to limitations in the Matter specification, which does not
 #### Why isn't my Dyson Solarcycle Morph desk light supported?
 
 <!-- INCLUDES: issue-19-1b2e -->
-The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi.
+The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
-While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. From version `1.9.1` onwards, the plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
+While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
 
 ## Matterbridge
 
@@ -76,4 +68,4 @@ It is expected behaviour to see all appliances linked to your MyDyson account me
 
 The `entityBlackList` and `entityWhiteList` filters are applied after this initial discovery phase, just before the plugin registers devices as Matter endpoints. Consequently, even devices excluded from being bridged will appear during the initialisation and account-authorisation logs.
 
-<!-- EXCLUDED: issue-1-59e4 issue-16-b5e2 issue-26-2ae8 -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 -->

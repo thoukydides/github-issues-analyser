@@ -1,6 +1,6 @@
 {
     "heading": "Frequently Asked Questions (FAQ)",
-    "preamble": "<!-- TOC-START -->\n- **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**\n  - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)\n  - [What information should I collect to enable support for a new Dyson models?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-models)\n  - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)\n  - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)\n- **[Matterbridge](#matterbridge)**\n  - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)\n<!-- TOC-END -->",
+    "preamble": "<!-- TOC-START -->\n- **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**\n  - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)\n  - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)\n  - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)\n  - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)\n- **[Matterbridge](#matterbridge)**\n  - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)\n- **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**\n  - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)\n<!-- TOC-END -->",
     "partitions": [],
     "subcategories": [
         {
@@ -11,25 +11,17 @@
                     "entries": [
                         {
                             "question": "Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?",
-                            "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities (such as `ReadyOffDock`) are identified and correctly implemented rather than silently ignored.\n\nWhen Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise (e.g. `response[x].connectedConfiguration.firmware.capabilities[y] is not a valid enum value`), the validation fails to prevent unpredictable behaviour. To resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide the JSON response snippet in a GitHub issue so the new API structures can be correctly mapped.",
+                            "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored. When Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise, the validation fails which prevents the plugin from starting.\n\nTo resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide a full debug log in a GitHub issue so the new API structures can be correctly mapped.",
                             "included_ids": [
                                 "issue-17-fe91"
-                            ]
-                        },
-                        {
-                            "question": "What is the status of support for newer Dyson robot models like the 360 Heurist, 360 Vis Nav, or Spot+Scrub Ai (RB05)?",
-                            "answer": "Support for newer Dyson robot models is a work in progress, as they employ significantly different cloud API capability schemas and MQTT message formats compared to the older 360 Eye. \n\nModels like the 360 Heurist and 360 Vis Nav may currently show missing telemetry (such as `batteryChargeLevel` or `faults`) because they use new fields like `activeFaults` and `currentCleaningStrategy`. The Dyson Spot+Scrub Ai (RB05) currently has a placeholder implementation; while basic start/stop functionality may work, advanced features such as mopping controls, dock maintenance, or specific cleaning strategies are not yet supported. Full support for these models depends on community contributions of debug logs to map their unique capabilities to Matter attributes.",
-                            "included_ids": [
-                                "issue-13-4541",
-                                "issue-17-01c1"
                             ]
                         },
                         {
                             "question": "What information should I collect to enable support for a new Dyson model or missing features?",
                             "answer": "The information required depends on the device type and the specific feature being requested:\n\n1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data.\n\n2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.\n\n3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` in your configuration and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record a log while the device completes a cycle (e.g. a full clean) and submit the output via a GitHub issue.",
                             "included_ids": [
-                                "issue-16-b67c",
-                                "issue-13-4541"
+                                "issue-13-4541",
+                                "issue-16-b67c"
                             ]
                         },
                         {
@@ -42,7 +34,7 @@
                         },
                         {
                             "question": "Why isn't my Dyson Solarcycle Morph desk light supported?",
-                            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi.\n\nWhile the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. From version `1.9.1` onwards, the plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.",
+                            "answer": "The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).\n\nWhile the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.",
                             "included_ids": [
                                 "issue-19-1b2e"
                             ]
@@ -94,10 +86,12 @@
     ],
     "excluded_ids": [
         "issue-1-59e4",
+        "issue-13-4541",
         "issue-16-b5e2",
+        "issue-17-01c1",
         "issue-26-2ae8"
     ],
     "source_hashes": {
-        "faq": "8304489e5792169a007b9f6a5305f7102be60958d418026e7d41eca3aafc2f53"
+        "faq": "11aaab1f0f24aa7dc5f8c3019dcac0dd69421873b716ec65ea23fefbb60958fc"
     }
 }
