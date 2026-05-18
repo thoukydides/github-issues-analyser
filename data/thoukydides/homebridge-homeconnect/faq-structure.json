@@ -262,7 +262,7 @@
                             "entries": [
                                 {
                                     "question": "Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?",
-                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped where appropriate.",
+                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models (such as the Spotless cleaning robot series) and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values or `(unrecognised)` tags, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide context**: Note which setting you were changing in the official Home Connect app when the log entry appeared.\n4. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped where appropriate.",
                                     "included_ids": [
                                         "issue-145-3b74",
                                         "issue-175-3d7e",
@@ -350,7 +350,8 @@
                                         "issue-377-3b83",
                                         "issue-379-2e76",
                                         "issue-381-fa8e",
-                                        "issue-389-3f8f"
+                                        "issue-389-3f8f",
+                                        "issue-391-d362"
                                     ]
                                 },
                                 {
@@ -542,14 +543,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 391,
-                                    "id": "issue-391-d362",
-                                    "question": "Why are unrecognised API values appearing in the plugin logs?",
-                                    "answer": "Unrecognised values or `unrecognised` tags in the logs occur when an appliance reports status codes, program options, or settings that are not yet included in the plugin's internal definitions. This frequently happens with newer appliance models (such as the Spotless cleaning robot series) or after firmware updates, as the official Home Connect API documentation often lags behind hardware releases.\n\nIf you encounter these logs:\n1. Ensure you are running the latest version of the plugin, as many values are added shortly after they are discovered.\n2. Note which setting you are changing in the official Home Connect app when the log entry appears.\n3. Submit a report on GitHub including the log snippet and the name of the corresponding setting to help the maintainer update the plugin's internal schema."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
