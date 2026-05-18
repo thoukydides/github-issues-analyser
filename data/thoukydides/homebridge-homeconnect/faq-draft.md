@@ -234,13 +234,14 @@ To use the silence feature, you must either start the dedicated `NightWash` prog
 
 #### Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue`?
 
-This error indicates a server-side regression within the Home Connect API infrastructure, typically occurring when attempting to start a venting program on certain hood models.
+<!-- INCLUDES: issue-388-980e -->
+This error, specifically referencing `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when attempting to start a venting program or change the fan speed on certain hood models.
 
-The error message `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost` implies that the Home Connect server is internally requiring a default value for a "Boost" feature that it simultaneously claims the appliance does not support. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start the program. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.
+The Home Connect server-side logic expects a default value for a 'Boost' feature that is not documented in the public API and has not been correctly initialised for affected appliances. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start or modify the program. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.
 
 If you encounter this error, you should:
 1. Verify if the hood can be controlled via the official Home Connect app (which may use different, private APIs or a direct local connection).
-2. Report the issue directly to [Home Connect support](https://developer.home-connect.com/support/contact), providing your account and appliance details, with the specific error message including the `Cooking.Common.Option.Hood.Boost` key.
+2. Report the issue directly to [Home Connect developer support](https://developer.home-connect.com/support/contact), providing your account details and the specific error message including the `Cooking.Common.Option.Hood.Boost` key.
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
@@ -328,15 +329,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
-
-#### 🚧 Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`? 🚧
-
-<!-- INCLUDES: issue-388-980e -->
-This error, specifically referencing `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when trying to start or change the fan speed of a hood.
-
-The Home Connect server-side logic expects a default value for a program option (`Cooking.Common.Option.Hood.Boost`) that is not documented in the public API and has not been correctly initialised for your specific appliance. Because the plugin only includes options advertised as supported by the appliance, and the API does not advertise this boost option for affected models, the plugin does not include it in the request. The server fails internally regardless of the request content.
-
-While the official Home Connect app may continue to function correctly, this is because it often uses different internal APIs or direct local network communication, bypassing the problematic sections of the public API. There is no configuration change or workaround within the plugin that can resolve this. Affected users should report the issue to [Home Connect customer service](https://www.home-connect.com/global/service/contact-customer-service/service), providing their account email and the specific error message from the logs.
 
 ### Local/Remote Control
 
