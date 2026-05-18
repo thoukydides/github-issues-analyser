@@ -767,6 +767,13 @@
                                     ]
                                 },
                                 {
+                                    "question": "Why is support for Home Connect robot vacuum cleaners limited?",
+                                    "answer": "Support for robot vacuum cleaners (RVC), such as the Roxxter and Spotless series, is currently limited because the version of the HomeKit Accessory Protocol (HAP) used by Homebridge does not natively support RVC services. While the newer Matter standard provides a proper specification for robot vacuums, implementing Matter support within this plugin is not currently planned because:\n\n1. The maintainer does not own the specific hardware required for testing and development.\n2. Implementing Matter support is significantly more complex than the current HAP-based architecture.\n\nUsers should expect only basic status and control for these devices. Advanced features, such as specific cleaning modes, suction power settings, and mopping controls, are not easily mapped to existing HomeKit service types without causing issues with Siri or creating an inaccurate representation in the Apple Home app.",
+                                    "included_ids": [
+                                        "issue-391-11a8"
+                                    ]
+                                },
+                                {
                                     "question": "Why are appliance lights mapped as lightbulbs instead of switches?",
                                     "answer": "The Home Connect API defines appliance lights (such as internal refrigerator lights or hood lighting) as settings that often include more than just simple on/off functionality. These can support `Brightness`, `ColorTemperature`, or `Color` depending on the specific model. The plugin uses the HomeKit `Lightbulb` service to allow for the full range of hardware capabilities to be exposed to HomeKit.\n\nMany models, particularly hoods, have a hardware-enforced minimum brightness of 10%. The Home Connect API reflects this limitation; dragging the brightness slider below this threshold in HomeKit will typically turn the light off entirely rather than dimming it further.\n\nA side effect of the lightbulb mapping is that Siri will include these appliance lights when you issue commands to turn off the lights in a specific room. If you do not want an appliance light to be controlled or grouped with your room lighting, you should disable that specific service in your Homebridge configuration.",
                                     "included_ids": [
@@ -783,14 +790,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 391,
-                                    "id": "issue-391-11a8",
-                                    "question": "Why is support for Home Connect robot vacuum cleaners limited?",
-                                    "answer": "Support for robot vacuum cleaners (RVC), such as the Roxxter and Spotless series, is limited because the legacy HomeKit Accessory Protocol (HAP) used by Homebridge does not natively support RVC services. While the newer Matter standard provides a proper specification for robot vacuums, implementing Matter support within this plugin is not currently planned because:\n\n1. The maintainer does not own the specific hardware required for testing and development.\n2. Bridging RVCs to Matter is complex and requires physical access to the device to verify functionality.\n\nUsers should expect only basic status and control for these devices, as advanced features like specific cleaning modes, suction power, and mop settings are not easily mapped to existing HAP service types."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

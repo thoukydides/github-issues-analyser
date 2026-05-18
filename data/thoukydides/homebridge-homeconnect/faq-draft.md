@@ -79,6 +79,7 @@
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
     - [Can the physical hood control buttons on a Home Connect hob be used to trigger HomeKit automations?](#can-the-physical-hood-control-buttons-on-a-home-connect-hob-be-used-to-trigger-homekit-automations)
     - [Why can I only control power and fan speed for my Home Connect air conditioner?](#why-can-i-only-control-power-and-fan-speed-for-my-home-connect-air-conditioner)
+    - [Why is support for Home Connect robot vacuum cleaners limited?](#why-is-support-for-home-connect-robot-vacuum-cleaners-limited)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
   - **[Notifications & Events](#notifications--events)**
@@ -846,6 +847,16 @@ Consequently, the plugin maps air conditioners using a combination of a power **
 
 To avoid disrupting settings it cannot control, the plugin preserves the program currently selected via the physical remote or official app.
 
+#### Why is support for Home Connect robot vacuum cleaners limited?
+
+<!-- INCLUDES: issue-391-11a8 -->
+Support for robot vacuum cleaners (RVC), such as the Roxxter and Spotless series, is currently limited because the version of the HomeKit Accessory Protocol (HAP) used by Homebridge does not natively support RVC services. While the newer Matter standard provides a proper specification for robot vacuums, implementing Matter support within this plugin is not currently planned because:
+
+1. The maintainer does not own the specific hardware required for testing and development.
+2. Implementing Matter support is significantly more complex than the current HAP-based architecture.
+
+Users should expect only basic status and control for these devices. Advanced features, such as specific cleaning modes, suction power settings, and mopping controls, are not easily mapped to existing HomeKit service types without causing issues with Siri or creating an inaccurate representation in the Apple Home app.
+
 #### Why are appliance lights mapped as lightbulbs instead of switches?
 
 <!-- INCLUDES: issue-2-bdbd issue-84-6da7 issue-362-e525 -->
@@ -861,16 +872,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why is support for Home Connect robot vacuum cleaners limited? 🚧
-
-<!-- INCLUDES: issue-391-11a8 -->
-Support for robot vacuum cleaners (RVC), such as the Roxxter and Spotless series, is limited because the legacy HomeKit Accessory Protocol (HAP) used by Homebridge does not natively support RVC services. While the newer Matter standard provides a proper specification for robot vacuums, implementing Matter support within this plugin is not currently planned because:
-
-1. The maintainer does not own the specific hardware required for testing and development.
-2. Bridging RVCs to Matter is complex and requires physical access to the device to verify functionality.
-
-Users should expect only basic status and control for these devices, as advanced features like specific cleaning modes, suction power, and mop settings are not easily mapped to existing HAP service types.
 
 ### Notifications & Events
 
