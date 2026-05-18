@@ -1,0 +1,18 @@
+{
+    "issue_number": 391,
+    "updated_at": "2026-05-18T08:52:36.372Z",
+    "faq": [
+        {
+            "question": "Why is support for Home Connect robot vacuum cleaners limited?",
+            "answer": "Support for robot vacuum cleaners (RVC), such as the Roxxter and Spotless series, is limited because the legacy HomeKit Accessory Protocol (HAP) used by Homebridge does not natively support RVC services. While the newer Matter standard provides a proper specification for robot vacuums, implementing Matter support within this plugin is not currently planned because:\n\n1. The maintainer does not own the specific hardware required for testing and development.\n2. Bridging RVCs to Matter is complex and requires physical access to the device to verify functionality.\n\nUsers should expect only basic status and control for these devices, as advanced features like specific cleaning modes, suction power, and mop settings are not easily mapped to existing HAP service types.",
+            "semantic_abstract": "The legacy HomeKit Accessory Protocol (HAP) lacks a native service definition for robot vacuum cleaners (RVC), limiting the integration of Bosch and Siemens cleaning robots to basic status controls. Full functionality requires implementation via the Matter protocol, which is currently unsupported due to the lack of developer access to physical hardware for testing.",
+            "hash": "11a8e438b177b4b3d2505145695787611678d71819bdb5b4acd2ffe321bd5360"
+        },
+        {
+            "question": "Why are unrecognised API values appearing in the plugin logs?",
+            "answer": "Unrecognised values or `unrecognised` tags in the logs occur when an appliance reports status codes, program options, or settings that are not yet included in the plugin's internal definitions. This frequently happens with newer appliance models (such as the Spotless cleaning robot series) or after firmware updates, as the official Home Connect API documentation often lags behind hardware releases.\n\nIf you encounter these logs:\n1. Ensure you are running the latest version of the plugin, as many values are added shortly after they are discovered.\n2. Note which setting you are changing in the official Home Connect app when the log entry appears.\n3. Submit a report on GitHub including the log snippet and the name of the corresponding setting to help the maintainer update the plugin's internal schema.",
+            "semantic_abstract": "Home Connect API documentation gaps and new firmware releases lead to unrecognised status or option values within the plugin's event stream. These mismatches require manual schema updates within the plugin to correctly map manufacturer-specific enums and program options to HomeKit-compatible characteristics.",
+            "hash": "d3624ab6b67ec7d6743dc8846078aef4176635fac2b74dc3930caa39ca89651d"
+        }
+    ]
+}
