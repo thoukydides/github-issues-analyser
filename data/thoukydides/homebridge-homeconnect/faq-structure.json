@@ -125,9 +125,7 @@
                                 {
                                     "question": "Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue`?",
                                     "answer": "This error indicates a server-side regression within the Home Connect API infrastructure, typically occurring when attempting to start a venting program on certain hood models.\n\nThe error message `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost` implies that the Home Connect server is internally requiring a default value for a \"Boost\" feature that it simultaneously claims the appliance does not support. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start the program. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.\n\nIf you encounter this error, you should:\n1. Verify if the hood can be controlled via the official Home Connect app (which may use different, private APIs or a direct local connection).\n2. Report the issue directly to [Home Connect support](https://developer.home-connect.com/support/contact), providing your account and appliance details, with the specific error message including the `Cooking.Common.Option.Hood.Boost` key.",
-                                    "included_ids": [
-                                        "issue-388-3992"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does my appliance show as `Not Responding` in the Home app when turned off?",
@@ -192,7 +190,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 388,
+                                    "id": "issue-388-980e",
+                                    "question": "Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`?",
+                                    "answer": "This error, specifically referencing `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when trying to start or change the fan speed of a hood.\n\nThe Home Connect server-side logic expects a default value for a program option (`Cooking.Common.Option.Hood.Boost`) that is not documented in the public API and has not been correctly initialised for your specific appliance. Because the plugin only includes options advertised as supported by the appliance, and the API does not advertise this boost option for affected models, the plugin does not include it in the request. The server fails internally regardless of the request content.\n\nWhile the official Home Connect app may continue to function correctly, this is because it often uses different internal APIs or direct local network communication, bypassing the problematic sections of the public API. There is no configuration change or workaround within the plugin that can resolve this. Affected users should report the issue to [Home Connect customer service](https://www.home-connect.com/global/service/contact-customer-service/service), providing their account email and the specific error message from the logs."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -542,7 +547,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 391,
+                                    "id": "issue-391-d362",
+                                    "question": "Why are unrecognised API values appearing in the plugin logs?",
+                                    "answer": "Unrecognised values or `unrecognised` tags in the logs occur when an appliance reports status codes, program options, or settings that are not yet included in the plugin's internal definitions. This frequently happens with newer appliance models (such as the Spotless cleaning robot series) or after firmware updates, as the official Home Connect API documentation often lags behind hardware releases.\n\nIf you encounter these logs:\n1. Ensure you are running the latest version of the plugin, as many values are added shortly after they are discovered.\n2. Note which setting you are changing in the official Home Connect app when the log entry appears.\n3. Submit a report on GitHub including the log snippet and the name of the corresponding setting to help the maintainer update the plugin's internal schema."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -782,7 +794,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 391,
+                                    "id": "issue-391-11a8",
+                                    "question": "Why is support for Home Connect robot vacuum cleaners limited?",
+                                    "answer": "Support for robot vacuum cleaners (RVC), such as the Roxxter and Spotless series, is limited because the legacy HomeKit Accessory Protocol (HAP) used by Homebridge does not natively support RVC services. While the newer Matter standard provides a proper specification for robot vacuums, implementing Matter support within this plugin is not currently planned because:\n\n1. The maintainer does not own the specific hardware required for testing and development.\n2. Bridging RVCs to Matter is complex and requires physical access to the device to verify functionality.\n\nUsers should expect only basic status and control for these devices, as advanced features like specific cleaning modes, suction power, and mop settings are not easily mapped to existing HAP service types."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []

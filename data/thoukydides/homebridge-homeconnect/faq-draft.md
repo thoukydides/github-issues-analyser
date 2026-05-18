@@ -234,7 +234,6 @@ To use the silence feature, you must either start the dedicated `NightWash` prog
 
 #### Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue`?
 
-<!-- INCLUDES: issue-388-3992 -->
 This error indicates a server-side regression within the Home Connect API infrastructure, typically occurring when attempting to start a venting program on certain hood models.
 
 The error message `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost` implies that the Home Connect server is internally requiring a default value for a "Boost" feature that it simultaneously claims the appliance does not support. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start the program. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.
@@ -329,6 +328,15 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
+
+#### 🚧 Why does my hood return a `409 Conflict` error with `SDK.Error.MissingOptionValue`? 🚧
+
+<!-- INCLUDES: issue-388-980e -->
+This error, specifically referencing `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when trying to start or change the fan speed of a hood.
+
+The Home Connect server-side logic expects a default value for a program option (`Cooking.Common.Option.Hood.Boost`) that is not documented in the public API and has not been correctly initialised for your specific appliance. Because the plugin only includes options advertised as supported by the appliance, and the API does not advertise this boost option for affected models, the plugin does not include it in the request. The server fails internally regardless of the request content.
+
+While the official Home Connect app may continue to function correctly, this is because it often uses different internal APIs or direct local network communication, bypassing the problematic sections of the public API. There is no configuration change or workaround within the plugin that can resolve this. Affected users should report the issue to [Home Connect customer service](https://www.home-connect.com/global/service/contact-customer-service/service), providing their account email and the specific error message from the logs.
 
 ### Local/Remote Control
 
@@ -608,6 +616,16 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why are unrecognised API values appearing in the plugin logs? 🚧
+
+<!-- INCLUDES: issue-391-d362 -->
+Unrecognised values or `unrecognised` tags in the logs occur when an appliance reports status codes, program options, or settings that are not yet included in the plugin's internal definitions. This frequently happens with newer appliance models (such as the Spotless cleaning robot series) or after firmware updates, as the official Home Connect API documentation often lags behind hardware releases.
+
+If you encounter these logs:
+1. Ensure you are running the latest version of the plugin, as many values are added shortly after they are discovered.
+2. Note which setting you are changing in the official Home Connect app when the log entry appears.
+3. Submit a report on GitHub including the log snippet and the name of the corresponding setting to help the maintainer update the plugin's internal schema.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
@@ -860,6 +878,16 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
+
+#### 🚧 Why is support for Home Connect robot vacuum cleaners limited? 🚧
+
+<!-- INCLUDES: issue-391-11a8 -->
+Support for robot vacuum cleaners (RVC), such as the Roxxter and Spotless series, is limited because the legacy HomeKit Accessory Protocol (HAP) used by Homebridge does not natively support RVC services. While the newer Matter standard provides a proper specification for robot vacuums, implementing Matter support within this plugin is not currently planned because:
+
+1. The maintainer does not own the specific hardware required for testing and development.
+2. Bridging RVCs to Matter is complex and requires physical access to the device to verify functionality.
+
+Users should expect only basic status and control for these devices, as advanced features like specific cleaning modes, suction power, and mop settings are not easily mapped to existing HAP service types.
 
 ### Notifications & Events
 
