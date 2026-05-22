@@ -123,9 +123,12 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue`?",
-                                    "answer": "This error, specifically referencing `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when attempting to start a venting program or change the fan speed on certain hood models.\n\nThe Home Connect server-side logic expects a default value for a 'Boost' feature that is not documented in the public API and has not been correctly initialised for affected appliances. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start or modify the program. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.\n\nIf you encounter this error, you should:\n1. Verify if the hood can be controlled via the official Home Connect app (which may use different, private APIs or a direct local connection).\n2. Report the issue directly to [Home Connect developer support](https://developer.home-connect.com/support/contact), providing your account details and the specific error message including the `Cooking.Common.Option.Hood.Boost` key.",
-                                    "included_ids": []
+                                    "question": "Why does my hood fail with `409 Conflict` and `Cooking.Common.Option.Hood.Boost`?",
+                                    "answer": "This error, typically logged as `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`, indicates a Home Connect API server-side regression. It occurs when attempting to start a venting program or change the fan speed on certain hood models.\n\nThe Home Connect server-side logic expects a default value for a 'Boost' feature that is not documented in the public API and has not been correctly initialised for affected appliances. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.\n\nIf you encounter this error, you should:\n1. Verify if the hood can be controlled via the official Home Connect app (which may use different, private APIs or a direct local connection).\n2. Report the issue directly to [Home Connect developer support](https://developer.home-connect.com/support/contact). Provide your account email address, the appliance `haID` (available in the Homebridge logs), and the specific error message including the `Cooking.Common.Option.Hood.Boost` key.",
+                                    "included_ids": [
+                                        "issue-388-a426",
+                                        "issue-392-d5d9"
+                                    ]
                                 },
                                 {
                                     "question": "Why does my appliance show as `Not Responding` in the Home app when turned off?",
@@ -190,20 +193,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 388,
-                                    "id": "issue-388-a426",
-                                    "question": "Why does my hood fail to turn on with error `409 Conflict` and `Cooking.Common.Option.Hood.Boost`?",
-                                    "answer": "This error is caused by a Home Connect API server-side regression rather than an issue with the plugin or your local home network setup. The Home Connect servers incorrectly require a default value for the undocumented option `Cooking.Common.Option.Hood.Boost` (associated with the fan's boost feature) even if your specific hood model does not advertise or support this capability.\n\nBecause your appliance does not support this feature, the plugin does not (and cannot) include this option in its program request, leading to the server returning a `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]` error.\n\nThe official Home Connect mobile application avoids this error because it utilises private APIs or establishes a direct connection over your local network, bypassing the public API gateway.\n\nThere is no configuration change or workaround within Homebridge to resolve this server-side failure. If you encounter this error, you must contact Home Connect customer service to report the bug on their server, providing your account details."
-                                },
-                                {
-                                    "issue_number": 392,
-                                    "id": "issue-392-d5d9",
-                                    "question": "Why does controlling my hood fan speed fail with a `Cooking.Common.Option.Hood.Boost` error?",
-                                    "answer": "This issue is caused by a Home Connect API server-side validation error or appliance firmware bug, and it cannot be resolved or worked around by this plugin.\n\nWhen attempting to control the hood fan speed, the Home Connect API returns a conflict error:\n`[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`\n\nThis occurs because the Home Connect servers expect a default value for a boost feature that may not be supported or configured correctly on your specific appliance model.\n\nTo resolve this issue, you must contact Home Connect Customer Support directly to request a fix on their servers or a firmware update for your appliance. When contacting support, please provide:\n1. Your Home Connect account email address\n2. Your appliance `haID` (Home Appliance ID)\n3. The exact error message from your Homebridge logs"
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
