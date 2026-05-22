@@ -1,0 +1,12 @@
+{
+    "issue_number": 392,
+    "updated_at": "2026-05-22T08:31:12.472Z",
+    "faq": [
+        {
+            "question": "Why does controlling my hood fan speed fail with a `Cooking.Common.Option.Hood.Boost` error?",
+            "answer": "This issue is caused by a Home Connect API server-side validation error or appliance firmware bug, and it cannot be resolved or worked around by this plugin.\n\nWhen attempting to control the hood fan speed, the Home Connect API returns a conflict error:\n`[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`\n\nThis occurs because the Home Connect servers expect a default value for a boost feature that may not be supported or configured correctly on your specific appliance model.\n\nTo resolve this issue, you must contact Home Connect Customer Support directly to request a fix on their servers or a firmware update for your appliance. When contacting support, please provide:\n1. Your Home Connect account email address\n2. Your appliance `haID` (Home Appliance ID)\n3. The exact error message from your Homebridge logs",
+            "semantic_abstract": "Home Connect API server-side validation failure prevents hood venting programme activation by throwing a `[409 Conflict]` error regarding `Cooking.Common.Option.Hood.Boost`, preventing fan speed adjustment. This is a platform-level firmware or API capability mismatch that requires vendor-side resolution and cannot be resolved by local plugin configuration.",
+            "hash": "d5d9ff7ca8bf8cc577923b9c6240e52d05791ccd4ddd9e9d1c0a2cbb5938402e"
+        }
+    ]
+}
