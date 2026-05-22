@@ -839,18 +839,17 @@ Manufacturers typically design these buttons to communicate directly with compat
 
 #### Why can I only control power and fan speed for my Home Connect air conditioner?
 
-The Home Connect API currently provides extremely limited support for `AirConditioner` appliances. Crucial capabilities required for a full HomeKit `Thermostat` or `HeaterCooler` service are missing from the public API:
+<!-- INCLUDES: issue-346-881d -->
+The Home Connect API provides limited support for `AirConditioner` appliances, lacking the full telemetry required for standard HomeKit climate control services (`Thermostat` or `Heater Cooler`).
 
-- **Ambient Temperature and Humidity**: There is no API endpoint to read the current room temperature or humidity.
-- **Temperature Setpoints**: No endpoints are provided to set a target temperature.
-- **Mode Selection**: Selection of cooling, heating, or auto programs is not fully exposed for control.
+While the API supports basic power switching (`BSH.Common.Setting.PowerState`) and fan controls, it often lacks endpoints for real-time ambient room temperature or humidity. Even when target temperature setpoints (`SetpointTemperature`) are available, HomeKit requires current ambient feedback to correctly manage and display the heating or cooling status. Without this feedback, the accessory would often appear as "No Response" or report inaccurate data in the Apple Home app.
 
-Consequently, the plugin maps air conditioners using a combination of a power **Switch** (to toggle `PowerState` between `On` and `Standby`) and a **Fan v2** service. The Fan service manages:
+Consequently, the plugin maps air conditioners using a combination of a power `Switch` (to toggle between `On` and `Standby`) and a `Fan v2` service. The Fan service manages:
 - `Active` and `Current Fan State`: Reporting if the fan is running.
 - `Target Fan State`: Toggling between `Manual` and `Automatic` modes.
 - `Rotation Speed`: Adjusting the `FanSpeedPercentage` (1–100%).
 
-To avoid disrupting settings it cannot control, the plugin preserves the program currently selected via the physical remote or official app.
+To avoid disrupting settings it cannot control, the plugin preserves the program or mode currently selected via the physical remote or official app. Any adjustments not supported by these HomeKit services must be made directly through the Home Connect app.
 
 #### Why is support for Home Connect robot vacuum cleaners limited?
 
@@ -877,19 +876,6 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
-
-#### 🚧 Why are my Home Connect air conditioner's temperature controls and ambient readings missing or limited in HomeKit? 🚧
-
-<!-- INCLUDES: issue-346-881d -->
-Home Connect air conditioner support in the official Home Connect API is highly restricted. While the API supports basic power switching (`BSH.Common.Setting.PowerState`), fan speed percentage (`FanSpeedPercentage`), fan mode (`FanSpeedMode`), and target temperature setpoints (`SetpointTemperature`), it lacks telemetry for ambient room temperature or humidity.
-
-Because of these API constraints, the plugin cannot expose a fully functional HomeKit `Thermostat` or `Heater Cooler` accessory, as these services require real-time ambient temperature feedback to function correctly in Apple Home. 
-
-To work around these limitations, the plugin maps supported air conditioners using:
-- A `Switch` service to control the overall power state (on/standby).
-- A `Fan` (v2) service to adjust fan speed and toggle between manual and automatic fan modes.
-
-To avoid overwriting custom operating modes, the plugin preserves your currently selected programme rather than forcing a default one. Any mode or programme adjustments not supported by HomeKit must be configured directly via the official Home Connect app or the physical remote control.
 
 ### Notifications & Events
 
