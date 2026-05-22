@@ -1,18 +1,12 @@
 {
     "issue_number": 346,
-    "updated_at": "2026-04-04T14:20:03.173Z",
+    "updated_at": "2026-05-22T14:00:22.672Z",
     "faq": [
         {
-            "question": "Why can't I control the temperature or see humidity for my air conditioner?",
-            "answer": "The Home Connect API for `AirConditioner` appliances currently lacks support for temperature and humidity control. While the API can report the appliance's power state and fan settings, it does not provide endpoints for:\n\n*   Reading the current ambient temperature or humidity.\n*   Setting a target temperature setpoint.\n\nThe plugin developer has confirmed with the Home Connect team that these features are not yet part of the public API specification. Until Home Connect extends the API to include these capabilities, the plugin cannot expose `Thermostat`, `HeaterCooler`, or `TemperatureSensor` services. Users must continue to use the official Home Connect app or the physical remote for temperature and humidity adjustments.",
-            "semantic_abstract": "The Home Connect API for `AirConditioner` appliances lacks endpoints for ambient temperature, humidity, and temperature setpoints, preventing the mapping of standard HomeKit climate control services. This limitation is a result of the third-party API specification rather than a plugin defect.",
-            "hash": "9fb503ef3e9dfedd8b110ad5315c2f8a39348fd9efa8992fb85365944eb08813"
-        },
-        {
-            "question": "How are air conditioners mapped into HomeKit?",
-            "answer": "Due to the absence of temperature and humidity data in the Home Connect API, air conditioners are mapped using a combination of `Switch` and `Fan` services rather than a single climate control service:\n\n*   **Power Switch**: A standard `Switch` service represents the appliance's `PowerState`, allowing it to be toggled between `On` and `Standby`.\n*   **Fan Control**: A `Fan` v2 service is used to manage the active program and fan-specific settings. This includes:\n    *   `Active` and `Current Fan State`: Indicating if the fan is running.\n    *   `Target Fan State`: Controlling whether the fan is in `Manual` or `Automatic` mode.\n    *   `Rotation Speed`: Adjusting the `FanSpeedPercentage` (1–100%).\n\nTo avoid disrupting settings that the plugin cannot control, it typically preserves the program currently selected on the device (via the app or remote) rather than forcing a specific mode like `Cool` or `Heat`.",
-            "semantic_abstract": "In the absence of API-level temperature control, `AirConditioner` appliances are mapped to HomeKit `Switch` and `Fan` services to provide power and fan speed functionality while preserving user-selected programs that cannot be managed via the plugin.",
-            "hash": "373baaf0c7bd1d87eecdf2b3da96d3b0b89aae155b656db4d024251ddeb4f62e"
+            "question": "Why are my Home Connect air conditioner's temperature controls and ambient readings missing or limited in HomeKit?",
+            "answer": "Home Connect air conditioner support in the official Home Connect API is highly restricted. While the API supports basic power switching (`BSH.Common.Setting.PowerState`), fan speed percentage (`FanSpeedPercentage`), fan mode (`FanSpeedMode`), and target temperature setpoints (`SetpointTemperature`), it lacks telemetry for ambient room temperature or humidity.\n\nBecause of these API constraints, the plugin cannot expose a fully functional HomeKit `Thermostat` or `Heater Cooler` accessory, as these services require real-time ambient temperature feedback to function correctly in Apple Home. \n\nTo work around these limitations, the plugin maps supported air conditioners using:\n- A `Switch` service to control the overall power state (on/standby).\n- A `Fan` (v2) service to adjust fan speed and toggle between manual and automatic fan modes.\n\nTo avoid overwriting custom operating modes, the plugin preserves your currently selected programme rather than forcing a default one. Any mode or programme adjustments not supported by HomeKit must be configured directly via the official Home Connect app or the physical remote control.",
+            "semantic_abstract": "Home Connect API technical limitations for `AirConditioner` appliances restrict functional mapping in HomeKit. The absence of ambient temperature and humidity telemetry from the API prevents the implementation of full `Thermostat` or `Heater Cooler` services, limiting integration to `Switch` and `Fan` v2 services for basic power, speed, and mode control.",
+            "hash": "881d982c9c98c2e870f325a2c455fa97cd0004a52644942f2929c84a8a7879cb"
         }
     ]
 }
