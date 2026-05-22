@@ -235,7 +235,6 @@ To use the silence feature, you must either start the dedicated `NightWash` prog
 
 #### Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue`?
 
-<!-- INCLUDES: issue-388-980e -->
 This error, specifically referencing `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`, indicates a Home Connect API server-side regression. It typically occurs when attempting to start a venting program or change the fan speed on certain hood models.
 
 The Home Connect server-side logic expects a default value for a 'Boost' feature that is not documented in the public API and has not been correctly initialised for affected appliances. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start or modify the program. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.
@@ -330,6 +329,32 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Do not delete** the file named `94a08da1fecbb6e8b46990538c7b50b2` which contains your authorisation token. Deleting this will require you to re-authorise.
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
+
+#### 🚧 Why does my hood fail to turn on with error `409 Conflict` and `Cooking.Common.Option.Hood.Boost`? 🚧
+
+<!-- INCLUDES: issue-388-a426 -->
+This error is caused by a Home Connect API server-side regression rather than an issue with the plugin or your local home network setup. The Home Connect servers incorrectly require a default value for the undocumented option `Cooking.Common.Option.Hood.Boost` (associated with the fan's boost feature) even if your specific hood model does not advertise or support this capability.
+
+Because your appliance does not support this feature, the plugin does not (and cannot) include this option in its program request, leading to the server returning a `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]` error.
+
+The official Home Connect mobile application avoids this error because it utilises private APIs or establishes a direct connection over your local network, bypassing the public API gateway.
+
+There is no configuration change or workaround within Homebridge to resolve this server-side failure. If you encounter this error, you must contact Home Connect customer service to report the bug on their server, providing your account details.
+
+#### 🚧 Why does controlling my hood fan speed fail with a `Cooking.Common.Option.Hood.Boost` error? 🚧
+
+<!-- INCLUDES: issue-392-d5d9 -->
+This issue is caused by a Home Connect API server-side validation error or appliance firmware bug, and it cannot be resolved or worked around by this plugin.
+
+When attempting to control the hood fan speed, the Home Connect API returns a conflict error:
+`[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`
+
+This occurs because the Home Connect servers expect a default value for a boost feature that may not be supported or configured correctly on your specific appliance model.
+
+To resolve this issue, you must contact Home Connect Customer Support directly to request a fix on their servers or a firmware update for your appliance. When contacting support, please provide:
+1. Your Home Connect account email address
+2. Your appliance `haID` (Home Appliance ID)
+3. The exact error message from your Homebridge logs
 
 ### Local/Remote Control
 
@@ -426,7 +451,6 @@ If a program is unexpectedly missing, try powering the appliance on, manually se
 
 #### Why are fan controls missing for my integrated venting hob?
 
-<!-- INCLUDES: issue-363-0abc -->
 The Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, such as the two cavities of dual ovens. Because extractor fans operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API.
 
 Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance. Note that updates to the Home Connect API to support new features can take a significant amount of time to be implemented.
@@ -609,6 +633,19 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`. Whilst the Apple Home app does not expose these features, they are shown in third-party apps (such as Eve) and may be used by automations.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
+
+#### 🚧 Why does the integrated ventilation fan on my hob not appear in Homebridge? 🚧
+
+<!-- INCLUDES: issue-363-f97b -->
+The Home Connect API historically treated hobs and hoods as completely separate appliance types (`Hob` and `Hood`) with no combined appliance model. For many integrated units (hobs with built-in extractor fans), the API simply did not expose any fan or ventilation controls, preventing the plugin from displaying them.
+
+However, the Home Connect API has introduced a setting specifically for this: `Cooking.Hob.Setting.Ventilation`. To check if your combined appliance supports this feature, you can inspect its cached API data:
+
+1. Enable debug logging with the `Log API Bodies` option enabled in the plugin configuration.
+2. Locate the cached API response files in the plugin's persist directory (typically `~/.homebridge/homebridge-homeconnect/persist`). Do not open or share the file containing your OAuth tokens.
+3. Search the files for occurrences of `Cooking.Hob.Setting.Ventilation`.
+
+If this setting is present in your appliance's API data but the fan is still not controllable in Homebridge, please capture a debug log and open an issue so support can be added.
 
 ### Appliance Status and Connectivity
 
@@ -833,7 +870,6 @@ Manufacturers typically design these buttons to communicate directly with compat
 
 #### Why can I only control power and fan speed for my Home Connect air conditioner?
 
-<!-- INCLUDES: issue-346-373b issue-346-9fb5 -->
 The Home Connect API currently provides extremely limited support for `AirConditioner` appliances. Crucial capabilities required for a full HomeKit `Thermostat` or `HeaterCooler` service are missing from the public API:
 
 - **Ambient Temperature and Humidity**: There is no API endpoint to read the current room temperature or humidity.
@@ -872,6 +908,19 @@ A side effect of the lightbulb mapping is that Siri will include these appliance
 Some hood models (such as the Siemens `LC91KLT60`) do not implement colour temperature control in compliance with the official Home Connect API documentation.
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
+
+#### 🚧 Why are my Home Connect air conditioner's temperature controls and ambient readings missing or limited in HomeKit? 🚧
+
+<!-- INCLUDES: issue-346-881d -->
+Home Connect air conditioner support in the official Home Connect API is highly restricted. While the API supports basic power switching (`BSH.Common.Setting.PowerState`), fan speed percentage (`FanSpeedPercentage`), fan mode (`FanSpeedMode`), and target temperature setpoints (`SetpointTemperature`), it lacks telemetry for ambient room temperature or humidity.
+
+Because of these API constraints, the plugin cannot expose a fully functional HomeKit `Thermostat` or `Heater Cooler` accessory, as these services require real-time ambient temperature feedback to function correctly in Apple Home. 
+
+To work around these limitations, the plugin maps supported air conditioners using:
+- A `Switch` service to control the overall power state (on/standby).
+- A `Fan` (v2) service to adjust fan speed and toggle between manual and automatic fan modes.
+
+To avoid overwriting custom operating modes, the plugin preserves your currently selected programme rather than forcing a default one. Any mode or programme adjustments not supported by HomeKit must be configured directly via the official Home Connect app or the physical remote control.
 
 ### Notifications & Events
 
