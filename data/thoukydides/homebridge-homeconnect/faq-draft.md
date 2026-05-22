@@ -426,9 +426,16 @@ If a program is unexpectedly missing, try powering the appliance on, manually se
 
 #### Why are fan controls missing for my integrated venting hob?
 
-The Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, such as the two cavities of dual ovens. Because extractor fans operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API.
+<!-- INCLUDES: issue-363-f97b -->
+The Home Connect API is architected to support a single active program per appliance. Because extractor fans typically operate as separate programs (e.g. `Cooking.Common.Program.Hood.Automatic`), many hobs with integrated ventilation are exposed by the API as two distinct appliances: a Hob and a Hood.
 
-Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance. Note that updates to the Home Connect API to support new features can take a significant amount of time to be implemented.
+However, some newer integrated units expose ventilation controls via a specific setting: `Cooking.Hob.Setting.Ventilation`. If this is available, the plugin can potentially control the fan without a separate Hood appliance. To verify if your appliance supports this:
+
+1. Enable **Debug Logging** and the **Log API Bodies** option in the plugin configuration.
+2. Check the logs or the cached API response files in the plugin's `persist` directory (typically `~/.homebridge/homebridge-homeconnect/persist`).
+3. Search for the string `Cooking.Hob.Setting.Ventilation`.
+
+If your appliance does not expose this setting and no separate Hood appliance appears in the Home Connect app or Homebridge, the fan cannot currently be controlled via the public API. In this case, you should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance or via the ventilation setting.
 
 #### Why does the log say a selected program is not supported by the Home Connect API?
 
@@ -608,19 +615,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`. Whilst the Apple Home app does not expose these features, they are shown in third-party apps (such as Eve) and may be used by automations.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why does the integrated ventilation fan on my hob not appear in Homebridge? 🚧
-
-<!-- INCLUDES: issue-363-f97b -->
-The Home Connect API historically treated hobs and hoods as completely separate appliance types (`Hob` and `Hood`) with no combined appliance model. For many integrated units (hobs with built-in extractor fans), the API simply did not expose any fan or ventilation controls, preventing the plugin from displaying them.
-
-However, the Home Connect API has introduced a setting specifically for this: `Cooking.Hob.Setting.Ventilation`. To check if your combined appliance supports this feature, you can inspect its cached API data:
-
-1. Enable debug logging with the `Log API Bodies` option enabled in the plugin configuration.
-2. Locate the cached API response files in the plugin's persist directory (typically `~/.homebridge/homebridge-homeconnect/persist`). Do not open or share the file containing your OAuth tokens.
-3. Search the files for occurrences of `Cooking.Hob.Setting.Ventilation`.
-
-If this setting is present in your appliance's API data but the fan is still not controllable in Homebridge, please capture a debug log and open an issue so support can be added.
 
 ### Appliance Status and Connectivity
 
