@@ -1,12 +1,12 @@
 {
     "issue_number": 388,
-    "updated_at": "2026-05-22T11:30:11.918Z",
+    "updated_at": "2026-05-23T09:27:28.064Z",
     "faq": [
         {
-            "question": "Why does my hood fail to turn on with error `409 Conflict` and `Cooking.Common.Option.Hood.Boost`?",
-            "answer": "This error is caused by a Home Connect API server-side regression rather than an issue with the plugin or your local home network setup. The Home Connect servers incorrectly require a default value for the undocumented option `Cooking.Common.Option.Hood.Boost` (associated with the fan's boost feature) even if your specific hood model does not advertise or support this capability.\n\nBecause your appliance does not support this feature, the plugin does not (and cannot) include this option in its program request, leading to the server returning a `[409 Conflict] Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]` error.\n\nThe official Home Connect mobile application avoids this error because it utilises private APIs or establishes a direct connection over your local network, bypassing the public API gateway.\n\nThere is no configuration change or workaround within Homebridge to resolve this server-side failure. If you encounter this error, you must contact Home Connect customer service to report the bug on their server, providing your account details.",
-            "semantic_abstract": "A Home Connect API server-side regression causes `409 Conflict` errors with `SDK.Error.MissingOptionValue` for the undocumented `Cooking.Common.Option.Hood.Boost` option during hood program execution. This issue occurs when the API gateway requires a default value for an unadvertised option, preventing the plugin from starting or altering hood fan speeds while the official app remains functional via direct local control.",
-            "hash": "a4267b34365bb1464fe9133850f485fedb02124a5e53831ed44e2ba4ccc3fe30"
+            "question": "Why does starting my hood fail with a `409 Conflict` `SDK.Error.MissingOptionValue` error?",
+            "answer": "This error (typically specifying `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`) is caused by a Home Connect API server-side regression. The Home Connect servers incorrectly demand a default value for an option that the appliance does not actually support or advertise, causing requests to start the venting programme to fail.\n\nTo resolve this issue, ensure you have updated the plugin to the latest version. A workaround was introduced to automatically bypass this specific server-side requirement for hoods.\n\nIf you encounter a similar `SDK.Error.MissingOptionValue` error on another appliance or option, it represents an upstream server-side issue. You should report this directly to Home Connect customer support so their development team can address the schema mismatch for your appliance model.",
+            "semantic_abstract": "Home Connect API server-side regressions can cause requests to fail with a `409 Conflict` `SDK.Error.MissingOptionValue` error when the server incorrectly demands default values for unsupported options like `Cooking.Common.Option.Hood.Boost`. While the plugin provides automated workarounds for known instances on hood appliances, other occurrences require reporting the upstream schema mismatch to Home Connect customer support.",
+            "hash": "278a84e4cb79084e786c08e413437960c44f90ae44ef50fcba82112f13ced241"
         }
     ]
 }
