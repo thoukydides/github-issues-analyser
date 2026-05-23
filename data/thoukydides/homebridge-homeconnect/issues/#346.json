@@ -1,12 +1,18 @@
 {
     "issue_number": 346,
-    "updated_at": "2026-05-22T14:00:22.672Z",
+    "updated_at": "2026-05-23T11:16:39.871Z",
     "faq": [
         {
-            "question": "Why are my Home Connect air conditioner's temperature controls and ambient readings missing or limited in HomeKit?",
-            "answer": "Home Connect air conditioner support in the official Home Connect API is highly restricted. While the API supports basic power switching (`BSH.Common.Setting.PowerState`), fan speed percentage (`FanSpeedPercentage`), fan mode (`FanSpeedMode`), and target temperature setpoints (`SetpointTemperature`), it lacks telemetry for ambient room temperature or humidity.\n\nBecause of these API constraints, the plugin cannot expose a fully functional HomeKit `Thermostat` or `Heater Cooler` accessory, as these services require real-time ambient temperature feedback to function correctly in Apple Home. \n\nTo work around these limitations, the plugin maps supported air conditioners using:\n- A `Switch` service to control the overall power state (on/standby).\n- A `Fan` (v2) service to adjust fan speed and toggle between manual and automatic fan modes.\n\nTo avoid overwriting custom operating modes, the plugin preserves your currently selected programme rather than forcing a default one. Any mode or programme adjustments not supported by HomeKit must be configured directly via the official Home Connect app or the physical remote control.",
-            "semantic_abstract": "Home Connect API technical limitations for `AirConditioner` appliances restrict functional mapping in HomeKit. The absence of ambient temperature and humidity telemetry from the API prevents the implementation of full `Thermostat` or `Heater Cooler` services, limiting integration to `Switch` and `Fan` v2 services for basic power, speed, and mode control.",
-            "hash": "881d982c9c98c2e870f325a2c455fa97cd0004a52644942f2929c84a8a7879cb"
+            "question": "Why doesn't my Home Connect air conditioner show the current room temperature or humidity?",
+            "answer": "The Home Connect API does not currently expose ambient temperature or humidity measurements for `AirConditioner` appliances. As a result, the plugin cannot display these values in HomeKit.\n\nWhile the plugin exposes a `Thermostat` service to let you adjust the target setpoint temperature, the current temperature displayed in HomeKit cannot reflect actual room conditions. You can still control:\n- Target temperature setpoint\n- Fan speed and automatic/manual fan modes\n- Operating mode (Cool, Heat, Auto, Dry, Fan)\n- Power state (On/Standby)",
+            "semantic_abstract": "Home Connect API design constraints omit ambient temperature and humidity telemetry for `AirConditioner` appliances, limiting HomeKit integration to target temperature setpoint modification and mode configuration without real-time environmental monitoring.",
+            "hash": "0f16d5522f7ff3a9a08a0e514da7ce73c3295e73ea4ee2eb9685ff8479d8c2b8"
+        },
+        {
+            "question": "How does the plugin map HomeKit Thermostat states to Home Connect air conditioner programmes?",
+            "answer": "Because HomeKit thermostat states do not map directly to Home Connect appliance programmes, the plugin uses the following mapping logic:\n\n- **Target Heating/Cooling State `Off`** maps to the `Fan` or `ActiveClean` programmes (allowing fan-only operation without active heating or cooling).\n- **Target Heating/Cooling State `Cool`** maps to the `Cool` or `Dry` programmes.\n- **Target Heating/Cooling State `Heat`** maps to the `Heat` programme.\n- **Target Heating/Cooling State `Auto`** maps to the `Auto` programme.\n\nTo avoid overriding custom settings, the plugin will attempt to preserve your appliance's currently selected programme if it is compatible with the state selected in HomeKit. If it is not compatible, the plugin will default to the first matching programme supported by your specific air conditioner model.",
+            "semantic_abstract": "Divergent control schemas between HomeKit `Thermostat` states and Home Connect operational modes necessitate a logical mapping translation layer to associate user thermostat actions with specific appliance programmes such as `Fan`, `Cool`, `Heat`, and `Auto`.",
+            "hash": "3cac66ee7806d5be37dfe604c2903d35d38b86dd79736d581fd73118ca9f9434"
         }
     ]
 }
