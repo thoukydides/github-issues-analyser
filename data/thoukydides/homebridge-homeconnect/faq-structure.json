@@ -774,22 +774,17 @@
                                     "included_ids": [
                                         "issue-366-0e9c"
                                     ]
-                                }
-                            ],
-                            "candidates": [
-                                {
-                                    "issue_number": 346,
-                                    "id": "issue-346-0f16",
-                                    "question": "Why doesn't my Home Connect air conditioner show the current room temperature or humidity?",
-                                    "answer": "The Home Connect API does not currently expose ambient temperature or humidity measurements for `AirConditioner` appliances. As a result, the plugin cannot display these values in HomeKit.\n\nWhile the plugin exposes a `Thermostat` service to let you adjust the target setpoint temperature, the current temperature displayed in HomeKit cannot reflect actual room conditions. You can still control:\n- Target temperature setpoint\n- Fan speed and automatic/manual fan modes\n- Operating mode (Cool, Heat, Auto, Dry, Fan)\n- Power state (On/Standby)"
                                 },
                                 {
-                                    "issue_number": 346,
-                                    "id": "issue-346-3cac",
-                                    "question": "How does the plugin map HomeKit Thermostat states to Home Connect air conditioner programmes?",
-                                    "answer": "Because HomeKit thermostat states do not map directly to Home Connect appliance programmes, the plugin uses the following mapping logic:\n\n- **Target Heating/Cooling State `Off`** maps to the `Fan` or `ActiveClean` programmes (allowing fan-only operation without active heating or cooling).\n- **Target Heating/Cooling State `Cool`** maps to the `Cool` or `Dry` programmes.\n- **Target Heating/Cooling State `Heat`** maps to the `Heat` programme.\n- **Target Heating/Cooling State `Auto`** maps to the `Auto` programme.\n\nTo avoid overriding custom settings, the plugin will attempt to preserve your appliance's currently selected programme if it is compatible with the state selected in HomeKit. If it is not compatible, the plugin will default to the first matching programme supported by your specific air conditioner model."
+                                    "question": "How are Home Connect air conditioners represented and controlled in HomeKit?",
+                                    "answer": "Home Connect air conditioners are exposed to HomeKit using a `Thermostat` service for temperature control and a `Fan` service for air flow. There are several limitations and specific mappings due to differences between the HomeKit Accessory Protocol (HAP) and the Home Connect API:\n\n- **Missing Sensor Data**: The Home Connect API does not currently expose ambient room temperature or humidity measurements for air conditioners. Consequently, the `Current Temperature` characteristic in HomeKit cannot reflect actual room conditions.\n- **Thermostat State Mapping**: Because HomeKit thermostat states (Off, Heat, Cool, Auto) do not align perfectly with appliance programs, the plugin uses the following logic:\n    - **Target Heating/Cooling State `Off`** maps to `Fan` or `ActiveClean` programs (fan-only operation).\n    - **Target Heating/Cooling State `Cool`** maps to `Cool` or `Dry` programs.\n    - **Target Heating/Cooling State `Heat`** maps to the `Heat` program.\n    - **Target Heating/Cooling State `Auto`** maps to the `Auto` program.\n- **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.\n\nIn addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.",
+                                    "included_ids": [
+                                        "issue-346-0f16",
+                                        "issue-346-3cac"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

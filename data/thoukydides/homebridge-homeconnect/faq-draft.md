@@ -80,6 +80,7 @@
     - [Why is support for Home Connect robot vacuum cleaners limited?](#why-is-support-for-home-connect-robot-vacuum-cleaners-limited)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
+    - [How are Home Connect air conditioners represented and controlled in HomeKit?](#how-are-home-connect-air-conditioners-represented-and-controlled-in-homekit)
   - **[Notifications & Events](#notifications--events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
@@ -846,28 +847,20 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
-#### 🚧 Why doesn't my Home Connect air conditioner show the current room temperature or humidity? 🚧
+#### How are Home Connect air conditioners represented and controlled in HomeKit?
 
-<!-- INCLUDES: issue-346-0f16 -->
-The Home Connect API does not currently expose ambient temperature or humidity measurements for `AirConditioner` appliances. As a result, the plugin cannot display these values in HomeKit.
+<!-- INCLUDES: issue-346-0f16 issue-346-3cac -->
+Home Connect air conditioners are exposed to HomeKit using a `Thermostat` service for temperature control and a `Fan` service for air flow. There are several limitations and specific mappings due to differences between the HomeKit Accessory Protocol (HAP) and the Home Connect API:
 
-While the plugin exposes a `Thermostat` service to let you adjust the target setpoint temperature, the current temperature displayed in HomeKit cannot reflect actual room conditions. You can still control:
-- Target temperature setpoint
-- Fan speed and automatic/manual fan modes
-- Operating mode (Cool, Heat, Auto, Dry, Fan)
-- Power state (On/Standby)
+- **Missing Sensor Data**: The Home Connect API does not currently expose ambient room temperature or humidity measurements for air conditioners. Consequently, the `Current Temperature` characteristic in HomeKit cannot reflect actual room conditions.
+- **Thermostat State Mapping**: Because HomeKit thermostat states (Off, Heat, Cool, Auto) do not align perfectly with appliance programs, the plugin uses the following logic:
+    - **Target Heating/Cooling State `Off`** maps to `Fan` or `ActiveClean` programs (fan-only operation).
+    - **Target Heating/Cooling State `Cool`** maps to `Cool` or `Dry` programs.
+    - **Target Heating/Cooling State `Heat`** maps to the `Heat` program.
+    - **Target Heating/Cooling State `Auto`** maps to the `Auto` program.
+- **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
-#### 🚧 How does the plugin map HomeKit Thermostat states to Home Connect air conditioner programmes? 🚧
-
-<!-- INCLUDES: issue-346-3cac -->
-Because HomeKit thermostat states do not map directly to Home Connect appliance programmes, the plugin uses the following mapping logic:
-
-- **Target Heating/Cooling State `Off`** maps to the `Fan` or `ActiveClean` programmes (allowing fan-only operation without active heating or cooling).
-- **Target Heating/Cooling State `Cool`** maps to the `Cool` or `Dry` programmes.
-- **Target Heating/Cooling State `Heat`** maps to the `Heat` programme.
-- **Target Heating/Cooling State `Auto`** maps to the `Auto` programme.
-
-To avoid overriding custom settings, the plugin will attempt to preserve your appliance's currently selected programme if it is compatible with the state selected in HomeKit. If it is not compatible, the plugin will default to the first matching programme supported by your specific air conditioner model.
+In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
 
 ### Notifications & Events
 
