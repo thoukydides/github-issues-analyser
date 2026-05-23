@@ -14,7 +14,6 @@
     - [Why does the log show `429 Too Many Requests`, `1000 calls in 1 day reached`, or a message like `Waiting ... before issuing Home Connect API request`?](#why-does-the-log-show-429-too-many-requests-1000-calls-in-1-day-reached-or-a-message-like-waiting--before-issuing-home-connect-api-request)
     - [Why does my appliance show a `409 Conflict` error?](#why-does-my-appliance-show-a-409-conflict-error)
     - [Why does starting the Silence program on my dishwasher fail or return a `409 Conflict` error?](#why-does-starting-the-silence-program-on-my-dishwasher-fail-or-return-a-409-conflict-error)
-    - [Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue`?](#why-does-my-hood-fail-with-409-conflict-and-sdkerrormissingoptionvalue)
     - [Why does my appliance show as `Not Responding` in the Home app when turned off?](#why-does-my-appliance-show-as-not-responding-in-the-home-app-when-turned-off)
     - [Why does the power button not work or return a `BSH.Common.Error.WriteRequest.Busy` error?](#why-does-the-power-button-not-work-or-return-a-bshcommonerrorwriterequestbusy-error)
     - [What do `Gateway Timeout`, `Proxy Error`, or `Timeout on Home Connect subsystem` messages mean?](#what-do-gateway-timeout-proxy-error-or-timeout-on-home-connect-subsystem-messages-mean)
@@ -33,7 +32,6 @@
   - **[Programs and Options](#programs-and-options)**
     - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-code-blocks)
     - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
-    - [Why are fan controls missing for my integrated venting hob?](#why-are-fan-controls-missing-for-my-integrated-venting-hob)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
     - [Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?](#why-is-my-appliance-stuck-at-waiting-for-features-to-finish-initialising-showing-as-not-responding-or-displaying-unresponsive-tiles)
     - [Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?](#why-do-i-see-an-invalidstepsize-or-sdkerrorinvalidoptionvalue-error)
@@ -78,7 +76,7 @@
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
     - [Can the physical hood control buttons on a Home Connect hob be used to trigger HomeKit automations?](#can-the-physical-hood-control-buttons-on-a-home-connect-hob-be-used-to-trigger-homekit-automations)
-    - [Why can I only control power and fan speed for my Home Connect air conditioner?](#why-can-i-only-control-power-and-fan-speed-for-my-home-connect-air-conditioner)
+    - [Why is support for Home Connect robot vacuum cleaners limited?](#why-is-support-for-home-connect-robot-vacuum-cleaners-limited)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
   - **[Notifications & Events](#notifications--events)**
@@ -231,17 +229,6 @@ The error `409 Conflict` (specifically `SDK.Error.WrongOperationState`) occurs w
 The plugin supports including these options when you **start** a program via HomeKit. However, it does not support changing options dynamically once a cycle has already begun. This is a deliberate design choice because the API does not generally permit dynamic modification of options mid-cycle and provides no clear indication of which specific options are safe to change. Furthermore, there is no reliable way to map dynamic, mid-cycle option changes into the standard HomeKit service and characteristic model.
 
 To use the silence feature, you must either start the dedicated `NightWash` program when the appliance is idle or include the relevant option at the time the primary program is initially triggered.
-
-#### Why does my hood fail with `409 Conflict` and `SDK.Error.MissingOptionValue`?
-
-<!-- INCLUDES: issue-388-3992 -->
-This error indicates a server-side regression within the Home Connect API infrastructure, typically occurring when attempting to start a venting program on certain hood models.
-
-The error message `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost` implies that the Home Connect server is internally requiring a default value for a "Boost" feature that it simultaneously claims the appliance does not support. Because the appliance does not advertise support for this option in its list of available features, the plugin correctly omits it from the request to start the program. The resulting conflict happens entirely within the Home Connect cloud service and cannot be resolved through plugin configuration or code changes.
-
-If you encounter this error, you should:
-1. Verify if the hood can be controlled via the official Home Connect app (which may use different, private APIs or a direct local connection).
-2. Report the issue directly to [Home Connect support](https://developer.home-connect.com/support/contact), providing your account and appliance details, with the specific error message including the `Cooking.Common.Option.Hood.Boost` key.
 
 #### Why does my appliance show as `Not Responding` in the Home app when turned off?
 
@@ -398,7 +385,7 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-354-bd8b issue-355-94db issue-356-0fe3 issue-357-f6ae issue-365-ec63 issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e issue-389-3f8f -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-354-bd8b issue-355-94db issue-356-0fe3 issue-357-f6ae issue-365-ec63 issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e issue-389-3f8f issue-391-d362 -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
 If you observe these messages:
@@ -421,13 +408,6 @@ The plugin dynamically discovers the capabilities of each appliance by querying 
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
 If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
-
-#### Why are fan controls missing for my integrated venting hob?
-
-<!-- INCLUDES: issue-363-0abc -->
-The Home Connect API is architected to support a single active program per appliance. Devices that support multiple simultaneous programs are exposed by the API as multiple appliances, such as the two cavities of dual ovens. Because extractor fans operate as programs (e.g. `Cooking.Common.Program.Hood.Automatic`), a hob with an integrated fan would need to expose a separate hood appliance for it to be controllable via the Home Connect API.
-
-Users affected by this should contact the [Home Connect developer team](https://developer.home-connect.com/support/contact) to request that the fan be exposed as a separate Hood appliance. Note that updates to the Home Connect API to support new features can take a significant amount of time to be implemented.
 
 #### Why does the log say a selected program is not supported by the Home Connect API?
 
@@ -829,21 +809,15 @@ No, the physical buttons on a hob designed to control a hood (fan and light) can
 
 Manufacturers typically design these buttons to communicate directly with compatible appliances using proprietary appliance-to-appliance protocols. Because these interactions are handled internally, they are not broadcast to the API event stream monitored by the plugin. If you wish to see this supported, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) expose these button presses as API events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for updates to available event types.
 
-#### Why can I only control power and fan speed for my Home Connect air conditioner?
+#### Why is support for Home Connect robot vacuum cleaners limited?
 
-<!-- INCLUDES: issue-346-373b issue-346-9fb5 -->
-The Home Connect API currently provides extremely limited support for `AirConditioner` appliances. Crucial capabilities required for a full HomeKit `Thermostat` or `HeaterCooler` service are missing from the public API:
+<!-- INCLUDES: issue-391-11a8 -->
+HomeKit only supports Robot Vacuum Cleaners (RVC) via the Matter protocol. Whilst Matter support has recently been incorporated into Homebridge, this plugin only supports the HomeKit Accessory Protocol (HAP), which limits functionality to simple controls like switches. The maintainer of this plugin has developed [Matterbridge](https://github.com/Luligu/matterbridge) plugins to integrate other brands of RVC with HomeKit (e.g. [matterbridge-dyson-robot](https://github.com/thoukydides/matterbridge-dyson-robot/) for Dyson 360 Eye, 360 Heurist, and 360 Vis Nav), but has no plans to do that with Home Connect RVCs such as the Roxxter and Spotless series:
 
-- **Ambient Temperature and Humidity**: There is no API endpoint to read the current room temperature or humidity.
-- **Temperature Setpoints**: No endpoints are provided to set a target temperature.
-- **Mode Selection**: Selection of cooling, heating, or auto programs is not fully exposed for control.
+1. The maintainer does not own the specific hardware required for testing and development.
+2. Implementing Matter support is significantly more complex than the current HAP-based architecture.
 
-Consequently, the plugin maps air conditioners using a combination of a power **Switch** (to toggle `PowerState` between `On` and `Standby`) and a **Fan v2** service. The Fan service manages:
-- `Active` and `Current Fan State`: Reporting if the fan is running.
-- `Target Fan State`: Toggling between `Manual` and `Automatic` modes.
-- `Rotation Speed`: Adjusting the `FanSpeedPercentage` (1–100%).
-
-To avoid disrupting settings it cannot control, the plugin preserves the program currently selected via the physical remote or official app.
+Users should expect only basic status and control for these devices. Advanced features, such as specific cleaning modes, suction power settings, and mopping controls, are not easily mapped to existing HomeKit service types without causing issues with Siri or creating an inaccurate representation in the Apple Home app.
 
 #### Why are appliance lights mapped as lightbulbs instead of switches?
 
@@ -976,4 +950,4 @@ To resolve this:
 2. Open the plugin configuration in the Homebridge UI, select each appliance in turn to check its configuration, and then click the **Save** button. This action updates the configuration into the correct format, even if no changes were manually made, usually resolving any missing property errors and allowing the plugin to start normally.
 3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary then please raise a GitHub issue to report the problem so that the plugin can be updated.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-346-881d issue-351-729d issue-360-b285 issue-363-f97b issue-388-a426 issue-392-d5d9 -->
