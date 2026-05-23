@@ -317,6 +317,28 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
 
+#### 🚧 Why does starting my hood fail with a `409 Conflict` `SDK.Error.MissingOptionValue` error? 🚧
+
+<!-- INCLUDES: issue-388-278a -->
+This error (typically specifying `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`) is caused by a Home Connect API server-side regression. The Home Connect servers incorrectly demand a default value for an option that the appliance does not actually support or advertise, causing requests to start the venting programme to fail.
+
+To resolve this issue, ensure you have updated the plugin to the latest version. A workaround was introduced to automatically bypass this specific server-side requirement for hoods.
+
+If you encounter a similar `SDK.Error.MissingOptionValue` error on another appliance or option, it represents an upstream server-side issue. You should report this directly to Home Connect customer support so their development team can address the schema mismatch for your appliance model.
+
+#### 🚧 Why does adjusting my hood fan speed result in a `409 Conflict` error or briefly run at a default speed? 🚧
+
+<!-- INCLUDES: issue-392-b36e -->
+Some Home Connect extractor hoods have a firmware quirk that prevents them from starting a venting program directly when the appliance is in standby or turned off. Attempting to do so via the API returns a `409 Conflict` error, typically stating: `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`.
+
+To circumvent this API limitation, the plugin automatically coordinates the command sequence when you request a specific fan speed while the hood is powered off:
+
+1. It first turns on the main power state of the appliance (`BSH.Common.Setting.PowerState`).
+2. This causes the hood to start its default venting program, which typically runs at a hardware-defined speed (often 50% or medium).
+3. Once the active program is running, the plugin immediately updates the venting level (`Cooking.Common.Option.Hood.VentingLevel`) to your requested speed.
+
+Because of this multi-step workaround, you may observe the hood briefly starting up at its default speed for a moment before adjusting to your selected setting. This is expected behaviour and is necessary to bypass the firmware constraint.
+
 ### Local/Remote Control
 
 #### Why does my appliance show `No Response` when I try to start a program?
@@ -835,6 +857,29 @@ Some hood models (such as the Siemens `LC91KLT60`) do not implement colour tempe
 
 The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%` = **warm light** and `100%` = **cold light**. The plugin follows this mapping to provide granular control in HomeKit. However, certain appliances (such as the Siemens `LC91KLT60`) interpret these values inversely. If your appliance is affected, you will need to reverse the settings in your HomeKit automations and scenes.
 
+#### 🚧 Why doesn't my Home Connect air conditioner show the current room temperature or humidity? 🚧
+
+<!-- INCLUDES: issue-346-0f16 -->
+The Home Connect API does not currently expose ambient temperature or humidity measurements for `AirConditioner` appliances. As a result, the plugin cannot display these values in HomeKit.
+
+While the plugin exposes a `Thermostat` service to let you adjust the target setpoint temperature, the current temperature displayed in HomeKit cannot reflect actual room conditions. You can still control:
+- Target temperature setpoint
+- Fan speed and automatic/manual fan modes
+- Operating mode (Cool, Heat, Auto, Dry, Fan)
+- Power state (On/Standby)
+
+#### 🚧 How does the plugin map HomeKit Thermostat states to Home Connect air conditioner programmes? 🚧
+
+<!-- INCLUDES: issue-346-3cac -->
+Because HomeKit thermostat states do not map directly to Home Connect appliance programmes, the plugin uses the following mapping logic:
+
+- **Target Heating/Cooling State `Off`** maps to the `Fan` or `ActiveClean` programmes (allowing fan-only operation without active heating or cooling).
+- **Target Heating/Cooling State `Cool`** maps to the `Cool` or `Dry` programmes.
+- **Target Heating/Cooling State `Heat`** maps to the `Heat` programme.
+- **Target Heating/Cooling State `Auto`** maps to the `Auto` programme.
+
+To avoid overriding custom settings, the plugin will attempt to preserve your appliance's currently selected programme if it is compatible with the state selected in HomeKit. If it is not compatible, the plugin will default to the first matching programme supported by your specific air conditioner model.
+
 ### Notifications & Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
@@ -950,4 +995,4 @@ To resolve this:
 2. Open the plugin configuration in the Homebridge UI, select each appliance in turn to check its configuration, and then click the **Save** button. This action updates the configuration into the correct format, even if no changes were manually made, usually resolving any missing property errors and allowing the plugin to start normally.
 3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary then please raise a GitHub issue to report the problem so that the plugin can be updated.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-346-881d issue-351-729d issue-360-b285 issue-363-f97b issue-388-a426 issue-392-d5d9 -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-f97b -->

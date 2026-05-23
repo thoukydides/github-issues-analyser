@@ -185,7 +185,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 388,
+                                    "id": "issue-388-278a",
+                                    "question": "Why does starting my hood fail with a `409 Conflict` `SDK.Error.MissingOptionValue` error?",
+                                    "answer": "This error (typically specifying `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`) is caused by a Home Connect API server-side regression. The Home Connect servers incorrectly demand a default value for an option that the appliance does not actually support or advertise, causing requests to start the venting programme to fail.\n\nTo resolve this issue, ensure you have updated the plugin to the latest version. A workaround was introduced to automatically bypass this specific server-side requirement for hoods.\n\nIf you encounter a similar `SDK.Error.MissingOptionValue` error on another appliance or option, it represents an upstream server-side issue. You should report this directly to Home Connect customer support so their development team can address the schema mismatch for your appliance model."
+                                },
+                                {
+                                    "issue_number": 392,
+                                    "id": "issue-392-b36e",
+                                    "question": "Why does adjusting my hood fan speed result in a `409 Conflict` error or briefly run at a default speed?",
+                                    "answer": "Some Home Connect extractor hoods have a firmware quirk that prevents them from starting a venting program directly when the appliance is in standby or turned off. Attempting to do so via the API returns a `409 Conflict` error, typically stating: `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`.\n\nTo circumvent this API limitation, the plugin automatically coordinates the command sequence when you request a specific fan speed while the hood is powered off:\n\n1. It first turns on the main power state of the appliance (`BSH.Common.Setting.PowerState`).\n2. This causes the hood to start its default venting program, which typically runs at a hardware-defined speed (often 50% or medium).\n3. Once the active program is running, the plugin immediately updates the venting level (`Cooking.Common.Option.Hood.VentingLevel`) to your requested speed.\n\nBecause of this multi-step workaround, you may observe the hood briefly starting up at its default speed for a moment before adjusting to your selected setting. This is expected behaviour and is necessary to bypass the firmware constraint."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -768,7 +781,20 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 346,
+                                    "id": "issue-346-0f16",
+                                    "question": "Why doesn't my Home Connect air conditioner show the current room temperature or humidity?",
+                                    "answer": "The Home Connect API does not currently expose ambient temperature or humidity measurements for `AirConditioner` appliances. As a result, the plugin cannot display these values in HomeKit.\n\nWhile the plugin exposes a `Thermostat` service to let you adjust the target setpoint temperature, the current temperature displayed in HomeKit cannot reflect actual room conditions. You can still control:\n- Target temperature setpoint\n- Fan speed and automatic/manual fan modes\n- Operating mode (Cool, Heat, Auto, Dry, Fan)\n- Power state (On/Standby)"
+                                },
+                                {
+                                    "issue_number": 346,
+                                    "id": "issue-346-3cac",
+                                    "question": "How does the plugin map HomeKit Thermostat states to Home Connect air conditioner programmes?",
+                                    "answer": "Because HomeKit thermostat states do not map directly to Home Connect appliance programmes, the plugin uses the following mapping logic:\n\n- **Target Heating/Cooling State `Off`** maps to the `Fan` or `ActiveClean` programmes (allowing fan-only operation without active heating or cooling).\n- **Target Heating/Cooling State `Cool`** maps to the `Cool` or `Dry` programmes.\n- **Target Heating/Cooling State `Heat`** maps to the `Heat` programme.\n- **Target Heating/Cooling State `Auto`** maps to the `Auto` programme.\n\nTo avoid overriding custom settings, the plugin will attempt to preserve your appliance's currently selected programme if it is compatible with the state selected in HomeKit. If it is not compatible, the plugin will default to the first matching programme supported by your specific air conditioner model."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -951,12 +977,9 @@
         "issue-298-1c85",
         "issue-300-7e4a",
         "issue-304-0ee0",
-        "issue-346-881d",
         "issue-351-729d",
         "issue-360-b285",
-        "issue-363-f97b",
-        "issue-388-a426",
-        "issue-392-d5d9"
+        "issue-363-f97b"
     ],
     "source_hashes": {
         "faq": "e13b70411d29c9d7084732a08bcf79ea28ef8c46f9d2c9e836a921a878de8a96"
