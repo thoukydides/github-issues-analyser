@@ -22,6 +22,7 @@
     - [Why is the log flooded with errors during a Home Connect outage?](#why-is-the-log-flooded-with-errors-during-a-home-connect-outage)
     - [Why does my multi-cavity oven show a `BSH.Common.Error.InvalidUIDValue` error?](#why-does-my-multi-cavity-oven-show-a-bshcommonerrorinvaliduidvalue-error)
     - [How can I refresh appliance capabilities or resolve stale program information?](#how-can-i-refresh-appliance-capabilities-or-resolve-stale-program-information)
+    - [Why does my hood return a `409 Conflict` error or briefly run at a default speed?](#why-does-my-hood-return-a-409-conflict-error-or-briefly-run-at-a-default-speed)
   - **[Local/Remote Control](#localremote-control)**
     - [Why does my appliance show `No Response` when I try to start a program?](#why-does-my-appliance-show-no-response-when-i-try-to-start-a-program)
     - [What does `LockedByLocalControl` or "Local Intervention" mean?](#what-does-lockedbylocalcontrol-or-local-intervention-mean)
@@ -317,27 +318,15 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
 
-#### 🚧 Why does starting my hood fail with a `409 Conflict` `SDK.Error.MissingOptionValue` error? 🚧
+#### Why does my hood return a `409 Conflict` error or briefly run at a default speed?
 
-<!-- INCLUDES: issue-388-278a -->
-This error (typically specifying `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost`) is caused by a Home Connect API server-side regression. The Home Connect servers incorrectly demand a default value for an option that the appliance does not actually support or advertise, causing requests to start the venting programme to fail.
+<!-- INCLUDES: issue-388-278a issue-392-b36e -->
+Specific models of extractor hoods exhibit quirks when interacting with the Home Connect API:
 
-To resolve this issue, ensure you have updated the plugin to the latest version. A workaround was introduced to automatically bypass this specific server-side requirement for hoods.
+1. **`SDK.Error.MissingOptionValue`**: This error (often referencing `Cooking.Common.Option.Hood.Boost`) is caused by a Home Connect API server-side regression where the server incorrectly demands a default value for an option that the appliance does not support. The plugin includes workarounds to bypass this specific requirement for hoods; ensure you are running the latest version. If you encounter this error on an appliance other than a hood, it represents an upstream schema mismatch that should be reported to Home Connect customer support.
+2. **Activation from Standby**: Some hoods cannot transition directly from an off state to a specific venting level. To circumvent this, the plugin automatically coordinates a command sequence: it enables the main power (`BSH.Common.Setting.PowerState`), which triggers the default venting program, and then immediately updates the `VentingLevel` to your requested setting. You may observe the hood briefly running at its hardware-defined default speed before the final adjustment is applied.
 
-If you encounter a similar `SDK.Error.MissingOptionValue` error on another appliance or option, it represents an upstream server-side issue. You should report this directly to Home Connect customer support so their development team can address the schema mismatch for your appliance model.
-
-#### 🚧 Why does adjusting my hood fan speed result in a `409 Conflict` error or briefly run at a default speed? 🚧
-
-<!-- INCLUDES: issue-392-b36e -->
-Some Home Connect extractor hoods have a firmware quirk that prevents them from starting a venting program directly when the appliance is in standby or turned off. Attempting to do so via the API returns a `409 Conflict` error, typically stating: `Unable to find default value for default option: Cooking.Common.Option.Hood.Boost [SDK.Error.MissingOptionValue]`.
-
-To circumvent this API limitation, the plugin automatically coordinates the command sequence when you request a specific fan speed while the hood is powered off:
-
-1. It first turns on the main power state of the appliance (`BSH.Common.Setting.PowerState`).
-2. This causes the hood to start its default venting program, which typically runs at a hardware-defined speed (often 50% or medium).
-3. Once the active program is running, the plugin immediately updates the venting level (`Cooking.Common.Option.Hood.VentingLevel`) to your requested speed.
-
-Because of this multi-step workaround, you may observe the hood briefly starting up at its default speed for a moment before adjusting to your selected setting. This is expected behaviour and is necessary to bypass the firmware constraint.
+These behaviours are necessary workarounds for platform-specific firmware and API constraints.
 
 ### Local/Remote Control
 
