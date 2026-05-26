@@ -262,7 +262,7 @@
                         {
                             "entries": [
                                 {
-                                    "question": "Why does the log show `Unexpected fields`, `(unrecognised)` values, or code blocks?",
+                                    "question": "Why does the log show `Unexpected fields`, `(unrecognised)` values, or TypeScript-like code blocks?",
                                     "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nOnce added, the warning will disappear and the features will be correctly mapped where appropriate.",
                                     "included_ids": [
                                         "issue-145-3b74",
@@ -352,7 +352,8 @@
                                         "issue-379-2e76",
                                         "issue-381-fa8e",
                                         "issue-389-3f8f",
-                                        "issue-391-d362"
+                                        "issue-391-d362",
+                                        "issue-393-daf5"
                                     ]
                                 },
                                 {
@@ -537,14 +538,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 393,
-                                    "id": "issue-393-daf5",
-                                    "question": "Why does the log show a TypeScript-like block of code with `(unrecognised)` comments?",
-                                    "answer": "The plugin automatically validates data received from the Home Connect API against its internal schema. If your appliance returns a setting, program, or option value that is undocumented or not yet known to the plugin, it will output a TypeScript-like definition block in the log file, marking the new elements with `(unrecognised)`.\n\nTo resolve this, first ensure you are running the latest version of the plugin, as support for the missing values may have already been added. If the warnings persist on the latest version, please open a GitHub issue and copy-paste the complete logged block. This allows the maintainer to update the plugin's type definitions and map the new API capabilities correctly."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
