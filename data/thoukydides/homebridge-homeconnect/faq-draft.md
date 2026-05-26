@@ -600,6 +600,13 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why does the log show a TypeScript-like block of code with `(unrecognised)` comments? 🚧
+
+<!-- INCLUDES: issue-393-daf5 -->
+The plugin automatically validates data received from the Home Connect API against its internal schema. If your appliance returns a setting, program, or option value that is undocumented or not yet known to the plugin, it will output a TypeScript-like definition block in the log file, marking the new elements with `(unrecognised)`.
+
+To resolve this, first ensure you are running the latest version of the plugin, as support for the missing values may have already been added. If the warnings persist on the latest version, please open a GitHub issue and copy-paste the complete logged block. This allows the maintainer to update the plugin's type definitions and map the new API capabilities correctly.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?

@@ -537,7 +537,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 393,
+                                    "id": "issue-393-daf5",
+                                    "question": "Why does the log show a TypeScript-like block of code with `(unrecognised)` comments?",
+                                    "answer": "The plugin automatically validates data received from the Home Connect API against its internal schema. If your appliance returns a setting, program, or option value that is undocumented or not yet known to the plugin, it will output a TypeScript-like definition block in the log file, marking the new elements with `(unrecognised)`.\n\nTo resolve this, first ensure you are running the latest version of the plugin, as support for the missing values may have already been added. If the warnings persist on the latest version, please open a GitHub issue and copy-paste the complete logged block. This allows the maintainer to update the plugin's type definitions and map the new API capabilities correctly."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
