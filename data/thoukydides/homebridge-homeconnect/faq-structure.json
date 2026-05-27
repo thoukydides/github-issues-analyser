@@ -785,7 +785,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 363,
+                                    "id": "issue-363-1bb7",
+                                    "question": "Does the plugin support hobs with integrated hoods or extractor fans?",
+                                    "answer": "Historically, the Home Connect API did not expose ventilation or extractor fan controls for hobs with integrated hoods. It only supported discrete `Hob` and `Hood` appliance types, meaning integrated extractor fans were completely hidden from the API.\n\nThe Home Connect API has since introduced a new setting specifically for this: `Cooking.Hob.Setting.Ventilation`. This plugin supports this setting starting from version 1.10.1.\n\nHowever, even if you are using the latest version of the plugin, your appliance must also support this API feature. If the fan control is not appearing in HomeKit:\n- Verify if a firmware update is available for your appliance via the official Home Connect app.\n- If your appliance firmware is up to date and the controls still do not appear, it means the manufacturer has not enabled API access for your specific model's ventilation feature. In this scenario, you would need to contact the Home Connect developer team to request support for your specific appliance model."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -969,8 +976,7 @@
         "issue-300-7e4a",
         "issue-304-0ee0",
         "issue-351-729d",
-        "issue-360-b285",
-        "issue-363-f97b"
+        "issue-360-b285"
     ],
     "source_hashes": {
         "faq": "e13b70411d29c9d7084732a08bcf79ea28ef8c46f9d2c9e836a921a878de8a96"

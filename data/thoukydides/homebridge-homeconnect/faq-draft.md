@@ -862,6 +862,17 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
 
+#### 🚧 Does the plugin support hobs with integrated hoods or extractor fans? 🚧
+
+<!-- INCLUDES: issue-363-1bb7 -->
+Historically, the Home Connect API did not expose ventilation or extractor fan controls for hobs with integrated hoods. It only supported discrete `Hob` and `Hood` appliance types, meaning integrated extractor fans were completely hidden from the API.
+
+The Home Connect API has since introduced a new setting specifically for this: `Cooking.Hob.Setting.Ventilation`. This plugin supports this setting starting from version 1.10.1.
+
+However, even if you are using the latest version of the plugin, your appliance must also support this API feature. If the fan control is not appearing in HomeKit:
+- Verify if a firmware update is available for your appliance via the official Home Connect app.
+- If your appliance firmware is up to date and the controls still do not appear, it means the manufacturer has not enabled API access for your specific model's ventilation feature. In this scenario, you would need to contact the Home Connect developer team to request support for your specific appliance model.
+
 ### Notifications & Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
@@ -977,4 +988,4 @@ To resolve this:
 2. Open the plugin configuration in the Homebridge UI, select each appliance in turn to check its configuration, and then click the **Save** button. This action updates the configuration into the correct format, even if no changes were manually made, usually resolving any missing property errors and allowing the plugin to start normally.
 3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary then please raise a GitHub issue to report the problem so that the plugin can be updated.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-f97b -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 -->
