@@ -77,6 +77,7 @@
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
     - [Can the physical hood control buttons on a Home Connect hob be used to trigger HomeKit automations?](#can-the-physical-hood-control-buttons-on-a-home-connect-hob-be-used-to-trigger-homekit-automations)
+    - [Does the plugin support integrated extractor fans on hobs?](#does-the-plugin-support-integrated-extractor-fans-on-hobs)
     - [Why is support for Home Connect robot vacuum cleaners limited?](#why-is-support-for-home-connect-robot-vacuum-cleaners-limited)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
@@ -821,6 +822,15 @@ No, the physical buttons on a hob designed to control a hood (fan and light) can
 
 Manufacturers typically design these buttons to communicate directly with compatible appliances using proprietary appliance-to-appliance protocols. Because these interactions are handled internally, they are not broadcast to the API event stream monitored by the plugin. If you wish to see this supported, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) expose these button presses as API events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for updates to available event types.
 
+#### Does the plugin support integrated extractor fans on hobs?
+
+<!-- INCLUDES: issue-363-1bb7 -->
+Historically, the Home Connect API did not expose ventilation or extractor fan controls for hobs with integrated hoods. It only supported discrete `Hob` and `Hood` appliance types, meaning integrated extractor fans were completely hidden from the API. The Home Connect API has since introduced a new setting specifically for this: `Cooking.Hob.Setting.Ventilation`. This plugin supports this setting starting from version 1.10.1.
+
+However, even if you are using the latest version of the plugin, your appliance must also support this API feature. If the fan control is not appearing in HomeKit:
+- Verify if a firmware update is available for your appliance via the official Home Connect app.
+- If your appliance firmware is up to date and the controls still do not appear, it means the manufacturer has not enabled API access for your specific model's ventilation feature. In this scenario, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) enable access to the ventilation setting for your specific model.
+
 #### Why is support for Home Connect robot vacuum cleaners limited?
 
 <!-- INCLUDES: issue-391-11a8 -->
@@ -861,17 +871,6 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 - **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
-
-#### 🚧 Does the plugin support hobs with integrated hoods or extractor fans? 🚧
-
-<!-- INCLUDES: issue-363-1bb7 -->
-Historically, the Home Connect API did not expose ventilation or extractor fan controls for hobs with integrated hoods. It only supported discrete `Hob` and `Hood` appliance types, meaning integrated extractor fans were completely hidden from the API.
-
-The Home Connect API has since introduced a new setting specifically for this: `Cooking.Hob.Setting.Ventilation`. This plugin supports this setting starting from version 1.10.1.
-
-However, even if you are using the latest version of the plugin, your appliance must also support this API feature. If the fan control is not appearing in HomeKit:
-- Verify if a firmware update is available for your appliance via the official Home Connect app.
-- If your appliance firmware is up to date and the controls still do not appear, it means the manufacturer has not enabled API access for your specific model's ventilation feature. In this scenario, you would need to contact the Home Connect developer team to request support for your specific appliance model.
 
 ### Notifications & Events
 

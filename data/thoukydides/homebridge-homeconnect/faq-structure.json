@@ -754,6 +754,13 @@
                                     ]
                                 },
                                 {
+                                    "question": "Does the plugin support integrated extractor fans on hobs?",
+                                    "answer": "Historically, the Home Connect API did not expose ventilation or extractor fan controls for hobs with integrated hoods. It only supported discrete `Hob` and `Hood` appliance types, meaning integrated extractor fans were completely hidden from the API. The Home Connect API has since introduced a new setting specifically for this: `Cooking.Hob.Setting.Ventilation`. This plugin supports this setting starting from version 1.10.1.\n\nHowever, even if you are using the latest version of the plugin, your appliance must also support this API feature. If the fan control is not appearing in HomeKit:\n- Verify if a firmware update is available for your appliance via the official Home Connect app.\n- If your appliance firmware is up to date and the controls still do not appear, it means the manufacturer has not enabled API access for your specific model's ventilation feature. In this scenario, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) enable access to the ventilation setting for your specific model.",
+                                    "included_ids": [
+                                        "issue-363-1bb7"
+                                    ]
+                                },
+                                {
                                     "question": "Why is support for Home Connect robot vacuum cleaners limited?",
                                     "answer": "HomeKit only supports Robot Vacuum Cleaners (RVC) via the Matter protocol. Whilst Matter support has recently been incorporated into Homebridge, this plugin only supports the HomeKit Accessory Protocol (HAP), which limits functionality to simple controls like switches. The maintainer of this plugin has developed [Matterbridge](https://github.com/Luligu/matterbridge) plugins to integrate other brands of RVC with HomeKit (e.g. [matterbridge-dyson-robot](https://github.com/thoukydides/matterbridge-dyson-robot/) for Dyson 360 Eye, 360 Heurist, and 360 Vis Nav), but has no plans to do that with Home Connect RVCs such as the Roxxter and Spotless series:\n\n1. The maintainer does not own the specific hardware required for testing and development.\n2. Implementing Matter support is significantly more complex than the current HAP-based architecture.\n\nUsers should expect only basic status and control for these devices. Advanced features, such as specific cleaning modes, suction power settings, and mopping controls, are not easily mapped to existing HomeKit service types without causing issues with Siri or creating an inaccurate representation in the Apple Home app.",
                                     "included_ids": [
@@ -785,14 +792,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 363,
-                                    "id": "issue-363-1bb7",
-                                    "question": "Does the plugin support hobs with integrated hoods or extractor fans?",
-                                    "answer": "Historically, the Home Connect API did not expose ventilation or extractor fan controls for hobs with integrated hoods. It only supported discrete `Hob` and `Hood` appliance types, meaning integrated extractor fans were completely hidden from the API.\n\nThe Home Connect API has since introduced a new setting specifically for this: `Cooking.Hob.Setting.Ventilation`. This plugin supports this setting starting from version 1.10.1.\n\nHowever, even if you are using the latest version of the plugin, your appliance must also support this API feature. If the fan control is not appearing in HomeKit:\n- Verify if a firmware update is available for your appliance via the official Home Connect app.\n- If your appliance firmware is up to date and the controls still do not appear, it means the manufacturer has not enabled API access for your specific model's ventilation feature. In this scenario, you would need to contact the Home Connect developer team to request support for your specific appliance model."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
