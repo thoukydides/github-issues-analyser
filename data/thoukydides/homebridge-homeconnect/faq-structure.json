@@ -353,7 +353,8 @@
                                         "issue-381-fa8e",
                                         "issue-389-3f8f",
                                         "issue-391-d362",
-                                        "issue-393-daf5"
+                                        "issue-393-daf5",
+                                        "issue-394-179a"
                                     ]
                                 },
                                 {
@@ -538,14 +539,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 394,
-                                    "id": "issue-394-179a",
-                                    "question": "Why does the log contain a block of code with `unrecognised` comments?",
-                                    "answer": "The `homebridge-homeconnect` plugin dynamically monitors events from the Home Connect API. If your appliance reports a program, option, setting, or state value that is not currently mapped within the plugin's schema, it automatically generates and logs a formatted TypeScript block indicating the unknown keys with `// (unrecognised)` comments.\n\nThis is a deliberate design choice to simplify the process of identifying and adding new API features. When you see this block in your logs, please follow these steps:\n\n1. Check if an update is available for the plugin and install the latest version to see if support has already been added.\n2. If the values remain unrecognised, copy the complete log output between the `====================` delimiters.\n3. Open a new issue on GitHub and paste this code block so that the maintainer can update the plugin schema to support your appliance's functionality."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
