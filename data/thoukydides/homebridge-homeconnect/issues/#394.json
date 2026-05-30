@@ -1,0 +1,12 @@
+{
+    "issue_number": 394,
+    "updated_at": "2026-05-30T10:16:38.624Z",
+    "faq": [
+        {
+            "question": "Why does the log contain a block of code with `unrecognised` comments?",
+            "answer": "The `homebridge-homeconnect` plugin dynamically monitors events from the Home Connect API. If your appliance reports a program, option, setting, or state value that is not currently mapped within the plugin's schema, it automatically generates and logs a formatted TypeScript block indicating the unknown keys with `// (unrecognised)` comments.\n\nThis is a deliberate design choice to simplify the process of identifying and adding new API features. When you see this block in your logs, please follow these steps:\n\n1. Check if an update is available for the plugin and install the latest version to see if support has already been added.\n2. If the values remain unrecognised, copy the complete log output between the `====================` delimiters.\n3. Open a new issue on GitHub and paste this code block so that the maintainer can update the plugin schema to support your appliance's functionality.",
+            "semantic_abstract": "The plugin dynamically generates TypeScript schema definitions in logs when it detects unrecognised Home Connect API fields, facilitating user reporting of unsupported appliance options, programs, or states. This mechanism mitigates mismatches between active API payloads and the plugin's static schema definitions across different appliance models and firmware versions.",
+            "hash": "179a3043f8fd1af50d43e409c41f4ea1e1e09a589fccb30e1b38f2591222fc13"
+        }
+    ]
+}
