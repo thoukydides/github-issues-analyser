@@ -32,7 +32,7 @@
     - [Why does my appliance frequently show `Disconnected (setting On error status)`?](#why-does-my-appliance-frequently-show-disconnected-setting-on-error-status)
   - **[Programs and Options](#programs-and-options)**
     - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or TypeScript-like code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-typescript-like-code-blocks)
-    - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
+    - [Why are some appliance features, programs, or options missing or unavailable (including in the configuration editor)?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable-including-in-the-configuration-editor)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
     - [Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?](#why-is-my-appliance-stuck-at-waiting-for-features-to-finish-initialising-showing-as-not-responding-or-displaying-unresponsive-tiles)
     - [Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?](#why-do-i-see-an-invalidstepsize-or-sdkerrorinvalidoptionvalue-error)
@@ -409,14 +409,15 @@ If you observe these messages:
 
 Once added, the warning will disappear and the features will be correctly mapped where appropriate.
 
-#### Why are some appliance features, programs, or options missing or unavailable?
+#### Why are some appliance features, programs, or options missing or unavailable (including in the configuration editor)?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-f393 issue-380-03ac issue-386-9bb3 -->
-The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-f393 issue-380-03ac issue-386-9bb3 issue-395-e3b4 -->
+The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit, hidden in the configuration editor, or appear as `currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
-- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
+- **Hardware and Firmware Constraints**: Certain models or programs have hard-coded limitations. For example, high-wattage microwave programs (like 600W or Max/Boost) may not support options like `Duration` or `StartInRelative` via the API. If the Home Connect API returns an empty options list for a specific program, the plugin will hide those fields in the Homebridge configuration editor to prevent invalid configurations.
+- **Remote Control Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
 - **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
@@ -434,7 +435,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 issue-395-e3b4 -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When initialisation stalls, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Several factors can contribute to this state:
@@ -448,7 +449,7 @@ To resolve this, perform the following diagnostic steps:
 4. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.
 5. **Power Cycle**: Disconnect the appliance from the mains power (unplug it or turn off the circuit breaker) for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
 6. **Restart Homebridge**: Once the appliance has reconnected, restart Homebridge to trigger a fresh initialisation sequence.
-7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
+7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. These files are named with an MD5 hash of your appliance's Home Connect ID (HaID) followed by ` cache`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
 8. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.
 
 #### Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?
@@ -600,22 +601,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`. Whilst the Apple Home app does not expose these features, they are shown in third-party apps (such as Eve) and may be used by automations.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why are some program options, such as duration or start time, missing for specific programs in the configuration editor? 🚧
-
-<!-- INCLUDES: issue-395-e3b4 -->
-The plugin dynamically queries and caches the available options for each appliance program from the Home Connect API. According to the Home Connect API specifications, appliances dynamically update their list of supported options only when a specific program is selected.
-
-For certain appliances, specific programs (such as high-wattage microwave programs like 600W or Max/Boost) do not support options like duration (`BSH.Common.Option.Duration`) or delayed start (`BSH.Common.Option.StartInRelative`) due to manufacturer firmware or API constraints. When the plugin queries the API while these programs are selected, the API returns an empty options list, which the plugin respects by hiding these fields in the configuration editor.
-
-To troubleshoot or force the plugin to re-evaluate your appliance's capabilities if you suspect a temporary API glitch:
-
-1. Stop Homebridge.
-2. Locate the cache files in `~/.homebridge/homebridge-homeconnect/persist/`.
-3. Delete the cache file corresponding to your appliance (the filename is an MD5 hash of your appliance's Home Connect ID followed by ` cache`).
-4. Restart Homebridge. The plugin will run its initialisation sequence, selecting each program on the appliance in turn to refresh the capability cache.
-
-Alternatively, you can trigger a refresh by using the **Identify** function on the accessory within your HomeKit client (such as the Eve app).
 
 ### Appliance Status and Connectivity
 
