@@ -539,7 +539,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 395,
+                                    "id": "issue-395-e3b4",
+                                    "question": "Why are some program options, such as duration or start time, missing for specific programs in the configuration editor?",
+                                    "answer": "The plugin dynamically queries and caches the available options for each appliance program from the Home Connect API. According to the Home Connect API specifications, appliances dynamically update their list of supported options only when a specific program is selected.\n\nFor certain appliances, specific programs (such as high-wattage microwave programs like 600W or Max/Boost) do not support options like duration (`BSH.Common.Option.Duration`) or delayed start (`BSH.Common.Option.StartInRelative`) due to manufacturer firmware or API constraints. When the plugin queries the API while these programs are selected, the API returns an empty options list, which the plugin respects by hiding these fields in the configuration editor.\n\nTo troubleshoot or force the plugin to re-evaluate your appliance's capabilities if you suspect a temporary API glitch:\n\n1. Stop Homebridge.\n2. Locate the cache files in `~/.homebridge/homebridge-homeconnect/persist/`.\n3. Delete the cache file corresponding to your appliance (the filename is an MD5 hash of your appliance's Home Connect ID followed by ` cache`).\n4. Restart Homebridge. The plugin will run its initialisation sequence, selecting each program on the appliance in turn to refresh the capability cache.\n\nAlternatively, you can trigger a refresh by using the **Identify** function on the accessory within your HomeKit client (such as the Eve app)."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []

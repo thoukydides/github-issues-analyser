@@ -601,6 +601,22 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why are some program options, such as duration or start time, missing for specific programs in the configuration editor? 🚧
+
+<!-- INCLUDES: issue-395-e3b4 -->
+The plugin dynamically queries and caches the available options for each appliance program from the Home Connect API. According to the Home Connect API specifications, appliances dynamically update their list of supported options only when a specific program is selected.
+
+For certain appliances, specific programs (such as high-wattage microwave programs like 600W or Max/Boost) do not support options like duration (`BSH.Common.Option.Duration`) or delayed start (`BSH.Common.Option.StartInRelative`) due to manufacturer firmware or API constraints. When the plugin queries the API while these programs are selected, the API returns an empty options list, which the plugin respects by hiding these fields in the configuration editor.
+
+To troubleshoot or force the plugin to re-evaluate your appliance's capabilities if you suspect a temporary API glitch:
+
+1. Stop Homebridge.
+2. Locate the cache files in `~/.homebridge/homebridge-homeconnect/persist/`.
+3. Delete the cache file corresponding to your appliance (the filename is an MD5 hash of your appliance's Home Connect ID followed by ` cache`).
+4. Restart Homebridge. The plugin will run its initialisation sequence, selecting each program on the appliance in turn to refresh the capability cache.
+
+Alternatively, you can trigger a refresh by using the **Identify** function on the accessory within your HomeKit client (such as the Eve app).
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
