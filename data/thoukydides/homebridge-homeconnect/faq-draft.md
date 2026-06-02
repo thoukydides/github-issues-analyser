@@ -22,7 +22,6 @@
     - [Why is the log flooded with errors during a Home Connect outage?](#why-is-the-log-flooded-with-errors-during-a-home-connect-outage)
     - [Why does my multi-cavity oven show a `BSH.Common.Error.InvalidUIDValue` error?](#why-does-my-multi-cavity-oven-show-a-bshcommonerrorinvaliduidvalue-error)
     - [How can I refresh appliance capabilities or resolve stale program information?](#how-can-i-refresh-appliance-capabilities-or-resolve-stale-program-information)
-    - [Why does my hood return a `409 Conflict` error or briefly run at a default speed?](#why-does-my-hood-return-a-409-conflict-error-or-briefly-run-at-a-default-speed)
   - **[Local/Remote Control](#localremote-control)**
     - [Why does my appliance show `No Response` when I try to start a program?](#why-does-my-appliance-show-no-response-when-i-try-to-start-a-program)
     - [What does `LockedByLocalControl` or "Local Intervention" mean?](#what-does-lockedbylocalcontrol-or-local-intervention-mean)
@@ -32,7 +31,7 @@
     - [Why does my appliance frequently show `Disconnected (setting On error status)`?](#why-does-my-appliance-frequently-show-disconnected-setting-on-error-status)
   - **[Programs and Options](#programs-and-options)**
     - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or TypeScript-like code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-typescript-like-code-blocks)
-    - [Why are some appliance features, programs, or options missing or unavailable (including in the configuration editor)?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable-including-in-the-configuration-editor)
+    - [Why are some appliance features, programs, or options missing or unavailable?](#why-are-some-appliance-features-programs-or-options-missing-or-unavailable)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
     - [Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?](#why-is-my-appliance-stuck-at-waiting-for-features-to-finish-initialising-showing-as-not-responding-or-displaying-unresponsive-tiles)
     - [Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?](#why-do-i-see-an-invalidstepsize-or-sdkerrorinvalidoptionvalue-error)
@@ -77,7 +76,6 @@
     - [Why is the hood boost mode a separate switch instead of part of the fan speed control?](#why-is-the-hood-boost-mode-a-separate-switch-instead-of-part-of-the-fan-speed-control)
     - [Why is hood fan speed controlled using percentages instead of discrete levels?](#why-is-hood-fan-speed-controlled-using-percentages-instead-of-discrete-levels)
     - [Can the physical hood control buttons on a Home Connect hob be used to trigger HomeKit automations?](#can-the-physical-hood-control-buttons-on-a-home-connect-hob-be-used-to-trigger-homekit-automations)
-    - [Does the plugin support integrated extractor fans on hobs?](#does-the-plugin-support-integrated-extractor-fans-on-hobs)
     - [Why is support for Home Connect robot vacuum cleaners limited?](#why-is-support-for-home-connect-robot-vacuum-cleaners-limited)
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
@@ -320,16 +318,6 @@ If an appliance program stops responding, fails to start, or reflects outdated c
     - **Delete all other files** in that directory. These contain cached capabilities and will be regenerated automatically.
     - **Start Homebridge** to fetch fresh data from the Home Connect API.
 
-#### Why does my hood return a `409 Conflict` error or briefly run at a default speed?
-
-<!-- INCLUDES: issue-388-278a issue-392-b36e -->
-Specific models of extractor hoods exhibit quirks when interacting with the Home Connect API:
-
-1. **`SDK.Error.MissingOptionValue`**: This error (often referencing `Cooking.Common.Option.Hood.Boost`) is caused by a Home Connect API server-side regression where the server incorrectly demands a default value for an option that the appliance does not support. The plugin includes workarounds to bypass this specific requirement for hoods; ensure you are running the latest version. If you encounter this error on an appliance other than a hood, it represents an upstream schema mismatch that should be reported to Home Connect customer support.
-2. **Activation from Standby**: Some hoods cannot transition directly from an off state to a specific venting level. To circumvent this, the plugin automatically coordinates a command sequence: it enables the main power (`BSH.Common.Setting.PowerState`), which triggers the default venting program, and then immediately updates the `VentingLevel` to your requested setting. You may observe the hood briefly running at its hardware-defined default speed before the final adjustment is applied.
-
-These behaviours are necessary workarounds for platform-specific firmware and API constraints.
-
 ### Local/Remote Control
 
 #### Why does my appliance show `No Response` when I try to start a program?
@@ -409,15 +397,14 @@ If you observe these messages:
 
 Once added, the warning will disappear and the features will be correctly mapped where appropriate.
 
-#### Why are some appliance features, programs, or options missing or unavailable (including in the configuration editor)?
+#### Why are some appliance features, programs, or options missing or unavailable?
 
 <!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-f393 issue-380-03ac issue-386-9bb3 issue-395-e3b4 -->
-The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit, hidden in the configuration editor, or appear as `currently unavailable` in the logs:
+The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
 - **Appliance Settings**: Some programs, such as `Sabbath` mode, often require being explicitly enabled in the physical appliance settings menu before they are exposed via the API.
-- **Hardware and Firmware Constraints**: Certain models or programs have hard-coded limitations. For example, high-wattage microwave programs (like 600W or Max/Boost) may not support options like `Duration` or `StartInRelative` via the API. If the Home Connect API returns an empty options list for a specific program, the plugin will hide those fields in the Homebridge configuration editor to prevent invalid configurations.
-- **Remote Control Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
+- **Hardware Restrictions**: Certain models, such as Neff ovens with rotary dials, cannot be powered on remotely via the public API. This can prevent the plugin from discovering the full range of supported options during its initialisation routine.
 - **Program Specifics**: Maintenance cycles (such as drum cleaning, rinsing, or descaling) and user-defined programs are frequently restricted or not advertised with full configuration options via the public Home Connect API.
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 
@@ -823,15 +810,6 @@ No, the physical buttons on a hob designed to control a hood (fan and light) can
 
 Manufacturers typically design these buttons to communicate directly with compatible appliances using proprietary appliance-to-appliance protocols. Because these interactions are handled internally, they are not broadcast to the API event stream monitored by the plugin. If you wish to see this supported, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) expose these button presses as API events. You can monitor the [Home Connect API documentation](https://api-docs.home-connect.com/events/) for updates to available event types.
 
-#### Does the plugin support integrated extractor fans on hobs?
-
-<!-- INCLUDES: issue-363-1bb7 -->
-Historically, the Home Connect API did not expose ventilation or extractor fan controls for hobs with integrated hoods. It only supported discrete `Hob` and `Hood` appliance types, meaning integrated extractor fans were completely hidden from the API. The Home Connect API has since introduced a new setting specifically for this: `Cooking.Hob.Setting.Ventilation`. This plugin supports this setting starting from version 1.10.1.
-
-However, even if you are using the latest version of the plugin, your appliance must also support this API feature. If the fan control is not appearing in HomeKit:
-- Verify if a firmware update is available for your appliance via the official Home Connect app.
-- If your appliance firmware is up to date and the controls still do not appear, it means the manufacturer has not enabled API access for your specific model's ventilation feature. In this scenario, you would need to request that [Home Connect support](https://developer.home-connect.com/support/contact) enable access to the ventilation setting for your specific model.
-
 #### Why is support for Home Connect robot vacuum cleaners limited?
 
 <!-- INCLUDES: issue-391-11a8 -->
@@ -988,4 +966,4 @@ To resolve this:
 2. Open the plugin configuration in the Homebridge UI, select each appliance in turn to check its configuration, and then click the **Save** button. This action updates the configuration into the correct format, even if no changes were manually made, usually resolving any missing property errors and allowing the plugin to start normally.
 3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary then please raise a GitHub issue to report the problem so that the plugin can be updated.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-1bb7 issue-388-278a issue-392-b36e -->
