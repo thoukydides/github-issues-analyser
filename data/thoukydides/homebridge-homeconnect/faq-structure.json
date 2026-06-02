@@ -379,8 +379,7 @@
                                         "issue-340-bf6e",
                                         "issue-368-f393",
                                         "issue-380-03ac",
-                                        "issue-386-9bb3",
-                                        "issue-395-e3b4"
+                                        "issue-386-9bb3"
                                     ]
                                 },
                                 {
@@ -405,8 +404,7 @@
                                         "issue-323-0be1",
                                         "issue-329-638e",
                                         "issue-333-8d17",
-                                        "issue-390-64e2",
-                                        "issue-395-e3b4"
+                                        "issue-390-64e2"
                                     ]
                                 },
                                 {
@@ -533,7 +531,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 395,
+                                    "id": "issue-395-3895",
+                                    "question": "Why are some programme options, such as duration or start time, missing in the configuration UI for certain appliance programmes?",
+                                    "answer": "The Home Connect API dynamically updates available options (such as duration, temperature, or relative start time) only when a specific programme is actively selected on the physical appliance. To avoid turning on the appliance and cycling through every programme on every Homebridge reboot, the plugin performs this discovery sequence once during its first run and caches the results locally.\n\nIf a temporary API glitch or connection issue occurs during this initial discovery phase, the Home Connect API may return an empty list of options for some programmes. The plugin will then cache these incomplete options, causing them to be permanently missing from the configuration UI.\n\nTo resolve this and force the plugin to re-discover your appliance's capabilities, follow these steps:\n\n1. Stop Homebridge.\n2. Access your Homebridge server's file system and navigate to the plugin's persist directory, typically located at `~/.homebridge/homebridge-homeconnect/persist/`.\n3. Delete the cache file corresponding to the affected appliance. The filename is a unique MD5 hash (for example, `488a91739055915e5ff6e549433eb5f2`). Alternatively, you can safely delete all files in this directory to clear the cache for all registered appliances.\n4. Restart Homebridge.\n\nUpon restarting, the plugin will execute its first-run sequence, querying each programme from the Home Connect API to rebuild a fresh, accurate capabilities cache."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []

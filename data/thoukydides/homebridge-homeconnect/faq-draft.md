@@ -399,7 +399,7 @@ Once added, the warning will disappear and the features will be correctly mapped
 
 #### Why are some appliance features, programs, or options missing or unavailable?
 
-<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-f393 issue-380-03ac issue-386-9bb3 issue-395-e3b4 -->
+<!-- INCLUDES: issue-1-d662 issue-17-56af issue-24-8ee6 issue-29-ff17 issue-42-d406 issue-42-e5af issue-44-1e1b issue-54-196a issue-62-bd95 issue-75-349e issue-76-7959 issue-77-6bec issue-122-b195 issue-141-568b issue-157-6512 issue-186-686f issue-201-c103 issue-202-c38d issue-208-0821 issue-250-36bc issue-273-cef7 issue-316-2b86 issue-328-b486 issue-340-bf6e issue-368-f393 issue-380-03ac issue-386-9bb3 -->
 The plugin dynamically discovers the capabilities of each appliance by querying the Home Connect API. Several factors can cause features to be missing from HomeKit or appear as `currently unavailable` in the logs:
 
 - **Private API Limitations**: The official Home Connect app and certain partners (like IFTTT) use a private API with functionality not available to third-party developers. If a program or feature is missing from the [official public API documentation](https://api-docs.home-connect.com), the plugin cannot access it.
@@ -422,7 +422,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 issue-395-e3b4 -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When initialisation stalls, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Several factors can contribute to this state:
@@ -588,6 +588,22 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`. Whilst the Apple Home app does not expose these features, they are shown in third-party apps (such as Eve) and may be used by automations.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
+
+#### 🚧 Why are some programme options, such as duration or start time, missing in the configuration UI for certain appliance programmes? 🚧
+
+<!-- INCLUDES: issue-395-3895 -->
+The Home Connect API dynamically updates available options (such as duration, temperature, or relative start time) only when a specific programme is actively selected on the physical appliance. To avoid turning on the appliance and cycling through every programme on every Homebridge reboot, the plugin performs this discovery sequence once during its first run and caches the results locally.
+
+If a temporary API glitch or connection issue occurs during this initial discovery phase, the Home Connect API may return an empty list of options for some programmes. The plugin will then cache these incomplete options, causing them to be permanently missing from the configuration UI.
+
+To resolve this and force the plugin to re-discover your appliance's capabilities, follow these steps:
+
+1. Stop Homebridge.
+2. Access your Homebridge server's file system and navigate to the plugin's persist directory, typically located at `~/.homebridge/homebridge-homeconnect/persist/`.
+3. Delete the cache file corresponding to the affected appliance. The filename is a unique MD5 hash (for example, `488a91739055915e5ff6e549433eb5f2`). Alternatively, you can safely delete all files in this directory to clear the cache for all registered appliances.
+4. Restart Homebridge.
+
+Upon restarting, the plugin will execute its first-run sequence, querying each programme from the Home Connect API to rebuild a fresh, accurate capabilities cache.
 
 ### Appliance Status and Connectivity
 
