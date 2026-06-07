@@ -9,7 +9,9 @@
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
-  - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
+  - **[New subcategory](#new-subcategory)**
+    - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
+  - **[Appliance Naming](#appliance-naming)**
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -61,11 +63,27 @@ To ensure you are running the latest version:
 
 ## Appliance Discovery and Filtering
 
+### New subcategory
+
 #### Why does the plugin still log details for appliances I have blacklisted?
 
 <!-- INCLUDES: issue-13-160a -->
 It is expected behaviour to see all appliances linked to your MyDyson account mentioned in the startup logs. The plugin must first query the Dyson cloud API to retrieve a full manifest of all devices to determine their models and communication requirements.
 
 The `entityBlackList` and `entityWhiteList` filters are applied after this initial discovery phase, just before the plugin registers devices as Matter endpoints. Consequently, even devices excluded from being bridged will appear during the initialisation and account-authorisation logs.
+
+### Appliance Naming
+
+#### 🚧 Why does the server node fail to initialise with the error `Variable name ... contains empty segments`? 🚧
+
+<!-- INCLUDES: issue-31-833f -->
+This error occurs when the `enableServerRvc` setting is enabled and the Dyson appliance has special characters or symbols (such as the trademark symbol `™`) in its name within the MyDyson app.
+
+The underlying cause is a limitation in the upstream `matter.js` library. When generating internal node identifiers, `matter.js` sanitises the device name by replacing non-alphanumeric characters with period characters (`.`). If this substitution results in consecutive periods (for example, converting `Dyson360VisNav™` to `Dyson360VisNav..plugins`), the parser throws an implementation error due to empty segments.
+
+To resolve this issue:
+1. Open the MyDyson app and navigate to your appliance settings.
+2. Rename the appliance to a simple name containing only letters (`A` to `Z`, `a` to `z`) and numbers, ensuring there are no spaces, trademark symbols, or other special characters.
+3. Restart Matterbridge to allow the plugin to discover the appliance with its new name.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 -->
