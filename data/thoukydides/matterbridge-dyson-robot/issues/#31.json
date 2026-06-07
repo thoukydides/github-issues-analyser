@@ -1,12 +1,12 @@
 {
     "issue_number": 31,
-    "updated_at": "2026-06-07T08:29:51.903Z",
+    "updated_at": "2026-06-07T10:55:33.079Z",
     "faq": [
         {
-            "question": "Why does enabling `enableServerRvc` fail with a `Variable name ... contains empty segments` error?",
-            "answer": "This error occurs if the Dyson appliance name configured in the MyDyson app contains special characters, spaces, or symbols (such as the trademark symbol `™`).\n\nWhen `enableServerRvc` is set to `true`, the plugin uses the appliance's name to register its Matter node. The underlying `matter.js` library sanitises non-alphanumeric characters by replacing them with period (`.`) characters. If a symbol sits adjacent to an existing delimiter, this replacement creates consecutive periods (e.g., `..`), which triggers an `ImplementationError` because of empty variable segments.\n\nTo resolve this issue:\n1. Open the MyDyson app and rename your appliance.\n2. Use a simple name containing only letters (`A` to `Z`, `a` to `z`) and numbers, avoiding spaces, hyphens, or special symbols.\n3. Restart the Matterbridge plugin.",
-            "semantic_abstract": "Special characters or symbols in an appliance name trigger a sanitisation bug in the underlying `matter.js` `VariableService` when `enableServerRvc` is active. The sanitisation process replaces non-alphanumeric characters with periods, which can generate consecutive dots in internal variable paths and cause initialisation to fail. Renaming the appliance to use only alphanumeric characters bypasses this validation constraint.",
-            "hash": "5093d4dc419fd10208556c8a0e40a175a4a70429d03f17f882d49eace3ae456f"
+            "question": "Why does the server node fail to initialise with the error `Variable name ... contains empty segments`?",
+            "answer": "This error occurs when the `enableServerRvc` setting is enabled and the Dyson appliance has special characters or symbols (such as the trademark symbol `™`) in its name within the MyDyson app.\n\nThe underlying cause is a limitation in the upstream `matter.js` library. When generating internal node identifiers, `matter.js` sanitises the device name by replacing non-alphanumeric characters with period characters (`.`). If this substitution results in consecutive periods (for example, converting `Dyson360VisNav™` to `Dyson360VisNav..plugins`), the parser throws an implementation error due to empty segments.\n\nTo resolve this issue:\n1. Open the MyDyson app and navigate to your appliance settings.\n2. Rename the appliance to a simple name containing only letters (`A` to `Z`, `a` to `z`) and numbers, ensuring there are no spaces, trademark symbols, or other special characters.\n3. Restart Matterbridge to allow the plugin to discover the appliance with its new name.",
+            "semantic_abstract": "Special characters or symbols in the MyDyson appliance name trigger sanitisation bugs within the upstream `matter.js` library when `enableServerRvc` is active. The sanitisation process replaces non-alphanumeric characters with periods, creating invalid consecutive separators that crash the node parser. Renaming the appliance to a clean alphanumeric string resolves the parser error.",
+            "hash": "833f2d7821d5f240322b2b6e5ec9953e3bcea5078e145dbf7decc4f86b581b9f"
         }
     ]
 }
