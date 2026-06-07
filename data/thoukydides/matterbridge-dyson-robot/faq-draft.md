@@ -12,6 +12,7 @@
   - **[New subcategory](#new-subcategory)**
     - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
   - **[Appliance Naming](#appliance-naming)**
+    - [Why does the server node fail to initialise with the error `Variable name ... contains empty segments`?](#why-does-the-server-node-fail-to-initialise-with-the-error-variable-name--contains-empty-segments)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -74,7 +75,7 @@ The `entityBlackList` and `entityWhiteList` filters are applied after this initi
 
 ### Appliance Naming
 
-#### 🚧 Why does the server node fail to initialise with the error `Variable name ... contains empty segments`? 🚧
+#### Why does the server node fail to initialise with the error `Variable name ... contains empty segments`?
 
 <!-- INCLUDES: issue-31-833f -->
 This error occurs when the `enableServerRvc` setting is enabled and the Dyson appliance has special characters or symbols (such as the trademark symbol `™`) in its name within the MyDyson app.

@@ -93,15 +93,16 @@
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [],
-                            "candidates": [
+                            "entries": [
                                 {
-                                    "issue_number": 31,
-                                    "id": "issue-31-833f",
                                     "question": "Why does the server node fail to initialise with the error `Variable name ... contains empty segments`?",
-                                    "answer": "This error occurs when the `enableServerRvc` setting is enabled and the Dyson appliance has special characters or symbols (such as the trademark symbol `™`) in its name within the MyDyson app.\n\nThe underlying cause is a limitation in the upstream `matter.js` library. When generating internal node identifiers, `matter.js` sanitises the device name by replacing non-alphanumeric characters with period characters (`.`). If this substitution results in consecutive periods (for example, converting `Dyson360VisNav™` to `Dyson360VisNav..plugins`), the parser throws an implementation error due to empty segments.\n\nTo resolve this issue:\n1. Open the MyDyson app and navigate to your appliance settings.\n2. Rename the appliance to a simple name containing only letters (`A` to `Z`, `a` to `z`) and numbers, ensuring there are no spaces, trademark symbols, or other special characters.\n3. Restart Matterbridge to allow the plugin to discover the appliance with its new name."
+                                    "answer": "This error occurs when the `enableServerRvc` setting is enabled and the Dyson appliance has special characters or symbols (such as the trademark symbol `™`) in its name within the MyDyson app.\n\nThe underlying cause is a limitation in the upstream `matter.js` library. When generating internal node identifiers, `matter.js` sanitises the device name by replacing non-alphanumeric characters with period characters (`.`). If this substitution results in consecutive periods (for example, converting `Dyson360VisNav™` to `Dyson360VisNav..plugins`), the parser throws an implementation error due to empty segments.\n\nTo resolve this issue:\n1. Open the MyDyson app and navigate to your appliance settings.\n2. Rename the appliance to a simple name containing only letters (`A` to `Z`, `a` to `z`) and numbers, ensuring there are no spaces, trademark symbols, or other special characters.\n3. Restart Matterbridge to allow the plugin to discover the appliance with its new name.",
+                                    "included_ids": [
+                                        "issue-31-833f"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
