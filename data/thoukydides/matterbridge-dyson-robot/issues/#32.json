@@ -1,0 +1,12 @@
+{
+    "issue_number": 32,
+    "updated_at": "2026-06-08T09:54:59.792Z",
+    "faq": [
+        {
+            "question": "Why does my Dyson robot vacuum show as `Updating` in Apple Home while remaining reachable in Matterbridge?",
+            "answer": "An indefinite `Updating...` status in Apple Home, despite the Dyson robot vacuum being reported as reachable by Matterbridge and connected via MQTT, is typically caused by the Apple Home Hub (the Matter controller) terminating the connection.\n\nIn the Matterbridge logs, this behaviour is identified by the following entries:\n`[ServerSubscription] Subscription <id> cancelled by peer`\n`[DeviceAdvertiser] Subscription canceled by peer, re-announce`\n\nWhen this occurs, the plugin and Matterbridge are still actively connected to the Dyson appliance, but Apple Home has stopped listening for status updates. This represents a network or controller-level issue between Apple Home and Matterbridge rather than a failure in the Dyson plugin.\n\nTo troubleshoot this behaviour:\n* Ensure your Apple TV or HomePod is updated to the latest tvOS/audioOS version.\n* Restart the active Apple Home Hub to force it to re-establish the Matter subscription.\n* Verify that IPv6 and multicast (mDNS) are correctly configured and unblocked on your local network, as Matter relies heavily on these protocols for controller-to-bridge communication.",
+            "semantic_abstract": "Apple Home hubs may unilaterally terminate Matter subscriptions, leading to an indefinite `Updating...` status in the Apple Home app while the underlying Dyson robot vacuum maintains a stable MQTT connection to the plugin. This communication breakdown occurs at the Matter controller-to-bridge layer, often triggered by mDNS or IPv6 network routing issues, rather than a failure within the plugin or the appliance connection.",
+            "hash": "6b6bcd1edb3c92a0742d98f07057458c6b8e54907240fbf49727427fbc9d3762"
+        }
+    ]
+}
