@@ -13,6 +13,7 @@
     - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
   - **[Appliance Naming](#appliance-naming)**
     - [Why does the server node fail to initialise with the error `Variable name ... contains empty segments`?](#why-does-the-server-node-fail-to-initialise-with-the-error-variable-name--contains-empty-segments)
+- **[Apple Home (HomeKit) Integration](#apple-home-homekit-integration)**
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -86,5 +87,18 @@ To resolve this issue:
 1. Open the MyDyson app and navigate to your appliance settings.
 2. Rename the appliance to a simple name containing only letters (`A` to `Z`, `a` to `z`) and numbers, ensuring there are no spaces, trademark symbols, or other special characters.
 3. Restart Matterbridge to allow the plugin to discover the appliance with its new name.
+
+## Apple Home (HomeKit) Integration
+
+#### 🚧 Why does Apple Home show "Updating" for my Dyson robot vacuum after a few minutes? 🚧
+
+<!-- INCLUDES: issue-32-fc8e -->
+The "Updating..." status in Apple Home typically occurs when the Matter subscription between the Apple Home hub and Matterbridge is cancelled or fails to sustain an idle connection. This is an underlying protocol and connection management behaviour handled entirely by `matter.js` and the Matter controller, rather than the Dyson plugin.
+
+Robot vacuums are frequently idle for long periods and generate very few status updates compared to other appliances (such as air purifiers, which continuously stream environmental data). In certain network environments or controller firmware versions, this lack of activity can lead the Home hub to cancel the subscription (logged as `Subscription cancelled by peer`), which is not subsequently recovered.
+
+To address this behaviour:
+* Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
+* If the issue persists, seek support via the Matterbridge Discord server, or open an issue on the Matterbridge or `matter.js` GitHub repositories, as the resolution lies within the Matter implementation layer rather than this plugin.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 -->
