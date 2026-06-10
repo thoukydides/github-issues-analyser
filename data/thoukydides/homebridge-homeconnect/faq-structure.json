@@ -532,7 +532,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 396,
+                                    "id": "issue-396-ab5c",
+                                    "question": "Why does my log show a block of code with `(unrecognised)` values?",
+                                    "answer": "The Home Connect API frequently introduces new, undocumented status values, programme options, or process phases. When the plugin encounters a value it does not recognise, it outputs a diagnostic block of TypeScript-like definitions containing the label `(unrecognised)` in your Homebridge logs.\n\nTo resolve this, please open a new issue on the GitHub repository and share this diagnostic block. Ensure you include:\n\n* The complete block of code printed between the `===` separators.\n* The manufacturer and model number of the affected appliance.\n* Any additional related settings you can observe in the official Home Connect mobile application.\n\nAvoid guessing other theoretical values, as the Home Connect API often deviates from logical sequences; the plugin maintainer only adds verified values that have been observed from actual appliance logs."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
