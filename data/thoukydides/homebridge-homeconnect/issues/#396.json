@@ -1,12 +1,12 @@
 {
     "issue_number": 396,
-    "updated_at": "2026-06-10T12:35:33.384Z",
+    "updated_at": "2026-06-10T16:25:19.694Z",
     "faq": [
         {
-            "question": "Why does the log show `unrecognised` Home Connect API keys or union types?",
-            "answer": "The plugin maintains an internal schema of the Home Connect API's programs, options, statuses, and their corresponding values. When your appliance reports a state or configuration option that is not yet documented or mapped within the plugin's schema (frequently occurring with new appliance models or firmware updates), the plugin outputs a structured diagnostic block in the log highlighting these values with an `(unrecognised)` comment.\n\nTo resolve this:\n1. Ensure you are running the latest version of the plugin, as support for newly discovered API values is regularly added in updates.\n2. If the unrecognized values persist on the latest release, copy the complete diagnostic block (delimited by the `====================` lines) from your logs and open an issue on the GitHub repository so they can be added to the schema in a future release.",
-            "semantic_abstract": "Home Connect appliances frequently introduce undocumented API states and options via firmware updates, resulting in the plugin logging auto-generated diagnostic blocks with `(unrecognised)` annotations. Reporting these schema mismatches allows the maintainer to update the internal TypeScript types and incorporate support for the new appliance features.",
-            "hash": "f49b73cdbe43a26b6e2738b1b386b8b3c67de714e5d76203452b5ff93abe658d"
+            "question": "Why does my log show a block of code with `(unrecognised)` values?",
+            "answer": "The Home Connect API frequently introduces new, undocumented status values, programme options, or process phases. When the plugin encounters a value it does not recognise, it outputs a diagnostic block of TypeScript-like definitions containing the label `(unrecognised)` in your Homebridge logs.\n\nTo resolve this, please open a new issue on the GitHub repository and share this diagnostic block. Ensure you include:\n\n* The complete block of code printed between the `===` separators.\n* The manufacturer and model number of the affected appliance.\n* Any additional related settings you can observe in the official Home Connect mobile application.\n\nAvoid guessing other theoretical values, as the Home Connect API often deviates from logical sequences; the plugin maintainer only adds verified values that have been observed from actual appliance logs.",
+            "semantic_abstract": "Home Connect API schema variations and undocumented enum values are flagged by the plugin's diagnostic logger as `(unrecognised)`. This mechanism allows users to capture and report raw API payloads for integration into the plugin's type definitions, ensuring support for new appliance features and firmware updates.",
+            "hash": "ab5cca66e184b00876df3953c15001ccd3ac08bbca77a389d241ebd7d23b450b"
         }
     ]
 }
