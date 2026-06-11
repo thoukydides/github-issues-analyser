@@ -11,7 +11,7 @@
                     "entries": [
                         {
                             "question": "Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?",
-                            "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored. When Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise, the validation fails which prevents the plugin from starting.\n\nTo resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide a full debug log in a GitHub issue so the new API structures can be correctly mapped.",
+                            "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored. When Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise, the validation fails, which prevents the plugin from starting.\n\nTo resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide a full debug log in a GitHub issue so the new API structures can be correctly mapped.",
                             "included_ids": [
                                 "issue-17-fe91"
                             ]
@@ -100,6 +100,6 @@
         "issue-31-833f"
     ],
     "source_hashes": {
-        "faq": "0c0247525f3f8ddacba26f5f1f4b310fc7847254adee7ba84ed7e6e7ccf068b6"
+        "faq": "25dbb8fcec42ffc1ed3fb1364ce5e1ae0b1e0d44bdb88ce64d2c56a76cb4a727"
     }
 }

@@ -104,7 +104,7 @@
 #### Why is the plugin not starting or failing to show an authorisation URL?
 
 <!-- INCLUDES: issue-28-485b -->
-If the plugin does not provide an authorisation URL or appear to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.
+If the plugin does not provide an authorisation URL or fails to load, it is usually due to a configuration error in `config.json` preventing Homebridge from identifying the platform.
 
 First, check the Homebridge logs for `[HomeConnect] Initialising HomeConnect platform...`. If this line is missing, the plugin is not being loaded. Common causes include:
 
@@ -217,7 +217,7 @@ The Home Connect API uses `409 Conflict` errors for a variety of failures that r
 
 - `BSH.Common.Error.400.BadRequest`: This often indicates an attempt to stop a program that is already stopped. This typically occurs when multiple program switches are grouped into a single tile in the Home app, resulting in them all being toggled together.
 
-For details of other `409` errors refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
+For details of other `409` errors, refer to the [Home Connect API Errors](https://api-docs.home-connect.com/general/#api-errors) documentation.
 
 #### Why does starting the Silence program on my dishwasher fail or return a `409 Conflict` error?
 
@@ -687,7 +687,7 @@ No. The [unofficial Home Connect Server Status](https://homeconnect.thouky.co.uk
 <!-- INCLUDES: issue-52-1e99 -->
 The plugin creates HomeKit accessories based on the list of appliances provided by the Home Connect API. These accessories should remain visible in the Home app even when the physical device is switched off or disconnected from Wi-Fi.
 
-If accessories spontaneously disappear, reappear, or lose their HomeKit configuration (e.g. room assignments, custom names, scenes, or automations) it is usually due to one of the following:
+If accessories spontaneously disappear, reappear, or lose their HomeKit configuration (e.g. room assignments, custom names, scenes, or automations), it is usually due to one of the following:
 
 1. **Home Connect API Instability**: If the API temporarily fails to report an appliance during a synchronisation check, the plugin may remove the corresponding accessory from HomeKit. When the API later reports the appliance again, the plugin recreates it as a new accessory. Because HomeKit treats this as a brand-new device, all previous configurations are lost.
 2. **HomeKit Cache Issues**: Local database corruption within the Apple Home app or Homebridge can lead to inconsistent UI behaviour where devices appear to vanish or move.
@@ -792,8 +792,8 @@ However, the official Apple Home app does not currently display or provide contr
 <!-- INCLUDES: issue-338-f65a -->
 The plugin represents Home Connect hood functionality using a combination of a `Fan` service for speed control and a `Switch` service for the boost mode. This design reflects the different behaviours of these features in the appliance firmware:
 
-1. **Standard Speeds and Intensive Mode**: These are mapped to the HomeKit fan speed percentage steps. The highest fan speeds correspond to **intensive mode**, which run for a fixed period (e.g. 6 minutes) before automatically reverting to a specific lower speed.
-2. **Boost Mode**: On supported models the **Boost** option provides a higher fan speed for a very short duration (e.g. 20 seconds). Unlike intensive mode, when the boost period ends, the hood returns to the **previous** speed setting.
+1. **Standard Speeds and Intensive Mode**: These are mapped to the HomeKit fan speed percentage steps. The highest fan speeds correspond to **intensive mode**, which runs for a fixed period (e.g. 6 minutes) before automatically reverting to a specific lower speed.
+2. **Boost Mode**: On supported models, the **Boost** option provides a higher fan speed for a very short duration (e.g. 20 seconds). Unlike intensive mode, when the boost period ends, the hood returns to the **previous** speed setting.
 
 Because HomeKit fan speed controls represent a linear progression, incorporating a mode that reverts to an arbitrary previous state is not natively supported by the speed slider. Exposing `Boost` as a separate `Switch` better represents this hardware behaviour and allows it to be activated independently of the current speed. This `Switch` can be hidden in the plugin configuration if it is not required.
 
@@ -840,7 +840,7 @@ The `Cooking.Hood.Setting.ColorTemperaturePercent` setting is documented as `0%`
 #### How are Home Connect air conditioners represented and controlled in HomeKit?
 
 <!-- INCLUDES: issue-346-0f16 issue-346-3cac -->
-Home Connect air conditioners are exposed to HomeKit using a `Thermostat` service for temperature control and a `Fan` service for air flow. There are several limitations and specific mappings due to differences between the HomeKit Accessory Protocol (HAP) and the Home Connect API:
+Home Connect air conditioners are exposed to HomeKit using a `Thermostat` service for temperature control and a `Fan` service for airflow. There are several limitations and specific mappings due to differences between the HomeKit Accessory Protocol (HAP) and the Home Connect API:
 
 - **Missing Sensor Data**: The Home Connect API does not currently expose ambient room temperature or humidity measurements for air conditioners. Consequently, the `Current Temperature` characteristic in HomeKit cannot reflect actual room conditions.
 - **Thermostat State Mapping**: Because HomeKit thermostat states (Off, Heat, Cool, Auto) do not align perfectly with appliance programs, the plugin uses the following logic:
@@ -865,7 +865,7 @@ This design is necessary for several reasons:
 2. **Inconsistent Reporting**: The API does not consistently report when an event condition clears. While some appliances might send an "off" status, others simply stop sending the "present" event with no standard timeout defined.
 3. **Protocol Compliance**: The HomeKit Accessory Protocol (HAP) defines sensors like `Contact Sensor` for continuous states. Mapping a momentary event to these services is technically incorrect.
 
-The Apple Home app only displays numeric labels (e.g. "Button 1") for these services. This is a design limitation of the Home app; while the HomeKit framework allows for descriptive labels (visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents, check the **Homebridge logs** during startup. These events can be disabled per-appliance in the plugin configuration if they are not required.
+The Apple Home app only displays numeric labels (e.g. "Button 1") for these services. This is a design limitation of the Home app; while the HomeKit framework allows for descriptive labels (visible in third-party apps like *Eve* or *Home+*), Apple's interface defaults to generic numbering. To identify what each button represents, check the **Homebridge logs** during startup. These events can be disabled per appliance in the plugin configuration if they are not required.
 
 #### Why does the Home app show two (or more) tiles for one appliance?
 
@@ -965,6 +965,6 @@ To resolve this:
 
 1. Ensure you are running the latest release versions of both Homebridge UI and this plugin.
 2. Open the plugin configuration in the Homebridge UI, select each appliance in turn to check its configuration, and then click the **Save** button. This action updates the configuration into the correct format, even if no changes were manually made, usually resolving any missing property errors and allowing the plugin to start normally.
-3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary then please raise a GitHub issue to report the problem so that the plugin can be updated.
+3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary, then please raise a GitHub issue to report the problem so that the plugin can be updated.
 
 <!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-1bb7 issue-388-278a issue-392-b36e -->
