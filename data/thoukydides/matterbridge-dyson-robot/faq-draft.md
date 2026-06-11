@@ -9,11 +9,7 @@
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
-  - **[New subcategory](#new-subcategory)**
-    - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
-  - **[Appliance Naming](#appliance-naming)**
-    - [Why does the server node fail to initialise with the error `Variable name ... contains empty segments`?](#why-does-the-server-node-fail-to-initialise-with-the-error-variable-name--contains-empty-segments)
-- **[Apple Home (HomeKit) Integration](#apple-home-homekit-integration)**
+  - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
   - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
 <!-- TOC-END -->
 
@@ -66,30 +62,12 @@ To ensure you are running the latest version:
 
 ## Appliance Discovery and Filtering
 
-### New subcategory
-
 #### Why does the plugin still log details for appliances I have blacklisted?
 
 <!-- INCLUDES: issue-13-160a -->
 It is expected behaviour to see all appliances linked to your MyDyson account mentioned in the startup logs. The plugin must first query the Dyson cloud API to retrieve a full manifest of all devices to determine their models and communication requirements.
 
 The `entityBlackList` and `entityWhiteList` filters are applied after this initial discovery phase, just before the plugin registers devices as Matter endpoints. Consequently, even devices excluded from being bridged will appear during the initialisation and account-authorisation logs.
-
-### Appliance Naming
-
-#### Why does the server node fail to initialise with the error `Variable name ... contains empty segments`?
-
-<!-- INCLUDES: issue-31-833f -->
-This error occurs when the `enableServerRvc` setting is enabled and the Dyson appliance has special characters or symbols (such as the trademark symbol `™`) in its name within the MyDyson app.
-
-The underlying cause is a limitation in the upstream `matter.js` library. When generating internal node identifiers, `matter.js` sanitises the device name by replacing non-alphanumeric characters with period characters (`.`). If this substitution results in consecutive periods (for example, converting `Dyson360VisNav™` to `Dyson360VisNav..plugins`), the parser throws an implementation error due to empty segments.
-
-To resolve this issue:
-1. Open the MyDyson app and navigate to your appliance settings.
-2. Rename the appliance to a simple name containing only letters (`A` to `Z`, `a` to `z`) and numbers, ensuring there are no spaces, trademark symbols, or other special characters.
-3. Restart Matterbridge to allow the plugin to discover the appliance with its new name.
-
-## Apple Home (HomeKit) Integration
 
 #### Why does Apple Home show `Updating` for my Dyson robot vacuum?
 
@@ -100,6 +78,6 @@ Robot vacuums are frequently idle for long periods and generate very few status 
 
 To address this behaviour:
 1. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
-2. If the issue persists, seek support via the Matterbridge Discord server, or open an issue on the Matterbridge or `matter.js` GitHub repositories, as the resolution lies within the Matter implementation layer rather than this plugin.
+2. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer rather than this plugin.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f -->

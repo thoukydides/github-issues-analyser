@@ -394,7 +394,6 @@ If you observe these messages:
 1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.
 2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
 3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
-4. **Include context**: Specify the manufacturer and model of the appliance, and describe any related settings or activity visible in the official Home Connect app at the time.
 
 Please do not attempt to guess or suggest theoretical values; the maintainer only adds verified values observed from actual appliance behaviour. Once added, the warning will disappear and the features will be correctly mapped where appropriate.
 
@@ -410,7 +409,7 @@ The plugin dynamically discovers the capabilities of each appliance by querying 
 - **Operational Status**: A program may be reported as supported but currently unavailable if the appliance is powered off, busy, a cycle is already running, a door is open, or required consumables (salt, rinse aid, water, detergent, coffee beans) are missing.
 - **Incomplete Discovery**: The plugin performs a discovery routine to identify supported options (like temperature ranges or durations). If this process fails due to an API glitch or a busy appliance, the plugin may cache an incomplete list of capabilities. These options will then be missing from both HomeKit and the plugin configuration UI until the cache is cleared.
 
-If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the options remain missing from the configuration UI, follow the steps to delete the appliance cache files in the section regarding unresponsive tiles and initialisation stalls. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
+If a program is unexpectedly missing, try powering the appliance on, manually selecting it on the physical panel, and leaving it idle for one minute. Then, trigger the plugin to re-read details using the HomeKit **Identify** method. If the API continues to refuse access, contact [Home Connect Developer Support](https://developer.home-connect.com/support/contact).
 
 #### Why does the log say a selected program is not supported by the Home Connect API?
 
