@@ -95,21 +95,23 @@
             "preamble": "",
             "partitions": [
                 {
-                    "entries": [],
-                    "candidates": [
+                    "entries": [
                         {
-                            "issue_number": 33,
-                            "id": "issue-33-3d80",
-                            "question": "Why do Dyson appliances appear as multiple entities in Apple Home, and why can only one entity be moved to a different room?",
-                            "answer": "Dyson devices are multi-functional, offering fan control, temperature sensing, humidity monitoring, and air quality reporting. To expose these distinct functions via Matter, the plugin presents the appliance as a multi-endpoint accessory consisting of a primary device and several sub-entities.\n\nIn Apple Home, this behaviour results in multiple entities grouped under a single parent accessory. If you configure the Home app to show these services as separate tiles, you may notice that room assignment settings are only editable on the primary \"master\" entity. To move the entire appliance to a different room, you must change the room configuration on this primary accessory; all associated sub-entities (such as temperature or humidity sensors) will automatically follow the parent accessory's room assignment."
+                            "question": "Why can only one part of the appliance be moved to a different room in Apple Home?",
+                            "answer": "Dyson appliances are multi-functional, providing fan control alongside various sensors. The plugin represents these as a single multi-endpoint accessory to expose all features via Matter.\n\nIn Apple Home, this results in multiple entities grouped under one parent accessory. Room assignment for the entire appliance is controlled by the primary \"master\" entity. When you move the primary accessory to a different room, all associated sub-entities (such as temperature or humidity sensors) will automatically follow. Room settings cannot be changed on the individual sub-entities independently.",
+                            "included_ids": [
+                                "issue-33-3d80"
+                            ]
                         },
                         {
-                            "issue_number": 35,
-                            "id": "issue-35-9d14",
-                            "question": "Why does the Composed Air Purifier option show incorrect controls or behave unpredictably in Apple Home?",
-                            "answer": "The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This limitation causes HomeKit to render an unpredictable, incomplete, or broken user interface for these composed devices.\n\nIf you are using Apple Home as your primary Matter controller, it is recommended to avoid enabling the `Composed Air Purifier` configuration. Instead, allow the plugin to expose the appliance as separate, individual accessory endpoints (such as separate fan, temperature, and humidity sensors). This default configuration is fully supported by Apple Home and ensures all controls and sensor readings are displayed reliably."
+                            "question": "Why does the `Composed Air Purifier` option cause issues in Apple Home?",
+                            "answer": "The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable or broken user interface when this option is enabled.\n\nIf Apple Home is your primary Matter controller, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.",
+                            "included_ids": [
+                                "issue-35-9d14"
+                            ]
                         }
-                    ]
+                    ],
+                    "candidates": []
                 }
             ],
             "subcategories": []
