@@ -11,6 +11,7 @@
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
   - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
   - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
+- **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -79,5 +80,21 @@ Robot vacuums are frequently idle for long periods and generate very few status 
 To address this behaviour:
 1. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
 2. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer rather than this plugin.
+
+## Apple Home and HomeKit Mapping
+
+#### 🚧 Why do Dyson appliances appear as multiple entities in Apple Home, and why can only one entity be moved to a different room? 🚧
+
+<!-- INCLUDES: issue-33-3d80 -->
+Dyson devices are multi-functional, offering fan control, temperature sensing, humidity monitoring, and air quality reporting. To expose these distinct functions via Matter, the plugin presents the appliance as a multi-endpoint accessory consisting of a primary device and several sub-entities.
+
+In Apple Home, this behaviour results in multiple entities grouped under a single parent accessory. If you configure the Home app to show these services as separate tiles, you may notice that room assignment settings are only editable on the primary "master" entity. To move the entire appliance to a different room, you must change the room configuration on this primary accessory; all associated sub-entities (such as temperature or humidity sensors) will automatically follow the parent accessory's room assignment.
+
+#### 🚧 Why does the Composed Air Purifier option show incorrect controls or behave unpredictably in Apple Home? 🚧
+
+<!-- INCLUDES: issue-35-9d14 -->
+The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This limitation causes HomeKit to render an unpredictable, incomplete, or broken user interface for these composed devices.
+
+If you are using Apple Home as your primary Matter controller, it is recommended to avoid enabling the `Composed Air Purifier` configuration. Instead, allow the plugin to expose the appliance as separate, individual accessory endpoints (such as separate fan, temperature, and humidity sensors). This default configuration is fully supported by Apple Home and ensures all controls and sensor readings are displayed reliably.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f -->
