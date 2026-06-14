@@ -1,0 +1,12 @@
+{
+    "issue_number": 33,
+    "updated_at": "2026-06-14T08:49:22.892Z",
+    "faq": [
+        {
+            "question": "Why do Dyson appliances appear as multiple entities in Apple Home, and why can only one entity be moved to a different room?",
+            "answer": "Dyson devices are multi-functional, offering fan control, temperature sensing, humidity monitoring, and air quality reporting. To expose these distinct functions via Matter, the plugin presents the appliance as a multi-endpoint accessory consisting of a primary device and several sub-entities.\n\nIn Apple Home, this behaviour results in multiple entities grouped under a single parent accessory. If you configure the Home app to show these services as separate tiles, you may notice that room assignment settings are only editable on the primary \"master\" entity. To move the entire appliance to a different room, you must change the room configuration on this primary accessory; all associated sub-entities (such as temperature or humidity sensors) will automatically follow the parent accessory's room assignment.",
+            "semantic_abstract": "Matterbridge exposes multi-functional Dyson appliances as bridged accessories with multiple endpoints, which Apple Home groups under a parent accessory. Room assignment behaviour in Apple Home dictates that child endpoints inherit the parent's room configuration, restricting independent relocation of individual sensors or controls.",
+            "hash": "3d80a86373a6b283ee69a70cb3c3d7714427417418d354f8e42a004b541a3784"
+        }
+    ]
+}
