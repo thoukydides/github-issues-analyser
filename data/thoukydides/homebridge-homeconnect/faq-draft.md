@@ -80,7 +80,6 @@
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
     - [How are Home Connect air conditioners represented and controlled in HomeKit?](#how-are-home-connect-air-conditioners-represented-and-controlled-in-homekit)
-    - [Why does renaming an appliance in the Home Connect app not always update its name in Homebridge or Apple Home?](#why-does-renaming-an-appliance-in-the-home-connect-app-not-always-update-its-name-in-homebridge-or-apple-home)
     - [Why does Homebridge log a warning that the `Name` characteristic is invalid or exceeds 64 characters?](#why-does-homebridge-log-a-warning-that-the-name-characteristic-is-invalid-or-exceeds-64-characters)
   - **[Notifications & Events](#notifications--events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
@@ -703,8 +702,6 @@ To resolve these issues:
 
 ### HomeKit Accessories, Services, and Characteristics
 
-<!-- PARTITION: New subcategory -->
-
 #### Why does the Apple Home app not show the remaining time or detailed status for my appliance?
 
 <!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-eae0 issue-124-ba42 issue-225-4543 issue-230-e24b -->
@@ -856,17 +853,6 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
 
-<!-- PARTITION: Appliance Naming -->
-
-#### Why does renaming an appliance in the Home Connect app not always update its name in Homebridge or Apple Home?
-
-<!-- INCLUDES: issue-400-582b -->
-The plugin synchronises the appliance name from your Home Connect account when the accessory is first discovered. While the plugin may update the underlying `Name` characteristic on subsequent restarts, Apple Home and HomeKit prioritise any names edited directly within the Home app.
-
-When a name is edited in Apple Home, it is stored in the `ConfiguredName` characteristic. The plugin is designed to respect these user overrides to ensure that custom names are not lost during plugin restarts or API refreshes. If you have previously renamed a service or accessory within the Home app, any subsequent changes in the official Home Connect app will be ignored by HomeKit.
-
-To ensure names are updated correctly, it is recommended to rename accessories and services directly within the Apple Home app. If no user override exists, the plugin will automatically apply name updates from the Home Connect API upon restarting Homebridge.
-
 #### Why does Homebridge log a warning that the `Name` characteristic is invalid or exceeds 64 characters?
 
 <!-- INCLUDES: issue-400-0a4c -->
@@ -875,7 +861,7 @@ HomeKit enforces specific validation rules for the `Name` characteristic of acce
 - **Length Limit**: Names have a hard limit of 64 characters. The plugin often generates service names by combining the appliance name with a specific function, program, or event (for example, `Dishwasher Machine Care & Optional Filter`). If the appliance name configured in the Home Connect app is long, the resulting composite name may exceed this limit.
 - **Character Requirements**: Names must start and end with an alphanumeric character and cannot contain leading or trailing whitespace.
 
-The plugin avoids automatically trimming or modifying these names because HomeKit's exact requirements are undocumented and can vary between iOS releases. To resolve these warnings, you should shorten the appliance name in the official Home Connect app—ensuring there are no accidental spaces or unsupported symbols—or manually rename the affected service within the Apple Home app to a shorter, valid name.
+The plugin avoids automatically trimming or modifying these names because HomeKit's exact requirements are undocumented and can vary between iOS releases. To resolve these warnings, you should shorten the appliance name in the official Home Connect app (ensuring there are no accidental spaces or unsupported symbols) or manually rename the affected service within the Apple Home app to a shorter, valid name.
 
 ### Notifications & Events
 
@@ -992,4 +978,4 @@ To resolve this:
 2. Open the plugin configuration in the Homebridge UI, select each appliance in turn to check its configuration, and then click the **Save** button. This action updates the configuration into the correct format, even if no changes were manually made, usually resolving any missing property errors and allowing the plugin to start normally.
 3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary, then please raise a GitHub issue to report the problem so that the plugin can be updated.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-1bb7 issue-388-278a issue-392-b36e -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-1bb7 issue-388-278a issue-392-b36e issue-400-582b -->

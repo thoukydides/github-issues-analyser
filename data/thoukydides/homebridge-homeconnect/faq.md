@@ -66,7 +66,7 @@
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
-    - [Why do disabled services still appear or remain unresponsive in HomeKit?](#why-do-disabled-services-still-appear-or-remain-unresponsive-in-homekit)
+    - [Why do duplicate or orphaned accessory tiles appear in the Home app?](#why-do-duplicate-or-orphaned-accessory-tiles-appear-in-the-home-app)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
@@ -80,6 +80,7 @@
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
     - [How are Home Connect air conditioners represented and controlled in HomeKit?](#how-are-home-connect-air-conditioners-represented-and-controlled-in-homekit)
+    - [Why does Homebridge log a warning that the `Name` characteristic is invalid or exceeds 64 characters?](#why-does-homebridge-log-a-warning-that-the-name-characteristic-is-invalid-or-exceeds-64-characters)
   - **[Notifications & Events](#notifications--events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
@@ -386,8 +387,8 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or TypeScript-like code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-354-bd8b issue-355-94db issue-356-0fe3 issue-357-f6ae issue-365-ec63 issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e issue-389-3f8f issue-391-d362 issue-393-daf5 issue-394-179a issue-396-ab5c -->
-The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-354-bd8b issue-355-94db issue-356-0fe3 issue-357-f6ae issue-365-ec63 issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e issue-389-3f8f issue-391-d362 issue-393-daf5 issue-394-179a issue-396-ab5c issue-397-baed -->
+The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code, annotated with `// (unrecognised)` comments, and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
 
 If you observe these messages:
 
@@ -717,26 +718,26 @@ The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined w
 
 Although HAP includes a `Service Label Index` characteristic, it is specifically intended for ordering `Stateless Programmable Switch` services and is not officially supported or respected by apps for other service types. Technical attempts to influence the order—such as marking the power switch as a `Primary` service or using `Linked` services to group controls—have proven inconsistent across different applications. In some cases, these changes actually made the Apple Home app's ordering less predictable. Most third-party HomeKit apps, such as *Eve*, *Home+*, and *Hesperus*, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.
 
-#### Why do disabled services still appear or remain unresponsive in HomeKit?
+#### Why do duplicate or orphaned accessory tiles appear in the Home app?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 -->
-The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service, it can lead to stale "No Response" entries or disappearing service labels.
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 issue-398-a34c -->
+The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to enable optional secondary service tiles (such as the `Power` or `Active Program` switches) or remove existing ones, it can lead to stale "No Response" entries, disappearing service labels, phantom tiles, or duplicate switches.
 
-This occurs for two main reasons:
+This behaviour is typically caused by HomeKit's local accessory state caching rather than the plugin publishing extraneous devices. When the plugin's registered accessories change, Apple Home sometimes fails to immediately prune unlinked services from its internal database. This occurs for several reasons:
+
 1. **Homebridge caching**: As a dynamic platform plugin, Homebridge saves the state of accessories to disk. On startup, it restores this state before the plugin applies the current configuration. If a feature was recently disabled, it may briefly appear until the plugin logs `Removing obsolete service "..."`.
-2. **HomeKit and iCloud synchronisation**: HomeKit maintains an internal cache across home hubs (Apple TV or HomePod) and iOS devices. Syncing changes via iCloud can be unreliable, leading to persistent display bugs.
+2. **HomeKit and iCloud synchronisation**: HomeKit maintains an internal cache across home hubs (Apple TV or HomePod) and iOS devices. Syncing changes via iCloud can be unreliable, leading to persistent display bugs or unresponsive tiles.
 
-Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because the plugin uses this service as a way to trigger HomeKit to refresh the accessory state. Without this service any error conditions are more likely to persist until appliance state updates other services.
+Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because the plugin uses this service as a way to trigger HomeKit to refresh the accessory state. Conversely, enabling it creates an additional tile that may confuse users expecting a single integrated control.
 
 To resolve persistent issues:
-- **Wait**: Cache synchronisation often resolves within a few hours.
-- **Verify Logs**: Check for `Removing obsolete service` messages.
-- **Restart Homebridge**: This triggers a fresh advertisement of the current state.
+- **Force-close and restart the Apple Home app**: This is the first step to clear local app-level display issues.
+- **Verify Logs**: Check the Homebridge logs for `Removing obsolete service` messages.
+- **Restart Homebridge**: Restarting the Homebridge instance (or the specific child bridge) forces a fresh advertisement of the current authoritative state to HomeKit.
+- **Wait**: Cache synchronisation often resolves within a few minutes to a few hours.
 - **Reboot Home Hubs**: Restarting the active Apple TV or HomePod can force a refresh.
 - **Sign out of iCloud**: On the home hub, sign out and back in to force a full resynchronisation.
-- **Clear Cache or Re-add**: Clear Homebridge cached accessories for the appliance. If this fails, remove and re-add the bridge (note: this deletes associated automations and scenes).
-
-The plugin avoids using workarounds like randomising service identifiers to force updates, as this would break existing HomeKit automations and scenes.
+- **Manage Cached Accessories**: Use the Homebridge UI to manually clear cached data for the appliance if the orphaned tile persists. If this fails, remove and re-add the bridge (note: this deletes associated automations and scenes).
 
 #### Why is temperature control not supported for fridges, freezers, or ovens?
 
@@ -851,6 +852,16 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 - **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
+
+#### Why does Homebridge log a warning that the `Name` characteristic is invalid or exceeds 64 characters?
+
+<!-- INCLUDES: issue-400-0a4c -->
+HomeKit enforces specific validation rules for the `Name` characteristic of accessories and services, which can lead to warnings from `HAP-NodeJS` if they are not met:
+
+- **Length Limit**: Names have a hard limit of 64 characters. The plugin often generates service names by combining the appliance name with a specific function, program, or event (for example, `Dishwasher Machine Care & Optional Filter`). If the appliance name configured in the Home Connect app is long, the resulting composite name may exceed this limit.
+- **Character Requirements**: Names must start and end with an alphanumeric character and cannot contain leading or trailing whitespace.
+
+The plugin avoids automatically trimming or modifying these names because HomeKit's exact requirements are undocumented and can vary between iOS releases. To resolve these warnings, you should shorten the appliance name in the official Home Connect app (ensuring there are no accidental spaces or unsupported symbols) or manually rename the affected service within the Apple Home app to a shorter, valid name.
 
 ### Notifications & Events
 
@@ -967,4 +978,4 @@ To resolve this:
 2. Open the plugin configuration in the Homebridge UI, select each appliance in turn to check its configuration, and then click the **Save** button. This action updates the configuration into the correct format, even if no changes were manually made, usually resolving any missing property errors and allowing the plugin to start normally.
 3. If the issue persists, you can manually configure these settings by editing the `config.json` file directly. If you find that this is necessary, then please raise a GitHub issue to report the problem so that the plugin can be updated.
 
-<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-1bb7 issue-388-278a issue-392-b36e -->
+<!-- EXCLUDED: issue-1-3b47 issue-1-6c10 issue-2-4fcb issue-3-5aac issue-4-579a issue-6-a773 issue-9-8790 issue-10-f724 issue-13-3c36 issue-13-9879 issue-21-fdd3 issue-25-a46c issue-33-75c5 issue-35-302a issue-47-ce58 issue-65-719f issue-67-487c issue-72-dd80 issue-80-403c issue-85-5365 issue-89-4014 issue-93-57c0 issue-94-e57b issue-144-5faf issue-181-6697 issue-194-0961 issue-195-e227 issue-239-6f85 issue-256-069a issue-259-ff85 issue-294-c8c6 issue-298-1c85 issue-300-7e4a issue-304-0ee0 issue-351-729d issue-360-b285 issue-363-1bb7 issue-388-278a issue-392-b36e issue-400-582b -->

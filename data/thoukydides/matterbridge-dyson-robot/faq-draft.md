@@ -4,24 +4,15 @@
 - **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**
   - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
   - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
+  - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
   - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
   - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
 - **[Matterbridge](#matterbridge)**
-  - **[New subcategory](#new-subcategory)**
-    - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
-  - **[Manual Authentication and Configuration](#manual-authentication-and-configuration)**
-    - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
-- **[Appliance Discovery and Status](#appliance-discovery-and-status)**
-  - **[New subcategory](#new-subcategory)**
-    - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
-    - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
-  - **[Dyson 360 Vis Nav (RB05) Connectivity and Status](#dyson-360-vis-nav-rb05-connectivity-and-status)**
-    - [Why can't I connect to my Dyson 360 Vis Nav (RB05) locally?](#why-cant-i-connect-to-my-dyson-360-vis-nav-rb05-locally)
-    - [Why does my RB05 show status codes in the fault field during normal cleaning?](#why-does-my-rb05-show-status-codes-in-the-fault-field-during-normal-cleaning)
-    - [Why does `opendyson listen` fail to show status messages for the RB05?](#why-does-opendyson-listen-fail-to-show-status-messages-for-the-rb05)
-    - [What are the automatic charging thresholds for the RB05 robot?](#what-are-the-automatic-charging-thresholds-for-the-rb05-robot)
+  - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
+- **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
+  - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
+  - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
 - **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
-  - [Why can only one part of the appliance be moved to a different room in Apple Home?](#why-can-only-one-part-of-the-appliance-be-moved-to-a-different-room-in-apple-home)
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
 <!-- TOC-END -->
 
@@ -39,11 +30,23 @@ To resolve this, ensure you are running the latest version of the plugin. If the
 <!-- INCLUDES: issue-13-4541 issue-16-b67c -->
 The information required depends on the device type and the specific feature being requested:
 
-1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data.
+1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. *Dyson robots use a MQTT status topic that is unsupported by `opendyson`; a plugin debug log is also required to capture this.*
 
 2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.
 
 3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` in your configuration and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record a log while the device completes a cycle (e.g. a full clean) and submit the output via a GitHub issue.
+
+#### Where is the `libdyson` configuration file located?
+
+<!-- INCLUDES: issue-46-a42b -->
+When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
+
+The location of this file depends on the operating system:
+
+- **Linux**: `~/.config/libdyson/config.yml` 
+- **macOS**: `~/Library/Application Support/libdyson/config.yml` 
+
+Note that these paths are relative to the user's home directory.
 
 #### Why are Dyson error codes and the sleep timer not visible in my Matter controller?
 
@@ -61,8 +64,6 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 ## Matterbridge
 
-### New subcategory
-
 #### Why does `matterbridge-dyson-robot` report an older version in logs after an update?
 
 <!-- INCLUDES: issue-16-09f2 -->
@@ -74,23 +75,7 @@ To ensure you are running the latest version:
 2. Check the version number reported in the log with a `[Dyson Robot]` prefix during startup; this is the definitive version of the plugin instance currently running.
 3. If the issue persists, uninstall and then reinstall the `matterbridge-dyson-robot` plugin to clear any cached files or lingering older files.
 
-### Manual Authentication and Configuration
-
-#### Where is the `libdyson` configuration file located?
-
-<!-- INCLUDES: issue-46-a42b -->
-When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
-
-The location of this file depends on the operating system:
-
-- **Linux**: `~/.config/libdyson/config.yml` 
-- **macOS**: `~/Library/Application Support/libdyson/config.yml` 
-
-Note that these paths are relative to the user's home directory.
-
-## Appliance Discovery and Status
-
-### New subcategory
+## Appliance Discovery and Filtering
 
 #### Why does the plugin still log details for appliances I have blacklisted?
 
@@ -111,53 +96,16 @@ To address this behaviour:
 2. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
 3. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer.
 
-### Dyson 360 Vis Nav (RB05) Connectivity and Status
-
-#### Why can't I connect to my Dyson 360 Vis Nav (RB05) locally?
-
-<!-- INCLUDES: issue-46-42f9 -->
-The Dyson 360 Vis Nav (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API.
-
-#### Why does my RB05 show status codes in the fault field during normal cleaning?
-
-<!-- INCLUDES: issue-46-d0fb -->
-The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors.
-
-Known informational codes include:
-- `2101`: Charging during a clean
-- `2103`: Dock busy (washing or drying the mop)
-- `2108`: Discovering (stationary rotation after resuming)
-- `2109`: Running a full clean
-
-Actual faults that require user intervention, such as being stuck, use different codes (e.g. `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions.
-
-#### Why does `opendyson listen` fail to show status messages for the RB05?
-
-<!-- INCLUDES: issue-46-dbac -->
-The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots.
-
-- **Topic Structure**: The device publishes state information to `RB05/<serial>/status` instead of the `status/current` or `status/fault` topics used by other models.
-- **Polling Requirement**: The RB05 does not automatically push full state updates. It must be explicitly polled using a `REQUEST-CURRENT-STATE` command. If the device is not being actively polled (for example, by the MyDyson app or the plugin), it will only broadcast minimal position updates while moving.
-
-#### What are the automatic charging thresholds for the RB05 robot?
-
-<!-- INCLUDES: issue-46-6cfa -->
-The RB05 model is programmed with specific battery thresholds for autonomous operation. It will stop cleaning and return to the dock to recharge (`FULL_CLEAN_NEEDS_CHARGE`) when the battery level drops to 7%. Once docked, it will not resume the cleaning task until it has reached a 60% charge level.
-
 ## Apple Home and HomeKit Mapping
-
-#### Why can only one part of the appliance be moved to a different room in Apple Home?
-
-<!-- INCLUDES: issue-33-3d80 -->
-Dyson appliances are multi-functional, providing fan control alongside various sensors. The plugin represents these as a single multi-endpoint accessory to expose all features via Matter.
-
-In Apple Home, this results in multiple entities grouped under one parent accessory. Room assignment for the entire appliance is controlled by the primary "master" entity. When you move the primary accessory to a different room, all associated sub-entities (such as temperature or humidity sensors) will automatically follow. Room settings cannot be changed on the individual sub-entities independently.
 
 #### Why does the `Composed Air Purifier` option cause issues in Apple Home?
 
 <!-- INCLUDES: issue-35-8df4 -->
-The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable, incomplete, or broken user interface when this option is enabled.
+The Apple Home app only supports simple Matter devices correctly. When multiple devices are composed into a single bridged device, or subset device types are included, the Home app exhibits multiple issues:
+* The device icon can be for any of the composed or subset device types, instead of selecting the most relevant (the first recognised device type on the parent endpoint), e.g. an **Air Purifier** device may be randomly shown as a **Fan Device** or **Air Quality Sensor** instead.
+* Controls may be duplicated in the user interface if they can correspond to multiple overlapping device types, e.g. two fan speed sliders are shown if a device describes itself as both an **Air Purifier** and a **Fan** device.
+* Functionality is often reduced, e.g. an **Air Purifier** incorporating an **Air Quality** device results in the *Auto* mode, fan oscillation controls, and all sensor measurements, being hidden.
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-42f9 issue-46-6cfa issue-46-d0fb issue-46-dbac -->
