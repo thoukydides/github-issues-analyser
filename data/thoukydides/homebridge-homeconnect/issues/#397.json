@@ -1,0 +1,12 @@
+{
+    "issue_number": 397,
+    "updated_at": "2026-06-16T10:20:11.058Z",
+    "faq": [
+        {
+            "question": "Why does the log contain blocks of code with unrecognised programs or options?",
+            "answer": "The Home Connect API frequently introduces new programs, settings, and options that are not yet officially documented or implemented in the plugin. When the plugin detects these new identifiers, it outputs a pre-formatted block of code to the Homebridge logs containing the missing definitions, annotated with `// (unrecognised)` comments.\n\nTo resolve this and enable support for these options:\n1. Update the plugin to the latest version, as support for these keys may have already been added.\n2. If the block still appears, copy the entire generated code block from your log file.\n3. Open a new issue on the GitHub repository, including the code block and the model number of your appliance, so the maintainer can add the new definitions.",
+            "semantic_abstract": "Home Connect API updates or new appliance firmware can introduce undocumented program, option, or setting keys, resulting in schema validation mismatches within the plugin. The plugin outputs structured diagnostic code blocks to the logs to capture these unrecognised identifiers, allowing users to report them for integration into subsequent plugin releases.",
+            "hash": "baedfb589ed4fe894dc4706abadd26e8577ec8e58c814ca733a049f9da831318"
+        }
+    ]
+}
