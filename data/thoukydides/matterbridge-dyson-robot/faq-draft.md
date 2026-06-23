@@ -8,7 +8,7 @@
   - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
-- **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
+- **[Appliance Discovery and Status](#appliance-discovery-and-status)**
   - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
   - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
 - **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
@@ -63,7 +63,7 @@ To ensure you are running the latest version:
 2. Check the version number reported in the log with a `[Dyson Robot]` prefix during startup; this is the definitive version of the plugin instance currently running.
 3. If the issue persists, uninstall and then reinstall the `matterbridge-dyson-robot` plugin to clear any cached files or lingering older files.
 
-## Appliance Discovery and Filtering
+## Appliance Discovery and Status
 
 #### Why does the plugin still log details for appliances I have blacklisted?
 
@@ -74,6 +74,7 @@ The `entityBlackList` and `entityWhiteList` filters are applied after this initi
 
 #### Why does Apple Home show `Updating` for my Dyson robot vacuum?
 
+<!-- INCLUDES: issue-32-482a -->
 The `Updating...` status in Apple Home typically occurs when the Matter subscription between the Apple Home hub and Matterbridge is cancelled or fails to sustain an idle connection. This is an underlying protocol and connection management behaviour handled entirely by `matter.js` and the Matter controller, rather than the Dyson plugin.
 
 Robot vacuums are frequently idle for long periods and generate very few status updates compared to other appliances (such as air purifiers, which continuously stream environmental data). In certain network environments or controller firmware versions, this lack of activity can lead the Home hub to cancel the subscription (logged as `Subscription cancelled by peer`), which is not subsequently recovered.
@@ -81,17 +82,6 @@ Robot vacuums are frequently idle for long periods and generate very few status 
 To address this behaviour:
 1. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
 2. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer rather than this plugin.
-
-#### 🚧 Why does my Dyson robotic vacuum cleaner show `Updating` in Apple Home while remaining connected? 🚧
-
-<!-- INCLUDES: issue-32-482a -->
-This behaviour is typically not caused by the `matterbridge-dyson-robot` plugin. Individual plugins are not involved with maintaining the idle Matter connection or subscription lifecycles; this is managed entirely by the underlying Matterbridge and `matter.js` layers.
-
-Unlike air purifiers, which continuously send environmental monitoring and sensor updates, a robotic vacuum cleaner (RVC) remains mostly idle when docked. This prolonged period of inactivity can cause Apple Home to unexpectedly drop or cancel the subscription (logged as `Subscription cancelled by peer`), leading to the accessory permanently displaying an `Updating` state in the Apple Home app.
-
-To resolve this integration issue, consider the following actions:
-1. Ensure that both Matterbridge and its underlying dependencies are fully updated to the latest versions.
-2. Report connection drop issues directly to the Matterbridge and `matter.js` maintainers via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) or by opening an issue on the [Matterbridge GitHub repository](https://github.com/Luligu/matterbridge/issues).
 
 ## Apple Home and HomeKit Mapping
 

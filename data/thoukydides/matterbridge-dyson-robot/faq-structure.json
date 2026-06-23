@@ -65,7 +65,7 @@
             "subcategories": []
         },
         {
-            "heading": "Appliance Discovery and Filtering",
+            "heading": "Appliance Discovery and Status",
             "preamble": "",
             "partitions": [
                 {
@@ -80,17 +80,12 @@
                         {
                             "question": "Why does Apple Home show `Updating` for my Dyson robot vacuum?",
                             "answer": "The `Updating...` status in Apple Home typically occurs when the Matter subscription between the Apple Home hub and Matterbridge is cancelled or fails to sustain an idle connection. This is an underlying protocol and connection management behaviour handled entirely by `matter.js` and the Matter controller, rather than the Dyson plugin.\n\nRobot vacuums are frequently idle for long periods and generate very few status updates compared to other appliances (such as air purifiers, which continuously stream environmental data). In certain network environments or controller firmware versions, this lack of activity can lead the Home hub to cancel the subscription (logged as `Subscription cancelled by peer`), which is not subsequently recovered.\n\nTo address this behaviour:\n1. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.\n2. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer rather than this plugin.",
-                            "included_ids": []
+                            "included_ids": [
+                                "issue-32-482a"
+                            ]
                         }
                     ],
-                    "candidates": [
-                        {
-                            "issue_number": 32,
-                            "id": "issue-32-482a",
-                            "question": "Why does my Dyson robotic vacuum cleaner show `Updating` in Apple Home while remaining connected?",
-                            "answer": "This behaviour is typically not caused by the `matterbridge-dyson-robot` plugin. Individual plugins are not involved with maintaining the idle Matter connection or subscription lifecycles; this is managed entirely by the underlying Matterbridge and `matter.js` layers.\n\nUnlike air purifiers, which continuously send environmental monitoring and sensor updates, a robotic vacuum cleaner (RVC) remains mostly idle when docked. This prolonged period of inactivity can cause Apple Home to unexpectedly drop or cancel the subscription (logged as `Subscription cancelled by peer`), leading to the accessory permanently displaying an `Updating` state in the Apple Home app.\n\nTo resolve this integration issue, consider the following actions:\n1. Ensure that both Matterbridge and its underlying dependencies are fully updated to the latest versions.\n2. Report connection drop issues directly to the Matterbridge and `matter.js` maintainers via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) or by opening an issue on the [Matterbridge GitHub repository](https://github.com/Luligu/matterbridge/issues)."
-                        }
-                    ]
+                    "candidates": []
                 }
             ],
             "subcategories": []
