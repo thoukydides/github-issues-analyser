@@ -94,13 +94,9 @@ In Apple Home, this results in multiple entities grouped under one parent access
 
 #### Why does the `Composed Air Purifier` option cause issues in Apple Home?
 
-The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable or broken user interface when this option is enabled.
-
-If Apple Home is your primary Matter controller, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
-
-#### 🚧 Why does the Composed Air Purifier option display incorrectly in Apple Home? 🚧
-
 <!-- INCLUDES: issue-35-7599 -->
-The Apple Home app does not correctly support the Matter standard's `Composed Air Purifier` device type, which can lead to an unpredictable, buggy, or incomplete user interface. If your primary Matter ecosystem is Apple Home, it is recommended to disable the `Composed Air Purifier` option in your configuration. Instead, expose the device's sub-components, such as fans, air quality sensors, temperature sensors, and humidity sensors, as individual accessories which are fully and natively supported by Apple Home.
+The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable, buggy, or broken user interface when this option is enabled.
+
+If Apple Home is your primary Matter controller, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f -->
