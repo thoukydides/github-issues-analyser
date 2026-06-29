@@ -1,12 +1,12 @@
 {
     "issue_number": 35,
-    "updated_at": "2026-06-29T09:57:56.437Z",
+    "updated_at": "2026-06-29T17:19:20.271Z",
     "faq": [
         {
-            "question": "Should I use the Composed Air Purifier configuration with Apple Home?",
-            "answer": "The `Composed Air Purifier` setting attempts to group all appliance functions, such as the fan and various sensors, into a single Matter accessory. While this follows the Matter specification, the Apple Home app does not currently handle this specific device type correctly. This often results in an unpredictable or incomplete user interface where certain controls or sensor readings may be missing.\n\nFor the best experience in HomeKit:\n- Disable the `Composed Air Purifier` option in the plugin configuration.\n- When disabled, the plugin exposes the fan, air quality sensors, and environmental sensors as individual accessories. This ensures that Apple Home can correctly display and control every feature of the Dyson appliance using standard service mappings.",
-            "semantic_abstract": "Apple Home exhibits compatibility issues with the Matter `Composed Air Purifier` device type, resulting in incomplete UI rendering. Disabling this composed grouping allows the plugin to expose functionality as individual Matter services, ensuring full compatibility with HomeKit interface constraints.",
-            "hash": "f7e111dd063598f8b91d8d2552a4e1db33494df1339363b06890c453e1fc96d0"
+            "question": "Why does the Composed Air Purifier option display incorrectly in Apple Home?",
+            "answer": "The Apple Home app does not correctly support the Matter standard's `Composed Air Purifier` device type, which can lead to an unpredictable, buggy, or incomplete user interface. If your primary Matter ecosystem is Apple Home, it is recommended to disable the `Composed Air Purifier` option in your configuration. Instead, expose the device's sub-components, such as fans, air quality sensors, temperature sensors, and humidity sensors, as individual accessories which are fully and natively supported by Apple Home.",
+            "semantic_abstract": "Apple Home exhibits compatibility limitations with the Matter `Composed Air Purifier` device type, resulting in an incomplete and unpredictable user interface layout. Exposing fan and sensor endpoints as individual accessories rather than a single composed accessory ensures correct rendering and control within HomeKit.",
+            "hash": "7599294b595014b99b6246433ee37db0f1c2708c562d0c7d949ee842b58e3ad0"
         }
     ]
 }
