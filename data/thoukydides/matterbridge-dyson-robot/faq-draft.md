@@ -95,13 +95,9 @@ In Apple Home, this results in multiple entities grouped under one parent access
 
 #### Why does the `Composed Air Purifier` option cause issues in Apple Home?
 
-The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable, buggy, or broken user interface when this option is enabled.
-
-If Apple Home is your primary Matter controller, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
-
-#### 🚧 Why does the `Composed Air Purifier` configuration show an unpredictable or incomplete UI in Apple Home? 🚧
-
 <!-- INCLUDES: issue-35-8df4 -->
-The Apple Home app does not correctly handle the Matter `Composed Air Purifier` specification, which results in an unpredictable, incomplete, and degraded user interface. If you are using Apple Home (HomeKit) as your primary Matter ecosystem, it is highly recommended to avoid enabling the `Composed Air Purifier` option. Instead, configure the device using individual accessory endpoints to ensure all controls and sensors are fully functional and rendered correctly within the app.
+The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable, incomplete, or broken user interface when this option is enabled.
+
+If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f -->

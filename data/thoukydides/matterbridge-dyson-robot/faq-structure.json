@@ -105,18 +105,13 @@
                         },
                         {
                             "question": "Why does the `Composed Air Purifier` option cause issues in Apple Home?",
-                            "answer": "The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable, buggy, or broken user interface when this option is enabled.\n\nIf Apple Home is your primary Matter controller, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.",
-                            "included_ids": []
+                            "answer": "The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable, incomplete, or broken user interface when this option is enabled.\n\nIf Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.",
+                            "included_ids": [
+                                "issue-35-8df4"
+                            ]
                         }
                     ],
-                    "candidates": [
-                        {
-                            "issue_number": 35,
-                            "id": "issue-35-8df4",
-                            "question": "Why does the `Composed Air Purifier` configuration show an unpredictable or incomplete UI in Apple Home?",
-                            "answer": "The Apple Home app does not correctly handle the Matter `Composed Air Purifier` specification, which results in an unpredictable, incomplete, and degraded user interface. If you are using Apple Home (HomeKit) as your primary Matter ecosystem, it is highly recommended to avoid enabling the `Composed Air Purifier` option. Instead, configure the device using individual accessory endpoints to ensure all controls and sensors are fully functional and rendered correctly within the app."
-                        }
-                    ]
+                    "candidates": []
                 }
             ],
             "subcategories": []
