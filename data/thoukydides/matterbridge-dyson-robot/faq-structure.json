@@ -80,12 +80,17 @@
                         {
                             "question": "Why does Apple Home show `Updating` for my Dyson robot vacuum?",
                             "answer": "The `Updating...` status in Apple Home typically occurs when the Matter subscription between the Apple Home hub and Matterbridge is cancelled or fails to sustain an idle connection. This is an underlying protocol and connection management behaviour handled entirely by `matter.js` and the Matter controller, rather than the Dyson plugin.\n\nRobot vacuums (RVCs) are frequently idle for long periods and generate very few status updates compared to other appliances (such as air purifiers, which continuously stream environmental data). In certain network environments or controller firmware versions, this lack of activity can lead the Home hub to cancel the subscription (logged as `Subscription cancelled by peer`), which is not subsequently recovered.\n\nTo address this behaviour:\n1. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.\n2. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer rather than this plugin.",
-                            "included_ids": [
-                                "issue-32-29e3"
-                            ]
+                            "included_ids": []
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 32,
+                            "id": "issue-32-d8b6",
+                            "question": "Why does my Dyson vacuum show `Updating...` in Apple Home after a few minutes?",
+                            "answer": "This behaviour is typically caused by a platform-level communication issue between the underlying Matter implementation (`matter.js` or Matterbridge) and Apple Home, rather than a fault within this plugin. Individual plugins do not manage or maintain idle Matter connections.\n\nBecause robotic vacuum cleaners (RVCs) do not send continuous environmental telemetry when idle, the Matter connection can become completely silent. If Apple Home does not receive regular updates, it may cancel the subscription (logged as `Subscription cancelled by peer`), leading to the accessory getting stuck on `Updating...` even though the plugin remains connected to the robot via MQTT.\n\nTo address this issue:\n* Verify your log files for `Subscription cancelled by peer` or `Subscription canceled by peer, re-announce` messages.\n* Report the issue directly to the Matterbridge and `matter.js` maintainers via the Matterbridge Discord or their respective GitHub repositories, as they manage the core subscription and connection logic."
+                        }
+                    ]
                 }
             ],
             "subcategories": []
@@ -106,12 +111,17 @@
                         {
                             "question": "Why does the `Composed Air Purifier` option cause issues in Apple Home?",
                             "answer": "The Apple Home app does not correctly handle the Matter specification's `Composed Air Purifier` accessory category. This leads to an unpredictable, buggy, or broken user interface when this option is enabled.\n\nIf Apple Home is your primary Matter controller, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.",
-                            "included_ids": [
-                                "issue-35-7599"
-                            ]
+                            "included_ids": []
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 35,
+                            "id": "issue-35-8df4",
+                            "question": "Why does the `Composed Air Purifier` configuration show an unpredictable or incomplete UI in Apple Home?",
+                            "answer": "The Apple Home app does not correctly handle the Matter `Composed Air Purifier` specification, which results in an unpredictable, incomplete, and degraded user interface. If you are using Apple Home (HomeKit) as your primary Matter ecosystem, it is highly recommended to avoid enabling the `Composed Air Purifier` option. Instead, configure the device using individual accessory endpoints to ensure all controls and sensors are fully functional and rendered correctly within the app."
+                        }
+                    ]
                 }
             ],
             "subcategories": []
