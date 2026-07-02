@@ -1,12 +1,12 @@
 {
     "issue_number": 32,
-    "updated_at": "2026-06-24T08:32:58.178Z",
+    "updated_at": "2026-07-02T11:18:48.450Z",
     "faq": [
         {
-            "question": "Why does my Dyson robotic vacuum show `Updating...` in Apple Home after a few minutes?",
-            "answer": "This behaviour typically occurs when Apple Home cancels the Matter subscription (`Subscription cancelled by peer` in the logs) due to inactivity, leaving the accessory status frozen. \n\nIndividual plugins do not manage or maintain idle Matter connections; this is handled entirely by the underlying Matterbridge and `matter.js` engine. Because robotic vacuums (RVCs) only send updates during active operation, they can remain completely quiet for long periods when idle. In contrast, devices like air purifiers send continuous environmental updates, which naturally keeps their Matter subscriptions active. \n\nIf you encounter this issue, it points to a communication layer problem between the Matter controller (such as Apple Home) and the Matter bridge. To resolve this, ensure Matterbridge and its dependencies are fully updated, or seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) or the Matterbridge and `matter.js` GitHub repositories.",
-            "semantic_abstract": "Robotic vacuum cleaner (RVC) devices remain idle for long periods without sending telemetry updates, which can trigger Apple Home to cancel the inactive Matter subscription and display an `Updating...` status. This behaviour is caused by connection handling limitations within the underlying `matter.js` and Matterbridge platforms during periods of low activity, rather than a failure of the device plugin.",
-            "hash": "29e3ea62fc67f5f84ec032b37e004066fe11b14b44c8bb92c2f28b9466578dc7"
+            "question": "Why does my Dyson vacuum show `Updating...` in Apple Home after a few minutes?",
+            "answer": "This behaviour is typically caused by a platform-level communication issue between the underlying Matter implementation (`matter.js` or Matterbridge) and Apple Home, rather than a fault within this plugin. Individual plugins do not manage or maintain idle Matter connections.\n\nBecause robotic vacuum cleaners (RVCs) do not send continuous environmental telemetry when idle, the Matter connection can become completely silent. If Apple Home does not receive regular updates, it may cancel the subscription (logged as `Subscription cancelled by peer`), leading to the accessory getting stuck on `Updating...` even though the plugin remains connected to the robot via MQTT.\n\nTo address this issue:\n* Verify your log files for `Subscription cancelled by peer` or `Subscription canceled by peer, re-announce` messages.\n* Report the issue directly to the Matterbridge and `matter.js` maintainers via the Matterbridge Discord or their respective GitHub repositories, as they manage the core subscription and connection logic.",
+            "semantic_abstract": "Inactive Matter subscriptions for idle devices like robotic vacuums can cause Apple Home to cancel the connection, leading to an indefinite `Updating...` status. This communication failure occurs within the underlying `matter.js` or Matterbridge framework rather than the device-specific plugin, as the platform fails to maintain silent connections without continuous telemetry.",
+            "hash": "d8b6a33bcc63cf71572e3bbe890c109948ef23512f6b37e4ac56f84a7959e637"
         }
     ]
 }
