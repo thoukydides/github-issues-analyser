@@ -1,12 +1,12 @@
 {
     "issue_number": 35,
-    "updated_at": "2026-06-29T17:19:20.271Z",
+    "updated_at": "2026-07-02T08:24:28.466Z",
     "faq": [
         {
-            "question": "Why does the Composed Air Purifier option display incorrectly in Apple Home?",
-            "answer": "The Apple Home app does not correctly support the Matter standard's `Composed Air Purifier` device type, which can lead to an unpredictable, buggy, or incomplete user interface. If your primary Matter ecosystem is Apple Home, it is recommended to disable the `Composed Air Purifier` option in your configuration. Instead, expose the device's sub-components, such as fans, air quality sensors, temperature sensors, and humidity sensors, as individual accessories which are fully and natively supported by Apple Home.",
-            "semantic_abstract": "Apple Home exhibits compatibility limitations with the Matter `Composed Air Purifier` device type, resulting in an incomplete and unpredictable user interface layout. Exposing fan and sensor endpoints as individual accessories rather than a single composed accessory ensures correct rendering and control within HomeKit.",
-            "hash": "7599294b595014b99b6246433ee37db0f1c2708c562d0c7d949ee842b58e3ad0"
+            "question": "Why does the `Composed Air Purifier` configuration show an unpredictable or incomplete UI in Apple Home?",
+            "answer": "The Apple Home app does not correctly handle the Matter `Composed Air Purifier` specification, which results in an unpredictable, incomplete, and degraded user interface. If you are using Apple Home (HomeKit) as your primary Matter ecosystem, it is highly recommended to avoid enabling the `Composed Air Purifier` option. Instead, configure the device using individual accessory endpoints to ensure all controls and sensors are fully functional and rendered correctly within the app.",
+            "semantic_abstract": "Apple Home exhibits rendering and control limitations when processing the Matter Composed Air Purifier device configuration, resulting in an incomplete user interface. Utilizing individual accessory endpoint mapping instead of a composed structure bypasses these platform-specific limitations to restore full control functionality.",
+            "hash": "8df413065024aeb1609885c83cc1fc67b09401a6aab0606eaf98e54cd452f501"
         }
     ]
 }
