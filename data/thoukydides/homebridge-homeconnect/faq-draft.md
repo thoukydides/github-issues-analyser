@@ -719,19 +719,19 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 -->
-The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service, it can lead to stale "No Response" entries or disappearing service labels.
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 issue-398-ee99 -->
+The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service, or enable an optional one such as the `Power` switch, it can lead to stale "No Response" entries, disappearing service labels, or unexpected tiles (e.g. `Trockner Aus`).
 
 This occurs for two main reasons:
 1. **Homebridge caching**: As a dynamic platform plugin, Homebridge saves the state of accessories to disk. On startup, it restores this state before the plugin applies the current configuration. If a feature was recently disabled, it may briefly appear until the plugin logs `Removing obsolete service "..."`.
-2. **HomeKit and iCloud synchronisation**: HomeKit maintains an internal cache across home hubs (Apple TV or HomePod) and iOS devices. Syncing changes via iCloud can be unreliable, leading to persistent display bugs.
+2. **HomeKit and iCloud synchronisation**: HomeKit maintains an internal cache across home hubs (Apple TV or HomePod) and iOS devices. Syncing changes via iCloud can be unreliable, leading to persistent display bugs or unresponsive tiles.
 
-Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because the plugin uses this service as a way to trigger HomeKit to refresh the accessory state. Without this service any error conditions are more likely to persist until appliance state updates other services.
+Disabling the `Power` switch (`"Power": false`) is particularly likely to cause issues because the plugin uses this service as a way to trigger HomeKit to refresh the accessory state. Conversely, enabling it creates an additional tile that may confuse users expecting a single integrated control.
 
 To resolve persistent issues:
 - **Wait**: Cache synchronisation often resolves within a few hours.
 - **Verify Logs**: Check for `Removing obsolete service` messages.
-- **Restart Homebridge**: This triggers a fresh advertisement of the current state.
+- **Restart Homebridge**: Restarting the Homebridge instance (or child bridge) triggers a fresh advertisement of the current state.
 - **Reboot Home Hubs**: Restarting the active Apple TV or HomePod can force a refresh.
 - **Sign out of iCloud**: On the home hub, sign out and back in to force a full resynchronisation.
 - **Clear Cache or Re-add**: Clear Homebridge cached accessories for the appliance. If this fails, remove and re-add the bridge (note: this deletes associated automations and scenes).
@@ -851,20 +851,6 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 - **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
-
-#### 🚧 Why do orphaned or unresponsive accessories like `Trockner Aus` sporadically appear in the Home app? 🚧
-
-<!-- INCLUDES: issue-398-ee99 -->
-Unexpected tiles or unresponsive accessories are usually the result of either HomeKit cache synchronisation issues or specific plugin configuration settings.
-
-**HomeKit Cache Issues**
-HomeKit maintains a local cache of the accessories and services advertised by Homebridge. If a service is disabled or a configuration changes, HomeKit may continue to display a stale version of the accessory. These entries appear unresponsive because the plugin is no longer actively managing them. Restarting the Homebridge child bridge forces the plugin to re-advertise the current, correct list of accessories, which typically prompts HomeKit to update its cache and remove stale entries.
-
-**Plugin Configuration**
-Verify that the unexpected tile is not actually an enabled optional feature. For example, enabling the `Power` switch for a dryer will create an additional tile (such as `Trockner Aus`). If you do not want this tile to appear, ensure that the `Power` feature is disabled in the plugin's configuration for that specific appliance.
-
-**Synchronisation Lag**
-Communication delays between the Homebridge server and Apple Home hubs (such as a HomePod or Apple TV) can cause temporary discrepancies. These usually resolve after a restart of the Homebridge instance or after waiting for iCloud synchronisation to propagate across all devices.
 
 ### Notifications & Events
 
