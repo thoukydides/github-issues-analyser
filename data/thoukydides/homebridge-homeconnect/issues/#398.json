@@ -1,0 +1,12 @@
+{
+    "issue_number": 398,
+    "updated_at": "2026-07-10T08:39:32.865Z",
+    "faq": [
+        {
+            "question": "Why do orphaned or unresponsive accessories like `Trockner Aus` sporadically appear in the Home app?",
+            "answer": "Unexpected tiles or unresponsive accessories are usually the result of either HomeKit cache synchronisation issues or specific plugin configuration settings.\n\n**HomeKit Cache Issues**\nHomeKit maintains a local cache of the accessories and services advertised by Homebridge. If a service is disabled or a configuration changes, HomeKit may continue to display a stale version of the accessory. These entries appear unresponsive because the plugin is no longer actively managing them. Restarting the Homebridge child bridge forces the plugin to re-advertise the current, correct list of accessories, which typically prompts HomeKit to update its cache and remove stale entries.\n\n**Plugin Configuration**\nVerify that the unexpected tile is not actually an enabled optional feature. For example, enabling the `Power` switch for a dryer will create an additional tile (such as `Trockner Aus`). If you do not want this tile to appear, ensure that the `Power` feature is disabled in the plugin's configuration for that specific appliance.\n\n**Synchronisation Lag**\nCommunication delays between the Homebridge server and Apple Home hubs (such as a HomePod or Apple TV) can cause temporary discrepancies. These usually resolve after a restart of the Homebridge instance or after waiting for iCloud synchronisation to propagate across all devices.",
+            "semantic_abstract": "Discrepancies between the HomeKit accessory cache and the services advertised by the plugin can cause unresponsive or orphaned tiles to appear in the Home app. This technical mismatch typically occurs due to configuration changes or synchronisation lags between Homebridge and Apple Home hubs, and is often resolved by forcing a service re-advertisement through a child bridge restart or by verifying that optional features like the `Power` switch service are correctly configured.",
+            "hash": "ee99420d6eff89195b0a109233fca50708987703d698ead41f541cb46659436f"
+        }
+    ]
+}
