@@ -852,6 +852,20 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
 
+#### 🚧 Why do orphaned or unresponsive accessories like `Trockner Aus` sporadically appear in the Home app? 🚧
+
+<!-- INCLUDES: issue-398-ee99 -->
+Unexpected tiles or unresponsive accessories are usually the result of either HomeKit cache synchronisation issues or specific plugin configuration settings.
+
+**HomeKit Cache Issues**
+HomeKit maintains a local cache of the accessories and services advertised by Homebridge. If a service is disabled or a configuration changes, HomeKit may continue to display a stale version of the accessory. These entries appear unresponsive because the plugin is no longer actively managing them. Restarting the Homebridge child bridge forces the plugin to re-advertise the current, correct list of accessories, which typically prompts HomeKit to update its cache and remove stale entries.
+
+**Plugin Configuration**
+Verify that the unexpected tile is not actually an enabled optional feature. For example, enabling the `Power` switch for a dryer will create an additional tile (such as `Trockner Aus`). If you do not want this tile to appear, ensure that the `Power` feature is disabled in the plugin's configuration for that specific appliance.
+
+**Synchronisation Lag**
+Communication delays between the Homebridge server and Apple Home hubs (such as a HomePod or Apple TV) can cause temporary discrepancies. These usually resolve after a restart of the Homebridge instance or after waiting for iCloud synchronisation to propagate across all devices.
+
 ### Notifications & Events
 
 #### Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?
