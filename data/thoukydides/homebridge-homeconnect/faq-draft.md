@@ -719,7 +719,7 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 issue-398-ee99 -->
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 -->
 The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service, or enable an optional one such as the `Power` switch, it can lead to stale "No Response" entries, disappearing service labels, or unexpected tiles (e.g. `Trockner Aus`).
 
 This occurs for two main reasons:
@@ -851,6 +851,18 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 - **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
+
+#### 🚧 Why do duplicate, stale, or orphaned appliance tiles appear in the Home app? 🚧
+
+<!-- INCLUDES: issue-398-0f7c -->
+When services or accessories are modified, disabled, or removed from configuration, Apple HomeKit's local and iCloud device caches may retain phantom or unresponsive accessory tiles (such as duplicate power switches or old status controls). This occurs because Apple HomeKit caches accessory topologies across home hubs and iOS devices, and can fail to immediately sync removed or modified Homebridge services.
+
+To resolve stale or orphaned tiles in the Home app:
+
+1. Restart the Homebridge child bridge process to force Homebridge to re-advertise the updated accessory list on the local network.
+2. Force-close and reopen the Apple Home app on all connected iOS, iPadOS, and macOS devices.
+3. Restart any active HomeKit Home Hubs (Apple TV or HomePod) to force an iCloud HomeKit cache refresh.
+4. If an accessory service was disabled in the plugin configuration, ensure Homebridge removes stale accessory data by managing cached accessories in the Homebridge UI settings if necessary.
 
 ### Notifications & Events
 

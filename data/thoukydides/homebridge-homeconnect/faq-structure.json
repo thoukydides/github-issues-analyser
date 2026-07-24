@@ -678,8 +678,7 @@
                                         "issue-57-124f",
                                         "issue-77-e342",
                                         "issue-124-45f8",
-                                        "issue-364-d738",
-                                        "issue-398-ee99"
+                                        "issue-364-d738"
                                     ]
                                 },
                                 {
@@ -782,7 +781,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 398,
+                                    "id": "issue-398-0f7c",
+                                    "question": "Why do duplicate, stale, or orphaned appliance tiles appear in the Home app?",
+                                    "answer": "When services or accessories are modified, disabled, or removed from configuration, Apple HomeKit's local and iCloud device caches may retain phantom or unresponsive accessory tiles (such as duplicate power switches or old status controls). This occurs because Apple HomeKit caches accessory topologies across home hubs and iOS devices, and can fail to immediately sync removed or modified Homebridge services.\n\nTo resolve stale or orphaned tiles in the Home app:\n\n1. Restart the Homebridge child bridge process to force Homebridge to re-advertise the updated accessory list on the local network.\n2. Force-close and reopen the Apple Home app on all connected iOS, iPadOS, and macOS devices.\n3. Restart any active HomeKit Home Hubs (Apple TV or HomePod) to force an iCloud HomeKit cache refresh.\n4. If an accessory service was disabled in the plugin configuration, ensure Homebridge removes stale accessory data by managing cached accessories in the Homebridge UI settings if necessary."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
