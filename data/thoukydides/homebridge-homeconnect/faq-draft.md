@@ -66,7 +66,7 @@
   - **[HomeKit Accessories, Services, and Characteristics](#homekit-accessories-services-and-characteristics)**
     - [Why does the Apple Home app not show the remaining time or detailed status for my appliance?](#why-does-the-apple-home-app-not-show-the-remaining-time-or-detailed-status-for-my-appliance)
     - [Why are the power and program switches for my appliance in a random order in HomeKit?](#why-are-the-power-and-program-switches-for-my-appliance-in-a-random-order-in-homekit)
-    - [Why do disabled services still appear or remain unresponsive in HomeKit?](#why-do-disabled-services-still-appear-or-remain-unresponsive-in-homekit)
+    - [Why do duplicate or orphaned accessory tiles appear in the Home app?](#why-do-duplicate-or-orphaned-accessory-tiles-appear-in-the-home-app)
     - [Why is temperature control not supported for fridges, freezers, or ovens?](#why-is-temperature-control-not-supported-for-fridges-freezers-or-ovens)
     - [Why is my appliance door appearing as a `Door` service or security device instead of a `Contact Sensor`?](#why-is-my-appliance-door-appearing-as-a-door-service-or-security-device-instead-of-a-contact-sensor)
     - [Why does my fridge-freezer only show a single door status for all compartments?](#why-does-my-fridge-freezer-only-show-a-single-door-status-for-all-compartments)
@@ -717,12 +717,13 @@ The HomeKit Accessory Protocol (HAP) does not provide a robust or well-defined w
 
 Although HAP includes a `Service Label Index` characteristic, it is specifically intended for ordering `Stateless Programmable Switch` services and is not officially supported or respected by apps for other service types. Technical attempts to influence the order—such as marking the power switch as a `Primary` service or using `Linked` services to group controls—have proven inconsistent across different applications. In some cases, these changes actually made the Apple Home app's ordering less predictable. Most third-party HomeKit apps, such as *Eve*, *Home+*, and *Hesperus*, allow users to manually reorder services or characteristics for an accessory within their own interfaces. If you require a specific order, it is recommended to use the manual reordering features provided by these third-party apps.
 
-#### Why do disabled services still appear or remain unresponsive in HomeKit?
+#### Why do duplicate or orphaned accessory tiles appear in the Home app?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 -->
-The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service, or enable an optional one such as the `Power` switch, it can lead to stale "No Response" entries, disappearing service labels, phantom tiles, or duplicate switches.
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 issue-398-7168 -->
+The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to enable optional secondary service tiles (such as the `Power` or `Active Program` switches) or remove existing ones, it can lead to stale "No Response" entries, disappearing service labels, phantom tiles, or duplicate switches.
 
-This occurs for two main reasons:
+This behaviour is typically caused by HomeKit's local accessory state caching rather than the plugin publishing extraneous devices. When the plugin's registered accessories change, Apple Home sometimes fails to immediately prune unlinked services from its internal database. This occurs for two main reasons:
+
 1. **Homebridge caching**: As a dynamic platform plugin, Homebridge saves the state of accessories to disk. On startup, it restores this state before the plugin applies the current configuration. If a feature was recently disabled, it may briefly appear until the plugin logs `Removing obsolete service "..."`.
 2. **HomeKit and iCloud synchronisation**: HomeKit maintains an internal cache across home hubs (Apple TV or HomePod) and iOS devices. Syncing changes via iCloud can be unreliable, leading to persistent display bugs or unresponsive tiles.
 
@@ -736,8 +737,6 @@ To resolve persistent issues:
 - **Reboot Home Hubs**: Restarting the active Apple TV or HomePod can force a refresh.
 - **Sign out of iCloud**: On the home hub, sign out and back in to force a full resynchronisation.
 - **Manage Cached Accessories**: Use the Homebridge UI to manually clear cached data for the appliance if the orphaned tile persists. If this fails, remove and re-add the bridge (note: this deletes associated automations and scenes).
-
-The plugin avoids using workarounds like randomising service identifiers to force updates, as this would break existing HomeKit automations and scenes.
 
 #### Why is temperature control not supported for fridges, freezers, or ovens?
 
@@ -852,19 +851,6 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 - **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
-
-#### 🚧 Why does a duplicate or orphaned accessory tile appear in the Home app? 🚧
-
-<!-- INCLUDES: issue-398-7168 -->
-When optional switch features (such as Power or Active Program switches) are enabled in the plugin configuration, Homebridge creates corresponding secondary service tiles in HomeKit. If these configuration options are changed, or if HomeKit experiences caching glitches, stale or duplicate accessory tiles may remain visible in the Apple Home app.
-
-This behaviour is typically caused by HomeKit's local accessory state caching rather than the plugin publishing extraneous devices. When the plugin's registered accessories change, Apple Home sometimes fails to immediately prune unlinked services from its internal database.
-
-To resolve stale or unresponsive tiles:
-
-1. Verify the plugin configuration to confirm which optional services (such as Power switches) are actively enabled.
-2. Restart the Homebridge child bridge to force Homebridge and HAP-NodeJS to re-advertise the current accessory manifest.
-3. Restart Apple Home hubs (Apple TV or HomePod) and the Apple Home app on your iOS/macOS device to flush HomeKit's local sync cache.
 
 ### Notifications & Events
 
