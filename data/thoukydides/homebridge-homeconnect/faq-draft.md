@@ -719,7 +719,7 @@ Although HAP includes a `Service Label Index` characteristic, it is specifically
 
 #### Why do disabled services still appear or remain unresponsive in HomeKit?
 
-<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 issue-398-0f7c -->
+<!-- INCLUDES: issue-57-124f issue-77-e342 issue-124-45f8 issue-364-d738 -->
 The plugin allows for granular control over which services are exposed to HomeKit. However, HomeKit is designed for accessories with a static set of services. When you modify your `features` configuration to remove a service, or enable an optional one such as the `Power` switch, it can lead to stale "No Response" entries, disappearing service labels, phantom tiles, or duplicate switches.
 
 This occurs for two main reasons:
@@ -852,6 +852,19 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 - **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
+
+#### 🚧 Why does a duplicate or orphaned accessory tile appear in the Home app? 🚧
+
+<!-- INCLUDES: issue-398-7168 -->
+When optional switch features (such as Power or Active Program switches) are enabled in the plugin configuration, Homebridge creates corresponding secondary service tiles in HomeKit. If these configuration options are changed, or if HomeKit experiences caching glitches, stale or duplicate accessory tiles may remain visible in the Apple Home app.
+
+This behaviour is typically caused by HomeKit's local accessory state caching rather than the plugin publishing extraneous devices. When the plugin's registered accessories change, Apple Home sometimes fails to immediately prune unlinked services from its internal database.
+
+To resolve stale or unresponsive tiles:
+
+1. Verify the plugin configuration to confirm which optional services (such as Power switches) are actively enabled.
+2. Restart the Homebridge child bridge to force Homebridge and HAP-NodeJS to re-advertise the current accessory manifest.
+3. Restart Apple Home hubs (Apple TV or HomePod) and the Apple Home app on your iOS/macOS device to flush HomeKit's local sync cache.
 
 ### Notifications & Events
 
