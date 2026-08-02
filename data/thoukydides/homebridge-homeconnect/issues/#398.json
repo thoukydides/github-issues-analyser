@@ -1,12 +1,12 @@
 {
     "issue_number": 398,
-    "updated_at": "2026-07-25T15:18:10.822Z",
+    "updated_at": "2026-08-02T07:40:23.219Z",
     "faq": [
         {
-            "question": "Why does a duplicate or orphaned accessory tile appear in the Home app?",
-            "answer": "When optional switch features (such as Power or Active Program switches) are enabled in the plugin configuration, Homebridge creates corresponding secondary service tiles in HomeKit. If these configuration options are changed, or if HomeKit experiences caching glitches, stale or duplicate accessory tiles may remain visible in the Apple Home app.\n\nThis behaviour is typically caused by HomeKit's local accessory state caching rather than the plugin publishing extraneous devices. When the plugin's registered accessories change, Apple Home sometimes fails to immediately prune unlinked services from its internal database.\n\nTo resolve stale or unresponsive tiles:\n\n1. Verify the plugin configuration to confirm which optional services (such as Power switches) are actively enabled.\n2. Restart the Homebridge child bridge to force Homebridge and HAP-NodeJS to re-advertise the current accessory manifest.\n3. Restart Apple Home hubs (Apple TV or HomePod) and the Apple Home app on your iOS/macOS device to flush HomeKit's local sync cache.",
-            "semantic_abstract": "HomeKit local database caching causes removed, disabled, or modified Homebridge accessory services to linger as orphaned or duplicate tiles in the Apple Home application interface. Re-advertising accessory manifests via child bridge restarts forces HomeKit to reconcile its internal cache with active HAP service definitions.",
-            "hash": "7168fe460f08c92459d23cba6ea4d92a1db764ac98e784778101e42cb5de2fd8"
+            "question": "Why does a phantom or orphaned accessory appear in the Apple Home app?",
+            "answer": "When an accessory or service appears in the Apple Home app that cannot be operated or deleted, it is usually caused by HomeKit cache synchronisation issues rather than a bug in the plugin.\n\nApple Home local hubs (such as Apple TV or HomePod) maintain an internal cached view of accessories advertised by Homebridge over the HomeKit Accessory Protocol. If HomeKit fails to update its local cache when accessories or optional services change, stale tiles (orphaned accessories) may remain visible in the Home app.\n\nTo resolve orphaned accessories:\n\n1. **Restart the Homebridge child bridge**: Restarting the bridge forces Homebridge to re-advertise the current, authoritative list of accessories and services to HomeKit.\n2. **Check plugin configuration**: Verify whether the extra tile corresponds to an optional feature (such as an optional power switch) enabled in the plugin settings.\n3. **Allow HomeKit to synchronise**: After restarting, wait a few minutes for HomeKit hubs to propagate the updated accessory list across all connected Apple devices.",
+            "semantic_abstract": "HomeKit local hub cache synchronisation failures cause stale or orphaned accessory representations to remain visible in the Apple Home app despite no longer being published by the Homebridge plugin. Bridge restarts force Homebridge to re-advertise the authoritative accessory hierarchy over the HomeKit Accessory Protocol, clearing stale cached states.",
+            "hash": "a34c5b743b8ca56c61ae9b24976d381ef16380aea44511f7aea4f0db3c4048e1"
         }
     ]
 }
