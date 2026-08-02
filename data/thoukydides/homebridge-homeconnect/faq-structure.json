@@ -678,8 +678,7 @@
                                         "issue-57-124f",
                                         "issue-77-e342",
                                         "issue-124-45f8",
-                                        "issue-364-d738",
-                                        "issue-398-7168"
+                                        "issue-364-d738"
                                     ]
                                 },
                                 {
@@ -782,7 +781,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 398,
+                                    "id": "issue-398-a34c",
+                                    "question": "Why does a phantom or orphaned accessory appear in the Apple Home app?",
+                                    "answer": "When an accessory or service appears in the Apple Home app that cannot be operated or deleted, it is usually caused by HomeKit cache synchronisation issues rather than a bug in the plugin.\n\nApple Home local hubs (such as Apple TV or HomePod) maintain an internal cached view of accessories advertised by Homebridge over the HomeKit Accessory Protocol. If HomeKit fails to update its local cache when accessories or optional services change, stale tiles (orphaned accessories) may remain visible in the Home app.\n\nTo resolve orphaned accessories:\n\n1. **Restart the Homebridge child bridge**: Restarting the bridge forces Homebridge to re-advertise the current, authoritative list of accessories and services to HomeKit.\n2. **Check plugin configuration**: Verify whether the extra tile corresponds to an optional feature (such as an optional power switch) enabled in the plugin settings.\n3. **Allow HomeKit to synchronise**: After restarting, wait a few minutes for HomeKit hubs to propagate the updated accessory list across all connected Apple devices."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
