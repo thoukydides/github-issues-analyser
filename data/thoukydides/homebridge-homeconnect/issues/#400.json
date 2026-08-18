@@ -1,0 +1,12 @@
+{
+    "issue_number": 400,
+    "updated_at": "2026-08-18T13:06:37.149Z",
+    "faq": [
+        {
+            "question": "Why does renaming an appliance in the Home Connect app not update its name in HomeKit?",
+            "answer": "Renaming an appliance in the official Home Connect app does not update the accessory name in Homebridge or Apple Home for an existing accessory. This behaviour is by design.\n\nThe plugin only reads the appliance name from the Home Connect API when initially creating the accessory. Once an accessory has been cached, subsequent name changes from the Home Connect API are ignored to prevent overwriting custom names configured directly within Apple Home or other HomeKit apps.\n\nTo change the accessory name:\n- Rename the accessory directly within the Apple Home app settings.\n- To re-import the name from the Home Connect API, remove the cached accessory in Homebridge and restart to allow the plugin to recreate it.",
+            "semantic_abstract": "HomeKit platform accessory lifecycle restricts name synchronisation from the Home Connect API to initial accessory creation. Subsequent API name modifications are ignored by design to prevent overwriting user-defined names configured within HomeKit client applications.",
+            "hash": "440a1ff87d586919d8c1fc859411e60d759e0f6366ed2c46e4016692248d0f90"
+        }
+    ]
+}
