@@ -701,6 +701,8 @@ To resolve these issues:
 
 ### HomeKit Accessories, Services, and Characteristics
 
+<!-- PARTITION: New subcategory -->
+
 #### Why does the Apple Home app not show the remaining time or detailed status for my appliance?
 
 <!-- INCLUDES: issue-2-4fcb issue-3-a6f3 issue-36-ee06 issue-48-b565 issue-68-c09d issue-114-eae0 issue-124-ba42 issue-225-4543 issue-230-e24b -->
@@ -851,6 +853,20 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 - **Program Selection**: To avoid overriding custom settings, the plugin preserves the appliance's currently selected program if it is compatible with the state selected in HomeKit. If incompatible, it defaults to the first matching program supported by that specific model.
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
+
+<!-- PARTITION: Appliance Naming -->
+
+#### 🚧 Why does renaming an appliance in the Home Connect app not update its name in Homebridge? 🚧
+
+<!-- INCLUDES: issue-400-e9b6 -->
+The plugin only synchronises the appliance name from the Home Connect account during the initial discovery and creation of the accessory. Once the accessory is cached in Homebridge, any subsequent name changes made within the official Home Connect app are intentionally ignored. This design choice ensures that custom names configured by the user within the Home app (or Homebridge) are not overwritten or lost during plugin restarts or API refreshes. To update a name, you should rename the accessory directly within the Home app or Homebridge.
+
+#### 🚧 Why does `HAP-NodeJS` report an invalid `Name` characteristic for my appliance? 🚧
+
+<!-- INCLUDES: issue-400-c548 -->
+HomeKit has specific requirements for accessory names, such as requiring them to start and end with an alphanumeric character and prohibiting trailing or leading whitespace. If an appliance is named with an accidental space or unsupported symbol in the Home Connect app, it may be imported into Homebridge with that invalid character, causing `HAP-NodeJS` to issue a warning.
+
+The plugin avoids automatically trimming or modifying names because HomeKit's exact requirements are undocumented and can change between iOS releases. If you encounter this warning, you should correct the name in the Home Connect app. Note that because the plugin only synchronises names during initial discovery, you may also need to manually update the name within the Home app or Homebridge to remove the problematic character from the cached accessory.
 
 ### Notifications & Events
 
