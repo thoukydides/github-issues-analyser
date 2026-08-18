@@ -797,21 +797,23 @@
                             "preamble": "",
                             "partitions": [
                                 {
-                                    "entries": [],
-                                    "candidates": [
+                                    "entries": [
                                         {
-                                            "issue_number": 400,
-                                            "id": "issue-400-e9b6",
                                             "question": "Why does renaming an appliance in the Home Connect app not update its name in Homebridge?",
-                                            "answer": "The plugin only synchronises the appliance name from the Home Connect account during the initial discovery and creation of the accessory. Once the accessory is cached in Homebridge, any subsequent name changes made within the official Home Connect app are intentionally ignored. This design choice ensures that custom names configured by the user within the Home app (or Homebridge) are not overwritten or lost during plugin restarts or API refreshes. To update a name, you should rename the accessory directly within the Home app or Homebridge."
+                                            "answer": "The plugin only synchronises the appliance name from the Home Connect account during the initial discovery and creation of the accessory. Once the accessory is cached in Homebridge, any subsequent name changes made within the official Home Connect app are intentionally ignored. This design choice ensures that custom names configured by the user within the Home app or Homebridge are not overwritten or lost during plugin restarts or API refreshes. To update a name, you should rename the accessory directly within the Home app or Homebridge.",
+                                            "included_ids": [
+                                                "issue-400-e9b6"
+                                            ]
                                         },
                                         {
-                                            "issue_number": 400,
-                                            "id": "issue-400-c548",
                                             "question": "Why does `HAP-NodeJS` report an invalid `Name` characteristic for my appliance?",
-                                            "answer": "HomeKit has specific requirements for accessory names, such as requiring them to start and end with an alphanumeric character and prohibiting trailing or leading whitespace. If an appliance is named with an accidental space or unsupported symbol in the Home Connect app, it may be imported into Homebridge with that invalid character, causing `HAP-NodeJS` to issue a warning.\n\nThe plugin avoids automatically trimming or modifying names because HomeKit's exact requirements are undocumented and can change between iOS releases. If you encounter this warning, you should correct the name in the Home Connect app. Note that because the plugin only synchronises names during initial discovery, you may also need to manually update the name within the Home app or Homebridge to remove the problematic character from the cached accessory."
+                                            "answer": "HomeKit has specific requirements for accessory names, such as requiring them to start and end with an alphanumeric character and prohibiting trailing or leading whitespace. If an appliance is named with an accidental space or unsupported symbol in the Home Connect app, it may be imported into Homebridge with that invalid character, causing `HAP-NodeJS` to issue a warning.\n\nThe plugin avoids automatically trimming or modifying names because HomeKit's exact requirements are undocumented and can change between iOS releases. If you encounter this warning, you should correct the name in the Home Connect app. Note that because the plugin only synchronises names during initial discovery, you may also need to manually update the name within the Home app or Homebridge to remove the problematic character from the cached accessory.",
+                                            "included_ids": [
+                                                "issue-400-c548"
+                                            ]
                                         }
-                                    ]
+                                    ],
+                                    "candidates": []
                                 }
                             ],
                             "subcategories": []

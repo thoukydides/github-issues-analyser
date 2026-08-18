@@ -80,6 +80,8 @@
     - [Why are appliance lights mapped as lightbulbs instead of switches?](#why-are-appliance-lights-mapped-as-lightbulbs-instead-of-switches)
     - [Why is the colour temperature on my hood inverted?](#why-is-the-colour-temperature-on-my-hood-inverted)
     - [How are Home Connect air conditioners represented and controlled in HomeKit?](#how-are-home-connect-air-conditioners-represented-and-controlled-in-homekit)
+    - [Why does renaming an appliance in the Home Connect app not update its name in Homebridge?](#why-does-renaming-an-appliance-in-the-home-connect-app-not-update-its-name-in-homebridge)
+    - [Why does `HAP-NodeJS` report an invalid `Name` characteristic for my appliance?](#why-does-hap-nodejs-report-an-invalid-name-characteristic-for-my-appliance)
   - **[Notifications & Events](#notifications--events)**
     - [Why does my appliance appear as `Stateless Programmable Switch` buttons with numeric labels?](#why-does-my-appliance-appear-as-stateless-programmable-switch-buttons-with-numeric-labels)
     - [Why does the Home app show two (or more) tiles for one appliance?](#why-does-the-home-app-show-two-or-more-tiles-for-one-appliance)
@@ -854,14 +856,14 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
 
-<!-- PARTITION: Appliance Naming -->
+<!-- PARTITION -->
 
-#### 🚧 Why does renaming an appliance in the Home Connect app not update its name in Homebridge? 🚧
+#### Why does renaming an appliance in the Home Connect app not update its name in Homebridge?
 
 <!-- INCLUDES: issue-400-e9b6 -->
-The plugin only synchronises the appliance name from the Home Connect account during the initial discovery and creation of the accessory. Once the accessory is cached in Homebridge, any subsequent name changes made within the official Home Connect app are intentionally ignored. This design choice ensures that custom names configured by the user within the Home app (or Homebridge) are not overwritten or lost during plugin restarts or API refreshes. To update a name, you should rename the accessory directly within the Home app or Homebridge.
+The plugin only synchronises the appliance name from the Home Connect account during the initial discovery and creation of the accessory. Once the accessory is cached in Homebridge, any subsequent name changes made within the official Home Connect app are intentionally ignored. This design choice ensures that custom names configured by the user within the Home app or Homebridge are not overwritten or lost during plugin restarts or API refreshes. To update a name, you should rename the accessory directly within the Home app or Homebridge.
 
-#### 🚧 Why does `HAP-NodeJS` report an invalid `Name` characteristic for my appliance? 🚧
+#### Why does `HAP-NodeJS` report an invalid `Name` characteristic for my appliance?
 
 <!-- INCLUDES: issue-400-c548 -->
 HomeKit has specific requirements for accessory names, such as requiring them to start and end with an alphanumeric character and prohibiting trailing or leading whitespace. If an appliance is named with an accidental space or unsupported symbol in the Home Connect app, it may be imported into Homebridge with that invalid character, causing `HAP-NodeJS` to issue a warning.
