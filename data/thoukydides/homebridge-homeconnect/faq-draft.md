@@ -856,7 +856,7 @@ Home Connect air conditioners are exposed to HomeKit using a `Thermostat` servic
 
 In addition to the thermostat controls, the plugin also supports controlling the power state, fan speed, and automatic or manual fan modes.
 
-<!-- PARTITION -->
+<!-- PARTITION: Appliance Naming -->
 
 #### Why does renaming an appliance in the Home Connect app not update its name in Homebridge?
 
