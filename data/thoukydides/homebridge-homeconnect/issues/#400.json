@@ -1,12 +1,18 @@
 {
     "issue_number": 400,
-    "updated_at": "2026-08-18T13:06:37.149Z",
+    "updated_at": "2026-08-18T13:55:38.744Z",
     "faq": [
         {
-            "question": "Why does renaming an appliance in the Home Connect app not update its name in HomeKit?",
-            "answer": "Renaming an appliance in the official Home Connect app does not update the accessory name in Homebridge or Apple Home for an existing accessory. This behaviour is by design.\n\nThe plugin only reads the appliance name from the Home Connect API when initially creating the accessory. Once an accessory has been cached, subsequent name changes from the Home Connect API are ignored to prevent overwriting custom names configured directly within Apple Home or other HomeKit apps.\n\nTo change the accessory name:\n- Rename the accessory directly within the Apple Home app settings.\n- To re-import the name from the Home Connect API, remove the cached accessory in Homebridge and restart to allow the plugin to recreate it.",
-            "semantic_abstract": "HomeKit platform accessory lifecycle restricts name synchronisation from the Home Connect API to initial accessory creation. Subsequent API name modifications are ignored by design to prevent overwriting user-defined names configured within HomeKit client applications.",
-            "hash": "440a1ff87d586919d8c1fc859411e60d759e0f6366ed2c46e4016692248d0f90"
+            "question": "Why does renaming an appliance in the Home Connect app not update its name in Homebridge?",
+            "answer": "The plugin only synchronises the appliance name from the Home Connect account during the initial discovery and creation of the accessory. Once the accessory is cached in Homebridge, any subsequent name changes made within the official Home Connect app are intentionally ignored. This design choice ensures that custom names configured by the user within the Home app (or Homebridge) are not overwritten or lost during plugin restarts or API refreshes. To update a name, you should rename the accessory directly within the Home app or Homebridge.",
+            "semantic_abstract": "Appliance name synchronisation from the Home Connect API to Homebridge is restricted to initial accessory discovery to prevent overwriting user-defined names within the HomeKit ecosystem. This architectural choice prioritises local HomeKit naming customisations over changes made in the official Home Connect mobile application.",
+            "hash": "e9b6451ab96f0edebb836fc1ddf6e1da27e0d2a6125eb74df95d12aeb36aa541"
+        },
+        {
+            "question": "Why does `HAP-NodeJS` report an invalid `Name` characteristic for my appliance?",
+            "answer": "HomeKit has specific requirements for accessory names, such as requiring them to start and end with an alphanumeric character and prohibiting trailing or leading whitespace. If an appliance is named with an accidental space or unsupported symbol in the Home Connect app, it may be imported into Homebridge with that invalid character, causing `HAP-NodeJS` to issue a warning.\n\nThe plugin avoids automatically trimming or modifying names because HomeKit's exact requirements are undocumented and can change between iOS releases. If you encounter this warning, you should correct the name in the Home Connect app. Note that because the plugin only synchronises names during initial discovery, you may also need to manually update the name within the Home app or Homebridge to remove the problematic character from the cached accessory.",
+            "semantic_abstract": "Home Connect appliance names containing leading or trailing whitespace or unsupported characters trigger `HAP-NodeJS` validation warnings due to HomeKit naming constraints. The plugin maintains a policy of not automatically modifying these names to ensure compatibility across different HomeKit versions, requiring manual correction by the user.",
+            "hash": "c548a6f2885f6b610c1269ba195eb46ecbfcd0cb7a21f797b17b812cad5a125e"
         }
     ]
 }
