@@ -1,18 +1,18 @@
 {
     "issue_number": 400,
-    "updated_at": "2026-08-19T10:44:53.475Z",
+    "updated_at": "2026-08-19T11:38:34.096Z",
     "faq": [
         {
-            "question": "Why does Homebridge warn that the `Name` or `Configured Name` characteristic exceeded the maximum length of 64?",
-            "answer": "HomeKit enforces a hard limit of 64 characters on accessory and service `Name` and `Configured Name` characteristics.\n\nThe plugin automatically creates default names for auxiliary services and event switches by concatenating the appliance name with descriptive service labels (such as `[Appliance Name] Machine Care & Optional Filter`). If an appliance has a particularly long name in the Home Connect app, the combined service string can exceed 64 characters, causing HAP-NodeJS to log a validation warning.\n\nTo resolve this warning:\n- Shorten the appliance name in the official Home Connect app.\n- Alternatively, rename the individual service directly in the Apple Home app or Homebridge settings.",
-            "semantic_abstract": "HomeKit enforces a strict 64-character limit on `Name` and `Configured Name` characteristics, leading to validation warnings when composite service names built from appliance names and event descriptors exceed the length constraint.",
-            "hash": "4188152a5a77a0bfab51440e3f3d5a6616ec40e851e8ad4a9eebb500e4d179fe"
+            "question": "Why does changing an appliance name in the Home Connect app not update in Apple Home?",
+            "answer": "The plugin synchronises appliance names and generated service names on start-up. However, Apple Home and HomeKit prioritise user edits made directly within the Home app.\n\nWhen a name is edited in Apple Home, HomeKit writes to the `ConfiguredName` characteristic. The plugin tracks these custom values:\n- **User override active**: If a service or accessory has been renamed within Apple Home, the plugin preserves your custom name and ignores subsequent name updates from the Home Connect API.\n- **Default naming**: If no override exists, the plugin will automatically apply name updates from Home Connect upon restarting Homebridge.\n\nTo update the name of an accessory or service that has previously been renamed in Apple Home, update the name manually within the Apple Home app.",
+            "semantic_abstract": "The Home Connect plugin tracks user modifications to the HomeKit `ConfiguredName` characteristic to prevent upstream API appliance name changes from overwriting custom names assigned in Apple Home. When a user edits an accessory or service name in HomeKit, an override is maintained that suppresses subsequent automatic name synchronisation on startup.",
+            "hash": "582b89452d01d2ecf8afd34893dcd185c66708493d036f87a8f3a6a89c699f46"
         },
         {
-            "question": "Why does renaming an appliance in the Home Connect app not update in Apple Home?",
-            "answer": "Although the plugin synchronises appliance and service names from the Home Connect API on start-up, Apple Home prioritises user-defined names set within HomeKit.\n\nIf an accessory or service name has ever been edited directly in the Apple Home app, HomeKit stores that custom name override and ignores any subsequent name updates supplied by the plugin or the Home Connect platform.\n\nTo update the displayed name:\n- Rename the accessory or service directly within the Apple Home app.",
-            "semantic_abstract": "Apple HomeKit preserves local user edits to accessory and service name characteristics, causing HomeKit to ignore upstream appliance name synchronisation from the Home Connect API once a name has been modified in the Home app.",
-            "hash": "49cfe3b79f005625973476a300faf35fa1c89041bc7277dbbd4872efcfc35004"
+            "question": "Why does Homebridge log a warning that the `Name` characteristic exceeded the maximum length of 64 characters?",
+            "answer": "HomeKit enforces a hard limit of 64 characters on the `Name` characteristic for accessories and services.\n\nThe plugin automatically generates service names by combining the appliance name with the specific function, program, or event description (for example, `Dishwasher Machine Care & Optional Filter`). If the appliance name configured in the Home Connect app is relatively long, the generated composite name may exceed 64 characters, causing HAP-NodeJS to log a validation warning.\n\nTo resolve this warning:\n- Shorten the appliance name in the official Home Connect app.\n- Alternatively, manually rename the affected service within the Apple Home app to a shorter name.",
+            "semantic_abstract": "HomeKit HAP specification enforces a strict 64-character limit on the `Name` characteristic, which can be exceeded when the plugin concatenates user-defined Home Connect appliance names with default service descriptors. Long appliance names result in composite service strings that trigger HAP-NodeJS characteristic validation warnings.",
+            "hash": "0a4ccb012388fa1369d9ad5e19f2cbf1d35824ca3832deb1a59f221c929797f3"
         }
     ]
 }
