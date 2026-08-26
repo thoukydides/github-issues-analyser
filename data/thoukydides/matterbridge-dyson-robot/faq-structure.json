@@ -74,15 +74,16 @@
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [],
-                            "candidates": [
+                            "entries": [
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-a42b",
-                                    "question": "Where is the `libdyson` configuration file located for manual token retrieval?",
-                                    "answer": "The location of the `config.yml` file used by `libdyson` varies depending on your operating system:\n\n- **Linux**: `~/.config/libdyson/config.yml` \n- **macOS**: `~/Library/Application Support/libdyson/config.yml` \n\nThis file contains the `token` and other credentials required for the plugin to communicate with Dyson's cloud services."
+                                    "question": "Where is the `libdyson` configuration file located?",
+                                    "answer": "When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.\n\nThe location of this file depends on the operating system:\n\n- **Linux**: `~/.config/libdyson/config.yml` \n- **macOS**: `~/Library/Application Support/libdyson/config.yml` \n\nNote that these paths are relative to the user's home directory.",
+                                    "included_ids": [
+                                        "issue-46-a42b"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

@@ -10,6 +10,7 @@
   - **[New subcategory](#new-subcategory)**
     - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
   - **[Manual Authentication and Configuration](#manual-authentication-and-configuration)**
+    - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
 - **[Appliance Discovery and Status](#appliance-discovery-and-status)**
   - **[New subcategory](#new-subcategory)**
     - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
@@ -71,15 +72,17 @@ To ensure you are running the latest version:
 
 ### Manual Authentication and Configuration
 
-#### 🚧 Where is the `libdyson` configuration file located for manual token retrieval? 🚧
+#### Where is the `libdyson` configuration file located?
 
 <!-- INCLUDES: issue-46-a42b -->
-The location of the `config.yml` file used by `libdyson` varies depending on your operating system:
+When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
+
+The location of this file depends on the operating system:
 
 - **Linux**: `~/.config/libdyson/config.yml` 
 - **macOS**: `~/Library/Application Support/libdyson/config.yml` 
 
-This file contains the `token` and other credentials required for the plugin to communicate with Dyson's cloud services.
+Note that these paths are relative to the user's home directory.
 
 ## Appliance Discovery and Status
 
