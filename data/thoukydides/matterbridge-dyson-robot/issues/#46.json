@@ -1,0 +1,12 @@
+{
+    "issue_number": 46,
+    "updated_at": "2026-08-26T05:49:15.354Z",
+    "faq": [
+        {
+            "question": "Can the Dyson Spot+Scrub Ai (RB05) robot vacuum be controlled locally over the local network?",
+            "answer": "No. The Dyson Spot+Scrub Ai (RB05) does not host a local MQTT listener or open any listening network ports on the local area network (LAN).\n\nUnlike earlier Dyson robot vacuum models that allow direct local IP communication:\n- The MyDyson API does not provide a local IP address for this model.\n- The appliance connects exclusively via outbound connections to Dyson's AWS IoT cloud infrastructure.\n\nConsequently, direct local network communication cannot be established with the RB05; all control and status monitoring must operate through cloud MQTT using your Dyson account credentials.",
+            "semantic_abstract": "Dyson Spot+Scrub Ai (RB05) robotic vacuums lack an inbound local MQTT listener or open LAN ports, relying exclusively on outbound AWS IoT cloud connections. This hardware and firmware architecture prevents direct local network control and mandates cloud-based communication for device management.",
+            "hash": "0b7eb28c401aa967aa98aa878d8f206e07cca45f3f78186e0832dd137c3864d1"
+        }
+    ]
+}
