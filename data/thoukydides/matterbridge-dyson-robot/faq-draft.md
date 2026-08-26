@@ -7,10 +7,14 @@
   - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
   - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
 - **[Matterbridge](#matterbridge)**
-  - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
+  - **[New subcategory](#new-subcategory)**
+    - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
+  - **[Manual Authentication and Configuration](#manual-authentication-and-configuration)**
 - **[Appliance Discovery and Status](#appliance-discovery-and-status)**
-  - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
-  - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
+  - **[New subcategory](#new-subcategory)**
+    - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
+    - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
+  - **[Dyson 360 Vis Nav (RB05) Connectivity and Status](#dyson-360-vis-nav-rb05-connectivity-and-status)**
 - **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
   - [Why can only one part of the appliance be moved to a different room in Apple Home?](#why-can-only-one-part-of-the-appliance-be-moved-to-a-different-room-in-apple-home)
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
@@ -52,6 +56,8 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 ## Matterbridge
 
+### New subcategory
+
 #### Why does `matterbridge-dyson-robot` report an older version in logs after an update?
 
 <!-- INCLUDES: issue-16-09f2 -->
@@ -63,7 +69,21 @@ To ensure you are running the latest version:
 2. Check the version number reported in the log with a `[Dyson Robot]` prefix during startup; this is the definitive version of the plugin instance currently running.
 3. If the issue persists, uninstall and then reinstall the `matterbridge-dyson-robot` plugin to clear any cached files or lingering older files.
 
+### Manual Authentication and Configuration
+
+#### 🚧 Where is the `libdyson` configuration file located for manual token retrieval? 🚧
+
+<!-- INCLUDES: issue-46-a42b -->
+The location of the `config.yml` file used by `libdyson` varies depending on your operating system:
+
+- **Linux**: `~/.config/libdyson/config.yml` 
+- **macOS**: `~/Library/Application Support/libdyson/config.yml` 
+
+This file contains the `token` and other credentials required for the plugin to communicate with Dyson's cloud services.
+
 ## Appliance Discovery and Status
+
+### New subcategory
 
 #### Why does the plugin still log details for appliances I have blacklisted?
 
@@ -83,6 +103,39 @@ To address this behaviour:
 1. Check your log files for `Subscription cancelled by peer` or `Subscription canceled by peer, re-announce` messages. This confirms the issue is at the Matter layer rather than the plugin communication with the Dyson vacuum.
 2. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
 3. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer.
+
+### Dyson 360 Vis Nav (RB05) Connectivity and Status
+
+#### 🚧 Why can't I connect to my Dyson Spot+Scrub Ai (RB05) locally? 🚧
+
+<!-- INCLUDES: issue-46-42f9 -->
+The Dyson Spot+Scrub Ai (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API.
+
+#### 🚧 Why does my RB05 show status codes in the fault field during normal cleaning? 🚧
+
+<!-- INCLUDES: issue-46-d0fb -->
+The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors. 
+
+Known informational codes include:
+- `2101`: Charging during a clean
+- `2103`: Dock busy (washing or drying the mop)
+- `2108`: Discovering (stationary rotation after resuming)
+- `2109`: Running a full clean
+
+Actual faults that require user intervention, such as being stuck, use different codes (e.g., `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions.
+
+#### 🚧 Why does `opendyson listen` fail to show status messages for the RB05? 🚧
+
+<!-- INCLUDES: issue-46-dbac -->
+The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots. 
+
+- **Topic Structure**: The device publishes state information to `RB05/<serial>/status` instead of the `status/current` or `status/fault` topics used by other models.
+- **Polling Requirement**: The RB05 does not automatically push full state updates. It must be explicitly polled using a `REQUEST-CURRENT-STATE` command. If the device is not being actively polled (for example, by the MyDyson app or the plugin), it will only broadcast minimal position updates while moving.
+
+#### 🚧 What are the automatic charging thresholds for the RB05 robot? 🚧
+
+<!-- INCLUDES: issue-46-6cfa -->
+The RB05 model is programmed with specific battery thresholds for autonomous operation. It will stop cleaning and return to the dock to recharge (`FULL_CLEAN_NEEDS_CHARGE`) when the battery level drops to 7%. Once docked, it will not resume the cleaning task until it has reached a 60% charge level.
 
 ## Apple Home and HomeKit Mapping
 
