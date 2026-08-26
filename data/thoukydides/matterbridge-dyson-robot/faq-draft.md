@@ -16,6 +16,10 @@
     - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
     - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
   - **[Dyson 360 Vis Nav (RB05) Connectivity and Status](#dyson-360-vis-nav-rb05-connectivity-and-status)**
+    - [Why can't I connect to my Dyson 360 Vis Nav (RB05) locally?](#why-cant-i-connect-to-my-dyson-360-vis-nav-rb05-locally)
+    - [Why does my RB05 show status codes in the fault field during normal cleaning?](#why-does-my-rb05-show-status-codes-in-the-fault-field-during-normal-cleaning)
+    - [Why does `opendyson listen` fail to show status messages for the RB05?](#why-does-opendyson-listen-fail-to-show-status-messages-for-the-rb05)
+    - [What are the automatic charging thresholds for the RB05 robot?](#what-are-the-automatic-charging-thresholds-for-the-rb05-robot)
 - **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
   - [Why can only one part of the appliance be moved to a different room in Apple Home?](#why-can-only-one-part-of-the-appliance-be-moved-to-a-different-room-in-apple-home)
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
@@ -109,15 +113,15 @@ To address this behaviour:
 
 ### Dyson 360 Vis Nav (RB05) Connectivity and Status
 
-#### 🚧 Why can't I connect to my Dyson Spot+Scrub Ai (RB05) locally? 🚧
+#### Why can't I connect to my Dyson 360 Vis Nav (RB05) locally?
 
 <!-- INCLUDES: issue-46-42f9 -->
-The Dyson Spot+Scrub Ai (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API.
+The Dyson 360 Vis Nav (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API.
 
-#### 🚧 Why does my RB05 show status codes in the fault field during normal cleaning? 🚧
+#### Why does my RB05 show status codes in the fault field during normal cleaning?
 
 <!-- INCLUDES: issue-46-d0fb -->
-The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors. 
+The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors.
 
 Known informational codes include:
 - `2101`: Charging during a clean
@@ -125,17 +129,17 @@ Known informational codes include:
 - `2108`: Discovering (stationary rotation after resuming)
 - `2109`: Running a full clean
 
-Actual faults that require user intervention, such as being stuck, use different codes (e.g., `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions.
+Actual faults that require user intervention, such as being stuck, use different codes (e.g. `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions.
 
-#### 🚧 Why does `opendyson listen` fail to show status messages for the RB05? 🚧
+#### Why does `opendyson listen` fail to show status messages for the RB05?
 
 <!-- INCLUDES: issue-46-dbac -->
-The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots. 
+The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots.
 
 - **Topic Structure**: The device publishes state information to `RB05/<serial>/status` instead of the `status/current` or `status/fault` topics used by other models.
 - **Polling Requirement**: The RB05 does not automatically push full state updates. It must be explicitly polled using a `REQUEST-CURRENT-STATE` command. If the device is not being actively polled (for example, by the MyDyson app or the plugin), it will only broadcast minimal position updates while moving.
 
-#### 🚧 What are the automatic charging thresholds for the RB05 robot? 🚧
+#### What are the automatic charging thresholds for the RB05 robot?
 
 <!-- INCLUDES: issue-46-6cfa -->
 The RB05 model is programmed with specific battery thresholds for autonomous operation. It will stop cleaning and return to the dock to recharge (`FULL_CLEAN_NEEDS_CHARGE`) when the battery level drops to 7%. Once docked, it will not resume the cleaning task until it has reached a 60% charge level.

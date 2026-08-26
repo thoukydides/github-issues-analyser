@@ -126,33 +126,37 @@
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [],
-                            "candidates": [
+                            "entries": [
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-42f9",
-                                    "question": "Why can't I connect to my Dyson Spot+Scrub Ai (RB05) locally?",
-                                    "answer": "The Dyson Spot+Scrub Ai (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API."
+                                    "question": "Why can't I connect to my Dyson 360 Vis Nav (RB05) locally?",
+                                    "answer": "The Dyson 360 Vis Nav (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API.",
+                                    "included_ids": [
+                                        "issue-46-42f9"
+                                    ]
                                 },
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-d0fb",
                                     "question": "Why does my RB05 show status codes in the fault field during normal cleaning?",
-                                    "answer": "The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors. \n\nKnown informational codes include:\n- `2101`: Charging during a clean\n- `2103`: Dock busy (washing or drying the mop)\n- `2108`: Discovering (stationary rotation after resuming)\n- `2109`: Running a full clean\n\nActual faults that require user intervention, such as being stuck, use different codes (e.g., `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions."
+                                    "answer": "The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors.\n\nKnown informational codes include:\n- `2101`: Charging during a clean\n- `2103`: Dock busy (washing or drying the mop)\n- `2108`: Discovering (stationary rotation after resuming)\n- `2109`: Running a full clean\n\nActual faults that require user intervention, such as being stuck, use different codes (e.g. `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions.",
+                                    "included_ids": [
+                                        "issue-46-d0fb"
+                                    ]
                                 },
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-dbac",
                                     "question": "Why does `opendyson listen` fail to show status messages for the RB05?",
-                                    "answer": "The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots. \n\n- **Topic Structure**: The device publishes state information to `RB05/<serial>/status` instead of the `status/current` or `status/fault` topics used by other models.\n- **Polling Requirement**: The RB05 does not automatically push full state updates. It must be explicitly polled using a `REQUEST-CURRENT-STATE` command. If the device is not being actively polled (for example, by the MyDyson app or the plugin), it will only broadcast minimal position updates while moving."
+                                    "answer": "The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots.\n\n- **Topic Structure**: The device publishes state information to `RB05/<serial>/status` instead of the `status/current` or `status/fault` topics used by other models.\n- **Polling Requirement**: The RB05 does not automatically push full state updates. It must be explicitly polled using a `REQUEST-CURRENT-STATE` command. If the device is not being actively polled (for example, by the MyDyson app or the plugin), it will only broadcast minimal position updates while moving.",
+                                    "included_ids": [
+                                        "issue-46-dbac"
+                                    ]
                                 },
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-6cfa",
                                     "question": "What are the automatic charging thresholds for the RB05 robot?",
-                                    "answer": "The RB05 model is programmed with specific battery thresholds for autonomous operation. It will stop cleaning and return to the dock to recharge (`FULL_CLEAN_NEEDS_CHARGE`) when the battery level drops to 7%. Once docked, it will not resume the cleaning task until it has reached a 60% charge level."
+                                    "answer": "The RB05 model is programmed with specific battery thresholds for autonomous operation. It will stop cleaning and return to the dock to recharge (`FULL_CLEAN_NEEDS_CHARGE`) when the battery level drops to 7%. Once docked, it will not resume the cleaning task until it has reached a 60% charge level.",
+                                    "included_ids": [
+                                        "issue-46-6cfa"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
