@@ -1,12 +1,36 @@
 {
     "issue_number": 46,
-    "updated_at": "2026-08-26T05:49:15.354Z",
+    "updated_at": "2026-08-26T07:07:30.475Z",
     "faq": [
         {
-            "question": "Can the Dyson Spot+Scrub Ai (RB05) robot vacuum be controlled locally over the local network?",
-            "answer": "No. The Dyson Spot+Scrub Ai (RB05) does not host a local MQTT listener or open any listening network ports on the local area network (LAN).\n\nUnlike earlier Dyson robot vacuum models that allow direct local IP communication:\n- The MyDyson API does not provide a local IP address for this model.\n- The appliance connects exclusively via outbound connections to Dyson's AWS IoT cloud infrastructure.\n\nConsequently, direct local network communication cannot be established with the RB05; all control and status monitoring must operate through cloud MQTT using your Dyson account credentials.",
-            "semantic_abstract": "Dyson Spot+Scrub Ai (RB05) robotic vacuums lack an inbound local MQTT listener or open LAN ports, relying exclusively on outbound AWS IoT cloud connections. This hardware and firmware architecture prevents direct local network control and mandates cloud-based communication for device management.",
-            "hash": "0b7eb28c401aa967aa98aa878d8f206e07cca45f3f78186e0832dd137c3864d1"
+            "question": "Why can't I connect to my Dyson Spot+Scrub Ai (RB05) locally?",
+            "answer": "The Dyson Spot+Scrub Ai (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API.",
+            "semantic_abstract": "Dyson RB05 model hardware lacks a local MQTT listener, relying exclusively on outbound AWS IoT cloud connections for communication. This architectural shift prevents local network discovery and direct IP-based control, necessitating cloud-based interaction through the Dyson API.",
+            "hash": "42f90153ea9f5fd213eed21726c6248118e444e5c68e11d8445fe98be49750f9"
+        },
+        {
+            "question": "Why does my RB05 show status codes in the fault field during normal cleaning?",
+            "answer": "The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors. \n\nKnown informational codes include:\n- `2101`: Charging during a clean\n- `2103`: Dock busy (washing or drying the mop)\n- `2108`: Discovering (stationary rotation after resuming)\n- `2109`: Running a full clean\n\nActual faults that require user intervention, such as being stuck, use different codes (e.g., `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions.",
+            "semantic_abstract": "RB05 firmware utilises the `activeFaults` MQTT field to communicate operational status via numeric codes (21xx series) rather than exclusively reporting hardware failures. This requires specific mapping logic to ensure informational states are not misinterpreted as device errors in HomeKit.",
+            "hash": "d0fb83010f29e18bc1b3758f40dbda8875f0310504ee30ddc3b61c64fd04f1a0"
+        },
+        {
+            "question": "Why does `opendyson listen` fail to show status messages for the RB05?",
+            "answer": "The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots. \n\n- **Topic Structure**: The device publishes state information to `RB05/<serial>/status` instead of the `status/current` or `status/fault` topics used by other models.\n- **Polling Requirement**: The RB05 does not automatically push full state updates. It must be explicitly polled using a `REQUEST-CURRENT-STATE` command. If the device is not being actively polled (for example, by the MyDyson app or the plugin), it will only broadcast minimal position updates while moving.",
+            "semantic_abstract": "Dyson RB05 MQTT communication deviates from previous models by using a simplified status topic and requiring explicit polling via `REQUEST-CURRENT-STATE`. The device does not autonomously broadcast full state updates, leading to silent failures when using standard subscription patterns.",
+            "hash": "dbaca12342e84ba0dbf73b450d76f1df6aef17ada4ebfe71ffaa2d71891fae5e"
+        },
+        {
+            "question": "Where is the `libdyson` configuration file located for manual token retrieval?",
+            "answer": "The location of the `config.yml` file used by `libdyson` varies depending on your operating system:\n\n- **Linux**: `~/.config/libdyson/config.yml` \n- **macOS**: `~/Library/Application Support/libdyson/config.yml` \n\nThis file contains the `token` and other credentials required for the plugin to communicate with Dyson's cloud services.",
+            "semantic_abstract": "Configuration and authentication data for `libdyson` is stored in platform-specific directories, following standard OS conventions for user application support and configuration storage.",
+            "hash": "a42b9d2b633a6238d66a0244f066dd1b5334ebe6d082906a478502a4b4c016cc"
+        },
+        {
+            "question": "What are the automatic charging thresholds for the RB05 robot?",
+            "answer": "The RB05 model is programmed with specific battery thresholds for autonomous operation. It will stop cleaning and return to the dock to recharge (`FULL_CLEAN_NEEDS_CHARGE`) when the battery level drops to 7%. Once docked, it will not resume the cleaning task until it has reached a 60% charge level.",
+            "semantic_abstract": "RB05 power management firmware enforces specific state transitions based on battery percentage, with a 7% lower threshold for dock return and a 60% upper threshold for task resumption.",
+            "hash": "6cfadf908893ffb8ef510c05a66573b3fc9c43db50cfe512ae7a4ab146cfa7b0"
         }
     ]
 }
