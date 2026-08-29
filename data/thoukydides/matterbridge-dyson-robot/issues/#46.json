@@ -1,36 +1,30 @@
 {
     "issue_number": 46,
-    "updated_at": "2026-08-26T07:07:30.475Z",
+    "updated_at": "2026-08-29T11:39:27.776Z",
     "faq": [
         {
-            "question": "Why can't I connect to my Dyson Spot+Scrub Ai (RB05) locally?",
-            "answer": "The Dyson Spot+Scrub Ai (RB05) does not feature a local MQTT listener or any open ports for local communication. Unlike older models such as the RB01, RB02, or RB03, this model connects exclusively via outbound AWS IoT cloud connections. Consequently, local network discovery and direct IP-based control are not possible; the plugin must communicate with the device through the Dyson cloud API.",
-            "semantic_abstract": "Dyson RB05 model hardware lacks a local MQTT listener, relying exclusively on outbound AWS IoT cloud connections for communication. This architectural shift prevents local network discovery and direct IP-based control, necessitating cloud-based interaction through the Dyson API.",
-            "hash": "42f90153ea9f5fd213eed21726c6248118e444e5c68e11d8445fe98be49750f9"
+            "question": "Why does my Dyson Spot+Scrub Ai (RB05) show no open ports or local IP address?",
+            "answer": "The Dyson Spot+Scrub Ai (RB05) does not support local MQTT connections. Unlike many earlier Dyson models, this device lacks a local listener and does not expose a local IP for communication. It connects outbound exclusively to the AWS IoT cloud platform. Consequently, the plugin must interact with the robot via the Dyson cloud API rather than a direct local network connection.",
+            "semantic_abstract": "The Dyson Spot+Scrub Ai (RB05) hardware architecture lacks a local MQTT listener, necessitating cloud-only communication via AWS IoT and preventing local network control or discovery as observed in previous robot generations.",
+            "hash": "ea4d7b5b92ef71d6ec0d83004b23d5d98c92764a42d39c8984495a1a467da82a"
         },
         {
-            "question": "Why does my RB05 show status codes in the fault field during normal cleaning?",
-            "answer": "The RB05 firmware utilises the `activeFaults` field to report the robot's current activity using numeric codes, many of which do not represent errors. \n\nKnown informational codes include:\n- `2101`: Charging during a clean\n- `2103`: Dock busy (washing or drying the mop)\n- `2108`: Discovering (stationary rotation after resuming)\n- `2109`: Running a full clean\n\nActual faults that require user intervention, such as being stuck, use different codes (e.g., `568`). The plugin is designed to interpret these 21xx series codes as operational states rather than error conditions.",
-            "semantic_abstract": "RB05 firmware utilises the `activeFaults` MQTT field to communicate operational status via numeric codes (21xx series) rather than exclusively reporting hardware failures. This requires specific mapping logic to ensure informational states are not misinterpreted as device errors in HomeKit.",
-            "hash": "d0fb83010f29e18bc1b3758f40dbda8875f0310504ee30ddc3b61c64fd04f1a0"
+            "question": "Why does the status of my Dyson RB05 robot appear to lag or require polling?",
+            "answer": "Unlike previous models that pushed state updates automatically, the RB05 firmware does not push full state updates over MQTT. To maintain an accurate status, the plugin implements a configurable status polling interval (mirroring the behaviour of the official MyDyson app). If you observe a delay in status updates, it is due to this technical requirement to poll the device rather than receiving real-time pushes.",
+            "semantic_abstract": "Dyson RB05 firmware constraints prevent automatic state pushing via MQTT, requiring the plugin to implement periodic polling of the `CURRENT-STATE` message to synchronize device status with Matter and HomeKit.",
+            "hash": "9f57f0f60845570d06e576a1618e1090bdd157a33ad785aa92c8ef721735561f"
         },
         {
-            "question": "Why does `opendyson listen` fail to show status messages for the RB05?",
-            "answer": "The RB05 uses a different MQTT topic structure and reporting behaviour compared to earlier Dyson robots. \n\n- **Topic Structure**: The device publishes state information to `RB05/<serial>/status` instead of the `status/current` or `status/fault` topics used by other models.\n- **Polling Requirement**: The RB05 does not automatically push full state updates. It must be explicitly polled using a `REQUEST-CURRENT-STATE` command. If the device is not being actively polled (for example, by the MyDyson app or the plugin), it will only broadcast minimal position updates while moving.",
-            "semantic_abstract": "Dyson RB05 MQTT communication deviates from previous models by using a simplified status topic and requiring explicit polling via `REQUEST-CURRENT-STATE`. The device does not autonomously broadcast full state updates, leading to silent failures when using standard subscription patterns.",
-            "hash": "dbaca12342e84ba0dbf73b450d76f1df6aef17ada4ebfe71ffaa2d71891fae5e"
+            "question": "Why are status codes like `2109` or `2101` appearing in my Dyson RB05 logs as faults?",
+            "answer": "The RB05 utilizes the `activeFaults` MQTT channel to report both actual errors and general operational status. Many codes in the `21xx` range represent normal activities, such as `2109` for running or `2101` for charging, and are often flagged as `LOG_ONLY`. The plugin is designed to filter these operational codes to ensure the robot does not incorrectly show a fault state in HomeKit during normal cleaning cycles.",
+            "semantic_abstract": "Dyson RB05 uses the `activeFaults` data field for general operational telemetry, requiring the plugin to differentiate between `LOG_ONLY` status updates and actual hardware faults requiring user intervention.",
+            "hash": "990d7586c8cd5aa9853bd3d848e82fd2fdb72a41ae324560ff81e5bc50b8105e"
         },
         {
-            "question": "Where is the `libdyson` configuration file located for manual token retrieval?",
-            "answer": "The location of the `config.yml` file used by `libdyson` varies depending on your operating system:\n\n- **Linux**: `~/.config/libdyson/config.yml` \n- **macOS**: `~/Library/Application Support/libdyson/config.yml` \n\nThis file contains the `token` and other credentials required for the plugin to communicate with Dyson's cloud services.",
-            "semantic_abstract": "Configuration and authentication data for `libdyson` is stored in platform-specific directories, following standard OS conventions for user application support and configuration storage.",
-            "hash": "a42b9d2b633a6238d66a0244f066dd1b5334ebe6d082906a478502a4b4c016cc"
-        },
-        {
-            "question": "What are the automatic charging thresholds for the RB05 robot?",
-            "answer": "The RB05 model is programmed with specific battery thresholds for autonomous operation. It will stop cleaning and return to the dock to recharge (`FULL_CLEAN_NEEDS_CHARGE`) when the battery level drops to 7%. Once docked, it will not resume the cleaning task until it has reached a 60% charge level.",
-            "semantic_abstract": "RB05 power management firmware enforces specific state transitions based on battery percentage, with a 7% lower threshold for dock return and a 60% upper threshold for task resumption.",
-            "hash": "6cfadf908893ffb8ef510c05a66573b3fc9c43db50cfe512ae7a4ab146cfa7b0"
+            "question": "Where is the `libdyson` configuration file located on macOS?",
+            "answer": "The location of the `config.yml` file depends on your operating system's standard configuration paths:\n- On **macOS**: `~/Library/Application Support/libdyson/config.yml` \n- On **Linux**: `~/.config/libdyson/config.yml` \n\nThis file is used to store the `token` and other credentials necessary for the plugin to authenticate with the Dyson API.",
+            "semantic_abstract": "The `libdyson` configuration file path varies by operating system according to platform-specific user configuration directory conventions, impacting where users locate credentials for plugin configuration.",
+            "hash": "d0b73c3b3b1a0361f835fdd177336b0b73d1cbb200251ceaa69b53076eb9b96d"
         }
     ]
 }
