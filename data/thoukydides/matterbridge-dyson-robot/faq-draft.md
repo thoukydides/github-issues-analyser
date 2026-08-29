@@ -2,11 +2,13 @@
 
 <!-- TOC-START -->
 - **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**
-  - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
-  - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
-  - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
-  - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
-  - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
+  - **[New subcategory](#new-subcategory)**
+    - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
+    - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
+    - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
+    - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
+    - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
+  - **[Dyson Spot+Scrub Ai (RB05) Limitations and Behaviours](#dyson-spotscrub-ai-rb05-limitations-and-behaviours)**
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -17,6 +19,8 @@
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
+
+### New subcategory
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
@@ -38,7 +42,6 @@ The information required depends on the device type and the specific feature bei
 
 #### Where is the `libdyson` configuration file located?
 
-<!-- INCLUDES: issue-46-a42b -->
 When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
 
 The location of this file depends on the operating system:
@@ -61,6 +64,28 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
+
+### Dyson Spot+Scrub Ai (RB05) Limitations and Behaviours
+
+#### 🚧 Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network? 🚧
+
+<!-- INCLUDES: issue-46-ba43 -->
+The Dyson Spot+Scrub Ai (RB05) hardware does not host a local listener or open any ports on the local network. Unlike earlier models, it communicates exclusively via outbound connections to AWS IoT. Consequently, local provisioning and local-only control methods are not possible for this device; the plugin must interact with it through the cloud infrastructure.
+
+#### 🚧 Why does the status of my Dyson RB05 robot lag or fail to update in HomeKit? 🚧
+
+<!-- INCLUDES: issue-46-1dd6 -->
+The RB05 firmware does not push comprehensive state updates automatically via MQTT. While the robot pushes position data frequently while moving, it only provides full status information when explicitly requested. To maintain accurate status in HomeKit, the plugin implements a configurable polling interval specifically for this model to periodically fetch the current state from the device.
+
+#### 🚧 Why does my Dyson RB05 report faults when it is performing a normal cleaning run? 🚧
+
+<!-- INCLUDES: issue-46-85df -->
+The RB05 uses the `activeFaults` MQTT field to report operational status messages in addition to actual hardware errors. For example, status codes for `FULL_CLEAN_RUNNING` or `WASHING_MOP` are sent through this channel. The plugin is configured to filter these `LOG_ONLY` messages to ensure that only genuine hardware faults that require user intervention are surfaced in HomeKit.
+
+#### 🚧 Why are zone cleaning and cleaning maps not available for the Dyson RB05? 🚧
+
+<!-- INCLUDES: issue-46-04fc -->
+The Dyson Spot+Scrub Ai (RB05) uses a different non-MQTT cloud API for zone management and map rendering compared to previous models. Because these features are handled outside of the standard MQTT protocol used for basic controls, they require specific reverse engineering of the MyDyson API for this model. Until this API mapping is completed, zone selection and map visualisation are not supported.
 
 ## Matterbridge
 
@@ -108,4 +133,4 @@ The Apple Home app only supports simple Matter devices correctly. When multiple 
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-42f9 issue-46-6cfa issue-46-d0fb issue-46-dbac -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
