@@ -9,6 +9,10 @@
     - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
     - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
   - **[Dyson Spot+Scrub Ai (RB05) Limitations and Behaviours](#dyson-spotscrub-ai-rb05-limitations-and-behaviours)**
+    - [Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network?](#why-is-my-dyson-spotscrub-ai-rb05-robot-not-detected-on-my-local-network)
+    - [Why does the status of my Dyson RB05 robot lag or fail to update in HomeKit?](#why-does-the-status-of-my-dyson-rb05-robot-lag-or-fail-to-update-in-homekit)
+    - [Why does my Dyson RB05 report faults when it is performing a normal cleaning run?](#why-does-my-dyson-rb05-report-faults-when-it-is-performing-a-normal-cleaning-run)
+    - [Why are zone cleaning and cleaning maps not available for the Dyson RB05?](#why-are-zone-cleaning-and-cleaning-maps-not-available-for-the-dyson-rb05)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -67,22 +71,22 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 ### Dyson Spot+Scrub Ai (RB05) Limitations and Behaviours
 
-#### 🚧 Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network? 🚧
+#### Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network?
 
 <!-- INCLUDES: issue-46-ba43 -->
 The Dyson Spot+Scrub Ai (RB05) hardware does not host a local listener or open any ports on the local network. Unlike earlier models, it communicates exclusively via outbound connections to AWS IoT. Consequently, local provisioning and local-only control methods are not possible for this device; the plugin must interact with it through the cloud infrastructure.
 
-#### 🚧 Why does the status of my Dyson RB05 robot lag or fail to update in HomeKit? 🚧
+#### Why does the status of my Dyson RB05 robot lag or fail to update in HomeKit?
 
 <!-- INCLUDES: issue-46-1dd6 -->
 The RB05 firmware does not push comprehensive state updates automatically via MQTT. While the robot pushes position data frequently while moving, it only provides full status information when explicitly requested. To maintain accurate status in HomeKit, the plugin implements a configurable polling interval specifically for this model to periodically fetch the current state from the device.
 
-#### 🚧 Why does my Dyson RB05 report faults when it is performing a normal cleaning run? 🚧
+#### Why does my Dyson RB05 report faults when it is performing a normal cleaning run?
 
 <!-- INCLUDES: issue-46-85df -->
 The RB05 uses the `activeFaults` MQTT field to report operational status messages in addition to actual hardware errors. For example, status codes for `FULL_CLEAN_RUNNING` or `WASHING_MOP` are sent through this channel. The plugin is configured to filter these `LOG_ONLY` messages to ensure that only genuine hardware faults that require user intervention are surfaced in HomeKit.
 
-#### 🚧 Why are zone cleaning and cleaning maps not available for the Dyson RB05? 🚧
+#### Why are zone cleaning and cleaning maps not available for the Dyson RB05?
 
 <!-- INCLUDES: issue-46-04fc -->
 The Dyson Spot+Scrub Ai (RB05) uses a different non-MQTT cloud API for zone management and map rendering compared to previous models. Because these features are handled outside of the standard MQTT protocol used for basic controls, they require specific reverse engineering of the MyDyson API for this model. Until this API mapping is completed, zone selection and map visualisation are not supported.
