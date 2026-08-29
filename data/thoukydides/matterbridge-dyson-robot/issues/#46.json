@@ -1,30 +1,30 @@
 {
     "issue_number": 46,
-    "updated_at": "2026-08-29T11:39:27.776Z",
+    "updated_at": "2026-08-29T15:45:03.418Z",
     "faq": [
         {
-            "question": "Why does my Dyson Spot+Scrub Ai (RB05) show no open ports or local IP address?",
-            "answer": "The Dyson Spot+Scrub Ai (RB05) does not support local MQTT connections. Unlike many earlier Dyson models, this device lacks a local listener and does not expose a local IP for communication. It connects outbound exclusively to the AWS IoT cloud platform. Consequently, the plugin must interact with the robot via the Dyson cloud API rather than a direct local network connection.",
-            "semantic_abstract": "The Dyson Spot+Scrub Ai (RB05) hardware architecture lacks a local MQTT listener, necessitating cloud-only communication via AWS IoT and preventing local network control or discovery as observed in previous robot generations.",
-            "hash": "ea4d7b5b92ef71d6ec0d83004b23d5d98c92764a42d39c8984495a1a467da82a"
+            "question": "Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network?",
+            "answer": "The Dyson Spot+Scrub Ai (RB05) hardware does not host a local listener or open any ports on the local network. Unlike earlier models, it communicates exclusively via outbound connections to AWS IoT. Consequently, local provisioning and local-only control methods are not possible for this device; the plugin must interact with it through the cloud infrastructure.",
+            "semantic_abstract": "Dyson Spot+Scrub Ai (RB05) robots lack a local network listener, communicating exclusively via outbound AWS IoT connections. This prevents local control or discovery methods, requiring all interactions to be routed through Dyson cloud services.",
+            "hash": "ba437db9d8674195e35bbed114044f159e49466e051d86c93c711ad512f8fe08"
         },
         {
-            "question": "Why does the status of my Dyson RB05 robot appear to lag or require polling?",
-            "answer": "Unlike previous models that pushed state updates automatically, the RB05 firmware does not push full state updates over MQTT. To maintain an accurate status, the plugin implements a configurable status polling interval (mirroring the behaviour of the official MyDyson app). If you observe a delay in status updates, it is due to this technical requirement to poll the device rather than receiving real-time pushes.",
-            "semantic_abstract": "Dyson RB05 firmware constraints prevent automatic state pushing via MQTT, requiring the plugin to implement periodic polling of the `CURRENT-STATE` message to synchronize device status with Matter and HomeKit.",
-            "hash": "9f57f0f60845570d06e576a1618e1090bdd157a33ad785aa92c8ef721735561f"
+            "question": "Why does the status of my Dyson RB05 robot lag or fail to update in HomeKit?",
+            "answer": "The RB05 firmware does not push comprehensive state updates automatically via MQTT. While the robot pushes position data frequently while moving, it only provides full status information when explicitly requested. To maintain accurate status in HomeKit, the plugin implements a configurable polling interval specifically for this model to periodically fetch the current state from the device.",
+            "semantic_abstract": "Dyson RB05 firmware does not broadcast full state updates over MQTT, providing only asynchronous position data. The plugin requires periodic status polling to synchronise device state with Matterbridge and HomeKit, unlike earlier models that push state changes.",
+            "hash": "1dd65e18f6d645730aa9f62e1bd9786842767c0dbb0c65e26e1d58825987d48a"
         },
         {
-            "question": "Why are status codes like `2109` or `2101` appearing in my Dyson RB05 logs as faults?",
-            "answer": "The RB05 utilizes the `activeFaults` MQTT channel to report both actual errors and general operational status. Many codes in the `21xx` range represent normal activities, such as `2109` for running or `2101` for charging, and are often flagged as `LOG_ONLY`. The plugin is designed to filter these operational codes to ensure the robot does not incorrectly show a fault state in HomeKit during normal cleaning cycles.",
-            "semantic_abstract": "Dyson RB05 uses the `activeFaults` data field for general operational telemetry, requiring the plugin to differentiate between `LOG_ONLY` status updates and actual hardware faults requiring user intervention.",
-            "hash": "990d7586c8cd5aa9853bd3d848e82fd2fdb72a41ae324560ff81e5bc50b8105e"
+            "question": "Why does my Dyson RB05 report faults when it is performing a normal cleaning run?",
+            "answer": "The RB05 uses the `activeFaults` MQTT field to report operational status messages in addition to actual hardware errors. For example, status codes for `FULL_CLEAN_RUNNING` or `WASHING_MOP` are sent through this channel. The plugin is configured to filter these `LOG_ONLY` messages to ensure that only genuine hardware faults that require user intervention are surfaced in HomeKit.",
+            "semantic_abstract": "The Dyson RB05 `activeFaults` MQTT field serves as a general status channel for both operational telemetry and hardware errors. The plugin must filter non-critical log-only codes to prevent normal activities from being incorrectly reported as device faults.",
+            "hash": "85df1e754edea42fe6f1eebe1bf1dbd8f12cd5b4cb2cb0a16fd0a15578fd98af"
         },
         {
-            "question": "Where is the `libdyson` configuration file located on macOS?",
-            "answer": "The location of the `config.yml` file depends on your operating system's standard configuration paths:\n- On **macOS**: `~/Library/Application Support/libdyson/config.yml` \n- On **Linux**: `~/.config/libdyson/config.yml` \n\nThis file is used to store the `token` and other credentials necessary for the plugin to authenticate with the Dyson API.",
-            "semantic_abstract": "The `libdyson` configuration file path varies by operating system according to platform-specific user configuration directory conventions, impacting where users locate credentials for plugin configuration.",
-            "hash": "d0b73c3b3b1a0361f835fdd177336b0b73d1cbb200251ceaa69b53076eb9b96d"
+            "question": "Why are zone cleaning and cleaning maps not available for the Dyson RB05?",
+            "answer": "The Dyson Spot+Scrub Ai (RB05) uses a different non-MQTT cloud API for zone management and map rendering compared to previous models. Because these features are handled outside of the standard MQTT protocol used for basic controls, they require specific reverse engineering of the MyDyson API for this model. Until this API mapping is completed, zone selection and map visualisation are not supported.",
+            "semantic_abstract": "Zone cleaning and map rendering for Dyson RB05 models are managed via a model-specific HTTPS API rather than the MQTT stream. These features remain limited until the distinct API structures used by the RB05 are fully mapped and implemented in the plugin.",
+            "hash": "04fc1c7eb3f6893cb26686fd2080222816911177a6282649d2f614252da6e975"
         }
     ]
 }
