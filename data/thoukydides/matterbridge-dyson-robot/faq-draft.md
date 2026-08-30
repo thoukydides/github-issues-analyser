@@ -10,7 +10,7 @@
     - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
   - **[Dyson Spot+Scrub Ai (RB05) Limitations and Behaviours](#dyson-spotscrub-ai-rb05-limitations-and-behaviours)**
     - [Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network?](#why-is-my-dyson-spotscrub-ai-rb05-robot-not-detected-on-my-local-network)
-    - [Why does the status of my Dyson RB05 robot lag or fail to update in HomeKit?](#why-does-the-status-of-my-dyson-rb05-robot-lag-or-fail-to-update-in-homekit)
+    - [Why does the status of my Dyson RB05 robot lag or fail to update in the smart home app?](#why-does-the-status-of-my-dyson-rb05-robot-lag-or-fail-to-update-in-the-smart-home-app)
     - [Why does my Dyson RB05 report faults when it is performing a normal cleaning run?](#why-does-my-dyson-rb05-report-faults-when-it-is-performing-a-normal-cleaning-run)
     - [Why are zone cleaning and cleaning maps not available for the Dyson RB05?](#why-are-zone-cleaning-and-cleaning-maps-not-available-for-the-dyson-rb05)
 - **[Matterbridge](#matterbridge)**
@@ -73,34 +73,30 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 #### Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network?
 
-The Dyson Spot+Scrub Ai (RB05) hardware does not host a local listener or open any ports on the local network. Unlike earlier models, it communicates exclusively via outbound connections to AWS IoT. Consequently, local provisioning and local-only control methods are not possible for this device; the plugin must interact with it through the cloud infrastructure.
+<!-- INCLUDES: issue-46-9a90 -->
+The Dyson Spot+Scrub Ai (RB05) hardware does not host a local listener or open any ports on the local network. Unlike earlier models such as the 360 Eye, Heurist, or Vis Nav, it communicates exclusively via outbound connections to the MyDyson cloud (AWS IoT).
 
-#### Why does the status of my Dyson RB05 robot lag or fail to update in HomeKit?
+Consequently, local provisioning and local-only control methods are not possible for this device; the plugin must interact with it through the cloud infrastructure using cloud credentials. Control is not possible if the internet connection is interrupted.
 
-The RB05 firmware does not push comprehensive state updates automatically via MQTT. While the robot pushes position data frequently while moving, it only provides full status information when explicitly requested. To maintain accurate status in HomeKit, the plugin implements a configurable polling interval specifically for this model to periodically fetch the current state from the device.
+#### Why does the status of my Dyson RB05 robot lag or fail to update in the smart home app?
+
+<!-- INCLUDES: issue-46-66fd -->
+The RB05 firmware does not automatically push comprehensive state updates via MQTT when its state changes. While the robot pushes incremental position data (`globalPosition`) frequently while moving, it only provides full status information when explicitly requested.
+
+To maintain an accurate status in the Matter fabric, the plugin implements a configurable polling interval specifically for this model to periodically fetch the current state from the device. This balances responsiveness with API traffic; consequently, changes may take a few moments to reflect in HomeKit or other Matter controllers.
 
 #### Why does my Dyson RB05 report faults when it is performing a normal cleaning run?
 
-The RB05 uses the `activeFaults` MQTT field to report operational status messages in addition to actual hardware errors. For example, status codes for `FULL_CLEAN_RUNNING` or `WASHING_MOP` are sent through this channel. The plugin is configured to filter these `LOG_ONLY` messages to ensure that only genuine hardware faults that require user intervention are surfaced in HomeKit.
+<!-- INCLUDES: issue-46-7f58 -->
+The RB05 uses the `activeFaults` MQTT field to report operational status messages in addition to actual hardware errors. For example, status codes in the 21xx series, such as `2109` (`FULL_CLEAN_RUNNING`) or `2101` (`WASHING_MOP` or charging), are sent through this channel.
+
+The plugin is configured to identify and filter these `LOG_ONLY` messages to ensure that only genuine hardware faults requiring user intervention are surfaced.
 
 #### Why are zone cleaning and cleaning maps not available for the Dyson RB05?
 
-The Dyson Spot+Scrub Ai (RB05) uses a different non-MQTT cloud API for zone management and map rendering compared to previous models. Because these features are handled outside of the standard MQTT protocol used for basic controls, they require specific reverse engineering of the MyDyson API for this model. Until this API mapping is completed, zone selection and map visualisation are not supported.
+The Dyson Spot+Scrub Ai (RB05) uses a different non-MQTT cloud API for zone management and map rendering compared to previous models. Because these features are handled outside of the standard MQTT protocol used for basic controls, they require specific reverse engineering of the MyDyson API for this model.
 
-#### 🚧 Why does the Dyson Spot+Scrub Ai (RB05) not support local control? 🚧
-
-<!-- INCLUDES: issue-46-9a90 -->
-Unlike earlier Dyson robot models such as the 360 Eye, Heurist, or Vis Nav, the Spot+Scrub Ai (RB05) does not host a local MQTT listener or expose any open ports on the local network. It communicates exclusively via outbound connections to the MyDyson cloud (AWS IoT). This means the plugin must use cloud credentials to interact with the device, and control is not possible if the internet connection is interrupted.
-
-#### 🚧 Why does the Dyson Spot+Scrub Ai (RB05) status update slower than other models? 🚧
-
-<!-- INCLUDES: issue-46-66fd -->
-The RB05 firmware does not automatically push a full status update over MQTT when its state changes. Instead, it primarily pushes incremental position data (`globalPosition`) while moving. To maintain an accurate status in the Matter fabric, the plugin must periodically poll the device for its full state. A status polling interval is used for this model to balance responsiveness with API traffic; consequently, changes may take a few moments to reflect in your smart home app.
-
-#### 🚧 Why are some Dyson Spot+Scrub Ai (RB05) faults ignored by the plugin? 🚧
-
-<!-- INCLUDES: issue-46-7f58 -->
-The RB05 uses the `activeFaults` MQTT field to report both actual hardware errors and routine operational status codes. Many of these codes, such as those in the 21xx series (e.g., `2109` for running or `2101` for charging), represent normal behaviour rather than issues requiring user intervention. The plugin identifies and ignores codes marked as `LOG_ONLY` to prevent the device from appearing in a permanent error state during normal cleaning or docking operations.
+Until this API mapping is completed, zone selection and map visualisation are not supported.
 
 ## Matterbridge
 
