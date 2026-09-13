@@ -1,24 +1,24 @@
 {
     "issue_number": 46,
-    "updated_at": "2026-08-30T10:28:22.422Z",
+    "updated_at": "2026-09-13T10:16:34.887Z",
     "faq": [
         {
-            "question": "Why does the Dyson Spot+Scrub Ai (RB05) not support local control?",
-            "answer": "Unlike earlier Dyson robot models such as the 360 Eye, Heurist, or Vis Nav, the Spot+Scrub Ai (RB05) does not host a local MQTT listener or expose any open ports on the local network. It communicates exclusively via outbound connections to the MyDyson cloud (AWS IoT). This means the plugin must use cloud credentials to interact with the device, and control is not possible if the internet connection is interrupted.",
-            "semantic_abstract": "The Dyson Spot+Scrub Ai (RB05) hardware architecture lacks a local API or MQTT listener, necessitating a cloud-only communication path via AWS IoT. This contrasts with previous models that supported local network control, impacting offline functionality and integration methods.",
-            "hash": "9a9085466a1e54341b81eaafba18f5ff04911af3a72c5269646a7394c7f08cfe"
+            "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over the local area network?",
+            "answer": "No, local-only network communication is not possible for the Dyson Spot+Scrub Ai (RB05).\n\nEarlier Dyson robot vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) run an open local MQTT listener on the robot itself, which allows direct local LAN control without routing commands through external servers. In contrast, the Spot+Scrub Ai does not expose any open listening ports on the local network; it relies entirely on outbound connections to Dyson's AWS IoT cloud infrastructure. Communication with this model must therefore proceed via cloud MQTT.",
+            "semantic_abstract": "Network architecture differences in Dyson Spot+Scrub Ai (RB05) appliances preclude local LAN communication. Unlike previous models offering local MQTT listeners, the RB05 relies exclusively on outbound TLS connections to cloud MQTT endpoints, necessitating cloud-mediated control.",
+            "hash": "31fd3a71c95c33f7626d005963b9d59fb31b8f311113e98e37db3afe1213b48a"
         },
         {
-            "question": "Why does the Dyson Spot+Scrub Ai (RB05) status update slower than other models?",
-            "answer": "The RB05 firmware does not automatically push a full status update over MQTT when its state changes. Instead, it primarily pushes incremental position data (`globalPosition`) while moving. To maintain an accurate status in the Matter fabric, the plugin must periodically poll the device for its full state. A status polling interval is used for this model to balance responsiveness with API traffic; consequently, changes may take a few moments to reflect in your smart home app.",
-            "semantic_abstract": "Dyson RB05 firmware design prioritises incremental position updates over full state pushes, requiring the plugin to implement a polling mechanism to synchronise device status. This deviation from the push-based model of earlier generations affects the latency of status updates in the Matter fabric.",
-            "hash": "66fd1dd8fb1c6f896f13ca34425780518ed3fe1149166b84aa6e0e25f327aec5"
+            "question": "Why does the plugin need to poll the Dyson Spot+Scrub Ai (RB05) for status updates?",
+            "answer": "Unlike earlier Dyson robot models that automatically push full state telemetry over MQTT whenever state changes occur, the Spot+Scrub Ai (RB05) firmware only pushes position coordinate updates (`globalPosition`) while moving.\n\nThe complete operational state—including battery level, active cleaning mode, and dock status—is only returned by the robot in response to an explicit `REQUEST-CURRENT-STATE` command. To ensure the Matter accessory remains synchronised and accurately reflects device status, the plugin must actively poll the robot at regular intervals.",
+            "semantic_abstract": "MQTT telemetry implementation differences in the Dyson Spot+Scrub Ai (RB05) mandate active status polling by the controller. Firmware constraints restrict unsolicited MQTT messages to movement coordinates, delivering comprehensive state payloads only upon receiving explicit state request commands.",
+            "hash": "b5bdc9eaf35c97dec0fe5523d13b3019f14396bf478d1edac8cf865c2837f546"
         },
         {
-            "question": "Why are some Dyson Spot+Scrub Ai (RB05) faults ignored by the plugin?",
-            "answer": "The RB05 uses the `activeFaults` MQTT field to report both actual hardware errors and routine operational status codes. Many of these codes, such as those in the 21xx series (e.g., `2109` for running or `2101` for charging), represent normal behaviour rather than issues requiring user intervention. The plugin identifies and ignores codes marked as `LOG_ONLY` to prevent the device from appearing in a permanent error state during normal cleaning or docking operations.",
-            "semantic_abstract": "The RB05 firmware multiplexes operational status and hardware faults within the `activeFaults` MQTT field. The plugin filters out non-critical `LOG_ONLY` codes to ensure the HomeKit service status accurately reflects actual maintenance requirements rather than routine state transitions.",
-            "hash": "7f581d5918d1dab6c741eceb44fb2c7eacfbe23c3b579d21bf2a7950ff566746"
+            "question": "Why is simultaneous vacuuming and mopping on the Spot+Scrub Ai not represented by a dedicated Matter mode tag?",
+            "answer": "The Matter specification does not include a dedicated Mode Tag for concurrent vacuuming and washing; it only defines sequential operations such as `Vacuum then Mop`.\n\nAdditionally, major smart home ecosystems—most notably Apple Home—frequently fail to correctly parse or display multiple Mode Tags applied to a single endpoint. Due to these Matter specification limits and ecosystem rendering constraints, simultaneous vacuum and mop modes cannot be exposed as combined mode tags and may instead be mapped to standard alternatives such as `DeepClean`.",
+            "semantic_abstract": "Matter specification omissions and ecosystem compatibility limitations prevent the direct representation of simultaneous vacuuming and mopping. The lack of a concurrent mode tag in the Matter standard combined with Apple Home's inability to handle multiple mode tags requires mapping multi-function cleaning cycles to generalised operational modes.",
+            "hash": "a73176aa5a18c31e249afdd44cf5513634bdb3f324e4331e27c43668f6c05c3b"
         }
     ]
 }
