@@ -56,39 +56,25 @@
                     "subcategories": []
                 },
                 {
-                    "heading": "Dyson Spot+Scrub Ai (RB05) Limitations and Behaviours",
+                    "heading": "Dyson Spot+Scrub Ai (RB05) Connectivity",
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [
+                            "entries": [],
+                            "candidates": [
                                 {
-                                    "question": "Why is my Dyson Spot+Scrub Ai (RB05) robot not detected on my local network?",
-                                    "answer": "The Dyson Spot+Scrub Ai (RB05) hardware does not host a local listener or open any ports on the local network. Unlike earlier models such as the 360 Eye, Heurist, or Vis Nav, it communicates exclusively via outbound connections to the MyDyson cloud (AWS IoT).\n\nConsequently, local provisioning and local-only control methods are not possible for this device; the plugin must interact with it through the cloud infrastructure using cloud credentials. Control is not possible if the internet connection is interrupted.",
-                                    "included_ids": [
-                                        "issue-46-9a90"
-                                    ]
+                                    "issue_number": 46,
+                                    "id": "issue-46-31fd",
+                                    "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over the local area network?",
+                                    "answer": "No, local-only network communication is not possible for the Dyson Spot+Scrub Ai (RB05).\n\nEarlier Dyson robot vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) run an open local MQTT listener on the robot itself, which allows direct local LAN control without routing commands through external servers. In contrast, the Spot+Scrub Ai does not expose any open listening ports on the local network; it relies entirely on outbound connections to Dyson's AWS IoT cloud infrastructure. Communication with this model must therefore proceed via cloud MQTT."
                                 },
                                 {
-                                    "question": "Why does the status of my Dyson RB05 robot lag or fail to update in the smart home app?",
-                                    "answer": "The RB05 firmware does not automatically push comprehensive state updates via MQTT when its state changes. While the robot pushes incremental position data (`globalPosition`) frequently while moving, it only provides full status information when explicitly requested.\n\nTo maintain an accurate status in the Matter fabric, the plugin implements a configurable polling interval specifically for this model to periodically fetch the current state from the device. This balances responsiveness with API traffic; consequently, changes may take a few moments to reflect in HomeKit or other Matter controllers.",
-                                    "included_ids": [
-                                        "issue-46-66fd"
-                                    ]
-                                },
-                                {
-                                    "question": "Why does my Dyson RB05 report faults when it is performing a normal cleaning run?",
-                                    "answer": "The RB05 uses the `activeFaults` MQTT field to report operational status messages in addition to actual hardware errors. For example, status codes in the 21xx series, such as `2109` (`FULL_CLEAN_RUNNING`) or `2101` (`WASHING_MOP` or charging), are sent through this channel.\n\nThe plugin is configured to identify and filter these `LOG_ONLY` messages to ensure that only genuine hardware faults requiring user intervention are surfaced.",
-                                    "included_ids": [
-                                        "issue-46-7f58"
-                                    ]
-                                },
-                                {
-                                    "question": "Why are zone cleaning and cleaning maps not available for the Dyson RB05?",
-                                    "answer": "The Dyson Spot+Scrub Ai (RB05) uses a different non-MQTT cloud API for zone management and map rendering compared to previous models. Because these features are handled outside of the standard MQTT protocol used for basic controls, they require specific reverse engineering of the MyDyson API for this model.\n\nUntil this API mapping is completed, zone selection and map visualisation are not supported.",
-                                    "included_ids": []
+                                    "issue_number": 46,
+                                    "id": "issue-46-b5bd",
+                                    "question": "Why does the plugin need to poll the Dyson Spot+Scrub Ai (RB05) for status updates?",
+                                    "answer": "Unlike earlier Dyson robot models that automatically push full state telemetry over MQTT whenever state changes occur, the Spot+Scrub Ai (RB05) firmware only pushes position coordinate updates (`globalPosition`) while moving.\n\nThe complete operational state—including battery level, active cleaning mode, and dock status—is only returned by the robot in response to an explicit `REQUEST-CURRENT-STATE` command. To ensure the Matter accessory remains synchronised and accurately reflects device status, the plugin must actively poll the robot at regular intervals."
                                 }
-                            ],
-                            "candidates": []
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -143,21 +129,46 @@
         {
             "heading": "Apple Home and HomeKit Mapping",
             "preamble": "",
-            "partitions": [
+            "partitions": [],
+            "subcategories": [
                 {
-                    "entries": [
+                    "heading": "New subcategory",
+                    "preamble": "",
+                    "partitions": [
                         {
-                            "question": "Why does the `Composed Air Purifier` option cause issues in Apple Home?",
-                            "answer": "The Apple Home app only supports simple Matter devices correctly. When multiple devices are composed into a single bridged device, or subset device types are included, the Home app exhibits multiple issues:\n* The device icon can be for any of the composed or subset device types, instead of selecting the most relevant (the first recognised device type on the parent endpoint), e.g. an **Air Purifier** device may be randomly shown as a **Fan Device** or **Air Quality Sensor** instead.\n* Controls may be duplicated in the user interface if they can correspond to multiple overlapping device types, e.g. two fan speed sliders are shown if a device describes itself as both an **Air Purifier** and a **Fan** device.\n* Functionality is often reduced, e.g. an **Air Purifier** incorporating an **Air Quality** device results in the *Auto* mode, fan oscillation controls, and all sensor measurements, being hidden.\n\nIf Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.",
-                            "included_ids": [
-                                "issue-35-8df4"
+                            "entries": [
+                                {
+                                    "question": "Why does the `Composed Air Purifier` option cause issues in Apple Home?",
+                                    "answer": "The Apple Home app only supports simple Matter devices correctly. When multiple devices are composed into a single bridged device, or subset device types are included, the Home app exhibits multiple issues:\n* The device icon can be for any of the composed or subset device types, instead of selecting the most relevant (the first recognised device type on the parent endpoint), e.g. an **Air Purifier** device may be randomly shown as a **Fan Device** or **Air Quality Sensor** instead.\n* Controls may be duplicated in the user interface if they can correspond to multiple overlapping device types, e.g. two fan speed sliders are shown if a device describes itself as both an **Air Purifier** and a **Fan** device.\n* Functionality is often reduced, e.g. an **Air Purifier** incorporating an **Air Quality** device results in the *Auto* mode, fan oscillation controls, and all sensor measurements, being hidden.\n\nIf Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.",
+                                    "included_ids": [
+                                        "issue-35-8df4"
+                                    ]
+                                }
+                            ],
+                            "candidates": []
+                        }
+                    ],
+                    "subcategories": []
+                },
+                {
+                    "heading": "Mapping of Robot Vacuum Cleaning Modes",
+                    "preamble": "",
+                    "partitions": [
+                        {
+                            "entries": [],
+                            "candidates": [
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-a731",
+                                    "question": "Why is simultaneous vacuuming and mopping on the Spot+Scrub Ai not represented by a dedicated Matter mode tag?",
+                                    "answer": "The Matter specification does not include a dedicated Mode Tag for concurrent vacuuming and washing; it only defines sequential operations such as `Vacuum then Mop`.\n\nAdditionally, major smart home ecosystems—most notably Apple Home—frequently fail to correctly parse or display multiple Mode Tags applied to a single endpoint. Due to these Matter specification limits and ecosystem rendering constraints, simultaneous vacuum and mop modes cannot be exposed as combined mode tags and may instead be mapped to standard alternatives such as `DeepClean`."
+                                }
                             ]
                         }
                     ],
-                    "candidates": []
+                    "subcategories": []
                 }
-            ],
-            "subcategories": []
+            ]
         }
     ],
     "excluded_ids": [
@@ -170,6 +181,6 @@
         "issue-33-3d80"
     ],
     "source_hashes": {
-        "faq": "9cbc90cf9c7a98c7a0087fef3bb675691af110dc9f96d24f565118c74f6019d6"
+        "faq": "a4a6131376eca56b4deee24cb90583ad2dce4cbf3ecca01c8b86b01effd2824e"
     }
 }
