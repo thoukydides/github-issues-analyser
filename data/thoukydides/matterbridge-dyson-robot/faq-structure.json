@@ -157,15 +157,16 @@
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [],
-                            "candidates": [
+                            "entries": [
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-a731",
-                                    "question": "Why is simultaneous vacuuming and mopping on the Spot+Scrub Ai not represented by a dedicated Matter mode tag?",
-                                    "answer": "The Matter specification does not include a dedicated Mode Tag for concurrent vacuuming and washing; it only defines sequential operations such as `Vacuum then Mop`.\n\nAdditionally, major smart home ecosystems—most notably Apple Home—frequently fail to correctly parse or display multiple Mode Tags applied to a single endpoint. Due to these Matter specification limits and ecosystem rendering constraints, simultaneous vacuum and mop modes cannot be exposed as combined mode tags and may instead be mapped to standard alternatives such as `DeepClean`."
+                                    "question": "Why is simultaneous vacuuming and mopping not represented by a dedicated Matter mode?",
+                                    "answer": "The Matter specification does not include a dedicated Mode Tag for concurrent vacuuming and washing; it only defines sequential operations such as `Vacuum then Mop`.\n\nAdditionally, major smart home ecosystems—most notably Apple Home—frequently fail to correctly parse or display multiple Mode Tags applied to a single endpoint. Due to these Matter specification limits and ecosystem rendering constraints, simultaneous vacuum and mop modes (such as those on the Spot+Scrub Ai) cannot be exposed as combined mode tags and may instead be mapped to standard alternatives such as `DeepClean`.",
+                                    "included_ids": [
+                                        "issue-46-a731"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

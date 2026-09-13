@@ -20,6 +20,7 @@
   - **[New subcategory](#new-subcategory)**
     - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
   - **[Mapping of Robot Vacuum Cleaning Modes](#mapping-of-robot-vacuum-cleaning-modes)**
+    - [Why is simultaneous vacuuming and mopping not represented by a dedicated Matter mode?](#why-is-simultaneous-vacuuming-and-mopping-not-represented-by-a-dedicated-matter-mode)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -131,11 +132,11 @@ If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `
 
 ### Mapping of Robot Vacuum Cleaning Modes
 
-#### 🚧 Why is simultaneous vacuuming and mopping on the Spot+Scrub Ai not represented by a dedicated Matter mode tag? 🚧
+#### Why is simultaneous vacuuming and mopping not represented by a dedicated Matter mode?
 
 <!-- INCLUDES: issue-46-a731 -->
 The Matter specification does not include a dedicated Mode Tag for concurrent vacuuming and washing; it only defines sequential operations such as `Vacuum then Mop`.
 
-Additionally, major smart home ecosystems—most notably Apple Home—frequently fail to correctly parse or display multiple Mode Tags applied to a single endpoint. Due to these Matter specification limits and ecosystem rendering constraints, simultaneous vacuum and mop modes cannot be exposed as combined mode tags and may instead be mapped to standard alternatives such as `DeepClean`.
+Additionally, major smart home ecosystems—most notably Apple Home—frequently fail to correctly parse or display multiple Mode Tags applied to a single endpoint. Due to these Matter specification limits and ecosystem rendering constraints, simultaneous vacuum and mop modes (such as those on the Spot+Scrub Ai) cannot be exposed as combined mode tags and may instead be mapped to standard alternatives such as `DeepClean`.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
