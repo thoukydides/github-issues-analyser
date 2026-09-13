@@ -99,8 +99,8 @@ To address this behaviour:
 ## Apple Home and HomeKit Mapping
 
 #### Why does the `Composed Air Purifier` option cause issues in Apple Home?
-<!-- INCLUDES: issue-35-8df4 -->
 
+<!-- INCLUDES: issue-35-8df4 -->
 The Apple Home app only supports simple Matter devices correctly. When multiple devices are composed into a single bridged device, or subset device types are included, the Home app exhibits multiple issues:
 * The device icon can be for any of the composed or subset device types, instead of selecting the most relevant (the first recognised device type on the parent endpoint), e.g. an **Air Purifier** device may be randomly shown as a **Fan Device** or **Air Quality Sensor** instead.
 * Controls may be duplicated in the user interface if they can correspond to multiple overlapping device types, e.g. two fan speed sliders are shown if a device describes itself as both an **Air Purifier** and a **Fan** device.
@@ -108,4 +108,4 @@ The Apple Home app only supports simple Matter devices correctly. When multiple 
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-42f9 issue-46-6cfa issue-46-d0fb issue-46-dbac -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
