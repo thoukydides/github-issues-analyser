@@ -9,6 +9,8 @@
     - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
     - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
   - **[Dyson Spot+Scrub Ai (RB05) Connectivity](#dyson-spotscrub-ai-rb05-connectivity)**
+    - [Can the Dyson Spot+Scrub Ai (RB05) be controlled locally?](#can-the-dyson-spotscrub-ai-rb05-be-controlled-locally)
+    - [Why does the plugin poll the Dyson Spot+Scrub Ai (RB05) for status updates?](#why-does-the-plugin-poll-the-dyson-spotscrub-ai-rb05-for-status-updates)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -69,19 +71,15 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 ### Dyson Spot+Scrub Ai (RB05) Connectivity
 
-#### 🚧 Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over the local area network? 🚧
+#### Can the Dyson Spot+Scrub Ai (RB05) be controlled locally?
 
 <!-- INCLUDES: issue-46-31fd -->
-No, local-only network communication is not possible for the Dyson Spot+Scrub Ai (RB05).
+No, local-only network communication is not possible for the Dyson Spot+Scrub Ai (RB05). Earlier Dyson robot vacuums, such as the 360 Eye, 360 Heurist, and 360 Vis Nav, run an open local MQTT listener on the robot itself, which allows direct local LAN control without routing commands through external servers. In contrast, the Spot+Scrub Ai does not expose any open listening ports on the local network. It relies entirely on outbound connections to Dyson's AWS IoT cloud infrastructure, meaning communication with this model must proceed via cloud MQTT.
 
-Earlier Dyson robot vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) run an open local MQTT listener on the robot itself, which allows direct local LAN control without routing commands through external servers. In contrast, the Spot+Scrub Ai does not expose any open listening ports on the local network; it relies entirely on outbound connections to Dyson's AWS IoT cloud infrastructure. Communication with this model must therefore proceed via cloud MQTT.
-
-#### 🚧 Why does the plugin need to poll the Dyson Spot+Scrub Ai (RB05) for status updates? 🚧
+#### Why does the plugin poll the Dyson Spot+Scrub Ai (RB05) for status updates?
 
 <!-- INCLUDES: issue-46-b5bd -->
-Unlike earlier Dyson robot models that automatically push full state telemetry over MQTT whenever state changes occur, the Spot+Scrub Ai (RB05) firmware only pushes position coordinate updates (`globalPosition`) while moving.
-
-The complete operational state—including battery level, active cleaning mode, and dock status—is only returned by the robot in response to an explicit `REQUEST-CURRENT-STATE` command. To ensure the Matter accessory remains synchronised and accurately reflects device status, the plugin must actively poll the robot at regular intervals.
+The Spot+Scrub Ai (RB05) firmware handles telemetry differently from previous Dyson robot models. Earlier models automatically push full state telemetry over MQTT whenever a state change occurs. However, the RB05 firmware only pushes position coordinate updates (`globalPosition`) while moving. The complete operational state—including battery level, active cleaning mode, and dock status—is only returned by the robot in response to an explicit `REQUEST-CURRENT-STATE` command. To ensure the Matter accessory remains synchronised and accurately reflects device status, the plugin must actively poll the robot at regular intervals.
 
 ## Matterbridge
 

@@ -60,21 +60,23 @@
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [],
-                            "candidates": [
+                            "entries": [
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-31fd",
-                                    "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over the local area network?",
-                                    "answer": "No, local-only network communication is not possible for the Dyson Spot+Scrub Ai (RB05).\n\nEarlier Dyson robot vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) run an open local MQTT listener on the robot itself, which allows direct local LAN control without routing commands through external servers. In contrast, the Spot+Scrub Ai does not expose any open listening ports on the local network; it relies entirely on outbound connections to Dyson's AWS IoT cloud infrastructure. Communication with this model must therefore proceed via cloud MQTT."
+                                    "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally?",
+                                    "answer": "No, local-only network communication is not possible for the Dyson Spot+Scrub Ai (RB05). Earlier Dyson robot vacuums, such as the 360 Eye, 360 Heurist, and 360 Vis Nav, run an open local MQTT listener on the robot itself, which allows direct local LAN control without routing commands through external servers. In contrast, the Spot+Scrub Ai does not expose any open listening ports on the local network. It relies entirely on outbound connections to Dyson's AWS IoT cloud infrastructure, meaning communication with this model must proceed via cloud MQTT.",
+                                    "included_ids": [
+                                        "issue-46-31fd"
+                                    ]
                                 },
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-b5bd",
-                                    "question": "Why does the plugin need to poll the Dyson Spot+Scrub Ai (RB05) for status updates?",
-                                    "answer": "Unlike earlier Dyson robot models that automatically push full state telemetry over MQTT whenever state changes occur, the Spot+Scrub Ai (RB05) firmware only pushes position coordinate updates (`globalPosition`) while moving.\n\nThe complete operational state—including battery level, active cleaning mode, and dock status—is only returned by the robot in response to an explicit `REQUEST-CURRENT-STATE` command. To ensure the Matter accessory remains synchronised and accurately reflects device status, the plugin must actively poll the robot at regular intervals."
+                                    "question": "Why does the plugin poll the Dyson Spot+Scrub Ai (RB05) for status updates?",
+                                    "answer": "The Spot+Scrub Ai (RB05) firmware handles telemetry differently from previous Dyson robot models. Earlier models automatically push full state telemetry over MQTT whenever a state change occurs. However, the RB05 firmware only pushes position coordinate updates (`globalPosition`) while moving. The complete operational state—including battery level, active cleaning mode, and dock status—is only returned by the robot in response to an explicit `REQUEST-CURRENT-STATE` command. To ensure the Matter accessory remains synchronised and accurately reflects device status, the plugin must actively poll the robot at regular intervals.",
+                                    "included_ids": [
+                                        "issue-46-b5bd"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
