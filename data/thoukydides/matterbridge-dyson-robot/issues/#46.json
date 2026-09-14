@@ -1,24 +1,30 @@
 {
     "issue_number": 46,
-    "updated_at": "2026-09-13T10:16:34.887Z",
+    "updated_at": "2026-09-14T10:37:15.592Z",
     "faq": [
         {
-            "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over the local area network?",
-            "answer": "No, local-only network communication is not possible for the Dyson Spot+Scrub Ai (RB05).\n\nEarlier Dyson robot vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) run an open local MQTT listener on the robot itself, which allows direct local LAN control without routing commands through external servers. In contrast, the Spot+Scrub Ai does not expose any open listening ports on the local network; it relies entirely on outbound connections to Dyson's AWS IoT cloud infrastructure. Communication with this model must therefore proceed via cloud MQTT.",
-            "semantic_abstract": "Network architecture differences in Dyson Spot+Scrub Ai (RB05) appliances preclude local LAN communication. Unlike previous models offering local MQTT listeners, the RB05 relies exclusively on outbound TLS connections to cloud MQTT endpoints, necessitating cloud-mediated control.",
-            "hash": "31fd3a71c95c33f7626d005963b9d59fb31b8f311113e98e37db3afe1213b48a"
+            "question": "Does the Dyson Spot+Scrub Ai (RB05) support local connection?",
+            "answer": "No. The Dyson RB05 (Spot+Scrub Ai) does not feature a local MQTT listener or any open ports on the local network for direct communication. It relies exclusively on an outbound connection to Dyson's cloud services (AWS IoT). As a result, the plugin requires an active internet connection and valid cloud credentials to communicate with the device; local-only control is not possible for this model.",
+            "semantic_abstract": "The Dyson RB05 hardware lacks a local MQTT listener and open network ports, necessitating a cloud-only communication path via AWS IoT. This architecture prevents direct local control and requires an active internet connection for status updates and commands.",
+            "hash": "02e3655c3e67142ced160feb0674841ee2c503d6d85e9a69be646add147613d1"
         },
         {
-            "question": "Why does the plugin need to poll the Dyson Spot+Scrub Ai (RB05) for status updates?",
-            "answer": "Unlike earlier Dyson robot models that automatically push full state telemetry over MQTT whenever state changes occur, the Spot+Scrub Ai (RB05) firmware only pushes position coordinate updates (`globalPosition`) while moving.\n\nThe complete operational state—including battery level, active cleaning mode, and dock status—is only returned by the robot in response to an explicit `REQUEST-CURRENT-STATE` command. To ensure the Matter accessory remains synchronised and accurately reflects device status, the plugin must actively poll the robot at regular intervals.",
-            "semantic_abstract": "MQTT telemetry implementation differences in the Dyson Spot+Scrub Ai (RB05) mandate active status polling by the controller. Firmware constraints restrict unsolicited MQTT messages to movement coordinates, delivering comprehensive state payloads only upon receiving explicit state request commands.",
-            "hash": "b5bdc9eaf35c97dec0fe5523d13b3019f14396bf478d1edac8cf865c2837f546"
+            "question": "Why is the Dyson RB05 status slow to update?",
+            "answer": "Unlike many other Dyson appliances, the RB05 firmware does not automatically push its full state to the network. While it broadcasts position updates during cleaning, a full status update is only provided when the robot is specifically polled using a `REQUEST-CURRENT-STATE` command. To maintain accuracy, the plugin uses a configurable polling interval to fetch the current status. Users may notice a slight delay in status updates depending on the polling frequency configured.\n\nAdditionally, this model uses a unique MQTT topic structure (`RB05/<serial>/status`) rather than the `status/current` topic used by previous generations, which may cause third-party debugging tools to report empty logs if not correctly configured.",
+            "semantic_abstract": "Dyson RB05 firmware does not provide unsolicited full state updates, requiring the plugin to implement active polling via `REQUEST-CURRENT-STATE` MQTT commands. This model also utilises a specific topic hierarchy that differs from the standard structure found in earlier generations of Dyson robots.",
+            "hash": "7591e5702c87cd249efc20ddcc575866443a0e3e39bc70e1139583f9d1670add"
         },
         {
-            "question": "Why is simultaneous vacuuming and mopping on the Spot+Scrub Ai not represented by a dedicated Matter mode tag?",
-            "answer": "The Matter specification does not include a dedicated Mode Tag for concurrent vacuuming and washing; it only defines sequential operations such as `Vacuum then Mop`.\n\nAdditionally, major smart home ecosystems—most notably Apple Home—frequently fail to correctly parse or display multiple Mode Tags applied to a single endpoint. Due to these Matter specification limits and ecosystem rendering constraints, simultaneous vacuum and mop modes cannot be exposed as combined mode tags and may instead be mapped to standard alternatives such as `DeepClean`.",
-            "semantic_abstract": "Matter specification omissions and ecosystem compatibility limitations prevent the direct representation of simultaneous vacuuming and mopping. The lack of a concurrent mode tag in the Matter standard combined with Apple Home's inability to handle multiple mode tags requires mapping multi-function cleaning cycles to generalised operational modes.",
-            "hash": "a73176aa5a18c31e249afdd44cf5513634bdb3f324e4331e27c43668f6c05c3b"
+            "question": "Why does the Dyson RB05 report status codes in the fault field?",
+            "answer": "The RB05 model uses the `activeFaults` MQTT field to report both hardware errors and general status updates via numeric codes (such as the `21xx` series). These codes cover normal activities, such as charging (`2101`) or the dock drying the mop (`2103`). The plugin is designed to identify these specific status codes and ignore those categorised as `LOG_ONLY` to prevent the robot from appearing in a fault state in HomeKit or Matter during normal operation.",
+            "semantic_abstract": "The Dyson RB05 utilises the `activeFaults` MQTT field to communicate numeric status codes for normal activities like charging or mop maintenance. The plugin filters these `21xx` series codes to prevent operational status updates from being misinterpreted as functional hardware faults.",
+            "hash": "5fec6246dc56b07d3328ba37587a41cfc3654159b787e281140cb89ed61448b7"
+        },
+        {
+            "question": "Are zone cleaning and mop controls supported for the Dyson RB05?",
+            "answer": "Currently, support for zone cleaning, mop-specific modes, and map rendering is not fully available for the RB05 model. These functions rely on a different set of HTTPS API endpoints compared to previous Dyson robots, which require further reverse engineering to implement. Basic vacuum control and status monitoring are supported, but advanced mop configurations and zone management remain experimental until the underlying API is fully documented.",
+            "semantic_abstract": "Zone cleaning and mop-specific functionality for the Dyson RB05 are constrained by architectural differences in the MyDyson HTTPS API compared to earlier models. Implementation of these features is currently limited by the need for further reverse engineering of the device-specific cloud endpoints for map and mode control.",
+            "hash": "07b5441046e7a32032bd0817fb1086395556b5601f865561c79cea06f5afe276"
         }
     ]
 }
