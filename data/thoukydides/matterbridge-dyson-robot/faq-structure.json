@@ -64,33 +64,44 @@
                                 {
                                     "question": "Does the Dyson Spot+Scrub Ai (RB05) support local control?",
                                     "answer": "No. The Dyson RB05 does not feature a local MQTT listener or any open ports on the local network for direct communication. It relies exclusively on an outbound connection to Dyson cloud services (AWS IoT). The plugin therefore requires an active internet connection and valid cloud credentials; local-only control is not possible for this model.",
-                                    "included_ids": [
-                                        "issue-46-02e3"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does the Dyson RB05 status take time to update?",
                                     "answer": "Unlike many other Dyson appliances, the RB05 firmware does not automatically push its full state to the network. While it broadcasts position updates during cleaning, a full status update is only provided when the robot is specifically polled using a `REQUEST-CURRENT-STATE` command. To maintain accuracy, the plugin uses a configurable polling interval to fetch the current status. Users may notice a slight delay in updates depending on the polling frequency configured.\n\nAdditionally, this model uses a unique MQTT topic structure (`RB05/<serial>/status`) rather than the `status/current` topic used by previous generations. This may cause third-party debugging tools to report empty logs if they are not correctly configured for this model.",
-                                    "included_ids": [
-                                        "issue-46-7591"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does the Dyson RB05 report status codes in the fault field?",
                                     "answer": "The RB05 model uses the `activeFaults` MQTT field to report both hardware errors and general status updates via numeric codes. These codes cover normal activities, such as charging (`2101`) or the dock drying the mop (`2103`). The plugin identifies these specific status codes and ignores those categorised as `LOG_ONLY` to prevent the robot from appearing in a fault state in HomeKit or Matter during normal operation.",
-                                    "included_ids": [
-                                        "issue-46-5fec"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Are zone cleaning and mop controls supported for the Dyson RB05?",
                                     "answer": "Currently, support for zone cleaning, mop-specific modes, and map rendering is not fully available for the RB05 model. These functions rely on a different set of HTTPS API endpoints compared to previous Dyson robots, which require further reverse engineering to implement. Basic vacuum control and status monitoring are supported, but advanced mop configurations and zone management remain experimental until the underlying API is fully documented.",
-                                    "included_ids": [
-                                        "issue-46-07b5"
-                                    ]
+                                    "included_ids": []
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-4961",
+                                    "question": "Why does the Dyson Spot+Scrub Ai (RB05) not have a local IP address or any open ports?",
+                                    "answer": "The Dyson RB05 (Spot+Scrub Ai) does not provide a local MQTT listener or any open network ports for direct communication. Unlike earlier models that allow local control, this robot is designed to connect outbound to AWS IoT (cloud) only. Consequently, it does not have a local IP address for the plugin to connect to, and all communication must proceed via the Dyson cloud API."
+                                },
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-e6b6",
+                                    "question": "Why does the Dyson Spot+Scrub Ai (RB05) require a status polling interval?",
+                                    "answer": "The RB05 model does not automatically push its complete state over MQTT. While it sends frequent position updates while moving, the full device state is only provided in response to a specific request. To maintain an accurate status in HomeKit, the plugin implements a configurable polling interval to match the behaviour of the official MyDyson app."
+                                },
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-287b",
+                                    "question": "Why are features like zone cleaning, mop control, and map rendering missing for the Dyson Spot+Scrub Ai (RB05)?",
+                                    "answer": "Support for the RB05 is currently experimental and subject to several technical constraints:\n\n* **API Changes**: Zone cleaning and map rendering for the RB05 use a different cloud API than previous models. These features will remain unavailable until this new API is fully reverse-engineered.\n* **Matter Mapping**: There is currently no standard Matter mapping for simultaneous vacuuming and mopping modes. The plugin requires further data on supported MQTT commands before these can be accurately exposed to HomeKit.\n* **Functionality Limitations**: Some features, such as `SKIP-CURRENT-ZONE`, appear to be ignored by current robot firmware versions and are therefore not exposed as controls."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
