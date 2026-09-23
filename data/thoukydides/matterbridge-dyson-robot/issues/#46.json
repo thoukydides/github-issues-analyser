@@ -1,24 +1,18 @@
 {
     "issue_number": 46,
-    "updated_at": "2026-09-20T14:13:07.391Z",
+    "updated_at": "2026-09-23T09:58:27.367Z",
     "faq": [
         {
-            "question": "Why does the Dyson Spot+Scrub Ai (RB05) not have a local IP address or any open ports?",
-            "answer": "The Dyson RB05 (Spot+Scrub Ai) does not provide a local MQTT listener or any open network ports for direct communication. Unlike earlier models that allow local control, this robot is designed to connect outbound to AWS IoT (cloud) only. Consequently, it does not have a local IP address for the plugin to connect to, and all communication must proceed via the Dyson cloud API.",
-            "semantic_abstract": "Dyson RB05 (Spot+Scrub Ai) firmware architecture lacks a local MQTT server, restricting device communication to outbound cloud connections and preventing direct local network control or discovery.",
-            "hash": "4961d0471d8fa6c9f60ab6ec53741cf403c0f8d163632927d52f94d6f09da441"
+            "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over the local network?",
+            "answer": "Unlike earlier Dyson robot vacuum models (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) which host a local MQTT broker on the appliance, the Dyson Spot+Scrub Ai (RB05) does not run a local listener.\n\nPort scans of the appliance reveal no open listening ports on the local network. Although the Dyson cloud API provisions MQTT credentials, the device address field is returned empty because the robot communicates exclusively via outbound connections to Dyson's AWS IoT cloud endpoints. Consequently, direct local network communication is not supported on this model, and cloud connectivity is required.",
+            "semantic_abstract": "Dyson Spot+Scrub Ai (RB05) firmware omits the internal local MQTT listener found on earlier robot models, operating exclusively through outbound connections to AWS IoT cloud servers. This hardware and architectural change prevents direct local network control and mandates cloud-based communication.",
+            "hash": "c64c3ad455c2b24b8e16535916504f1cbd8e367666315c81997d9e083e8e2ae5"
         },
         {
-            "question": "Why does the Dyson Spot+Scrub Ai (RB05) require a status polling interval?",
-            "answer": "The RB05 model does not automatically push its complete state over MQTT. While it sends frequent position updates while moving, the full device state is only provided in response to a specific request. To maintain an accurate status in HomeKit, the plugin implements a configurable polling interval to match the behaviour of the official MyDyson app.",
-            "semantic_abstract": "The Dyson RB05 MQTT implementation provides coordinate updates via push but requires explicit polling for full state synchronisation, necessitating a periodic request mechanism in the plugin to maintain state parity with the official app.",
-            "hash": "e6b6e1c8c99085ad39eeac96307c9f71654d6b22ca08f721579a77ae736d66c3"
-        },
-        {
-            "question": "Why are features like zone cleaning, mop control, and map rendering missing for the Dyson Spot+Scrub Ai (RB05)?",
-            "answer": "Support for the RB05 is currently experimental and subject to several technical constraints:\n\n* **API Changes**: Zone cleaning and map rendering for the RB05 use a different cloud API than previous models. These features will remain unavailable until this new API is fully reverse-engineered.\n* **Matter Mapping**: There is currently no standard Matter mapping for simultaneous vacuuming and mopping modes. The plugin requires further data on supported MQTT commands before these can be accurately exposed to HomeKit.\n* **Functionality Limitations**: Some features, such as `SKIP-CURRENT-ZONE`, appear to be ignored by current robot firmware versions and are therefore not exposed as controls.",
-            "semantic_abstract": "Dyson RB05 advanced features are limited by a transition to a revised cloud API for mapping and zones, alongside a lack of standard Matter service mappings for hybrid cleaning modes.",
-            "hash": "287b347117cc2cdf42503ef14c742054ef77da6a58ea5385defba99dad80f433"
+            "question": "Why are zone cleaning and mopping features restricted on the Dyson Spot+Scrub Ai (RB05)?",
+            "answer": "Advanced functionality on the Dyson Spot+Scrub Ai (RB05) is subject to communication protocol differences and smart home specification limits:\n\n* **Proprietary cloud API for zones and maps**: Unlike base telemetry, zone coordination and floor maps are managed through Dyson's HTTPS cloud API rather than MQTT. Because the RB05 omits `zoneStatus` from MQTT `CURRENT-STATE` payloads and uses a different payload schema from older models, zone cleaning and map rendering cannot function over MQTT alone.\n* **Matter mode tag limitations**: The Matter robot vacuum specification does not include a mode tag for simultaneous vacuuming and mopping (providing only `Vacuum then Mop`). Additionally, major ecosystem controllers such as Apple Home do not reliably process multiple mode tags.\n\nStandard cleaning, docking, and state polling are supported, while granular zone targeting and multi-function mopping modes require further protocol discovery and ecosystem updates.",
+            "semantic_abstract": "Dyson Spot+Scrub Ai (RB05) relies on a proprietary HTTPS cloud API rather than MQTT for zone management and map data transmission. Furthermore, Matter specification limitations regarding concurrent vacuum-and-wash mode tags restrict mapping options within controller ecosystems such as Apple Home.",
+            "hash": "1b3cc16ded377d149ef72674d22f30e1e892b771c118cbd322e7b4f596fce68e"
         }
     ]
 }
