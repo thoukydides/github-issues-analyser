@@ -9,7 +9,7 @@
             "partitions": [],
             "subcategories": [
                 {
-                    "heading": "New subcategory",
+                    "heading": "Troubleshooting and Development Information",
                     "preamble": "",
                     "partitions": [
                         {
@@ -31,8 +31,10 @@
                                 },
                                 {
                                     "question": "Where is the `libdyson` configuration file located?",
-                                    "answer": "When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.\n\nThe location of this file depends on the operating system:\n\n- **Linux**: `~/.config/libdyson/config.yml` \n- **macOS**: `~/Library/Application Support/libdyson/config.yml` \n\nNote that these paths are relative to the user's home directory.",
-                                    "included_ids": []
+                                    "answer": "When performing manual token retrieval or troubleshooting authentication using tools like `opendyson`, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.\n\nThe location of this file is determined by the capture tools following standard platform-specific conventions for application data:\n- **macOS**: `~/Library/Application Support/libdyson/config.yml` \n- **Linux**: `~/.config/libdyson/config.yml` \n\nNote that these paths are relative to the user's home directory.",
+                                    "included_ids": [
+                                        "issue-46-71e1"
+                                    ]
                                 },
                                 {
                                     "question": "Why are Dyson error codes and the sleep timer not visible in my Matter controller?",
@@ -50,14 +52,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 46,
-                                    "id": "issue-46-71e1",
-                                    "question": "Where is the `libdyson` configuration file located on macOS?",
-                                    "answer": "When using tools like `opendyson` to retrieve tokens and credentials, the configuration file location depends on your operating system:\n- **macOS**: `~/Library/Application Support/libdyson/config.yml`\n- **Linux**: `~/.config/libdyson/config.yml` \n\nThis difference is due to the underlying `os.UserConfigDir()` implementation in the Go environment used by the capture tools, which respects platform-specific conventions for application data."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

@@ -2,7 +2,7 @@
 
 <!-- TOC-START -->
 - **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**
-  - **[New subcategory](#new-subcategory)**
+  - **[Troubleshooting and Development Information](#troubleshooting-and-development-information)**
     - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
     - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
     - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
@@ -24,7 +24,7 @@
 
 ## Unsupported Dyson Devices and Features
 
-### New subcategory
+### Troubleshooting and Development Information
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
@@ -46,12 +46,12 @@ The information required depends on the device type and the specific feature bei
 
 #### Where is the `libdyson` configuration file located?
 
-When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
+<!-- INCLUDES: issue-46-71e1 -->
+When performing manual token retrieval or troubleshooting authentication using tools like `opendyson`, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
 
-The location of this file depends on the operating system:
-
-- **Linux**: `~/.config/libdyson/config.yml` 
+The location of this file is determined by the capture tools following standard platform-specific conventions for application data:
 - **macOS**: `~/Library/Application Support/libdyson/config.yml` 
+- **Linux**: `~/.config/libdyson/config.yml` 
 
 Note that these paths are relative to the user's home directory.
 
@@ -68,15 +68,6 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
-
-#### 🚧 Where is the `libdyson` configuration file located on macOS? 🚧
-
-<!-- INCLUDES: issue-46-71e1 -->
-When using tools like `opendyson` to retrieve tokens and credentials, the configuration file location depends on your operating system:
-- **macOS**: `~/Library/Application Support/libdyson/config.yml`
-- **Linux**: `~/.config/libdyson/config.yml` 
-
-This difference is due to the underlying `os.UserConfigDir()` implementation in the Go environment used by the capture tools, which respects platform-specific conventions for application data.
 
 ### Dyson Spot+Scrub Ai (RB05) Support
 
