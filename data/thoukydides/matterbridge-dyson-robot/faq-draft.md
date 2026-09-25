@@ -11,8 +11,9 @@
   - **[Dyson Spot+Scrub Ai (RB05) Support](#dyson-spotscrub-ai-rb05-support)**
     - [Does the Dyson Spot+Scrub Ai (RB05) support local control?](#does-the-dyson-spotscrub-ai-rb05-support-local-control)
     - [Why does the Dyson RB05 status take time to update?](#why-does-the-dyson-rb05-status-take-time-to-update)
-    - [Why does the Dyson RB05 report status codes in the fault field?](#why-does-the-dyson-rb05-report-status-codes-in-the-fault-field)
+    - [Why does the Dyson RB05 report faults during normal cleaning or charging?](#why-does-the-dyson-rb05-report-faults-during-normal-cleaning-or-charging)
     - [Are zone cleaning and mop controls supported for the Dyson RB05?](#are-zone-cleaning-and-mop-controls-supported-for-the-dyson-rb05)
+    - [Why do debugging tools fail to capture status messages for the Dyson RB05?](#why-do-debugging-tools-fail-to-capture-status-messages-for-the-dyson-rb05)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -73,17 +74,25 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 #### Does the Dyson Spot+Scrub Ai (RB05) support local control?
 
+<!-- INCLUDES: issue-46-c302 -->
 No. Unlike earlier Dyson robot vacuum models (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) which host a local MQTT broker on the appliance, the RB05 does not feature a local listener or any open ports on the local network for direct communication. Port scans confirm there are no listening ports, and although the Dyson cloud API provisions MQTT credentials, the device address field is returned empty because the robot communicates exclusively via outbound connections to Dyson AWS IoT cloud endpoints. Consequently, the device does not provide a local IP address for the plugin to connect to; local-only control is not possible and an active internet connection with valid cloud credentials is required.
 
 #### Why does the Dyson RB05 status take time to update?
 
-Unlike many other Dyson appliances, the RB05 firmware does not automatically push its full state to the network. While it broadcasts position updates during cleaning, a full status update is only provided when the robot is specifically polled using a `REQUEST-CURRENT-STATE` command. To maintain accuracy and match the behaviour of the official MyDyson app, the plugin uses a configurable polling interval to fetch the current status. Users may notice a slight delay in updates depending on the frequency configured.
+<!-- INCLUDES: issue-46-42dc -->
+Unlike many other Dyson appliances, the RB05 firmware does not automatically push its full state to the network. While it frequently broadcasts position data during active cleaning, a comprehensive status update—including battery levels and cleaning progress—is only provided when the robot is specifically polled using a `REQUEST-CURRENT-STATE` command.
 
-Additionally, this model uses a unique MQTT topic structure (`RB05/<serial>/status`) rather than the `status/current` topic used by previous generations. This may cause third-party debugging tools to report empty logs if they are not correctly configured for this model.
+To maintain an accurate state in HomeKit and the Matter fabric and match the behaviour of the official MyDyson app, the plugin uses a configurable polling interval to fetch the current status. Users may notice a slight delay in updates depending on the frequency configured.
 
-#### Why does the Dyson RB05 report status codes in the fault field?
+#### Why does the Dyson RB05 report faults during normal cleaning or charging?
 
-The RB05 model uses the `activeFaults` MQTT field to report both hardware errors and general status updates via numeric codes. These codes cover normal activities, such as charging (`2101`) or the dock drying the mop (`2103`). The plugin identifies these specific status codes and ignores those categorised as `LOG_ONLY` to prevent the robot from appearing in a fault state in HomeKit or Matter during normal operation.
+<!-- INCLUDES: issue-46-c371 -->
+The RB05 model uses the `activeFaults` MQTT field to report both hardware errors and general informational status updates via numeric codes. These codes cover normal activities, such as charging (`2101` / `FULL_CLEAN_CHARGING`), running (`RUNNING`), or the dock drying the mop (`2103` / `DRYING_MOP`).
+
+The plugin is designed to handle these appropriately:
+1. Codes categorised as `LOG_ONLY` are ignored to prevent the robot from appearing in a permanent error state in HomeKit or Matter during normal operation.
+2. Only codes requiring user intervention (such as the robot being stuck) are reported as faults.
+3. If a persistent error appears without an obvious cause, check the plugin logs for the specific numeric fault code.
 
 #### Are zone cleaning and mop controls supported for the Dyson RB05?
 
@@ -95,34 +104,12 @@ Support for the RB05 is currently experimental and subject to several technical 
 
 Standard cleaning, docking, and state polling are supported, but granular control over zones and multi-function mopping requires further protocol discovery.
 
-#### 🚧 Does the Dyson Spot+Scrub Ai (RB05) support local control? 🚧
-
-<!-- INCLUDES: issue-46-c302 -->
-No. The Dyson Spot+Scrub Ai (RB05) does not feature a local MQTT broker or any open network ports for local communication. Unlike earlier models such as the 360 Eye or 360 Vis Nav, this model connects exclusively to Dyson cloud services via AWS IoT. Consequently, the plugin must interact with the device through the cloud API, and local IP address discovery will not function for this specific robot.
-
-#### 🚧 Why does the Dyson Spot+Scrub Ai (RB05) require status polling? 🚧
-
-<!-- INCLUDES: issue-46-42dc -->
-The RB05 firmware does not automatically push full state updates via MQTT. While it frequently pushes position data during active cleaning, it only provides a comprehensive status update (including battery levels and cleaning progress) when explicitly requested. To maintain an accurate state in HomeKit and the Matter fabric, the plugin implements a configurable polling interval, similar to the behaviour observed in the official MyDyson app.
-
-#### 🚧 Why does the Dyson Spot+Scrub Ai (RB05) report a fault during normal cleaning or charging? 🚧
-
-<!-- INCLUDES: issue-46-c371 -->
-The RB05 uses a numeric `activeFaults` channel that conflates actual hardware errors with informational status messages. For instance, codes in the `21xx` range are used for routine events like `FULL_CLEAN_CHARGING`, `RUNNING`, or `DRYING_MOP`.
-
-The plugin is designed to handle these appropriately:
-1. Codes marked as `LOG_ONLY` are ignored to prevent the robot from appearing in a permanent error state in HomeKit.
-2. Only codes requiring user intervention (such as the robot being stuck) are reported as faults.
-3. If a persistent error appears without an obvious cause, check the plugin logs for the specific numeric fault code.
-
-#### 🚧 Why does `opendyson` fail to capture status messages for the Dyson Spot+Scrub Ai (RB05)? 🚧
+#### Why do debugging tools fail to capture status messages for the Dyson RB05?
 
 <!-- INCLUDES: issue-46-f48c -->
-The Dyson Spot+Scrub Ai (RB05) uses a non-standard MQTT topic structure compared to other Dyson products. While many models publish to specific subtopics like `status/current` or `status/fault`, the RB05 publishes its entire state to the single root topic: `RB05/<serial>/status`.
+The Dyson Spot+Scrub Ai (RB05) uses a non-standard MQTT topic structure compared to previous generations. While many models publish to specific subtopics like `status/current` or `status/fault`, the RB05 publishes its entire state to a single root topic: `RB05/<serial>/status`.
 
-When using the `opendyson` tool for troubleshooting or log capture:
-- Ensure you are subscribing to the base status topic.
-- Default capture instructions designed for older models may result in empty logs because they look for subtopics that do not exist on this device.
+When using tools like `opendyson` for troubleshooting or log capture, ensure you are subscribing to this base status topic. Default capture instructions designed for older models may result in empty logs because they look for subtopics that do not exist on this device.
 
 ## Matterbridge
 
