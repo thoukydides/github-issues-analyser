@@ -7,6 +7,8 @@
   - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
   - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
   - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
+  - **[Dyson Spot+Scrub Ai (RB05) Support](#dyson-spotscrub-ai-rb05-support)**
+    - [Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?](#why-does-the-dyson-spotscrub-ai-rb05-status-take-time-to-update)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -38,11 +40,10 @@ The information required depends on the device type and the specific feature bei
 
 #### Where is the `libdyson` configuration file located?
 
-<!-- INCLUDES: issue-46-a42b -->
-When performing manual token retrieval or troubleshooting authentication, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
+<!-- INCLUDES: issue-46-71e1 -->
+When performing manual token retrieval or troubleshooting authentication using tools like `opendyson`, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
 
-The location of this file depends on the operating system:
-
+The location of this file is determined by the capture tools following standard platform-specific conventions for application data:
 - **Linux**: `~/.config/libdyson/config.yml` 
 - **macOS**: `~/Library/Application Support/libdyson/config.yml` 
 
@@ -61,6 +62,13 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
+
+### Dyson Spot+Scrub Ai (RB05) Support
+
+#### Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?
+
+<!-- INCLUDES: issue-46-42dc -->
+Unlike most other Dyson appliances, the RB05 firmware does not automatically publish changes to its status as MQTT messages. While it publishes regular position data during active cleaning, a comprehensive status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (matching the behaviour of the official MyDyson app) to poll for the current status, so changes may take that much longer to propagate to Matter.
 
 ## Matterbridge
 
@@ -108,4 +116,4 @@ The Apple Home app only supports simple Matter devices correctly. When multiple 
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-a731 -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-c302 issue-46-c371 issue-46-f48c -->

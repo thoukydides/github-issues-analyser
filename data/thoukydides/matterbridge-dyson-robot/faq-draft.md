@@ -2,18 +2,13 @@
 
 <!-- TOC-START -->
 - **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**
-  - **[Troubleshooting and Development Information](#troubleshooting-and-development-information)**
-    - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
-    - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
-    - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
-    - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
-    - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
+  - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
+  - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
+  - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
+  - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
+  - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
   - **[Dyson Spot+Scrub Ai (RB05) Support](#dyson-spotscrub-ai-rb05-support)**
-    - [Does the Dyson Spot+Scrub Ai (RB05) support local control?](#does-the-dyson-spotscrub-ai-rb05-support-local-control)
-    - [Why does the Dyson RB05 status take time to update?](#why-does-the-dyson-rb05-status-take-time-to-update)
-    - [Why does the Dyson RB05 report faults during normal cleaning or charging?](#why-does-the-dyson-rb05-report-faults-during-normal-cleaning-or-charging)
-    - [Are zone cleaning and mop controls supported for the Dyson RB05?](#are-zone-cleaning-and-mop-controls-supported-for-the-dyson-rb05)
-    - [Why do debugging tools fail to capture status messages for the Dyson RB05?](#why-do-debugging-tools-fail-to-capture-status-messages-for-the-dyson-rb05)
+    - [Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?](#why-does-the-dyson-spotscrub-ai-rb05-status-take-time-to-update)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -24,8 +19,6 @@
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
-
-### Troubleshooting and Development Information
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
@@ -51,8 +44,8 @@ The information required depends on the device type and the specific feature bei
 When performing manual token retrieval or troubleshooting authentication using tools like `opendyson`, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
 
 The location of this file is determined by the capture tools following standard platform-specific conventions for application data:
-- **macOS**: `~/Library/Application Support/libdyson/config.yml` 
 - **Linux**: `~/.config/libdyson/config.yml` 
+- **macOS**: `~/Library/Application Support/libdyson/config.yml` 
 
 Note that these paths are relative to the user's home directory.
 
@@ -72,44 +65,10 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 ### Dyson Spot+Scrub Ai (RB05) Support
 
-#### Does the Dyson Spot+Scrub Ai (RB05) support local control?
-
-<!-- INCLUDES: issue-46-c302 -->
-No. Unlike earlier Dyson robot vacuum models (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) which host a local MQTT broker on the appliance, the RB05 does not feature a local listener or any open ports on the local network for direct communication. Port scans confirm there are no listening ports, and although the Dyson cloud API provisions MQTT credentials, the device address field is returned empty because the robot communicates exclusively via outbound connections to Dyson AWS IoT cloud endpoints. Consequently, the device does not provide a local IP address for the plugin to connect to; local-only control is not possible and an active internet connection with valid cloud credentials is required.
-
-#### Why does the Dyson RB05 status take time to update?
+#### Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?
 
 <!-- INCLUDES: issue-46-42dc -->
-Unlike many other Dyson appliances, the RB05 firmware does not automatically push its full state to the network. While it frequently broadcasts position data during active cleaning, a comprehensive status update—including battery levels and cleaning progress—is only provided when the robot is specifically polled using a `REQUEST-CURRENT-STATE` command.
-
-To maintain an accurate state in HomeKit and the Matter fabric and match the behaviour of the official MyDyson app, the plugin uses a configurable polling interval to fetch the current status. Users may notice a slight delay in updates depending on the frequency configured.
-
-#### Why does the Dyson RB05 report faults during normal cleaning or charging?
-
-<!-- INCLUDES: issue-46-c371 -->
-The RB05 model uses the `activeFaults` MQTT field to report both hardware errors and general informational status updates via numeric codes. These codes cover normal activities, such as charging (`2101` / `FULL_CLEAN_CHARGING`), running (`RUNNING`), or the dock drying the mop (`2103` / `DRYING_MOP`).
-
-The plugin is designed to handle these appropriately:
-1. Codes categorised as `LOG_ONLY` are ignored to prevent the robot from appearing in a permanent error state in HomeKit or Matter during normal operation.
-2. Only codes requiring user intervention (such as the robot being stuck) are reported as faults.
-3. If a persistent error appears without an obvious cause, check the plugin logs for the specific numeric fault code.
-
-#### Are zone cleaning and mop controls supported for the Dyson RB05?
-
-Support for the RB05 is currently experimental and subject to several technical constraints regarding communication protocols and smart home specifications:
-
-* **API Differences**: Advanced features such as zone cleaning, floor maps, and mop-specific modes are managed through Dyson's HTTPS cloud API rather than MQTT. Because the RB05 omits `zoneStatus` from MQTT `CURRENT-STATE` payloads and uses a different schema from older models, these features remain unavailable until the new API is fully reverse-engineered.
-* **Matter Mapping**: The Matter robot vacuum specification currently lacks a standard mode tag for simultaneous vacuuming and mopping (providing only `Vacuum then Mop`). Furthermore, major ecosystem controllers such as Apple Home do not reliably process multiple mode tags.
-* **Firmware Limitations**: Certain commands, such as `SKIP-CURRENT-ZONE`, appear to be ignored by current robot firmware versions and are therefore not exposed as controls.
-
-Standard cleaning, docking, and state polling are supported, but granular control over zones and multi-function mopping requires further protocol discovery.
-
-#### Why do debugging tools fail to capture status messages for the Dyson RB05?
-
-<!-- INCLUDES: issue-46-f48c -->
-The Dyson Spot+Scrub Ai (RB05) uses a non-standard MQTT topic structure compared to previous generations. While many models publish to specific subtopics like `status/current` or `status/fault`, the RB05 publishes its entire state to a single root topic: `RB05/<serial>/status`.
-
-When using tools like `opendyson` for troubleshooting or log capture, ensure you are subscribing to this base status topic. Default capture instructions designed for older models may result in empty logs because they look for subtopics that do not exist on this device.
+Unlike most other Dyson appliances, the RB05 firmware does not automatically publish changes to its status as MQTT messages. While it publishes regular position data during active cleaning, a comprehensive status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (matching the behaviour of the official MyDyson app) to poll for the current status, so changes may take that much longer to propagate to Matter.
 
 ## Matterbridge
 
@@ -157,4 +116,4 @@ The Apple Home app only supports simple Matter devices correctly. When multiple 
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-c302 issue-46-c371 issue-46-f48c -->
