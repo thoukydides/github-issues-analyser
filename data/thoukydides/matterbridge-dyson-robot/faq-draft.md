@@ -7,6 +7,7 @@
   - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
   - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
   - [Why isn't my Dyson Solarcycle Morph desk light supported?](#why-isnt-my-dyson-solarcycle-morph-desk-light-supported)
+  - [Why doesn't the plugin support skipping the current cleaning zone for robot vacuums?](#why-doesnt-the-plugin-support-skipping-the-current-cleaning-zone-for-robot-vacuums)
   - **[Dyson Spot+Scrub Ai (RB05) Support](#dyson-spotscrub-ai-rb05-support)**
     - [Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?](#why-does-the-dyson-spotscrub-ai-rb05-status-take-time-to-update)
 - **[Matterbridge](#matterbridge)**
@@ -19,6 +20,8 @@
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
+
+<!-- PARTITION: Unsupported Dyson Devices and Features -->
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
@@ -62,15 +65,10 @@ The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting produc
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
 
-#### 🚧 Why doesn't the plugin implement the `SKIP-CURRENT-ZONE` command for Dyson robot vacuums? 🚧
+#### Why doesn't the plugin support skipping the current cleaning zone for robot vacuums?
 
 <!-- INCLUDES: issue-46-d18e -->
-The plugin does not implement the `SKIP-CURRENT-ZONE` command, nor does it expose the Matter Service Area Cluster's `SkipArea` command. This decision is based on two factors:
-
-1.  **Firmware Behaviour**: Observed Dyson Spot+Scrub Ai (RB05) firmware has been seen to ignore `SKIP-CURRENT-ZONE` commands, suggesting inconsistent or absent support at the device level.
-2.  **Historical Precedent**: Previous Dyson robot models also did not support this functionality.
-
-Given these observations, adding support for a command that is not reliably acted upon by the device or universally supported across models is not prioritised to maintain plugin stability and avoid exposing non-functional controls.
+The plugin does not implement the `SKIP-CURRENT-ZONE` command or the Matter Service Area Cluster's `SkipArea` command. This decision is based on observations that Dyson robot firmware, such as that on the Dyson Spot+Scrub Ai (RB05), frequently ignores these commands. Historical data from previous Dyson robot models also indicates a lack of support for this functionality. To ensure a reliable user experience and avoid exposing non-functional controls in Matter controllers, this feature is not currently prioritised.
 
 ### Dyson Spot+Scrub Ai (RB05) Support
 
