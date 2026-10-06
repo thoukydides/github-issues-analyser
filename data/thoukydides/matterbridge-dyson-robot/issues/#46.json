@@ -1,36 +1,30 @@
 {
     "issue_number": 46,
-    "updated_at": "2026-09-24T09:59:36.465Z",
+    "updated_at": "2026-10-06T12:01:08.528Z",
     "faq": [
         {
-            "question": "Does the Dyson Spot+Scrub Ai (RB05) support local control?",
-            "answer": "No. The Dyson Spot+Scrub Ai (RB05) does not feature a local MQTT broker or any open network ports for local communication. Unlike earlier models such as the 360 Eye or 360 Vis Nav, this model connects exclusively to Dyson cloud services via AWS IoT. Consequently, the plugin must interact with the device through the cloud API, and local IP address discovery will not function for this specific robot.",
-            "semantic_abstract": "Dyson RB05 robots lack a local MQTT listener or open network ports, necessitating cloud-only communication via AWS IoT rather than the local control path available on previous robot generations.",
-            "hash": "c30270d490363ccb8ab66c1eaa0e14f085621c5914e0b9db5c44b5659729fbc5"
+            "question": "Why does the Dyson Spot+Scrub Ai (RB05) require a cloud connection for local control?",
+            "answer": "Unlike earlier Dyson robot models, the Spot+Scrub Ai (RB05) does not host a local MQTT broker or listen on any local network ports. It communicates exclusively via outbound connections to the Dyson/AWS cloud infrastructure. Because there is no local API or listener available on the device, the plugin must use cloud credentials to interact with it, and local-only operation is not possible.",
+            "semantic_abstract": "Dyson Spot+Scrub Ai (RB05) hardware architecture lacks a local MQTT listener or open network ports, necessitating outbound cloud-based communication and preventing local network control common in earlier generations.",
+            "hash": "18d04064b5ba4319146c07c5700f160d1f9b07a8ee8bf12c86dc81848385a1f6"
         },
         {
-            "question": "Why does the Dyson Spot+Scrub Ai (RB05) require status polling?",
-            "answer": "The RB05 firmware does not automatically push full state updates via MQTT. While it frequently pushes position data during active cleaning, it only provides a comprehensive status update (including battery levels and cleaning progress) when explicitly requested. To maintain an accurate state in HomeKit and the Matter fabric, the plugin implements a configurable polling interval, similar to the behaviour observed in the official MyDyson app.",
-            "semantic_abstract": "Dyson RB05 firmware design omits automated full state pushes via MQTT, requiring the plugin to implement periodic status polling to synchronise device state with the Matter fabric.",
-            "hash": "42dc4a742b8c04eb73f04bfaa8ea96828c6a589a54d4454e9e07d5bc91430936"
+            "question": "Why does the `opendyson` tool fail to capture status messages for the Spot+Scrub Ai?",
+            "answer": "The Spot+Scrub Ai (RB05) uses a different MQTT topic structure and reporting behaviour compared to other Dyson models:\n\n1. **Topic Mismatch**: While standard diagnostic instructions suggest subscribing to `status/current` and `status/fault`, the RB05 publishes all state information to the root `status` topic (e.g., `RB05/<serial>/status`). \n2. **Polling Requirement**: The RB05 does not automatically push its full state to the broker. It only pushes position updates during active cleaning. The full state must be explicitly requested via a poll, similar to how the official MyDyson app functions. \n\nThe plugin handles this by implementing a configurable status polling interval specifically for this model.",
+            "semantic_abstract": "Dyson RB05 models utilize a non-standard MQTT topic hierarchy and lack automatic state pushing, requiring active status polling and subscription to the root `status` topic for effective data capture.",
+            "hash": "1160156978d65c7b6d3da59a2f41ba28981a24f8293c0d9b96e8f631ce1a5ddd"
         },
         {
-            "question": "Why does the Dyson Spot+Scrub Ai (RB05) report a fault during normal cleaning or charging?",
-            "answer": "The RB05 uses a numeric `activeFaults` channel that conflates actual hardware errors with informational status messages. For instance, codes in the `21xx` range are used for routine events like `FULL_CLEAN_CHARGING`, `RUNNING`, or `DRYING_MOP`.\n\nThe plugin is designed to handle these appropriately:\n1. Codes marked as `LOG_ONLY` are ignored to prevent the robot from appearing in a permanent error state in HomeKit.\n2. Only codes requiring user intervention (such as the robot being stuck) are reported as faults.\n3. If a persistent error appears without an obvious cause, check the plugin logs for the specific numeric fault code.",
-            "semantic_abstract": "RB05 numeric fault codes conflate operational status with actual hardware errors, requiring the plugin to filter specific identifiers to prevent erroneous fault reporting in HomeKit.",
-            "hash": "c3715ce050a239ea8a1568fb8a72e76a09c6cc08f3a7cabd141683aa840a53e6"
+            "question": "Why does my Spot+Scrub Ai show active faults during normal operation like charging or drying?",
+            "answer": "The Spot+Scrub Ai (RB05) firmware utilizes the `activeFaults` MQTT field to communicate operational status codes in addition to genuine hardware errors. Numeric codes in the `21xx` range are typically informational rather than indicative of a problem. Common observed codes include:\n\n* `2101`: Charging\n* `2103`: Dock busy (e.g., washing or drying the mop)\n* `2109`: Cleaning in progress\n\nThe plugin is designed to ignore these `LOG_ONLY` status codes so that they do not trigger a fault state in HomeKit. Only codes requiring user intervention (such as code `568` for a stuck robot) will be reported as errors.",
+            "semantic_abstract": "Dyson RB05 firmware encodes routine operational states within the `activeFaults` MQTT field using numeric 21xx codes, requiring the plugin to distinguish between informational log-only updates and genuine hardware faults.",
+            "hash": "b955fcb3e644631a3fbdf747630ee306da3c509b6f78030e9e99c4a9db04afba"
         },
         {
-            "question": "Why does `opendyson` fail to capture status messages for the Dyson Spot+Scrub Ai (RB05)?",
-            "answer": "The Dyson Spot+Scrub Ai (RB05) uses a non-standard MQTT topic structure compared to other Dyson products. While many models publish to specific subtopics like `status/current` or `status/fault`, the RB05 publishes its entire state to the single root topic: `RB05/<serial>/status`.\n\nWhen using the `opendyson` tool for troubleshooting or log capture:\n- Ensure you are subscribing to the base status topic.\n- Default capture instructions designed for older models may result in empty logs because they look for subtopics that do not exist on this device.",
-            "semantic_abstract": "The Dyson RB05 robot employs a simplified MQTT topic hierarchy that consolidates all state updates into a single status topic, causing standard capture tools using subtopic subscriptions to miss data.",
-            "hash": "f48c555469e327e1ecd413711d9ea4c0eab5ef7f9b22ddbf99fc398634bcf59e"
-        },
-        {
-            "question": "Where is the `libdyson` configuration file located on macOS?",
-            "answer": "When using tools like `opendyson` to retrieve tokens and credentials, the configuration file location depends on your operating system:\n- **macOS**: `~/Library/Application Support/libdyson/config.yml`\n- **Linux**: `~/.config/libdyson/config.yml` \n\nThis difference is due to the underlying `os.UserConfigDir()` implementation in the Go environment used by the capture tools, which respects platform-specific conventions for application data.",
-            "semantic_abstract": "The `libdyson` credential storage path varies by operating system, following platform-specific conventions for configuration data storage on macOS versus Linux.",
-            "hash": "71e1d6231ada7d8acdaa28feda978bf8d03753a688b03ba12a33d8144254627b"
+            "question": "Why are zone cleaning and cleaning maps missing for the Spot+Scrub Ai?",
+            "answer": "Support for the Spot+Scrub Ai (RB05) is experimental. While basic vacuuming, mopping status, and general state reporting are implemented via MQTT, advanced features like zone-specific cleaning and map rendering require the use of a separate HTTPS cloud API. This API is significantly different from the ones used by the 360 Eye or 360 Vis Nav models and requires further reverse-engineering before these features can be exposed to Matter or HomeKit.",
+            "semantic_abstract": "Advanced Dyson RB05 features such as zone control and map rendering rely on a proprietary HTTPS cloud API that differs from previous generations, limiting current plugin support to core MQTT-based vacuuming and status functionality.",
+            "hash": "2103f58c685f3015dcbbd1bf0f2cf1e39089a0137f486d136ffcda51cf2f51a6"
         }
     ]
 }
