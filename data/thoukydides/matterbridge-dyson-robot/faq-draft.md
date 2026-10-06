@@ -40,7 +40,6 @@ The information required depends on the device type and the specific feature bei
 
 #### Where is the `libdyson` configuration file located?
 
-<!-- INCLUDES: issue-46-71e1 -->
 When performing manual token retrieval or troubleshooting authentication using tools like `opendyson`, you may need to access the `libdyson` configuration file. This file, named `config.yml`, contains the credentials required for the plugin to communicate with Dyson's cloud services.
 
 The location of this file is determined by the capture tools following standard platform-specific conventions for application data:
@@ -63,12 +62,63 @@ The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting produc
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
 
+#### 🚧 Why doesn't the plugin implement the `SKIP-CURRENT-ZONE` command for Dyson robot vacuums? 🚧
+
+<!-- INCLUDES: issue-46-d18e -->
+The plugin does not implement the `SKIP-CURRENT-ZONE` command, nor does it expose the Matter Service Area Cluster's `SkipArea` command. This decision is based on two factors:
+
+1.  **Firmware Behaviour**: Observed Dyson Spot+Scrub Ai (RB05) firmware has been seen to ignore `SKIP-CURRENT-ZONE` commands, suggesting inconsistent or absent support at the device level.
+2.  **Historical Precedent**: Previous Dyson robot models also did not support this functionality.
+
+Given these observations, adding support for a command that is not reliably acted upon by the device or universally supported across models is not prioritised to maintain plugin stability and avoid exposing non-functional controls.
+
 ### Dyson Spot+Scrub Ai (RB05) Support
 
 #### Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?
 
-<!-- INCLUDES: issue-46-42dc -->
 Unlike most other Dyson appliances, the RB05 firmware does not automatically publish changes to its status as MQTT messages. While it publishes regular position data during active cleaning, a comprehensive status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (matching the behaviour of the official MyDyson app) to poll for the current status, so changes may take that much longer to propagate to Matter.
+
+#### 🚧 Why can't my Dyson Spot+Scrub Ai (RB05) be controlled locally, or why doesn't it have a local IP address? 🚧
+
+<!-- INCLUDES: issue-46-3075 -->
+The Dyson Spot+Scrub Ai (RB05) fundamentally operates differently from earlier Dyson robot vacuum models. It does not have a local MQTT listener or any open network ports on your local area network (LAN). Instead, it communicates exclusively outbound with the AWS IoT cloud services. This design means that local provisioning methods or direct LAN control, which might work for other Dyson devices, are not applicable to the Spot+Scrub Ai. All communication and control must be routed through the Dyson cloud API.
+
+#### 🚧 Why is zone cleaning or cleaned area map rendering not fully supported for my Dyson Spot+Scrub Ai (RB05)? 🚧
+
+<!-- INCLUDES: issue-46-cb49 -->
+Full support for zone cleaning control and rendering cleaned area maps for the Dyson Spot+Scrub Ai (RB05) requires reverse-engineering the non-MQTT Dyson cloud API. While basic MQTT communication has been integrated, the specific API endpoints and message structures for advanced features like zone management, mapping, and related configuration are highly device-specific and undocumented. The plugin relies on user-provided network traffic captures (e.g., using Proxyman) to discover these proprietary API details. Until comprehensive cloud API documentation or captures are available, these advanced features will remain partially or entirely unsupported.
+
+#### 🚧 Why are mopping modes and related controls not fully available or configurable for my Dyson Spot+Scrub Ai (RB05)? 🚧
+
+<!-- INCLUDES: issue-46-5d6a -->
+Implementing comprehensive control for Dyson Spot+Scrub Ai (RB05) mopping modes (e.g., vacuum only, wash only, vacuum then wash) faces several challenges:
+
+*   **Incomplete API Enum Values**: The full range of supported `fullCleanAction` enum values from the Dyson API is not yet fully documented or captured. Without these, it's not possible to correctly map all available cleaning modes.
+*   **Matter/HomeKit Limitations**: Matter and HomeKit have limitations in representing complex cleaning modes. For example, Matter does not have a specific "Vacuum and Mop simultaneously" Mode Tag, only "Vacuum then Mop". Apple Home also struggles to handle multiple Mode Tags effectively. This necessitates mapping complex robot functionalities to the most appropriate, albeit sometimes imperfect, Matter/HomeKit equivalents (e.g., mapping "Vacuum and wash simultaneously" to `DeepClean`).
+*   **API Command Discovery**: The specific MQTT or cloud API commands required to trigger and configure these various mopping modes need to be identified through network traffic captures.
+
+Until these details are fully understood and mapped, certain mopping functionalities may not be directly exposed or configurable within Matterbridge and Apple Home.
+
+#### 🚧 How can I collect detailed debug logs for troubleshooting my Dyson Spot+Scrub Ai (RB05)? 🚧
+
+<!-- INCLUDES: issue-46-7229 -->
+To help diagnose issues with your Dyson Spot+Scrub Ai (RB05) and other Dyson robots, enabling comprehensive debug logging in your Matterbridge configuration is essential. This allows the maintainer to review the full communication between the plugin and your device, including MQTT payloads and cloud API interactions.
+
+To enable the necessary logging, add or modify the `debug` and `debugFeatures` sections in your `matterbridge` configuration file as follows:
+
+```json
+{
+  ...
+  "debug": true,
+  "debugFeatures": [
+    "Log API Bodies",
+    "Log MQTT Payloads as JSON",
+    "Log Debug as Info"
+  ]
+}
+```
+
+If your environment (e.g., Homebridge) already captures standard `debug` level output, you can omit `"Log Debug as Info"`. After enabling these options, restart Matterbridge and attempt to reproduce the issue while ensuring a complete cleaning cycle is covered by the logs. The generated logs can then be provided when reporting an issue.
 
 ## Matterbridge
 
@@ -116,4 +166,4 @@ The Apple Home app only supports simple Matter devices correctly. When multiple 
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-c302 issue-46-c371 issue-46-f48c -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
