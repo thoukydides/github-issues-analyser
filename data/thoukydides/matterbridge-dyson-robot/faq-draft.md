@@ -10,6 +10,10 @@
   - [Why doesn't the plugin support skipping the current cleaning zone for robot vacuums?](#why-doesnt-the-plugin-support-skipping-the-current-cleaning-zone-for-robot-vacuums)
   - **[Dyson Spot+Scrub Ai (RB05) Support](#dyson-spotscrub-ai-rb05-support)**
     - [Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?](#why-does-the-dyson-spotscrub-ai-rb05-status-take-time-to-update)
+    - [Why does the Dyson Spot+Scrub Ai (RB05) lack a local IP address or local control?](#why-does-the-dyson-spotscrub-ai-rb05-lack-a-local-ip-address-or-local-control)
+    - [Why are zone cleaning and map features missing for the Dyson Spot+Scrub Ai (RB05)?](#why-are-zone-cleaning-and-map-features-missing-for-the-dyson-spotscrub-ai-rb05)
+    - [How are mopping modes for the Dyson Spot+Scrub Ai (RB05) mapped to Matter?](#how-are-mopping-modes-for-the-dyson-spotscrub-ai-rb05-mapped-to-matter)
+    - [How do I collect debug logs for troubleshooting the Dyson Spot+Scrub Ai (RB05)?](#how-do-i-collect-debug-logs-for-troubleshooting-the-dyson-spotscrub-ai-rb05)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -76,37 +80,36 @@ The plugin does not implement the `SKIP-CURRENT-ZONE` command or the Matter Serv
 
 Unlike most other Dyson appliances, the RB05 firmware does not automatically publish changes to its status as MQTT messages. While it publishes regular position data during active cleaning, a comprehensive status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (matching the behaviour of the official MyDyson app) to poll for the current status, so changes may take that much longer to propagate to Matter.
 
-#### 🚧 Why can't my Dyson Spot+Scrub Ai (RB05) be controlled locally, or why doesn't it have a local IP address? 🚧
+#### Why does the Dyson Spot+Scrub Ai (RB05) lack a local IP address or local control?
 
 <!-- INCLUDES: issue-46-3075 -->
-The Dyson Spot+Scrub Ai (RB05) fundamentally operates differently from earlier Dyson robot vacuum models. It does not have a local MQTT listener or any open network ports on your local area network (LAN). Instead, it communicates exclusively outbound with the AWS IoT cloud services. This design means that local provisioning methods or direct LAN control, which might work for other Dyson devices, are not applicable to the Spot+Scrub Ai. All communication and control must be routed through the Dyson cloud API.
+The Dyson Spot+Scrub Ai (RB05) operates differently from earlier Dyson robot vacuum models. It does not provide a local MQTT listener or expose any open network ports on your local area network (LAN). Communication is exclusively outbound to Dyson AWS IoT cloud services. Consequently, local provisioning methods or direct LAN control are not supported; all interaction must be routed through the Dyson cloud API.
 
-#### 🚧 Why is zone cleaning or cleaned area map rendering not fully supported for my Dyson Spot+Scrub Ai (RB05)? 🚧
+#### Why are zone cleaning and map features missing for the Dyson Spot+Scrub Ai (RB05)?
 
 <!-- INCLUDES: issue-46-cb49 -->
-Full support for zone cleaning control and rendering cleaned area maps for the Dyson Spot+Scrub Ai (RB05) requires reverse-engineering the non-MQTT Dyson cloud API. While basic MQTT communication has been integrated, the specific API endpoints and message structures for advanced features like zone management, mapping, and related configuration are highly device-specific and undocumented. The plugin relies on user-provided network traffic captures (e.g., using Proxyman) to discover these proprietary API details. Until comprehensive cloud API documentation or captures are available, these advanced features will remain partially or entirely unsupported.
+Support for zone cleaning and cleaned area maps for the Dyson Spot+Scrub Ai (RB05) requires reverse-engineering the non-MQTT Dyson cloud API. While basic MQTT communication is integrated, the specific API endpoints and message structures for advanced features like zone management and mapping are undocumented and highly device-specific. Progress on these features depends on network traffic captures (for example, using Proxyman) to identify the proprietary API details.
 
-#### 🚧 Why are mopping modes and related controls not fully available or configurable for my Dyson Spot+Scrub Ai (RB05)? 🚧
+#### How are mopping modes for the Dyson Spot+Scrub Ai (RB05) mapped to Matter?
 
 <!-- INCLUDES: issue-46-5d6a -->
-Implementing comprehensive control for Dyson Spot+Scrub Ai (RB05) mopping modes (e.g., vacuum only, wash only, vacuum then wash) faces several challenges:
+Implementing comprehensive control for the Dyson Spot+Scrub Ai (RB05) mopping modes (such as vacuum only, wash only, or vacuum then wash) involves addressing several constraints:
 
-*   **Incomplete API Enum Values**: The full range of supported `fullCleanAction` enum values from the Dyson API is not yet fully documented or captured. Without these, it's not possible to correctly map all available cleaning modes.
-*   **Matter/HomeKit Limitations**: Matter and HomeKit have limitations in representing complex cleaning modes. For example, Matter does not have a specific "Vacuum and Mop simultaneously" Mode Tag, only "Vacuum then Mop". Apple Home also struggles to handle multiple Mode Tags effectively. This necessitates mapping complex robot functionalities to the most appropriate, albeit sometimes imperfect, Matter/HomeKit equivalents (e.g., mapping "Vacuum and wash simultaneously" to `DeepClean`).
-*   **API Command Discovery**: The specific MQTT or cloud API commands required to trigger and configure these various mopping modes need to be identified through network traffic captures.
+* **Matter and HomeKit limitations**: Matter and HomeKit have restricted vocabularies for representing complex cleaning cycles. For instance, Matter lacks a specific 'Vacuum and mop simultaneously' mode tag, offering only 'Vacuum then mop'. Consequently, functionalities must be mapped to the closest equivalent, such as using `DeepClean` to represent 'Vacuum and wash'.
+* **Incomplete API enumeration**: The full range of `fullCleanAction` values supported by the Dyson API is not yet entirely documented. Without these, it is not possible to accurately expose every cleaning mode.
+* **Command discovery**: Determining the exact commands required to trigger specific mopping configurations requires further network traffic analysis.
 
-Until these details are fully understood and mapped, certain mopping functionalities may not be directly exposed or configurable within Matterbridge and Apple Home.
+As a result, some mopping functionalities may not yet be directly available or configurable within Matter or Apple Home.
 
-#### 🚧 How can I collect detailed debug logs for troubleshooting my Dyson Spot+Scrub Ai (RB05)? 🚧
+#### How do I collect debug logs for troubleshooting the Dyson Spot+Scrub Ai (RB05)?
 
 <!-- INCLUDES: issue-46-7229 -->
-To help diagnose issues with your Dyson Spot+Scrub Ai (RB05) and other Dyson robots, enabling comprehensive debug logging in your Matterbridge configuration is essential. This allows the maintainer to review the full communication between the plugin and your device, including MQTT payloads and cloud API interactions.
+To diagnose issues with the Dyson Spot+Scrub Ai (RB05), detailed logging of the communication between the plugin and the Dyson cloud is required. This includes MQTT payloads and API interactions.
 
-To enable the necessary logging, add or modify the `debug` and `debugFeatures` sections in your `matterbridge` configuration file as follows:
+To enable the necessary logs, update the `debug` and `debugFeatures` sections in your `matterbridge` configuration:
 
 ```json
 {
-  ...
   "debug": true,
   "debugFeatures": [
     "Log API Bodies",
@@ -116,7 +119,7 @@ To enable the necessary logging, add or modify the `debug` and `debugFeatures` s
 }
 ```
 
-If your environment (e.g., Homebridge) already captures standard `debug` level output, you can omit `"Log Debug as Info"`. After enabling these options, restart Matterbridge and attempt to reproduce the issue while ensuring a complete cleaning cycle is covered by the logs. The generated logs can then be provided when reporting an issue.
+If your environment (such as Homebridge) already captures `debug` level output, the `"Log Debug as Info"` option can be omitted. After saving the configuration, restart Matterbridge and attempt to reproduce the behaviour, ideally capturing a full cleaning cycle.
 
 ## Matterbridge
 
