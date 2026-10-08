@@ -25,6 +25,7 @@
   - **[New subcategory](#new-subcategory)**
     - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
   - **[Robot Vacuum Control in Apple Home](#robot-vacuum-control-in-apple-home)**
+    - [How can I clean specific rooms or zones using Apple Home?](#how-can-i-clean-specific-rooms-or-zones-using-apple-home)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -180,14 +181,13 @@ If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `
 
 ### Robot Vacuum Control in Apple Home
 
-#### 🚧 How can I use Apple Home to control my Dyson robot to clean specific rooms or zones effectively? 🚧
+#### How can I clean specific rooms or zones using Apple Home?
 
 <!-- INCLUDES: issue-46-b5d3 -->
-To control your Dyson robot for cleaning specific rooms or zones, it is most effective to utilise Apple Home **Scenes**.
+To control a Dyson robot to clean specific rooms or zones, it is most effective to utilise Apple Home **Scenes**.
 
-*   You can create a custom scene (e.g., "Mop the Kitchen") that includes your Dyson robot accessory.
-*   Within the scene, configure the robot to start cleaning and select the desired rooms or zones that you have previously defined in the MyDyson app. The plugin leverages these existing MyDyson app settings for room-specific cleaning.
+Create a custom scene (e.g. "Clean the Kitchen") that includes the Dyson robot accessory. Within the scene settings, configure the robot to start cleaning and select the desired rooms or zones previously defined in the MyDyson app. The plugin leverages these existing app settings for room-specific cleaning.
 
-Using individual `Switch` accessories for each room, as might be created in some third-party forks, is generally less efficient. The built-in Service Areas functionality in Apple Home, combined with scenes, provides a more native and flexible way to achieve room-specific automations and Siri commands. Apple Home's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be clunky, often listing all Mode Tags rather than descriptive labels, and it functions as a global setting rather than per-area.
+While some third-party forks create individual `Switch` accessories for each room, this plugin relies on the native HomeKit Service Areas functionality. This approach provides a more flexible way to achieve room-specific automations and Siri commands. Note that the Apple Home app's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be unintuitive, often displaying mode tags rather than descriptive labels, and it acts as a global setting rather than a per-area configuration.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->

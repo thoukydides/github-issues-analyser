@@ -192,15 +192,16 @@
                     "preamble": "",
                     "partitions": [
                         {
-                            "entries": [],
-                            "candidates": [
+                            "entries": [
                                 {
-                                    "issue_number": 46,
-                                    "id": "issue-46-b5d3",
-                                    "question": "How can I use Apple Home to control my Dyson robot to clean specific rooms or zones effectively?",
-                                    "answer": "To control your Dyson robot for cleaning specific rooms or zones, it is most effective to utilise Apple Home **Scenes**.\n\n*   You can create a custom scene (e.g., \"Mop the Kitchen\") that includes your Dyson robot accessory.\n*   Within the scene, configure the robot to start cleaning and select the desired rooms or zones that you have previously defined in the MyDyson app. The plugin leverages these existing MyDyson app settings for room-specific cleaning.\n\nUsing individual `Switch` accessories for each room, as might be created in some third-party forks, is generally less efficient. The built-in Service Areas functionality in Apple Home, combined with scenes, provides a more native and flexible way to achieve room-specific automations and Siri commands. Apple Home's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be clunky, often listing all Mode Tags rather than descriptive labels, and it functions as a global setting rather than per-area."
+                                    "question": "How can I clean specific rooms or zones using Apple Home?",
+                                    "answer": "To control a Dyson robot to clean specific rooms or zones, it is most effective to utilise Apple Home **Scenes**.\n\nCreate a custom scene (e.g. \"Clean the Kitchen\") that includes the Dyson robot accessory. Within the scene settings, configure the robot to start cleaning and select the desired rooms or zones previously defined in the MyDyson app. The plugin leverages these existing app settings for room-specific cleaning.\n\nWhile some third-party forks create individual `Switch` accessories for each room, this plugin relies on the native HomeKit Service Areas functionality. This approach provides a more flexible way to achieve room-specific automations and Siri commands. Note that the Apple Home app's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be unintuitive, often displaying mode tags rather than descriptive labels, and it acts as a global setting rather than a per-area configuration.",
+                                    "included_ids": [
+                                        "issue-46-b5d3"
+                                    ]
                                 }
-                            ]
+                            ],
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
