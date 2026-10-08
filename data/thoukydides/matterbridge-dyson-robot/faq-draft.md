@@ -82,15 +82,18 @@ The plugin does not implement the `SKIP-CURRENT-ZONE` command or the Matter Serv
 
 #### Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?
 
-Unlike most other Dyson appliances, the RB05 firmware does not automatically publish comprehensive changes to its status. While it publishes regular position data during active cleaning, a full status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (matching the behaviour of the official MyDyson app) to poll for the current status, so changes may take that long to propagate to Matter.
+<!-- INCLUDES: issue-46-9bdb -->
+Unlike most other Dyson appliances, the RB05 firmware does not automatically publish comprehensive changes to its status. While it publishes regular position data during active cleaning, a full status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (matching the behaviour of the official MyDyson app) to poll for the current status, so changes may take that long to propagate to Matter. This polling interval can be adjusted in the plugin configuration, though the robot typically only responds to these polls when active.
 
 #### Does the Dyson Spot+Scrub Ai (RB05) support local network control or a local MQTT broker?
 
-The Dyson Spot+Scrub Ai (RB05) does not provide a local MQTT listener or expose any open network ports on your local area network (LAN). Communication is exclusively outbound to Dyson AWS IoT cloud services. Consequently, local provisioning methods or direct LAN control are not supported; all interaction must be routed through the Dyson cloud API. Additionally, the device does not use the `status/jdm` or `command/jdm` MQTT topics referenced in some third-party projects; it uses `RB05/<serial>/status` for status updates and `RB05/<serial>/command` for commands.
+<!-- INCLUDES: issue-46-1f2c -->
+The Dyson Spot+Scrub Ai (RB05) does not provide a local MQTT listener or expose any open network ports on your local area network (LAN). Unlike previous Dyson robot models that permitted local control, the RB05 communicates exclusively via outbound connections to Dyson AWS IoT cloud services. Consequently, local network discovery or provisioning methods will fail; all interaction must be routed through the Dyson cloud API. Additionally, the device does not use the `status/jdm` or `command/jdm` MQTT topics referenced in some third-party projects; it uses `RB05/<serial>/status` for status updates and `RB05/<serial>/command` for commands.
 
 #### Why are map features and zone cleaning missing for the Dyson Spot+Scrub Ai (RB05)?
 
-Support for cleaned area maps and advanced features like zone cleaning requires reverse-engineering the non-MQTT Dyson cloud API. These endpoints and message structures are undocumented and highly device-specific. Furthermore, the `SKIP-CURRENT-ZONE` command is ignored by the RB05 firmware, meaning the Matter Service Area Cluster's skip functionality cannot be implemented for this device. Progress on these features depends on network traffic captures to identify the proprietary API details.
+<!-- INCLUDES: issue-46-91b2 -->
+Support for cleaned area maps and advanced features like zone cleaning requires reverse-engineering the non-MQTT Dyson cloud API. These endpoints and message structures are undocumented and highly device-specific, differing significantly from earlier models like the 360 Vis Nav. Furthermore, the `SKIP-CURRENT-ZONE` command is currently ignored by the RB05 firmware, meaning the Matter Service Area Cluster's skip functionality cannot be implemented for this device. Progress on these features depends on capturing network traffic to identify proprietary API details.
 
 #### How are mopping modes for the Dyson Spot+Scrub Ai (RB05) mapped to Matter?
 
@@ -102,7 +105,8 @@ Implementing comprehensive control for the Dyson Spot+Scrub Ai (RB05) mopping mo
 
 #### Why are some status updates for the Dyson Spot+Scrub Ai (RB05) reported as faults?
 
-The `activeFaults` field in MQTT messages for the RB05 can contain numeric codes representing the robot's current activity (e.g. `FULL_CLEAN_CHARGING`, `DRYING_MOP`) rather than actual errors requiring user intervention. These codes are often accompanied by `"nextActionRequired":"LOG_ONLY"`. The plugin is designed to recognise and ignore these `LOG_ONLY` entries to prevent the robot from incorrectly appearing in a permanent error state. True faults requiring user action typically use different codes, such as `568` for 'stuck'.
+<!-- INCLUDES: issue-46-2ab8 -->
+The `activeFaults` field in MQTT messages for the RB05 can contain numeric codes representing the robot's current activity rather than actual errors requiring user intervention. For example, codes in the `21xx` family represent normal operation: `2101` indicates the robot is charging, and `2109` indicates it is running. These codes are often accompanied by `"nextActionRequired":"LOG_ONLY"`. The plugin is designed to recognise and ignore these `LOG_ONLY` entries to prevent the robot from incorrectly appearing in a permanent error state. True faults requiring user action typically use different codes, such as `568` for 'stuck'.
 
 #### Why does `opendyson listen` fail to show status messages for the Dyson Spot+Scrub Ai (RB05)?
 
@@ -124,30 +128,6 @@ To diagnose issues with the Dyson Spot+Scrub Ai (RB05), detailed logging of the 
 ```
 
 If your environment (such as Homebridge) already captures `debug` level output, the `"Log Debug as Info"` option can be omitted. After saving the configuration, restart Matterbridge and attempt to reproduce the behaviour, ideally capturing a full cleaning cycle.
-
-#### 🚧 Why does the Dyson Spot+Scrub Ai (RB05) not appear when scanning the local network? 🚧
-
-<!-- INCLUDES: issue-46-1f2c -->
-The Dyson Spot+Scrub Ai (RB05) does not have a local MQTT listener or any open ports for local communication. Unlike previous Dyson robot models that allowed local control, the RB05 connects exclusively to Dyson's cloud services via outbound AWS IoT connections. Consequently, local network discovery methods will fail, and the device can only be integrated using cloud-based credentials and connectivity.
-
-#### 🚧 Why does my Dyson Spot+Scrub Ai (RB05) show a fault when it is charging or running? 🚧
-
-<!-- INCLUDES: issue-46-2ab8 -->
-The RB05 model uses the `activeFaults` MQTT field to report operational status codes rather than just errors. For example, codes in the `21xx` family represent normal activities: `2101` indicates charging and `2109` indicates running. 
-
-The plugin identifies these as `LOG_ONLY` events and ignores them to prevent false-positive error states. If you see a persistent fault in HomeKit or Matter, ensure you are running the latest version of the plugin, as it contains logic to filter these non-critical status identifiers.
-
-#### 🚧 Why does the status of my Dyson Spot+Scrub Ai (RB05) not update instantly in HomeKit? 🚧
-
-<!-- INCLUDES: issue-46-9bdb -->
-The RB05 firmware does not automatically push full state updates (such as battery level or current mode) over MQTT. It only pushes position updates while moving. To ensure the status remains accurate, the plugin must periodically poll the Dyson cloud API. 
-
-You can adjust how often this occurs by modifying the status polling interval in the plugin configuration. Note that the robot only responds to these polls when it is active; the MyDyson app uses a similar 30-second polling mechanism when the app is in the foreground.
-
-#### 🚧 Why is the cleaned area map not displayed for the Dyson Spot+Scrub Ai (RB05)? 🚧
-
-<!-- INCLUDES: issue-46-91b2 -->
-Map rendering for the RB05 is handled differently than on earlier models like the 360 Vis Nav. The RB05 uses a distinct non-MQTT cloud API to fetch map data, which requires separate reverse engineering to support. At present, the plugin focuses on functional control and status reporting; map rendering for this specific model is a known limitation that may be addressed in future updates as API captures become available.
 
 ## Matterbridge
 
