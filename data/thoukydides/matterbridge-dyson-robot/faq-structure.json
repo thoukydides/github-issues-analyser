@@ -64,46 +64,32 @@
                                 {
                                     "question": "Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?",
                                     "answer": "Unlike most other Dyson appliances, the RB05 firmware does not automatically publish comprehensive changes to its status. While it publishes regular position data during active cleaning, a full status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (matching the behaviour of the official MyDyson app) to poll for the current status, so changes may take that long to propagate to Matter.",
-                                    "included_ids": [
-                                        "issue-46-636e"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Does the Dyson Spot+Scrub Ai (RB05) support local network control or a local MQTT broker?",
                                     "answer": "The Dyson Spot+Scrub Ai (RB05) does not provide a local MQTT listener or expose any open network ports on your local area network (LAN). Communication is exclusively outbound to Dyson AWS IoT cloud services. Consequently, local provisioning methods or direct LAN control are not supported; all interaction must be routed through the Dyson cloud API. Additionally, the device does not use the `status/jdm` or `command/jdm` MQTT topics referenced in some third-party projects; it uses `RB05/<serial>/status` for status updates and `RB05/<serial>/command` for commands.",
-                                    "included_ids": [
-                                        "issue-46-ba3b",
-                                        "issue-46-d505"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why are map features and zone cleaning missing for the Dyson Spot+Scrub Ai (RB05)?",
                                     "answer": "Support for cleaned area maps and advanced features like zone cleaning requires reverse-engineering the non-MQTT Dyson cloud API. These endpoints and message structures are undocumented and highly device-specific. Furthermore, the `SKIP-CURRENT-ZONE` command is ignored by the RB05 firmware, meaning the Matter Service Area Cluster's skip functionality cannot be implemented for this device. Progress on these features depends on network traffic captures to identify the proprietary API details.",
-                                    "included_ids": [
-                                        "issue-46-99f1",
-                                        "issue-46-6f9f"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "How are mopping modes for the Dyson Spot+Scrub Ai (RB05) mapped to Matter?",
                                     "answer": "Implementing comprehensive control for the Dyson Spot+Scrub Ai (RB05) mopping modes (such as vacuum only, wash only, or vacuum then wash) involves addressing several constraints:\n\n* **Matter and HomeKit limitations**: Matter and HomeKit have restricted vocabularies for representing complex cleaning cycles. Matter lacks a specific 'Vacuum and mop simultaneously' mode tag, so functionalities are mapped to the closest equivalent, such as using `DeepClean` to represent 'Vacuum and wash'.\n* **Incomplete API enumeration**: The full range of `fullCleanAction` values supported by the Dyson API is not yet entirely documented.\n* **Command discovery**: Determining the exact commands required to trigger specific mopping configurations requires further network traffic analysis.",
-                                    "included_ids": [
-                                        "issue-46-2b78"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why are some status updates for the Dyson Spot+Scrub Ai (RB05) reported as faults?",
                                     "answer": "The `activeFaults` field in MQTT messages for the RB05 can contain numeric codes representing the robot's current activity (e.g. `FULL_CLEAN_CHARGING`, `DRYING_MOP`) rather than actual errors requiring user intervention. These codes are often accompanied by `\"nextActionRequired\":\"LOG_ONLY\"`. The plugin is designed to recognise and ignore these `LOG_ONLY` entries to prevent the robot from incorrectly appearing in a permanent error state. True faults requiring user action typically use different codes, such as `568` for 'stuck'.",
-                                    "included_ids": [
-                                        "issue-46-f78a"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does `opendyson listen` fail to show status messages for the Dyson Spot+Scrub Ai (RB05)?",
                                     "answer": "The `opendyson` tool by default subscribes to MQTT topics such as `RB05/<serial>/status/current` and `RB05/<serial>/status/fault`. However, the Dyson Spot+Scrub Ai (RB05) publishes its status to the more general `RB05/<serial>/status` topic. This mismatch in expected MQTT topics means `opendyson` will not receive any status messages, making it appear as if the device is not publishing.",
-                                    "included_ids": [
-                                        "issue-46-a33c"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "How do I collect debug logs for troubleshooting the Dyson Spot+Scrub Ai (RB05)?",
@@ -111,7 +97,32 @@
                                     "included_ids": []
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-1f2c",
+                                    "question": "Why does the Dyson Spot+Scrub Ai (RB05) not appear when scanning the local network?",
+                                    "answer": "The Dyson Spot+Scrub Ai (RB05) does not have a local MQTT listener or any open ports for local communication. Unlike previous Dyson robot models that allowed local control, the RB05 connects exclusively to Dyson's cloud services via outbound AWS IoT connections. Consequently, local network discovery methods will fail, and the device can only be integrated using cloud-based credentials and connectivity."
+                                },
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-2ab8",
+                                    "question": "Why does my Dyson Spot+Scrub Ai (RB05) show a fault when it is charging or running?",
+                                    "answer": "The RB05 model uses the `activeFaults` MQTT field to report operational status codes rather than just errors. For example, codes in the `21xx` family represent normal activities: `2101` indicates charging and `2109` indicates running. \n\nThe plugin identifies these as `LOG_ONLY` events and ignores them to prevent false-positive error states. If you see a persistent fault in HomeKit or Matter, ensure you are running the latest version of the plugin, as it contains logic to filter these non-critical status identifiers."
+                                },
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-9bdb",
+                                    "question": "Why does the status of my Dyson Spot+Scrub Ai (RB05) not update instantly in HomeKit?",
+                                    "answer": "The RB05 firmware does not automatically push full state updates (such as battery level or current mode) over MQTT. It only pushes position updates while moving. To ensure the status remains accurate, the plugin must periodically poll the Dyson cloud API. \n\nYou can adjust how often this occurs by modifying the status polling interval in the plugin configuration. Note that the robot only responds to these polls when it is active; the MyDyson app uses a similar 30-second polling mechanism when the app is in the foreground."
+                                },
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-91b2",
+                                    "question": "Why is the cleaned area map not displayed for the Dyson Spot+Scrub Ai (RB05)?",
+                                    "answer": "Map rendering for the RB05 is handled differently than on earlier models like the 360 Vis Nav. The RB05 uses a distinct non-MQTT cloud API to fetch map data, which requires separate reverse engineering to support. At present, the plugin focuses on functional control and status reporting; map rendering for this specific model is a known limitation that may be addressed in future updates as API captures become available."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -196,12 +207,17 @@
                                 {
                                     "question": "How can I clean specific rooms or zones using Apple Home?",
                                     "answer": "To control a Dyson robot to clean specific rooms or zones, it is most effective to utilise Apple Home **Scenes**.\n\nCreate a custom scene (e.g. \"Clean the Kitchen\") that includes the Dyson robot accessory. Within the scene settings, configure the robot to start cleaning and select the desired rooms or zones previously defined in the MyDyson app. The plugin leverages these existing app settings for room-specific cleaning.\n\nWhile some third-party forks create individual `Switch` accessories for each room, this plugin relies on the native HomeKit Service Areas functionality. This approach provides a more flexible way to achieve room-specific automations and Siri commands. Note that the Apple Home app's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be unintuitive, often displaying mode tags rather than descriptive labels, and it acts as a global setting rather than a per-area configuration.",
-                                    "included_ids": [
-                                        "issue-46-b5d3"
-                                    ]
+                                    "included_ids": []
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-1b6c",
+                                    "question": "How can I trigger room-specific cleaning for my Dyson robot using Siri or Apple Home?",
+                                    "answer": "While the plugin exposes rooms as Service Areas in Matter, the most effective way to control specific rooms in Apple Home is through **Scenes**. \n\n1. Create a new Scene in the Apple Home app.\n2. Add your Dyson robot to the Scene.\n3. Configure the robot's state within the Scene to be **Cleaning** and select the specific rooms you want it to target.\n4. You can then trigger this Scene via Siri (e.g., 'Siri, mop the kitchen') or through automations.\n\nThe plugin will use the per-room settings (vacuum power, water flow, etc.) already configured for those rooms in the MyDyson app when the Scene is activated."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
