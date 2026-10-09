@@ -181,22 +181,16 @@ If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `
 
 #### How can I clean specific rooms or zones using Apple Home?
 
-To control a Dyson robot to clean specific rooms or zones, it is most effective to utilise Apple Home **Scenes**.
-
-Create a custom scene (e.g. "Clean the Kitchen") that includes the Dyson robot accessory. Within the scene settings, configure the robot to start cleaning and select the desired rooms or zones previously defined in the MyDyson app. The plugin leverages these existing app settings for room-specific cleaning.
-
-While some third-party forks create individual `Switch` accessories for each room, this plugin relies on the native HomeKit Service Areas functionality. This approach provides a more flexible way to achieve room-specific automations and Siri commands. Note that the Apple Home app's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be unintuitive, often displaying mode tags rather than descriptive labels, and it acts as a global setting rather than a per-area configuration.
-
-#### 🚧 How can I trigger room-specific cleaning for my Dyson robot using Siri or Apple Home? 🚧
-
 <!-- INCLUDES: issue-46-1b6c -->
-While the plugin exposes rooms as Service Areas in Matter, the most effective way to control specific rooms in Apple Home is through **Scenes**. 
+To control a Dyson robot to clean specific rooms or zones, it is most effective to utilise Apple Home **Scenes**. This approach leverages the native HomeKit Service Areas functionality rather than creating individual `Switch` accessories for every room.
 
-1. Create a new Scene in the Apple Home app.
-2. Add your Dyson robot to the Scene.
-3. Configure the robot's state within the Scene to be **Cleaning** and select the specific rooms you want it to target.
-4. You can then trigger this Scene via Siri (e.g., 'Siri, mop the kitchen') or through automations.
+To set up room-specific cleaning:
+1. Create a new Scene in the Apple Home app (e.g. "Clean the Kitchen").
+2. Add the Dyson robot accessory to the Scene.
+3. Configure the robot's state within the Scene to be **Cleaning** and select the specific rooms or zones previously defined in the MyDyson app.
 
-The plugin will use the per-room settings (vacuum power, water flow, etc.) already configured for those rooms in the MyDyson app when the Scene is activated.
+You can then trigger these Scenes using Siri commands or through automations. When the Scene is activated, the robot will use the per-room settings (such as vacuum power or water flow) already configured for those areas in the MyDyson app.
+
+Note that the Apple Home app's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be unintuitive. It often displays technical mode tags rather than descriptive labels, and it acts as a global setting for the device rather than a per-area configuration.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
