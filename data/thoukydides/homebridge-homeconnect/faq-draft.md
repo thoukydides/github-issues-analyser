@@ -387,8 +387,10 @@ The plugin is designed to handle these interruptions by automatically attempting
 
 #### Why does the log show `Unexpected fields`, `(unrecognised)` values, or TypeScript-like code blocks?
 
-<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-354-bd8b issue-355-94db issue-356-0fe3 issue-357-f6ae issue-365-ec63 issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e issue-389-3f8f issue-391-d362 issue-393-daf5 issue-394-179a issue-396-ab5c issue-397-baed -->
+<!-- INCLUDES: issue-145-3b74 issue-175-3d7e issue-189-e829 issue-190-e84b issue-198-b26f issue-199-f859 issue-200-1745 issue-202-bb2c issue-203-4555 issue-204-7213 issue-205-007f issue-206-4a1d issue-207-fb07 issue-209-bb2e issue-210-b8f3 issue-211-f9e3 issue-212-c927 issue-213-6ee5 issue-214-298a issue-216-198c issue-217-68d0 issue-219-85c9 issue-220-b400 issue-221-75f7 issue-222-b055 issue-223-c141 issue-228-b228 issue-231-a6d9 issue-233-0457 issue-235-b315 issue-236-cd27 issue-237-4f1f issue-238-a815 issue-243-6ba9 issue-244-d65d issue-246-2c5f issue-247-8e1e issue-248-cee7 issue-249-0f27 issue-252-2404 issue-253-01f9 issue-254-5a30 issue-255-37c5 issue-257-6688 issue-258-e981 issue-261-f0a2 issue-262-e72f issue-265-c490 issue-266-1044 issue-274-9060 issue-277-7b13 issue-278-36c0 issue-279-4938 issue-282-79e6 issue-283-831d issue-284-483e issue-285-9573 issue-286-9052 issue-287-d4de issue-291-0da8 issue-297-6f1d issue-301-4c18 issue-305-082b issue-309-42e3 issue-312-f274 issue-313-9e94 issue-314-d0cf issue-317-c7e3 issue-320-0ddb issue-324-75d2 issue-339-2bbb issue-344-c999 issue-345-23b7 issue-347-5f58 issue-349-6403 issue-354-bd8b issue-355-94db issue-356-0fe3 issue-357-f6ae issue-365-ec63 issue-369-fc94 issue-372-7a45 issue-373-0d05 issue-377-3b83 issue-379-2e76 issue-381-fa8e issue-389-3f8f issue-391-d362 issue-393-daf5 issue-394-179a issue-396-ab5c issue-397-baed issue-406-692f -->
 The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code, annotated with `// (unrecognised)` comments, and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.
+
+Sometimes, values may appear as an empty string (`''`) or other seemingly invalid entries. This is typically caused by an upstream Home Connect API bug or appliance firmware anomaly where the server returns an empty value instead of a valid member or omitting the field entirely.
 
 If you observe these messages:
 
@@ -396,7 +398,9 @@ If you observe these messages:
 2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.
 3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.
 
-Please do not attempt to guess or suggest theoretical values; the maintainer only adds verified values observed from actual appliance behaviour. Once added, the warning will disappear and the features will be correctly mapped where appropriate.
+If you wish to inspect the raw data the API is returning, the plugin stores cached appliance definitions in the Homebridge persistence directory (usually `~/.homebridge/homebridge-homeconnect/persist/` or `/var/lib/homebridge/homebridge-homeconnect/persist/`). The appliance capability JSON files can be reviewed with a text editor. **Do not share** the file named `94a08da1fecbb6e8b46990538c7b50b2`, as it contains private OAuth authentication tokens.
+
+Please do not attempt to guess or suggest theoretical values; the maintainer only adds verified values observed from actual appliance behaviour.
 
 #### Why are some appliance features, programs, or options missing, unavailable, or absent from the configuration UI?
 
@@ -424,7 +428,7 @@ This is often a known inconsistency in the Home Connect API's behaviour. When th
 
 #### Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 -->
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 issue-406-692f -->
 The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When initialisation stalls, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
 
 Several factors can contribute to this state:
@@ -436,9 +440,9 @@ To resolve this, perform the following diagnostic steps:
 2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If this fails, the appliance is not correctly connected to the cloud servers.
 3. **Verify App Connectivity Status**: Within the official Home Connect app, check the appliance's network settings. A fully functional connection is typically indicated by **three green lines**.
 4. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.
-5. **Power Cycle**: Disconnect the appliance from the mains power (unplug it or turn off the circuit breaker) for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
+5. **Power Cycle**: Disconnect the appliance from the mains power for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
 6. **Restart Homebridge**: Once the appliance has reconnected, restart Homebridge to trigger a fresh initialisation sequence.
-7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in `~/.homebridge/homebridge-homeconnect/persist`. These files are named with an MD5 hash of your appliance's Home Connect ID (HaID) followed by ` cache`. Do not delete the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
+7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in the `persist` directory (usually `~/.homebridge/homebridge-homeconnect/persist/` or `/var/lib/homebridge/homebridge-homeconnect/persist/`). These files are named with an MD5 hash of your appliance's Home Connect ID (HaID) followed by ` cache`. **Do not delete or share** the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`, as it contains private OAuth authentication tokens.
 8. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.
 
 #### Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?
@@ -590,27 +594,6 @@ Users should be aware of several technical consequences:
 1. **Dependent features are disabled**: Several features and characteristics are hosted on the Power switch service. Disabling it will implicitly disable functionality including `Remote Control`, `Child Lock`, `ProgramMode`, `SetDuration`, and `LockPhysicalControls`. Whilst the Apple Home app does not expose these features, they are shown in third-party apps (such as Eve) and may be used by automations.
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
-
-#### 🚧 Why does the plugin report an unrecognised empty string (`''`) for appliance options like `SpinSpeed`? 🚧
-
-<!-- INCLUDES: issue-406-692f -->
-The Home Connect API specification defines explicit enumeration values for appliance program options, such as `LaundryCare.Washer.Option.SpinSpeed`. The official specification does not permit empty strings (`''`) for these options, and options that are inactive or unset are expected to be omitted entirely.
-
-When an appliance or the cloud API returns an empty string instead of a valid enum member or omitting the field, the plugin's schema generation logs the value as unrecognised:
-
-```typescript
-export type SpinSpeed =
-    '' // (unrecognised)
-  | 'LaundryCare.Washer.EnumType.SpinSpeed.RPM1000'
-  ...
-```
-
-This behaviour is caused by an upstream Home Connect API bug or appliance firmware anomaly emitting empty string values for options.
-
-To inspect the raw capability data when troubleshooting these API mismatches:
-- The plugin stores cached appliance definitions in the Homebridge persistence directory, typically located at `~/.homebridge/homebridge-homeconnect/persist/` (or `/var/lib/homebridge/homebridge-homeconnect/persist/` on Linux).
-- The appliance capability JSON files can be opened and reviewed with any text editor to verify what the API is returning.
-- **Do not share** the file named `94a08da1fecbb6e8b46990538c7b50b2` in that folder, as it contains private OAuth authentication tokens.
 
 ### Appliance Status and Connectivity
 
