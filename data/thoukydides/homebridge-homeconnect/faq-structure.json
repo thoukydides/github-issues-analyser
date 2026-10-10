@@ -534,7 +534,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 406,
+                                    "id": "issue-406-692f",
+                                    "question": "Why does the plugin report an unrecognised empty string (`''`) for appliance options like `SpinSpeed`?",
+                                    "answer": "The Home Connect API specification defines explicit enumeration values for appliance program options, such as `LaundryCare.Washer.Option.SpinSpeed`. The official specification does not permit empty strings (`''`) for these options, and options that are inactive or unset are expected to be omitted entirely.\n\nWhen an appliance or the cloud API returns an empty string instead of a valid enum member or omitting the field, the plugin's schema generation logs the value as unrecognised:\n\n```typescript\nexport type SpinSpeed =\n    '' // (unrecognised)\n  | 'LaundryCare.Washer.EnumType.SpinSpeed.RPM1000'\n  ...\n```\n\nThis behaviour is caused by an upstream Home Connect API bug or appliance firmware anomaly emitting empty string values for options.\n\nTo inspect the raw capability data when troubleshooting these API mismatches:\n- The plugin stores cached appliance definitions in the Homebridge persistence directory, typically located at `~/.homebridge/homebridge-homeconnect/persist/` (or `/var/lib/homebridge/homebridge-homeconnect/persist/` on Linux).\n- The appliance capability JSON files can be opened and reviewed with any text editor to verify what the API is returning.\n- **Do not share** the file named `94a08da1fecbb6e8b46990538c7b50b2` in that folder, as it contains private OAuth authentication tokens."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []

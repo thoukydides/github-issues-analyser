@@ -591,6 +591,27 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why does the plugin report an unrecognised empty string (`''`) for appliance options like `SpinSpeed`? 🚧
+
+<!-- INCLUDES: issue-406-692f -->
+The Home Connect API specification defines explicit enumeration values for appliance program options, such as `LaundryCare.Washer.Option.SpinSpeed`. The official specification does not permit empty strings (`''`) for these options, and options that are inactive or unset are expected to be omitted entirely.
+
+When an appliance or the cloud API returns an empty string instead of a valid enum member or omitting the field, the plugin's schema generation logs the value as unrecognised:
+
+```typescript
+export type SpinSpeed =
+    '' // (unrecognised)
+  | 'LaundryCare.Washer.EnumType.SpinSpeed.RPM1000'
+  ...
+```
+
+This behaviour is caused by an upstream Home Connect API bug or appliance firmware anomaly emitting empty string values for options.
+
+To inspect the raw capability data when troubleshooting these API mismatches:
+- The plugin stores cached appliance definitions in the Homebridge persistence directory, typically located at `~/.homebridge/homebridge-homeconnect/persist/` (or `/var/lib/homebridge/homebridge-homeconnect/persist/` on Linux).
+- The appliance capability JSON files can be opened and reviewed with any text editor to verify what the API is returning.
+- **Do not share** the file named `94a08da1fecbb6e8b46990538c7b50b2` in that folder, as it contains private OAuth authentication tokens.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
