@@ -34,17 +34,34 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 -->
-The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict validation of all data received from the MyDyson cloud API. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored. When Dyson releases a new model or a firmware update that includes data fields or values that the plugin does not yet recognise, the validation fails, which prevents the plugin from starting.
+<!-- INCLUDES: issue-17-fe91 issue-50-f48e -->
+The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored.
 
-To resolve this, ensure you are running the latest version of the plugin. If the error persists, please check the logs for the specific validation failure and provide a full debug log in a GitHub issue so the new API structures can be correctly mapped.
+This error frequently occurs with newer robot models—such as the Spot+Scrub Ai (`RB05`), R1 Nurovi Dry (`RB07`), R2 Nurovi Wash+Dry (`RB07`), or R3 Nurovi Spot+Scrub UV (`RB05`)—or when firmware updates introduce unrecognised capability identifiers like `SelfCleanOptionsV2`. Support for these models is often developed without direct access to physical devices.
+
+To resolve this:
+1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
+2. If the error persists, enable detailed diagnostic logging in your configuration:
+```json
+{
+  "wildcardTopic": true,
+  "debug": true,
+  "debugFeatures": [
+    "Log API Bodies",
+    "Log MQTT Payloads as JSON",
+    "Log Debug as Info"
+  ]
+}
+```
+3. Record a full cleaning cycle from the initial start command through to the completion of any dock maintenance routines (such as self-cleaning or drying).
+4. Provide the redacted logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
 <!-- INCLUDES: issue-13-4541 issue-16-b67c -->
 The information required depends on the device type and the specific feature being requested:
 
-1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. *Dyson robots use a MQTT status topic that is unsupported by `opendyson`; a plugin debug log is also required to capture this.*
+1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use a MQTT status topic that is unsupported by `opendyson`; a plugin debug log is also required to capture this.
 
 2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.
 
@@ -77,29 +94,6 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 #### Why doesn't the plugin support skipping the current cleaning zone for robot vacuums?
 
 The plugin does not implement the `SKIP-CURRENT-ZONE` command or the Matter Service Area Cluster's `SkipArea` command. This decision is based on observations that Dyson robot firmware, such as that on the Dyson Spot+Scrub Ai (RB05), frequently ignores these commands. Historical data from previous Dyson robot models also indicates a lack of support for this functionality. To ensure a reliable user experience and avoid exposing non-functional controls in Matter controllers, this feature is not currently prioritised.
-
-#### 🚧 Why does startup fail with `DysonCloudError: Unexpected structure of Dyson cloud API response` on newer Dyson robot models? 🚧
-
-<!-- INCLUDES: issue-50-f48e -->
-The plugin performs strict schema validation on the Dyson cloud `/v3/manifest` response and incoming MQTT payloads against known definitions (such as `DysonManifestCapability`). When Dyson releases new models—such as the Spot+Scrub Ai (`RB05`), R1 Nurovi Dry (`RB07`), R2 Nurovi Wash+Dry (`RB07`), or R3 Nurovi Spot+Scrub UV (`RB05`)—or newer firmware updates, unrecognised capability identifiers (such as `SelfCleanOptionsV2`) cause validation to fail, halting plugin startup.
-
-Support for these newer models is experimental and developed without direct access to physical devices. If an unrecognised capability or structure is reported:
-
-1. Ensure the plugin is running the latest release, as newly identified capabilities are added incrementally.
-2. If startup still fails or unexpected validation errors occur, enable detailed diagnostic logging in the plugin configuration:
-```json
-{
-  "wildcardTopic": true,
-  "debug": true,
-  "debugFeatures": [
-    "Log API Bodies",
-    "Log MQTT Payloads as JSON",
-    "Log Debug as Info"
-  ]
-}
-```
-3. Record a full cleaning cycle from the initial start command through to the completion of any dock maintenance routines (such as self-cleaning or drying).
-4. Provide the redacted logs in an issue report so the missing capabilities and MQTT message structures can be incorporated into the plugin schemas.
 
 ### Dyson Spot+Scrub Ai (RB05) Support
 
