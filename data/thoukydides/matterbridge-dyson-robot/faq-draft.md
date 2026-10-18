@@ -78,6 +78,29 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 
 The plugin does not implement the `SKIP-CURRENT-ZONE` command or the Matter Service Area Cluster's `SkipArea` command. This decision is based on observations that Dyson robot firmware, such as that on the Dyson Spot+Scrub Ai (RB05), frequently ignores these commands. Historical data from previous Dyson robot models also indicates a lack of support for this functionality. To ensure a reliable user experience and avoid exposing non-functional controls in Matter controllers, this feature is not currently prioritised.
 
+#### 🚧 Why does startup fail with `DysonCloudError: Unexpected structure of Dyson cloud API response` on newer Dyson robot models? 🚧
+
+<!-- INCLUDES: issue-50-f48e -->
+The plugin performs strict schema validation on the Dyson cloud `/v3/manifest` response and incoming MQTT payloads against known definitions (such as `DysonManifestCapability`). When Dyson releases new models—such as the Spot+Scrub Ai (`RB05`), R1 Nurovi Dry (`RB07`), R2 Nurovi Wash+Dry (`RB07`), or R3 Nurovi Spot+Scrub UV (`RB05`)—or newer firmware updates, unrecognised capability identifiers (such as `SelfCleanOptionsV2`) cause validation to fail, halting plugin startup.
+
+Support for these newer models is experimental and developed without direct access to physical devices. If an unrecognised capability or structure is reported:
+
+1. Ensure the plugin is running the latest release, as newly identified capabilities are added incrementally.
+2. If startup still fails or unexpected validation errors occur, enable detailed diagnostic logging in the plugin configuration:
+```json
+{
+  "wildcardTopic": true,
+  "debug": true,
+  "debugFeatures": [
+    "Log API Bodies",
+    "Log MQTT Payloads as JSON",
+    "Log Debug as Info"
+  ]
+}
+```
+3. Record a full cleaning cycle from the initial start command through to the completion of any dock maintenance routines (such as self-cleaning or drying).
+4. Provide the redacted logs in an issue report so the missing capabilities and MQTT message structures can be incorporated into the plugin schemas.
+
 ### Dyson Spot+Scrub Ai (RB05) Support
 
 #### Why does the Dyson Spot+Scrub Ai (RB05) status take time to update?
