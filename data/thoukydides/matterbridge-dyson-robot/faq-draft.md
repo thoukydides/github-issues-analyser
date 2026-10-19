@@ -34,14 +34,14 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 -->
-The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored.
+<!-- INCLUDES: issue-17-fe91 issue-50-a351 -->
+The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or proprietary JSON Data Model (`JDM`) commands are identified and correctly implemented rather than silently ignored.
 
 This error frequently occurs with newer robot models—such as the Spot+Scrub Ai (`RB05`), R1 Nurovi Dry (`RB07`), R2 Nurovi Wash+Dry (`RB07`), or R3 Nurovi Spot+Scrub UV (`RB05`)—or when firmware updates introduce unrecognised capability identifiers like `SelfCleanOptionsV2`. Support for these models is often developed without direct access to physical devices.
 
 To resolve this:
 1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
-2. If the error persists, enable detailed diagnostic logging in your configuration:
+2. Enable detailed diagnostic logging in your configuration:
 ```json
 {
   "wildcardTopic": true,
@@ -53,19 +53,19 @@ To resolve this:
   ]
 }
 ```
-3. Record a full cleaning cycle from the initial start command through to the completion of any dock maintenance routines (such as self-cleaning or drying).
+3. Record an entire operational cycle: confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
 4. Provide the redacted logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
-<!-- INCLUDES: issue-13-4541 issue-16-b67c -->
+<!-- INCLUDES: issue-13-4541 issue-16-b67c issue-50-a351 -->
 The information required depends on the device type and the specific feature being requested:
 
-1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use a MQTT status topic that is unsupported by `opendyson`; a plugin debug log is also required to capture this.
+1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use a MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.
 
 2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.
 
-3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` in your configuration and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record a log while the device completes a cycle (e.g. a full clean) and submit the output via a GitHub issue.
+3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` and `wildcardTopic` in your configuration, and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record an entire operational cycle from start to finish, including autonomous return to dock and any maintenance routines (e.g. mop washing or drying). Providing an accompanying timeline of robot states (`state`, `dockState`) alongside the output helps map behaviour accurately. Inspect logs prior to sharing to ensure all private identifiers remain protected.
 
 #### Where is the `libdyson` configuration file located?
 
@@ -94,34 +94,6 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 #### Why doesn't the plugin support skipping the current cleaning zone for robot vacuums?
 
 The plugin does not implement the `SKIP-CURRENT-ZONE` command or the Matter Service Area Cluster's `SkipArea` command. This decision is based on observations that Dyson robot firmware, such as that on the Dyson Spot+Scrub Ai (RB05), frequently ignores these commands. Historical data from previous Dyson robot models also indicates a lack of support for this functionality. To ensure a reliable user experience and avoid exposing non-functional controls in Matter controllers, this feature is not currently prioritised.
-
-#### 🚧 How do I capture diagnostic logs and MQTT payloads for untested Dyson robot models? 🚧
-
-<!-- INCLUDES: issue-50-a351 -->
-Support for newer or unverified Dyson robot models (such as the Spot+Scrub Ai `RB05` or Nurovi R1/R2/R3 `RB07`) relies on community telemetry, as the maintainer may lack physical access to every hardware variant. These models frequently introduce new REST API manifest capabilities, unrecognised MQTT topics, and proprietary JSON Data Model (`JDM`) commands that do not match existing schema definitions.
-
-To capture the telemetry required to implement or refine device support, configure the plugin with extended logging options:
-
-```json
-{
-  "wildcardTopic": true,
-  "debug": true,
-  "debugFeatures": [
-    "Log API Bodies",
-    "Log MQTT Payloads as JSON",
-    "Log Debug as Info"
-  ]
-}
-```
-
-When recording diagnostic logs for analysis, capture an entire operational cycle from start to finish:
-
-1. Start Matterbridge and confirm that the plugin initialises and establishes an MQTT connection to the AWS IoT broker.
-2. Initiate a full clean using either the MyDyson application or Matter controls.
-3. Allow the robot to finish cleaning and return to its dock autonomously.
-4. Allow all dock maintenance routines to finish completely, including dust collection, mop washing, and mop drying cycles.
-
-While the plugin automatically redacts sensitive account credentials and tokens, inspect logs prior to sharing to ensure all private identifiers remain protected. Providing an accompanying timeline of robot states (`state`, `dockState`) alongside the output helps map operational states accurately.
 
 ### Dyson Spot+Scrub Ai (RB05) Support
 
