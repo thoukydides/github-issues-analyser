@@ -13,8 +13,7 @@
                             "question": "Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?",
                             "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored.\n\nThis error frequently occurs with newer robot models—such as the Spot+Scrub Ai (`RB05`), R1 Nurovi Dry (`RB07`), R2 Nurovi Wash+Dry (`RB07`), or R3 Nurovi Spot+Scrub UV (`RB05`)—or when firmware updates introduce unrecognised capability identifiers like `SelfCleanOptionsV2`. Support for these models is often developed without direct access to physical devices.\n\nTo resolve this:\n1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.\n2. If the error persists, enable detailed diagnostic logging in your configuration:\n```json\n{\n  \"wildcardTopic\": true,\n  \"debug\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n3. Record a full cleaning cycle from the initial start command through to the completion of any dock maintenance routines (such as self-cleaning or drying).\n4. Provide the redacted logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.",
                             "included_ids": [
-                                "issue-17-fe91",
-                                "issue-50-f48e"
+                                "issue-17-fe91"
                             ]
                         },
                         {
@@ -51,7 +50,14 @@
                             "included_ids": []
                         }
                     ],
-                    "candidates": [],
+                    "candidates": [
+                        {
+                            "issue_number": 50,
+                            "id": "issue-50-a351",
+                            "question": "How do I capture diagnostic logs and MQTT payloads for untested Dyson robot models?",
+                            "answer": "Support for newer or unverified Dyson robot models (such as the Spot+Scrub Ai `RB05` or Nurovi R1/R2/R3 `RB07`) relies on community telemetry, as the maintainer may lack physical access to every hardware variant. These models frequently introduce new REST API manifest capabilities, unrecognised MQTT topics, and proprietary JSON Data Model (`JDM`) commands that do not match existing schema definitions.\n\nTo capture the telemetry required to implement or refine device support, configure the plugin with extended logging options:\n\n```json\n{\n  \"wildcardTopic\": true,\n  \"debug\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\nWhen recording diagnostic logs for analysis, capture an entire operational cycle from start to finish:\n\n1. Start Matterbridge and confirm that the plugin initialises and establishes an MQTT connection to the AWS IoT broker.\n2. Initiate a full clean using either the MyDyson application or Matter controls.\n3. Allow the robot to finish cleaning and return to its dock autonomously.\n4. Allow all dock maintenance routines to finish completely, including dust collection, mop washing, and mop drying cycles.\n\nWhile the plugin automatically redacts sensitive account credentials and tokens, inspect logs prior to sharing to ensure all private identifiers remain protected. Providing an accompanying timeline of robot states (`state`, `dockState`) alongside the output helps map operational states accurately."
+                        }
+                    ],
                     "partition": "Unsupported Dyson Devices and Features"
                 }
             ],

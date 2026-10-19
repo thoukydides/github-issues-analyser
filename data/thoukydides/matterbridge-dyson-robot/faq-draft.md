@@ -34,7 +34,7 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-f48e -->
+<!-- INCLUDES: issue-17-fe91 -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or the introduction of new appliance capabilities are identified and correctly implemented rather than silently ignored.
 
 This error frequently occurs with newer robot models—such as the Spot+Scrub Ai (`RB05`), R1 Nurovi Dry (`RB07`), R2 Nurovi Wash+Dry (`RB07`), or R3 Nurovi Spot+Scrub UV (`RB05`)—or when firmware updates introduce unrecognised capability identifiers like `SelfCleanOptionsV2`. Support for these models is often developed without direct access to physical devices.
@@ -94,6 +94,34 @@ While the MyDyson API includes MQTT configuration for these models, testing has 
 #### Why doesn't the plugin support skipping the current cleaning zone for robot vacuums?
 
 The plugin does not implement the `SKIP-CURRENT-ZONE` command or the Matter Service Area Cluster's `SkipArea` command. This decision is based on observations that Dyson robot firmware, such as that on the Dyson Spot+Scrub Ai (RB05), frequently ignores these commands. Historical data from previous Dyson robot models also indicates a lack of support for this functionality. To ensure a reliable user experience and avoid exposing non-functional controls in Matter controllers, this feature is not currently prioritised.
+
+#### 🚧 How do I capture diagnostic logs and MQTT payloads for untested Dyson robot models? 🚧
+
+<!-- INCLUDES: issue-50-a351 -->
+Support for newer or unverified Dyson robot models (such as the Spot+Scrub Ai `RB05` or Nurovi R1/R2/R3 `RB07`) relies on community telemetry, as the maintainer may lack physical access to every hardware variant. These models frequently introduce new REST API manifest capabilities, unrecognised MQTT topics, and proprietary JSON Data Model (`JDM`) commands that do not match existing schema definitions.
+
+To capture the telemetry required to implement or refine device support, configure the plugin with extended logging options:
+
+```json
+{
+  "wildcardTopic": true,
+  "debug": true,
+  "debugFeatures": [
+    "Log API Bodies",
+    "Log MQTT Payloads as JSON",
+    "Log Debug as Info"
+  ]
+}
+```
+
+When recording diagnostic logs for analysis, capture an entire operational cycle from start to finish:
+
+1. Start Matterbridge and confirm that the plugin initialises and establishes an MQTT connection to the AWS IoT broker.
+2. Initiate a full clean using either the MyDyson application or Matter controls.
+3. Allow the robot to finish cleaning and return to its dock autonomously.
+4. Allow all dock maintenance routines to finish completely, including dust collection, mop washing, and mop drying cycles.
+
+While the plugin automatically redacts sensitive account credentials and tokens, inspect logs prior to sharing to ensure all private identifiers remain protected. Providing an accompanying timeline of robot states (`state`, `dockState`) alongside the output helps map operational states accurately.
 
 ### Dyson Spot+Scrub Ai (RB05) Support
 
