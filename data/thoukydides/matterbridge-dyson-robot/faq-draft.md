@@ -26,6 +26,7 @@
     - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
   - **[Robot Vacuum Control in Apple Home](#robot-vacuum-control-in-apple-home)**
     - [How can I clean specific rooms or zones using Apple Home?](#how-can-i-clean-specific-rooms-or-zones-using-apple-home)
+- **[Diagnostic Logging](#diagnostic-logging)**
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -34,7 +35,7 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-a351 -->
+<!-- INCLUDES: issue-17-fe91 -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API, new model identifiers, or proprietary JSON Data Model (`JDM`) commands are identified and correctly implemented rather than silently ignored.
 
 This error frequently occurs with newer robot models—such as the Spot+Scrub Ai (`RB05`), R1 Nurovi Dry (`RB07`), R2 Nurovi Wash+Dry (`RB07`), or R3 Nurovi Spot+Scrub UV (`RB05`)—or when firmware updates introduce unrecognised capability identifiers like `SelfCleanOptionsV2`. Support for these models is often developed without direct access to physical devices.
@@ -58,7 +59,7 @@ To resolve this:
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
-<!-- INCLUDES: issue-13-4541 issue-16-b67c issue-50-a351 -->
+<!-- INCLUDES: issue-13-4541 issue-16-b67c -->
 The information required depends on the device type and the specific feature being requested:
 
 1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use a MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.
@@ -209,5 +210,65 @@ To set up room-specific cleaning:
 You can then trigger these Scenes using Siri commands or through automations. When the Scene is activated, the robot will use the per-room settings (such as vacuum power or water flow) already configured for those areas in the MyDyson app.
 
 Note that the Apple Home app's handling of the Robot Vacuum Cleaner (RVC) Clean Mode can be unintuitive. It often displays technical mode tags rather than descriptive labels, and it acts as a global setting for the device rather than a per-area configuration.
+
+## Diagnostic Logging
+
+#### 🚧 How can comprehensive diagnostic logs be captured for Dyson robot vacuum troubleshooting? 🚧
+
+<!-- INCLUDES: issue-50-b8fb -->
+When diagnosing protocol errors, unhandled message types, or gathering data to support new Dyson robot models, detailed diagnostic logs covering a full operational cycle are required.
+
+To configure and capture diagnostic logs:
+
+1. Add the following logging and topic options to the plugin configuration:
+   ```json
+   {
+     "wildcardTopic": true,
+     "debug": true,
+     "debugFeatures": [
+       "Log API Bodies",
+       "Log MQTT Payloads as JSON",
+       "Log Debug as Info"
+     ]
+   }
+   ```
+2. Restart Matterbridge to apply the configuration and reinitialise the MQTT connection.
+3. Capture a complete cleaning cycle from beginning to end, ensuring the session records:
+   - Plugin initialisation and Dyson cloud API `/v3/manifest` retrieval
+   - MQTT broker connection establishment
+   - Clean initiation (via the MyDyson application or Matter)
+   - In-flight cleaning state transitions and telemetry updates
+   - Post-cleaning dock maintenance sequences (such as dust collection, mop washing, and drying) until the robot returns to an idle charging state
+
+Sensitive information, including cloud credentials and serial numbers, is automatically redacted by the plugin in log output.
+
+#### 🚧 How do I enable detailed debug logging for Dyson Cloud API and MQTT communication? 🚧
+
+<!-- INCLUDES: issue-51-f12c -->
+When diagnosing appliance communication issues, unsupported device behaviours, or unexpected API payload structures (such as `DysonCloudError`), comprehensive protocol logs are required to examine the raw data exchanged with the Dyson Cloud REST API and MQTT brokers.
+
+To enable full diagnostic logging, configure the plugin with the following parameters:
+
+```json
+{
+  "wildcardTopic": true,
+  "debug": true,
+  "debugFeatures": [
+    "Log API Bodies",
+    "Log MQTT Payloads as JSON",
+    "Log Debug as Info"
+  ]
+}
+```
+
+These parameters adjust logging behaviour as follows:
+- `wildcardTopic`: Subscribes to the MQTT wildcard topic (`#`), capturing all incoming and outgoing MQTT telemetry and status events for the appliance.
+- `debug`: Activates debug-level logging across the plugin.
+- `debugFeatures`:
+  - `"Log API Bodies"`: Logs the full request and response bodies for all Dyson Cloud HTTP API requests.
+  - `"Log MQTT Payloads as JSON"`: Formats raw MQTT payloads into readable JSON objects in the logs.
+  - `"Log Debug as Info"`: Elevates debug-level log statements to the `info` level, ensuring they appear in the standard Matterbridge console output without requiring global platform debug logging.
+
+The plugin automatically sanitises sensitive credentials, tokens, and serial numbers. However, review log output before sharing publicly to ensure any remaining private network or environment details are redacted.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
