@@ -27,6 +27,7 @@
   - **[Robot Vacuum Control in Apple Home](#robot-vacuum-control-in-apple-home)**
     - [How can I clean specific rooms or zones using Apple Home?](#how-can-i-clean-specific-rooms-or-zones-using-apple-home)
 - **[Diagnostic Logging](#diagnostic-logging)**
+  - [How do I capture diagnostic logs for troubleshooting or new device support?](#how-do-i-capture-diagnostic-logs-for-troubleshooting-or-new-device-support)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -213,41 +214,12 @@ Note that the Apple Home app's handling of the Robot Vacuum Cleaner (RVC) Clean 
 
 ## Diagnostic Logging
 
-#### 🚧 How can comprehensive diagnostic logs be captured for Dyson robot vacuum troubleshooting? 🚧
+#### How do I capture diagnostic logs for troubleshooting or new device support?
 
-<!-- INCLUDES: issue-50-b8fb -->
-When diagnosing protocol errors, unhandled message types, or gathering data to support new Dyson robot models, detailed diagnostic logs covering a full operational cycle are required.
+<!-- INCLUDES: issue-50-b8fb issue-51-f12c -->
+When diagnosing protocol errors, unhandled message types, or gathering data to support new Dyson robot models, detailed diagnostic logs covering interactions with the Dyson Cloud REST API and MQTT brokers are required.
 
-To configure and capture diagnostic logs:
-
-1. Add the following logging and topic options to the plugin configuration:
-   ```json
-   {
-     "wildcardTopic": true,
-     "debug": true,
-     "debugFeatures": [
-       "Log API Bodies",
-       "Log MQTT Payloads as JSON",
-       "Log Debug as Info"
-     ]
-   }
-   ```
-2. Restart Matterbridge to apply the configuration and reinitialise the MQTT connection.
-3. Capture a complete cleaning cycle from beginning to end, ensuring the session records:
-   - Plugin initialisation and Dyson cloud API `/v3/manifest` retrieval
-   - MQTT broker connection establishment
-   - Clean initiation (via the MyDyson application or Matter)
-   - In-flight cleaning state transitions and telemetry updates
-   - Post-cleaning dock maintenance sequences (such as dust collection, mop washing, and drying) until the robot returns to an idle charging state
-
-Sensitive information, including cloud credentials and serial numbers, is automatically redacted by the plugin in log output.
-
-#### 🚧 How do I enable detailed debug logging for Dyson Cloud API and MQTT communication? 🚧
-
-<!-- INCLUDES: issue-51-f12c -->
-When diagnosing appliance communication issues, unsupported device behaviours, or unexpected API payload structures (such as `DysonCloudError`), comprehensive protocol logs are required to examine the raw data exchanged with the Dyson Cloud REST API and MQTT brokers.
-
-To enable full diagnostic logging, configure the plugin with the following parameters:
+To enable full diagnostic logging, add the following parameters to the plugin configuration:
 
 ```json
 {
@@ -261,14 +233,18 @@ To enable full diagnostic logging, configure the plugin with the following param
 }
 ```
 
-These parameters adjust logging behaviour as follows:
-- `wildcardTopic`: Subscribes to the MQTT wildcard topic (`#`), capturing all incoming and outgoing MQTT telemetry and status events for the appliance.
+These settings perform the following functions:
+- `wildcardTopic`: Subscribes to the MQTT wildcard topic (`#`) to capture all telemetry and status events.
 - `debug`: Activates debug-level logging across the plugin.
 - `debugFeatures`:
-  - `"Log API Bodies"`: Logs the full request and response bodies for all Dyson Cloud HTTP API requests.
-  - `"Log MQTT Payloads as JSON"`: Formats raw MQTT payloads into readable JSON objects in the logs.
-  - `"Log Debug as Info"`: Elevates debug-level log statements to the `info` level, ensuring they appear in the standard Matterbridge console output without requiring global platform debug logging.
+  - `Log API Bodies`: Logs the full request and response bodies for all Dyson Cloud HTTP API requests.
+  - `Log MQTT Payloads as JSON`: Formats raw MQTT payloads into readable JSON objects.
+  - `Log Debug as Info`: Elevates debug statements to the `info` level, ensuring they appear in the standard Matterbridge console output.
 
-The plugin automatically sanitises sensitive credentials, tokens, and serial numbers. However, review log output before sharing publicly to ensure any remaining private network or environment details are redacted.
+To capture a complete diagnostic session:
+1. Restart Matterbridge to apply the configuration and reinitialise the MQTT connection.
+2. Record a complete operational cycle from beginning to end. This should include plugin initialisation, MQTT connection establishment, the initiation of a task (via the MyDyson application or Matter), and the return to an idle charging state (including dock maintenance such as dust collection or mop washing).
+
+Sensitive information, including cloud credentials and serial numbers, is automatically redacted by the plugin. However, please review the output for any remaining private environment details before sharing logs publicly.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
