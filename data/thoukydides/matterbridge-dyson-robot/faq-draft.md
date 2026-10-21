@@ -23,40 +23,47 @@
 
 ## Unsupported Dyson Devices and Features
 
+<!-- PARTITION: Unsupported Dyson Devices and Features -->
+
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 -->
+<!-- INCLUDES: issue-17-fe91 issue-50-cd0e -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
 
-This error frequently occurs with newer models or firmware updates are released. Support for these models is often developed without direct access to physical devices.
+This error frequently occurs when newer models or firmware updates are released. Support for these models is often developed without direct access to physical devices.
 
 To resolve this:
 1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
-2. Enable detailed diagnostic logging in your configuration:
-```json
-{
-    "wildcardTopic": true,
-    "debug": true,
-    "debugFeatures": [
-        "Log API Bodies",
-        "Log MQTT Payloads as JSON",
-        "Log Debug as Info"
-    ]
-}
-```
+2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
 3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
-4. Provide the redacted logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
+4. Provide the logs in a GitHub issue. **Note**: While the plugin automatically redacts appliance serial numbers and Dyson Cloud API tokens, Matterbridge outputs Matter commissioning secrets (including QR codes, setup passcodes, and discriminators) in clear text. Inspect and redact these Matterbridge-specific credentials before posting logs publicly.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
-<!-- INCLUDES: issue-13-4541 issue-16-b67c -->
+<!-- INCLUDES: issue-13-4541 issue-16-b67c issue-50-cd0e -->
 The information required depends on the device type and the specific feature being requested:
 
-1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use a MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.
+1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use an MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.
 
 2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.
 
-3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` and `wildcardTopic` in your configuration, and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record an entire operational cycle from start to finish, including autonomous return to dock and any maintenance routines (e.g. mop washing or drying). Providing an accompanying timeline of observed robot activity alongside the output helps map behaviour accurately. Inspect logs prior to sharing to ensure all private identifiers remain protected.
+3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable diagnostic logging in your configuration:
+```json
+{
+  "wildcardTopic": true,
+  "debug": true,
+  "debugFeatures": [
+    "Log API Bodies",
+    "Log MQTT Payloads as JSON",
+    "Log Debug as Info"
+  ]
+}
+```
+- `wildcardTopic`: Subscribes to all appliance MQTT topics to capture all state telemetry and JDM messages.
+- `debug`: Activates diagnostic logging within the plugin.
+- `debugFeatures` provides granular control: `Log API Bodies` captures Dyson Cloud REST API traffic; `Log MQTT Payloads as JSON` deserialises messages into formatted JSON for readability; `Log Debug as Info` ensures debug logs are preserved in environments that filter debug-level output.
+
+Record an entire operational cycle from start to finish and provide an accompanying timeline of observed behaviour. Ensure you redact Matter commissioning secrets (QR codes, passcodes, and discriminators) from the logs before sharing, as these are output by Matterbridge in clear text.
 
 #### Where is the `libdyson` configuration file located?
 
@@ -81,40 +88,6 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
-
-#### 🚧 How can detailed diagnostic logs be captured for troubleshooting Dyson robot communication? 🚧
-
-<!-- INCLUDES: issue-50-cd0e -->
-To diagnose communication problems or assist in adding support for unrecognised Dyson robot models, detailed protocol telemetry can be captured across both the Dyson Cloud REST API and the AWS IoT MQTT event stream.
-
-The following configuration parameters can be added to the plugin configuration within Matterbridge:
-
-```json
-{
-  "wildcardTopic": true,
-  "debug": true,
-  "debugFeatures": [
-    "Log API Bodies",
-    "Log MQTT Payloads as JSON",
-    "Log Debug as Info"
-  ]
-}
-```
-
-These options configure the logging subsystem as follows:
-- `wildcardTopic`: Subscribes to all appliance MQTT topics rather than a filtered subset, capturing all state telemetry and JDM messages.
-- `debug`: Activates diagnostic logging within the plugin.
-- `debugFeatures`:
-  - `"Log API Bodies"`: Outputs the complete JSON bodies of Dyson Cloud REST API requests and responses.
-  - `"Log MQTT Payloads as JSON"`: Deserialises incoming and outgoing MQTT messages into formatted JSON for readability.
-  - `"Log Debug as Info"`: Elevates debug-level log lines to informational status so they are preserved if the host container or environment filters out debug output.
-
-To generate an effective diagnostic capture:
-1. Apply these configuration options and restart Matterbridge.
-2. Initiate a complete cleaning cycle from beginning to end, ensuring any pre-clean dock actions (such as mop washing) and post-clean dock operations (such as dust collection and mop drying) are fully executed.
-3. Allow the robot and dock to settle back into their idle charging state before collecting the log file.
-
-Note that whilst the plugin automatically redacts appliance serial numbers and Dyson Cloud API tokens, Matterbridge itself outputs Matter commissioning secrets (including QR codes, setup passcodes, and discriminators) in clear text. Inspect and redact these Matterbridge-specific credentials before posting log extracts publicly.
 
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
