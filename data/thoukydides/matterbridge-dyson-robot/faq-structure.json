@@ -21,8 +21,7 @@
                             "answer": "The information required depends on the device type and the specific feature being requested:\n\n1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use a MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.\n\n2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.\n\n3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` and `wildcardTopic` in your configuration, and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record an entire operational cycle from start to finish, including autonomous return to dock and any maintenance routines (e.g. mop washing or drying). Providing an accompanying timeline of observed robot activity alongside the output helps map behaviour accurately. Inspect logs prior to sharing to ensure all private identifiers remain protected.",
                             "included_ids": [
                                 "issue-13-4541",
-                                "issue-16-b67c",
-                                "issue-50-b8fb"
+                                "issue-16-b67c"
                             ]
                         },
                         {
@@ -46,7 +45,14 @@
                             ]
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 50,
+                            "id": "issue-50-cd0e",
+                            "question": "How can detailed diagnostic logs be captured for troubleshooting Dyson robot communication?",
+                            "answer": "To diagnose communication problems or assist in adding support for unrecognised Dyson robot models, detailed protocol telemetry can be captured across both the Dyson Cloud REST API and the AWS IoT MQTT event stream.\n\nThe following configuration parameters can be added to the plugin configuration within Matterbridge:\n\n```json\n{\n  \"wildcardTopic\": true,\n  \"debug\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\nThese options configure the logging subsystem as follows:\n- `wildcardTopic`: Subscribes to all appliance MQTT topics rather than a filtered subset, capturing all state telemetry and JDM messages.\n- `debug`: Activates diagnostic logging within the plugin.\n- `debugFeatures`:\n  - `\"Log API Bodies\"`: Outputs the complete JSON bodies of Dyson Cloud REST API requests and responses.\n  - `\"Log MQTT Payloads as JSON\"`: Deserialises incoming and outgoing MQTT messages into formatted JSON for readability.\n  - `\"Log Debug as Info\"`: Elevates debug-level log lines to informational status so they are preserved if the host container or environment filters out debug output.\n\nTo generate an effective diagnostic capture:\n1. Apply these configuration options and restart Matterbridge.\n2. Initiate a complete cleaning cycle from beginning to end, ensuring any pre-clean dock actions (such as mop washing) and post-clean dock operations (such as dust collection and mop drying) are fully executed.\n3. Allow the robot and dock to settle back into their idle charging state before collecting the log file.\n\nNote that whilst the plugin automatically redacts appliance serial numbers and Dyson Cloud API tokens, Matterbridge itself outputs Matter commissioning secrets (including QR codes, setup passcodes, and discriminators) in clear text. Inspect and redact these Matterbridge-specific credentials before posting log extracts publicly."
+                        }
+                    ]
                 }
             ],
             "subcategories": [
