@@ -89,6 +89,17 @@ The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting produc
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
 
+#### 🚧 Why does the plugin fail with `countryCode is not a DysonProductCountryCode` or `Unexpected structure of Dyson cloud API response`? 🚧
+
+<!-- INCLUDES: issue-52-42d4 -->
+This error occurs when the Dyson cloud API returns a country or regional identifier that the plugin does not yet recognise. The plugin performs strict validation on the cloud API response to ensure data integrity; if an unknown code is encountered, the plugin will fail to start to prevent unpredictable behaviour.
+
+Dyson occasionally uses non-standard codes or regional markers instead of standard ISO 3166-1 country codes for certain appliance models or markets. For example, some models like the Spot+Scrub Ai (RB05) use the code `AZ` to represent a combined Australia and New Zealand market variant. These codes are used by the plugin to determine the correct language and region settings for subsequent API requests, such as retrieving fault code descriptions.
+
+To resolve this:
+1. Ensure you are running the latest version of the plugin, as new regional codes are added as they are identified.
+2. If the error persists, check the logs for the specific `countryCode` being reported (e.g., `AZ`, `XC`, `XD`) and report it to the project maintainers so it can be added to the supported list.
+
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
 #### Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?
