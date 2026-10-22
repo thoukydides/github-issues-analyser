@@ -2,7 +2,7 @@
 
 <!-- TOC-START -->
 - **[Unsupported Dyson Devices and Features](#unsupported-dyson-devices-and-features)**
-  - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-error)
+  - [Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` or `countryCode` error?](#why-does-the-plugin-fail-to-start-with-an-unexpected-structure-of-dyson-cloud-api-response-or-countrycode-error)
   - [What information should I collect to enable support for a new Dyson model or missing features?](#what-information-should-i-collect-to-enable-support-for-a-new-dyson-model-or-missing-features)
   - [Where is the `libdyson` configuration file located?](#where-is-the-libdyson-configuration-file-located)
   - [Why are Dyson error codes and the sleep timer not visible in my Matter controller?](#why-are-dyson-error-codes-and-the-sleep-timer-not-visible-in-my-matter-controller)
@@ -25,18 +25,18 @@
 
 <!-- PARTITION: Unsupported Dyson Devices and Features -->
 
-#### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
+#### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` or `countryCode` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-cd0e -->
+<!-- INCLUDES: issue-17-fe91 issue-50-cd0e issue-52-42d4 -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
 
-This error frequently occurs when newer models or firmware updates are released. Support for these models is often developed without direct access to physical devices.
+This error frequently occurs when newer models, firmware updates, or unrecognised regional markers are encountered. For example, some models like the Spot+Scrub Ai (RB05) use the code `AZ` to represent a combined Australia and New Zealand market variant instead of a standard ISO 3166-1 country code. These codes are essential for the plugin to determine the correct language and region settings for subsequent API requests, such as retrieving human-readable fault code descriptions.
 
 To resolve this:
-1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
+1. Ensure you are running the latest version of the plugin, as new models, firmware updates, and regional codes are added incrementally.
 2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
 3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
-4. Provide the logs in a GitHub issue. **Note**: While the plugin automatically redacts appliance serial numbers and Dyson Cloud API tokens, Matterbridge outputs Matter commissioning secrets (including QR codes, setup passcodes, and discriminators) in clear text. Inspect and redact these Matterbridge-specific credentials before posting logs publicly.
+4. Provide the logs in a GitHub issue, noting the specific `countryCode` (e.g., `AZ`, `XC`, `XD`) or unexpected field reported. **Note**: While the plugin automatically redacts appliance serial numbers and Dyson Cloud API tokens, Matterbridge outputs Matter commissioning secrets (including QR codes, setup passcodes, and discriminators) in clear text. Inspect and redact these Matterbridge-specific credentials before posting logs publicly.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
@@ -88,17 +88,6 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
-
-#### 🚧 Why does the plugin fail with `countryCode is not a DysonProductCountryCode` or `Unexpected structure of Dyson cloud API response`? 🚧
-
-<!-- INCLUDES: issue-52-42d4 -->
-This error occurs when the Dyson cloud API returns a country or regional identifier that the plugin does not yet recognise. The plugin performs strict validation on the cloud API response to ensure data integrity; if an unknown code is encountered, the plugin will fail to start to prevent unpredictable behaviour.
-
-Dyson occasionally uses non-standard codes or regional markers instead of standard ISO 3166-1 country codes for certain appliance models or markets. For example, some models like the Spot+Scrub Ai (RB05) use the code `AZ` to represent a combined Australia and New Zealand market variant. These codes are used by the plugin to determine the correct language and region settings for subsequent API requests, such as retrieving fault code descriptions.
-
-To resolve this:
-1. Ensure you are running the latest version of the plugin, as new regional codes are added as they are identified.
-2. If the error persists, check the logs for the specific `countryCode` being reported (e.g., `AZ`, `XC`, `XD`) and report it to the project maintainers so it can be added to the supported list.
 
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
