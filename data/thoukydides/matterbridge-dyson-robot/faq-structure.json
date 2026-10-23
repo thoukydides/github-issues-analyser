@@ -14,8 +14,7 @@
                             "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.\n\nThis error frequently occurs with newer models, regional variants, or firmware updates are released. Support for these models is often developed without direct access to physical devices.\n\nTo resolve this:\n1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.\n2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.\n3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.\n4. Provide the logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.",
                             "included_ids": [
                                 "issue-17-fe91",
-                                "issue-50-cd0e",
-                                "issue-52-42d4"
+                                "issue-50-cd0e"
                             ]
                         },
                         {
@@ -48,7 +47,14 @@
                             ]
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 52,
+                            "id": "issue-52-fe7d",
+                            "question": "Why does the plugin fail to start with `Unexpected structure of Dyson cloud API response` regarding a `countryCode`?",
+                            "answer": "This error occurs when the Dyson cloud API returns a region or country code that the plugin does not yet recognise. Dyson occasionally uses non-standard or undocumented market codes (for example, `AZ` for certain product variants in the Australia and New Zealand region) that are not listed in their official supported markets list. \n\nBecause the plugin performs strict validation on the structure of the device manifest during startup, an unrecognised code for even a single device will prevent the entire plugin from loading and exposing any appliances to Matter. Support for these codes is added to the plugin as they are discovered and mapped to appropriate regional settings for tasks like fetching fault code descriptions. If you encounter this error, ensure you are running the latest version of the plugin."
+                        }
+                    ]
                 }
             ],
             "subcategories": [
@@ -71,7 +77,14 @@
                                     "included_ids": []
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 51,
+                                    "id": "issue-51-dfab",
+                                    "question": "Why does selecting Mop or Vacuum and Mop fail when starting a full clean?",
+                                    "answer": "Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean fails with `Error: Global clean mopping is not implemented` in the plugin logs.\n\nThis limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active are undocumented and have not yet been reverse-engineered.\n\nTo work around this limitation:\n\n* Start mopping cycles by selecting specific rooms (zone clean) rather than initiating a whole-home clean.\n* Initiate full-home mopping sessions directly within the MyDyson mobile app."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -146,12 +159,23 @@
                         {
                             "question": "Why does selecting rooms in Apple Home immediately start cleaning?",
                             "answer": "Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command.\n\nThis behaviour is intentional for several reasons:\n\n- **Matter specification compliance**: Section 1.17.7.1 (`SelectAreas` Command) of the Matter Application Cluster Specification specifies that a device may begin operating immediately or wait for a command, defining this behaviour as manufacturer-specific.\n- **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin defaults to these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.\n\nBecause any global mode selected in Apple Home during room selection is deliberately ignored in favour of pre-configured zone settings, the clean begins as soon as the area selection is confirmed.",
-                            "included_ids": [
-                                "issue-51-064a"
-                            ]
+                            "included_ids": []
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 51,
+                            "id": "issue-51-aa8d",
+                            "question": "Why does the robot start cleaning immediately after selecting rooms in Apple Home?",
+                            "answer": "Under the Matter specification (Section 1.17.7.1 `SelectAreas` Command), appliances may start operating immediately upon area selection rather than awaiting a separate run command. The plugin implements immediate start by design.\n\n* **Preserving room presets**: When initiating a zone clean, the plugin prioritises the per-zone cleaning configurations defined in the MyDyson app over global controls. This guarantees safe operation across mixed flooring types, preventing the appliance from mopping carpeted rooms.\n* **Ignoring global mode overrides**: Because room-level settings defined in the MyDyson app take precedence to prevent floor damage, any global vacuum or mopping mode selected in Apple Home is intentionally ignored during zone cleaning.\n\nBecause room selection and cleaning mode cannot be configured independently without overriding room-specific floor safety profiles, cleaning commences as soon as the room selection is confirmed."
+                        },
+                        {
+                            "issue_number": 51,
+                            "id": "issue-51-0b2f",
+                            "question": "Why is there no dedicated vacuum-only mode in Apple Home?",
+                            "answer": "Vacuum-only cleaning is supported, but its presentation in Apple Home differs from the MyDyson app due to constraints in both the Matter specification and Apple's interface:\n\n* **Matter specification limitations**: Matter provides a single unified `RvcCleanMode` cluster list rather than distinct selectors for vacuum power and wet mopping. To prevent overly cluttered menus, vacuum-only operation is represented via suction power levels alongside combined or mop-only modes.\n* **Apple Home presentation limitations**: Apple Home does not render the custom mode description strings supplied by Matter devices; it displays only the standard Mode Tags associated with them.\n\nIn Apple Home, clean modes are mapped as follows:\n\n* **Quiet**, **Quick**, **Max**, and **Automatic**: Vacuum-only cleaning at the specified power level.\n* **Mop**: Mopping-only cleaning.\n* **VacuumAndMop**: Simultaneous vacuuming and mopping."
+                        }
+                    ]
                 }
             ],
             "subcategories": []
@@ -167,8 +191,7 @@
         "issue-33-3d80",
         "issue-46-1f2c",
         "issue-46-2ab8",
-        "issue-46-91b2",
-        "issue-51-3cb0"
+        "issue-46-91b2"
     ],
     "source_hashes": {
         "faq": "fed9d48392b71a6890a6ec2dce39ad311f7ff81e0bf7e1b1cce7cf6a4b19ceeb"
