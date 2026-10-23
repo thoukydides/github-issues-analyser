@@ -25,38 +25,27 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 -->
+<!-- INCLUDES: issue-17-fe91 issue-50-cd0e issue-52-42d4 -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
 
-This error frequently occurs with newer models or firmware updates are released. Support for these models is often developed without direct access to physical devices.
+This error frequently occurs with newer models, regional variants, or firmware updates are released. Support for these models is often developed without direct access to physical devices.
 
 To resolve this:
 1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
-2. Enable detailed diagnostic logging in your configuration:
-```json
-{
-    "wildcardTopic": true,
-    "debug": true,
-    "debugFeatures": [
-        "Log API Bodies",
-        "Log MQTT Payloads as JSON",
-        "Log Debug as Info"
-    ]
-}
-```
+2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
 3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
-4. Provide the redacted logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
+4. Provide the logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
-<!-- INCLUDES: issue-13-4541 issue-16-b67c issue-50-b8fb -->
+<!-- INCLUDES: issue-13-4541 issue-16-b67c issue-50-cd0e -->
 The information required depends on the device type and the specific feature being requested:
 
-1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use a MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.
+1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use an MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.
 
 2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.
 
-3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` and `wildcardTopic` in your configuration, and add `Log MQTT Payloads as JSON` to the `debugFeatures` array. Record an entire operational cycle from start to finish, including autonomous return to dock and any maintenance routines (e.g. mop washing or drying). Providing an accompanying timeline of observed robot activity alongside the output helps map behaviour accurately. Inspect logs prior to sharing to ensure all private identifiers remain protected.
+3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` and `wildcardTopic` in your configuration, and add `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array. Record an entire operational cycle from start to finish, including autonomous return to dock and any maintenance routines (e.g. mop washing or drying). Providing an accompanying timeline of observed robot activity alongside the output helps map behaviour accurately. Inspect logs prior to sharing to ensure all private identifiers remain protected.
 
 #### Where is the `libdyson` configuration file located?
 
