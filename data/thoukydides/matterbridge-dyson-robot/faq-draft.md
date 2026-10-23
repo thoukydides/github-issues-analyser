@@ -23,18 +23,20 @@
 
 ## Unsupported Dyson Devices and Features
 
+<!-- PARTITION: Unsupported Dyson Devices and Features -->
+
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-cd0e -->
+<!-- INCLUDES: issue-17-fe91 issue-50-cd0e issue-52-fe7d -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
 
-This error frequently occurs with newer models, regional variants, or firmware updates are released. Support for these models is often developed without direct access to physical devices.
+This error frequently occurs when newer models or firmware updates are released, or when Dyson introduces non-standard market codes (for example, `AZ` for certain variants in the Australia and New Zealand region). Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter.
 
 To resolve this:
-1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
+1. Ensure you are running the latest version of the plugin, as support for new models and regional settings is added incrementally.
 2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
 3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
-4. Provide the logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
+4. Provide the logs in a GitHub issue so the missing structures or codes can be correctly mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
@@ -70,13 +72,6 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
-
-#### 🚧 Why does the plugin fail to start with `Unexpected structure of Dyson cloud API response` regarding a `countryCode`? 🚧
-
-<!-- INCLUDES: issue-52-fe7d -->
-This error occurs when the Dyson cloud API returns a region or country code that the plugin does not yet recognise. Dyson occasionally uses non-standard or undocumented market codes (for example, `AZ` for certain product variants in the Australia and New Zealand region) that are not listed in their official supported markets list. 
-
-Because the plugin performs strict validation on the structure of the device manifest during startup, an unrecognised code for even a single device will prevent the entire plugin from loading and exposing any appliances to Matter. Support for these codes is added to the plugin as they are discovered and mapped to appropriate regional settings for tasks like fetching fault code descriptions. If you encounter this error, ensure you are running the latest version of the plugin.
 
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
