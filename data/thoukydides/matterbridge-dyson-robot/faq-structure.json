@@ -70,16 +70,16 @@
                                     "question": "Why does `opendyson listen` fail to show status messages for robot vacuums?",
                                     "answer": "The `opendyson` tool by default subscribes to MQTT topics used by air treatment devices such as `<model>/<serial>/status/current` and `<model>/<serial>/status/fault`. However, robot vacuums instead publish their status to the more general `<model>/<serial>/status` topic, with RB05 and later models additionally using `<model>/<serial>/status/jdm`. This mismatch in expected MQTT topics means `opendyson` will not receive any status messages, making it appear as if the device is not publishing.",
                                     "included_ids": []
+                                },
+                                {
+                                    "question": "Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?",
+                                    "answer": "Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean results in an `Error: Global clean mopping is not implemented` message in the plugin logs.\n\nThis limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active are undocumented and have not yet been reverse-engineered.\n\nTo work around this limitation:\n\n* Start mopping cycles by selecting specific rooms (zone clean) rather than initiating a whole-home clean.\n* Initiate full-home mopping sessions directly within the MyDyson mobile app.",
+                                    "included_ids": [
+                                        "issue-51-dfab"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 51,
-                                    "id": "issue-51-dfab",
-                                    "question": "Why does selecting Mop or Vacuum and Mop fail when starting a full clean?",
-                                    "answer": "Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean fails with `Error: Global clean mopping is not implemented` in the plugin logs.\n\nThis limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active are undocumented and have not yet been reverse-engineered.\n\nTo work around this limitation:\n\n* Start mopping cycles by selecting specific rooms (zone clean) rather than initiating a whole-home clean.\n* Initiate full-home mopping sessions directly within the MyDyson mobile app."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

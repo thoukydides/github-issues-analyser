@@ -10,6 +10,7 @@
   - **[Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support](#dyson-spotscrub-ai-and-r1r2r3-nurovi-support)**
     - [Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?](#why-does-the-dyson-spotscrub-ai-or-r1r2r3-nurovi-status-take-time-to-update)
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
+    - [Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?](#why-does-selecting-mop-or-vacuum-and-mop-fail-when-starting-a-whole-home-clean)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -84,10 +85,10 @@ Unlike most other Dyson appliances, the RB05 and RB07 robot vacuums do not autom
 
 The `opendyson` tool by default subscribes to MQTT topics used by air treatment devices such as `<model>/<serial>/status/current` and `<model>/<serial>/status/fault`. However, robot vacuums instead publish their status to the more general `<model>/<serial>/status` topic, with RB05 and later models additionally using `<model>/<serial>/status/jdm`. This mismatch in expected MQTT topics means `opendyson` will not receive any status messages, making it appear as if the device is not publishing.
 
-#### 🚧 Why does selecting Mop or Vacuum and Mop fail when starting a full clean? 🚧
+#### Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?
 
 <!-- INCLUDES: issue-51-dfab -->
-Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean fails with `Error: Global clean mopping is not implemented` in the plugin logs.
+Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean results in an `Error: Global clean mopping is not implemented` message in the plugin logs.
 
 This limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active are undocumented and have not yet been reverse-engineered.
 
