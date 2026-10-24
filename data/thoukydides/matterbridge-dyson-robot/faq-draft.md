@@ -19,7 +19,7 @@
   - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
 - **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
-  - [How can I trigger room-specific cleaning using Siri?](#how-can-i-trigger-room-specific-cleaning-using-siri)
+  - [Why are there no individual switches for rooms, and how do I automate area cleaning?](#why-are-there-no-individual-switches-for-rooms-and-how-do-i-automate-area-cleaning)
   - [Why does selecting rooms in Apple Home immediately start cleaning?](#why-does-selecting-rooms-in-apple-home-immediately-start-cleaning)
   - [Why is there no dedicated vacuum-only mode in Apple Home?](#why-is-there-no-dedicated-vacuum-only-mode-in-apple-home)
 - **[Diagnostic Logging](#diagnostic-logging)**
@@ -156,16 +156,19 @@ The Apple Home app only supports simple Matter devices correctly. When multiple 
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-#### How can I trigger room-specific cleaning using Siri?
+#### Why are there no individual switches for rooms, and how do I automate area cleaning?
 
-While the plugin exposes rooms as Service Areas in Matter, these can be difficult to invoke via Siri. The most effective way to control specific rooms in Apple Home is through **Scenes**.
+<!-- INCLUDES: issue-46-2646 -->
+The plugin does not provide dedicated virtual switch accessories for individual rooms or zones because Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) `Service Area` cluster. Creating artificial switch accessories would conflict with the Matter data model and add unnecessary complexity.
+
+The Matter specification defines the RVC `CleanMode` cluster as a global device setting rather than an attribute applied per service area. Consequently, individual switches cannot dynamically modify Matter cleaning mode tags for specific rooms. Furthermore, because Apple Home displays Matter clean mode tags without their descriptive labels, the plugin relies on the per-room cleaning rules (such as suction intensity, water flow, and mop passes) already configured within the MyDyson app when starting an area clean.
+
+To automate or voice-control specific rooms in Apple Home, use **Scenes**:
 
 1. Create a new Scene in the Apple Home app.
 2. Add the Dyson robot to the Scene.
-3. Configure the robot's state within the Scene to be **Cleaning** and select the specific rooms you want it to target.
+3. Configure the robot's state within the Scene to be **Cleaning** and select the specific rooms you want it to target under **Service Areas**.
 4. You can then trigger this Scene via Siri (e.g. 'Siri, clean the kitchen') or through automations.
-
-The plugin will use the per-room settings (vacuum power, water flow, etc.) already configured for those rooms in the MyDyson app when the Scene is activated.
 
 #### Why does selecting rooms in Apple Home immediately start cleaning?
 
@@ -189,17 +192,6 @@ In Apple Home, cleaning modes are mapped as follows:
 * **Quiet**, **Quick**, **Max**, and **Automatic**: Vacuum-only cleaning at the specified power level.
 * **Mop**: Mopping-only cleaning.
 * **VacuumAndMop**: Simultaneous vacuuming and mopping.
-
-#### 🚧 Why does the plugin not expose individual switch tiles for each room or zone? 🚧
-
-<!-- INCLUDES: issue-46-2646 -->
-The plugin does not provide dedicated virtual switch accessories for individual rooms or zones because Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) Service Area cluster.
-
-Exposing artificial switch accessories creates unwanted complexity and conflicts with the Matter data model:
-
-- **Native Apple Home scenes**: Targeted room cleaning can be automated directly in Apple Home without extra switches. Creating an Apple Home Scene that sets the robot accessory to cleaning mode and selects the desired room(s) under Service Areas allows room cleaning to be triggered by automations or Siri voice commands (for example, "Hey Siri, set Mop Kitchen").
-- **Global clean mode constraints**: The Matter specification defines the RVC `CleanMode` cluster as a global device setting rather than an attribute applied per service area. Individual room switches cannot dynamically modify Matter clean mode tags on a per-room basis.
-- **MyDyson per-room configuration**: Because Apple Home displays Matter clean mode tags without descriptive labels, the plugin relies on the per-room cleaning rules (such as suction intensity, wash frequency, and mop passes) configured within the MyDyson mobile application when starting an area clean.
 
 ## Diagnostic Logging
 
