@@ -179,21 +179,17 @@
             "preamble": "",
             "partitions": [
                 {
-                    "entries": [],
-                    "candidates": [
+                    "entries": [
                         {
-                            "issue_number": 46,
-                            "id": "issue-46-24ab",
-                            "question": "What configuration options are required to capture complete diagnostic logs?",
-                            "answer": "When reporting unrecognised device messages or debugging issues during a cleaning cycle, standard logging may omit essential payload details. The plugin provides dedicated debug feature flags to record full REST API and MQTT message exchanges.\n\nAdd the following options to the plugin configuration:\n\n```json\n{\n  \"debug\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\n- `debug`: Enables debug logging within the plugin.\n- `Log API Bodies`: Captures the complete HTTP request and response payloads for cloud REST API interactions, including map data and room definitions.\n- `Log MQTT Payloads as JSON`: Formats and outputs all raw MQTT event payloads as structured JSON.\n- `Log Debug as Info`: Elevates debug log statements to informational level, ensuring messages are recorded even if Matterbridge or the host container environment filters out standard debug-level logging. If the environment already captures debug-level logs, this feature can be omitted.\n\nWhen collecting diagnostic information for an issue report, record a complete cleaning cycle from start to finish."
-                        },
-                        {
-                            "issue_number": 50,
-                            "id": "issue-50-8ced",
-                            "question": "How can comprehensive diagnostic logs be captured for troubleshooting robot issues?",
-                            "answer": "When diagnosing unexpected behaviour, REST API communication errors, or gathering telemetry for unsupported robot models, the plugin can be configured to capture detailed Dyson cloud API transactions and MQTT message payloads.\n\nTo enable comprehensive diagnostic logging:\n1. Enable `debug: true` and set `wildcardTopic: true` in the plugin configuration to monitor all appliance MQTT topics.\n2. Configure the `debugFeatures` setting to include `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info`.\n\nExample configuration snippet:\n```json\n{\n  \"wildcardTopic\": true,\n  \"debug\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\nWhen capturing logs for troubleshooting:\n- Record a complete cycle from start to finish, including initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).\n- The plugin automatically masks sensitive values such as appliance serial numbers and cloud authentication tokens, but always review output before sharing. Note that Matterbridge core logs (including Matter pairing passcodes and setup QR codes) operate outside the plugin and must be redacted manually if required."
+                            "question": "How can I capture comprehensive diagnostic logs for troubleshooting?",
+                            "answer": "The plugin provides several debug flags to record detailed Dyson cloud REST API transactions and MQTT message payloads. This information is essential for diagnosing unexpected behaviour, API errors, or gathering telemetry for unsupported robot models.\n\nTo enable comprehensive diagnostic logging, add the following to the plugin configuration:\n\n```json\n{\n  \"debug\": true,\n  \"wildcardTopic\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\nKey configuration options:\n- `debug`: Enables debug logging within the plugin.\n- `wildcardTopic`: Monitors all appliance MQTT topics to ensure no telemetry is missed.\n- `Log API Bodies`: Captures HTTP request and response payloads for cloud REST API interactions, including map data and room definitions.\n- `Log MQTT Payloads as JSON`: Formats and outputs raw MQTT event payloads as structured JSON.\n- `Log Debug as Info`: Elevates debug log statements to informational level. This ensures messages are recorded even if the Matterbridge environment or container host filters out standard debug-level logging.\n\nWhen collecting logs for an issue report:\n1. Record a complete cycle from start to finish. This should include initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).\n2. The plugin automatically masks sensitive values like appliance serial numbers and cloud authentication tokens. However, Matterbridge core logs (including Matter pairing passcodes) are outside the plugin control and must be redacted manually before sharing logs publicly.",
+                            "included_ids": [
+                                "issue-46-24ab",
+                                "issue-50-8ced"
+                            ]
                         }
-                    ]
+                    ],
+                    "candidates": []
                 }
             ],
             "subcategories": []
