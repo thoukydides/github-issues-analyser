@@ -11,6 +11,7 @@
     - [Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?](#why-does-the-dyson-spotscrub-ai-or-r1r2r3-nurovi-status-take-time-to-update)
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
     - [Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?](#why-does-selecting-mop-or-vacuum-and-mop-fail-when-starting-a-whole-home-clean)
+    - [Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?](#can-the-dyson-spotscrub-ai-rb05-be-controlled-locally-over-lan-without-cloud-connectivity)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -98,14 +99,14 @@ To work around this limitation:
 * Start mopping cycles by selecting specific rooms (zone clean) rather than initiating a whole-home clean.
 * Initiate full-home mopping sessions directly within the MyDyson mobile app.
 
-#### 🚧 Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity? 🚧
+#### Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?
 
 <!-- INCLUDES: issue-46-b661 -->
 Unlike earlier Dyson robotic vacuum models that support local network discovery and control, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.
 
-- **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker on port 1883 or an HTTP management interface).
-- **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.
-- **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.
+* **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker on port 1883 or an HTTP management interface).
+* **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.
+* **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.
 
 Consequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture.
 
