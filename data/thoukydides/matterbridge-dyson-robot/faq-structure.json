@@ -14,7 +14,6 @@
                             "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.\n\nThis error frequently occurs when newer models or firmware updates are released, or when Dyson introduces non-standard market codes (for example, `AZ` for certain variants in the Australia and New Zealand region). Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter.\n\nTo resolve this:\n1. Ensure you are running the latest version of the plugin, as support for new models and regional settings is added incrementally.\n2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.\n3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.\n4. Provide the logs in a GitHub issue so the missing structures or codes can be correctly mapped.",
                             "included_ids": [
                                 "issue-17-fe91",
-                                "issue-50-cd0e",
                                 "issue-52-fe7d"
                             ]
                         },
@@ -23,8 +22,7 @@
                             "answer": "The information required depends on the device type and the specific feature being requested:\n\n1. **General MQTT Data (Purifiers and basic Robot state)**: Use the `opendyson` tool to capture a log whilst exercising the device's functionality. Install it via `go install github.com/libdyson-wg/opendyson`, then use `opendyson login`, `opendyson devices`, and `opendyson listen SERIALNUMBER` to collect data. Dyson robots use an MQTT status topic that is unsupported by `opendyson`; plugin debug logs are also required to capture this.\n\n2. **Advanced Robot Features (Maps and Zone Cleaning)**: Dyson robots perform many operations via HTTPS rather than MQTT. Use a tool like Proxyman to capture traffic from the MyDyson app for the host `appapi.cp.dyson.com`. Perform tasks like zone cleaning and viewing maps, then share the `.proxymanlogv2` file.\n\n3. **Plugin Debug Logs**: If a device is already recognised but missing telemetry, enable `debug` and `wildcardTopic` in your configuration, and add `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array. Record an entire operational cycle from start to finish, including autonomous return to dock and any maintenance routines (e.g. mop washing or drying). Providing an accompanying timeline of observed robot activity alongside the output helps map behaviour accurately. Inspect logs prior to sharing to ensure all private identifiers remain protected.",
                             "included_ids": [
                                 "issue-13-4541",
-                                "issue-16-b67c",
-                                "issue-50-cd0e"
+                                "issue-16-b67c"
                             ]
                         },
                         {
@@ -62,9 +60,7 @@
                                 {
                                     "question": "Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?",
                                     "answer": "Unlike most other Dyson appliances, the RB05 and RB07 robot vacuums do not automatically publish changes to their status as MQTT messages. While they publish regular position data during active cleaning, a full status update (including battery levels and cleaning progress) is only provided when the robot is specifically polled using an MQTT `REQUEST-CURRENT-STATE` command. The plugin publishes this command every 30 seconds (which is believed to match the behaviour of the official MyDyson app) to poll for the current status, so changes may take that much longer to propagate to Matter.",
-                                    "included_ids": [
-                                        "issue-46-9bdb"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does `opendyson listen` fail to show status messages for robot vacuums?",
@@ -79,7 +75,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-b661",
+                                    "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?",
+                                    "answer": "Unlike earlier Dyson robotic vacuum models that support local network discovery and control, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.\n\n- **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker on port 1883 or an HTTP management interface).\n- **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.\n- **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.\n\nConsequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -147,9 +150,7 @@
                         {
                             "question": "How can I trigger room-specific cleaning using Siri?",
                             "answer": "While the plugin exposes rooms as Service Areas in Matter, these can be difficult to invoke via Siri. The most effective way to control specific rooms in Apple Home is through **Scenes**.\n\n1. Create a new Scene in the Apple Home app.\n2. Add the Dyson robot to the Scene.\n3. Configure the robot's state within the Scene to be **Cleaning** and select the specific rooms you want it to target.\n4. You can then trigger this Scene via Siri (e.g. 'Siri, clean the kitchen') or through automations.\n\nThe plugin will use the per-room settings (vacuum power, water flow, etc.) already configured for those rooms in the MyDyson app when the Scene is activated.",
-                            "included_ids": [
-                                "issue-46-1b6c"
-                            ]
+                            "included_ids": []
                         },
                         {
                             "question": "Why does selecting rooms in Apple Home immediately start cleaning?",
@@ -166,7 +167,38 @@
                             ]
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 46,
+                            "id": "issue-46-2646",
+                            "question": "Why does the plugin not expose individual switch tiles for each room or zone?",
+                            "answer": "The plugin does not provide dedicated virtual switch accessories for individual rooms or zones because Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) Service Area cluster.\n\nExposing artificial switch accessories creates unwanted complexity and conflicts with the Matter data model:\n\n- **Native Apple Home scenes**: Targeted room cleaning can be automated directly in Apple Home without extra switches. Creating an Apple Home Scene that sets the robot accessory to cleaning mode and selects the desired room(s) under Service Areas allows room cleaning to be triggered by automations or Siri voice commands (for example, \"Hey Siri, set Mop Kitchen\").\n- **Global clean mode constraints**: The Matter specification defines the RVC `CleanMode` cluster as a global device setting rather than an attribute applied per service area. Individual room switches cannot dynamically modify Matter clean mode tags on a per-room basis.\n- **MyDyson per-room configuration**: Because Apple Home displays Matter clean mode tags without descriptive labels, the plugin relies on the per-room cleaning rules (such as suction intensity, wash frequency, and mop passes) configured within the MyDyson mobile application when starting an area clean."
+                        }
+                    ]
+                }
+            ],
+            "subcategories": []
+        },
+        {
+            "heading": "Diagnostic Logging",
+            "preamble": "",
+            "partitions": [
+                {
+                    "entries": [],
+                    "candidates": [
+                        {
+                            "issue_number": 46,
+                            "id": "issue-46-24ab",
+                            "question": "What configuration options are required to capture complete diagnostic logs?",
+                            "answer": "When reporting unrecognised device messages or debugging issues during a cleaning cycle, standard logging may omit essential payload details. The plugin provides dedicated debug feature flags to record full REST API and MQTT message exchanges.\n\nAdd the following options to the plugin configuration:\n\n```json\n{\n  \"debug\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\n- `debug`: Enables debug logging within the plugin.\n- `Log API Bodies`: Captures the complete HTTP request and response payloads for cloud REST API interactions, including map data and room definitions.\n- `Log MQTT Payloads as JSON`: Formats and outputs all raw MQTT event payloads as structured JSON.\n- `Log Debug as Info`: Elevates debug log statements to informational level, ensuring messages are recorded even if Matterbridge or the host container environment filters out standard debug-level logging. If the environment already captures debug-level logs, this feature can be omitted.\n\nWhen collecting diagnostic information for an issue report, record a complete cleaning cycle from start to finish."
+                        },
+                        {
+                            "issue_number": 50,
+                            "id": "issue-50-8ced",
+                            "question": "How can comprehensive diagnostic logs be captured for troubleshooting robot issues?",
+                            "answer": "When diagnosing unexpected behaviour, REST API communication errors, or gathering telemetry for unsupported robot models, the plugin can be configured to capture detailed Dyson cloud API transactions and MQTT message payloads.\n\nTo enable comprehensive diagnostic logging:\n1. Enable `debug: true` and set `wildcardTopic: true` in the plugin configuration to monitor all appliance MQTT topics.\n2. Configure the `debugFeatures` setting to include `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info`.\n\nExample configuration snippet:\n```json\n{\n  \"wildcardTopic\": true,\n  \"debug\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\nWhen capturing logs for troubleshooting:\n- Record a complete cycle from start to finish, including initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).\n- The plugin automatically masks sensitive values such as appliance serial numbers and cloud authentication tokens, but always review output before sharing. Note that Matterbridge core logs (including Matter pairing passcodes and setup QR codes) operate outside the plugin and must be redacted manually if required."
+                        }
+                    ]
                 }
             ],
             "subcategories": []
@@ -179,10 +211,7 @@
         "issue-17-01c1",
         "issue-26-2ae8",
         "issue-31-833f",
-        "issue-33-3d80",
-        "issue-46-1f2c",
-        "issue-46-2ab8",
-        "issue-46-91b2"
+        "issue-33-3d80"
     ],
     "source_hashes": {
         "faq": "fed9d48392b71a6890a6ec2dce39ad311f7ff81e0bf7e1b1cce7cf6a4b19ceeb"
