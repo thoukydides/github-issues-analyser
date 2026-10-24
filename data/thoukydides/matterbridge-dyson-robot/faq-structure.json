@@ -153,24 +153,20 @@
                         },
                         {
                             "question": "Why does selecting rooms in Apple Home immediately start cleaning?",
-                            "answer": "Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command.\n\nThis behaviour is intentional for several reasons:\n\n- **Matter specification compliance**: Section 1.17.7.1 (`SelectAreas` Command) of the Matter Application Cluster Specification specifies that a device may begin operating immediately or wait for a command, defining this behaviour as manufacturer-specific.\n- **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin defaults to these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.\n\nBecause any global mode selected in Apple Home during room selection is deliberately ignored in favour of pre-configured zone settings, the clean begins as soon as the area selection is confirmed.",
-                            "included_ids": []
-                        }
-                    ],
-                    "candidates": [
-                        {
-                            "issue_number": 51,
-                            "id": "issue-51-aa8d",
-                            "question": "Why does the robot start cleaning immediately after selecting rooms in Apple Home?",
-                            "answer": "Under the Matter specification (Section 1.17.7.1 `SelectAreas` Command), appliances may start operating immediately upon area selection rather than awaiting a separate run command. The plugin implements immediate start by design.\n\n* **Preserving room presets**: When initiating a zone clean, the plugin prioritises the per-zone cleaning configurations defined in the MyDyson app over global controls. This guarantees safe operation across mixed flooring types, preventing the appliance from mopping carpeted rooms.\n* **Ignoring global mode overrides**: Because room-level settings defined in the MyDyson app take precedence to prevent floor damage, any global vacuum or mopping mode selected in Apple Home is intentionally ignored during zone cleaning.\n\nBecause room selection and cleaning mode cannot be configured independently without overriding room-specific floor safety profiles, cleaning commences as soon as the room selection is confirmed."
+                            "answer": "Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command. This behaviour is intentional for several reasons:\n\n* **Matter specification compliance**: Section 1.17.7.1 (`SelectAreas` Command) of the Matter Application Cluster Specification specifies that a device may begin operating immediately or wait for a command, defining this behaviour as manufacturer-specific.\n* **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin defaults to these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.\n* **Safety and precedence**: Because room-level settings defined in the MyDyson app take precedence to prevent floor damage, any global vacuum or mopping mode selected in Apple Home is intentionally ignored during zone cleaning. Since room selection and cleaning mode cannot be configured independently without overriding room-specific floor safety profiles, cleaning commences as soon as the room selection is confirmed.",
+                            "included_ids": [
+                                "issue-51-aa8d"
+                            ]
                         },
                         {
-                            "issue_number": 51,
-                            "id": "issue-51-0b2f",
                             "question": "Why is there no dedicated vacuum-only mode in Apple Home?",
-                            "answer": "Vacuum-only cleaning is supported, but its presentation in Apple Home differs from the MyDyson app due to constraints in both the Matter specification and Apple's interface:\n\n* **Matter specification limitations**: Matter provides a single unified `RvcCleanMode` cluster list rather than distinct selectors for vacuum power and wet mopping. To prevent overly cluttered menus, vacuum-only operation is represented via suction power levels alongside combined or mop-only modes.\n* **Apple Home presentation limitations**: Apple Home does not render the custom mode description strings supplied by Matter devices; it displays only the standard Mode Tags associated with them.\n\nIn Apple Home, clean modes are mapped as follows:\n\n* **Quiet**, **Quick**, **Max**, and **Automatic**: Vacuum-only cleaning at the specified power level.\n* **Mop**: Mopping-only cleaning.\n* **VacuumAndMop**: Simultaneous vacuuming and mopping."
+                            "answer": "Vacuum-only cleaning is supported, but its presentation in Apple Home differs from the MyDyson app due to constraints in the Matter specification and Apple's user interface:\n\n* **Matter specification limitations**: Matter provides a single unified `RvcCleanMode` cluster list rather than distinct selectors for vacuum power and wet mopping. To prevent overly cluttered menus, vacuum-only operation is represented via suction power levels alongside combined or mop-only modes.\n* **Apple Home presentation limitations**: Apple Home does not render the custom mode description strings supplied by Matter devices; it displays only the standard Mode Tags associated with them.\n\nIn Apple Home, cleaning modes are mapped as follows:\n\n* **Quiet**, **Quick**, **Max**, and **Automatic**: Vacuum-only cleaning at the specified power level.\n* **Mop**: Mopping-only cleaning.\n* **VacuumAndMop**: Simultaneous vacuuming and mopping.",
+                            "included_ids": [
+                                "issue-51-0b2f"
+                            ]
                         }
-                    ]
+                    ],
+                    "candidates": []
                 }
             ],
             "subcategories": []
