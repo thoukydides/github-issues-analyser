@@ -595,6 +595,17 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 Why does my washer report an unrecognised empty string `''` for the spin speed option? 🚧
+
+<!-- INCLUDES: issue-406-3a69 -->
+The Home Connect API sometimes returns an empty string `''` for the `LaundryCare.Washer.Option.SpinSpeed` program option, which has been observed with certain Bosch washing machine models. This value is not defined in the official Home Connect API documentation, which only specifies a discrete set of RPM values such as `RPM400` or `RPM1400`.
+
+This behaviour is typically caused by one of the following:
+- A bug in the Home Connect API server implementation.
+- A firmware anomaly in the specific appliance model.
+
+The plugin identifies these unexpected values and logs them as unrecognised to highlight the discrepancy. While this does not usually prevent the appliance from being controlled, it indicates that the appliance is providing data that contradicts the manufacturer's own API specification. The plugin may be updated to silently ignore these empty values if they are confirmed as a permanent quirk of the API or firmware.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
