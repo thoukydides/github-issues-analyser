@@ -32,16 +32,18 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-52-fe7d -->
-The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
+<!-- INCLUDES: issue-17-fe91 issue-50-13e9 issue-52-fe7d -->
+The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest` or device capabilities) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
 
-This error frequently occurs when newer models or firmware updates are released, or when Dyson introduces non-standard market codes (for example, `AZ` for certain variants in the Australia and New Zealand region). Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter.
+This validation serves two main purposes:
+- **Feature enablement**: Manifest capabilities indicate supported device features and are used to determine which Matter clusters and endpoints are dynamically exposed.
+- **Coverage across hardware variants**: Strict validation ensures that when Dyson introduces new capabilities in firmware updates or regional variants (for example, `AZ` for certain variants in Australia), users report the unrecognised values rather than having new hardware features fail silently or remain unsupported.
 
-To resolve this:
+Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter. To resolve this:
 1. Ensure you are running the latest version of the plugin, as support for new models and regional settings is added incrementally.
-2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
-3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
-4. Provide the logs in a GitHub issue so the missing structures or codes can be correctly mapped.
+2. Identify the unrecognised value in the log output (for example, `response[0]...capabilities[X] is not a valid enum value`).
+3. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
+4. Provide the logs and specific unrecognised values in a GitHub issue so the missing structures or codes can be correctly mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
@@ -77,20 +79,6 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
-
-#### 🚧 Why does the plugin halt startup with an `Unexpected structure of Dyson cloud API response` error when new firmware capabilities appear? 🚧
-
-<!-- INCLUDES: issue-50-13e9 -->
-The plugin deliberately enforces strict schema validation on Dyson cloud API responses—including device manifest capabilities—rather than silently ignoring unrecognised values.
-
-This design serves two main purposes:
-- **Feature enablement**: Manifest capabilities indicate supported device features and are used to determine which Matter clusters and endpoints are dynamically exposed.
-- **Coverage across hardware variants**: The maintainer does not possess every Dyson vacuum model or firmware revision. Strict validation ensures that when Dyson introduces new capabilities in firmware updates, users report the unrecognised enum values rather than having new hardware features fail silently or remain unsupported.
-
-To resolve this when encountering a startup halt caused by an unrecognised capability:
-1. Identify the unrecognised enum value in the log output (for example, `response[0]...capabilities[X] is not a valid enum value`).
-2. Open an issue on GitHub providing the manifest error log extract and appliance model details.
-3. The maintainer can add the new capability string to the schema in an upcoming release.
 
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
