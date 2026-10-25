@@ -19,9 +19,10 @@
   - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
 - **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
-  - [Why are there no individual switches for rooms, and how do I automate area cleaning?](#why-are-there-no-individual-switches-for-rooms-and-how-do-i-automate-area-cleaning)
+  - [Why are there no individual switches for rooms or granular cleaning settings?](#why-are-there-no-individual-switches-for-rooms-or-granular-cleaning-settings)
   - [Why does selecting rooms in Apple Home immediately start cleaning?](#why-does-selecting-rooms-in-apple-home-immediately-start-cleaning)
   - [Why is there no dedicated vacuum-only mode in Apple Home?](#why-is-there-no-dedicated-vacuum-only-mode-in-apple-home)
+  - [Why do Matter Service Area IDs change after renaming a room?](#why-do-matter-service-area-ids-change-after-renaming-a-room)
 - **[Diagnostic Logging](#diagnostic-logging)**
   - [How can I capture comprehensive diagnostic logs for troubleshooting?](#how-can-i-capture-comprehensive-diagnostic-logs-for-troubleshooting)
 <!-- TOC-END -->
@@ -159,19 +160,23 @@ The Apple Home app only supports simple Matter devices correctly. When multiple 
 
 If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `Composed Air Purifier` configuration. By default, the plugin exposes the appliance as individual accessory endpoints (such as separate fan, air quality, temperature, and humidity sensors), which ensures all controls and sensor readings are displayed reliably in the Home app.
 
-#### Why are there no individual switches for rooms, and how do I automate area cleaning?
+#### Why are there no individual switches for rooms or granular cleaning settings?
 
-<!-- INCLUDES: issue-46-2646 -->
-The plugin does not provide dedicated virtual switch accessories for individual rooms or zones because Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) `Service Area` cluster. Creating artificial switch accessories would conflict with the Matter data model and add unnecessary complexity.
+<!-- INCLUDES: issue-46-2646 issue-50-0706 -->
+The plugin does not provide dedicated virtual switch accessories for individual rooms, nor does it expose granular settings such as hydration water levels or mop passes. This is due to architectural constraints in the Matter specification and controller implementations:
 
-The Matter specification defines the RVC `CleanMode` cluster as a global device setting rather than an attribute applied per service area. Consequently, individual switches cannot dynamically modify Matter cleaning mode tags for specific rooms. Furthermore, because Apple Home displays Matter clean mode tags without their descriptive labels, the plugin relies on the per-room cleaning rules (such as suction intensity, water flow, and mop passes) already configured within the MyDyson app when starting an area clean.
+* **Service Area Cluster**: Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) `Service Area` cluster. Creating artificial switches would conflict with this data model and add unnecessary complexity.
+* **Matter specification limitations**: The current Matter RVC specification does not provide standard attributes for appliance-specific mechanics like water pump rates or mop repetition counts. It also lacks a mechanism to pass zone-specific operational settings (such as differing suction or hydration levels per room) within a single cleaning command.
+* **Combinatorial explosion of Clean Modes**: Grouping every combination of suction mode, water level, and repeat pass into discrete Matter Clean Modes would create an excessively large list. Furthermore, Apple Home does not display custom mode labels, making such a list effectively unusable.
 
 To automate or voice-control specific rooms in Apple Home, use **Scenes**:
 
 1. Create a new Scene in the Apple Home app.
 2. Add the Dyson robot to the Scene.
-3. Configure the robot's state within the Scene to be **Cleaning** and select the specific rooms you want it to target under **Service Areas**.
-4. You can then trigger this Scene via Siri (e.g. 'Siri, clean the kitchen') or through automations.
+3. Configure the robot's state to be **Cleaning** and select the specific rooms under **Service Areas**.
+4. Trigger this Scene via Siri (e.g. 'Siri, clean the kitchen') or through automations.
+
+The robot will apply the per-room cleaning rules (suction intensity, water flow, etc.) already configured within the MyDyson app for those areas.
 
 #### Why does selecting rooms in Apple Home immediately start cleaning?
 
@@ -196,28 +201,16 @@ In Apple Home, cleaning modes are mapped as follows:
 * **Mop**: Mopping-only cleaning.
 * **VacuumAndMop**: Simultaneous vacuuming and mopping.
 
-#### 🚧 Why are detailed cleaning settings like water hydration level, clean passes, or wash-only modes not exposed to Matter? 🚧
-
-<!-- INCLUDES: issue-50-0706 -->
-Granular cleaning preferences available in the MyDyson app (such as hydration water levels, repetition counts, and per-zone clean types) are not exposed due to limitations in the Matter standard and controller implementations:
-
-- **No Matter cluster attributes**: The Matter Robotic Vacuum Cleaner (RVC) specification does not provide standard attributes or clusters to configure appliance-specific mechanics such as water pump rates or mop passes.
-- **Lack of per-zone parameters**: Matter allows controllers to select a list of Service Areas to clean, but does not provide a mechanism to pass zone-specific operational settings (such as differing suction or hydration levels per room).
-- **Combinatorial explosion of Clean Modes**: Grouping every combination of suction mode, water level, and repeat pass into discrete Matter Clean Modes creates an excessively large list of modes that degrades usability.
-- **Controller limitations**: Ecosystems such as Apple Home do not display custom Clean Mode labels; they only display standard Matter mode tags flattened across all modes, making bespoke combined modes ineffective.
-
-For users requiring fine-grained control over proprietary Dyson cleaning options within Home Assistant, dedicated non-Matter integrations (such as `hass-dyson`) may be better suited.
-
-#### 🚧 Why do Matter Service Area IDs change after renaming a room or restarting the plugin? 🚧
+#### Why do Matter Service Area IDs change after renaming a room?
 
 <!-- INCLUDES: issue-50-2780 -->
-Service Area identifiers (`AreaID`) exposed over Matter may change if rooms are renamed or maps are modified. This occurs due to architectural constraints in both the Dyson API and the Matter specification:
+Service Area identifiers (`AreaID`) exposed over Matter may change if rooms are renamed or maps are modified. This occurs due to how the plugin must derive stable identifiers from the Dyson API:
 
-- **Unstable Dyson zone identifiers**: Dyson cloud APIs do not provide stable, permanent identifiers for rooms or zones; internal Dyson zone IDs are regularly re-used across edits and can point to different physical spaces.
-- **Derived zone identification**: To prevent collisions, the plugin creates zone identifiers by concatenating the persistent map ID and the room name (adding zone area dimensions for custom names). Renaming a room in the MyDyson app alters this generated identifier, prompting the plugin to register it as a new zone with a new `AreaID`.
-- **Matter specification boundaries**: The Matter specification only states that an `AreaID` should not change during an active clean. It does not mandate that IDs remain persistent across restarts, nor does it provide a standard notification mechanism to alert controllers when room configurations are modified.
+* **Unstable Dyson zone identifiers**: Dyson cloud APIs do not provide stable, permanent identifiers for rooms or zones; internal Dyson zone IDs are regularly re-used across edits and can point to different physical spaces.
+* **Derived zone identification**: To provide persistence, the plugin generates identifiers by concatenating the persistent map ID and the room name. Renaming a room in the MyDyson app alters this generated identifier, prompting the plugin to register it as a new zone with a new `AreaID`.
+* **Matter specification boundaries**: The Matter specification only requires that an `AreaID` remains stable during an active cleaning session. It does not mandate that IDs remain persistent across restarts or configuration changes.
 
-If your Matter controller (such as Home Assistant) maps automations or dashboard areas strictly by numerical `AreaID`, avoid renaming rooms in the MyDyson app to maintain stable area associations.
+To maintain stable area associations in your Matter controller (such as Home Assistant), avoid renaming rooms in the MyDyson app once they have been used in automations.
 
 ## Diagnostic Logging
 
