@@ -255,7 +255,7 @@
                             "entries": [
                                 {
                                     "question": "Why does the log show `Unexpected fields`, `(unrecognised)` values, or TypeScript-like code blocks?",
-                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code, annotated with `// (unrecognised)` comments, and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nSometimes, values may appear as an empty string (`''`) or other seemingly invalid entries. This is typically caused by an upstream Home Connect API bug or appliance firmware anomaly where the server returns an empty value instead of a valid member.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nIf you wish to inspect the raw data the API is returning, the plugin stores cached appliance definitions in the Homebridge persistence directory (usually `~/.homebridge/homebridge-homeconnect/persist/` or `/var/lib/homebridge/homebridge-homeconnect/persist/`). The appliance capability JSON files can be reviewed with a text editor. **Do not share** the file named `94a08da1fecbb6e8b46990538c7b50b2`, as it contains private OAuth authentication tokens.\n\nPlease do not attempt to guess or suggest theoretical values; the maintainer only adds verified values observed from actual appliance behaviour.",
+                                    "answer": "The plugin performs strict validation on data from the Home Connect API to ensure reliability. Because the API often deviates from its official documentation, or because new appliance models and firmware introduce undocumented features, the plugin includes a diagnostic mechanism to identify identifiers it does not yet recognise. When the plugin encounters these values, it generates a technical diagnostic block in the log, formatted as TypeScript code, annotated with `// (unrecognised)` comments, and delimited by rows of `=` characters. This helps the maintainer update the plugin's internal schema and map features to HomeKit services.\n\nSometimes, values may appear as an empty string (`''`) or other seemingly invalid entries. This has been observed with specific options like `LaundryCare.Washer.Option.SpinSpeed` on certain Bosch models. This is typically caused by an upstream Home Connect API bug or appliance firmware anomaly where the server returns an empty value instead of a valid member.\n\nIf you observe these messages:\n\n1. **Update the plugin**: Ensure you are running the latest version, as support for new values is added frequently.\n2. **Report the values**: Wait approximately two minutes for the plugin to batch the data. Locate the URL provided in the log message immediately following the code block and click it to open a pre-populated GitHub issue.\n3. **Provide the snippet**: Paste the entire technical diagnostic block from the log (including the `=` separators) into the **Log File** field of the issue template.\n\nIf you wish to inspect the raw data the API is returning, the plugin stores cached appliance definitions in the Homebridge persistence directory (usually `~/.homebridge/homebridge-homeconnect/persist/` or `/var/lib/homebridge/homebridge-homeconnect/persist/`). The appliance capability JSON files can be reviewed with a text editor. **Do not share** the file named `94a08da1fecbb6e8b46990538c7b50b2`, as it contains private OAuth authentication tokens.\n\nPlease do not attempt to guess or suggest theoretical values; the maintainer only adds verified values observed from actual appliance behaviour.",
                                     "included_ids": [
                                         "issue-145-3b74",
                                         "issue-175-3d7e",
@@ -348,7 +348,8 @@
                                         "issue-393-daf5",
                                         "issue-394-179a",
                                         "issue-396-ab5c",
-                                        "issue-397-baed"
+                                        "issue-397-baed",
+                                        "issue-406-3a69"
                                     ]
                                 },
                                 {
@@ -534,14 +535,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 406,
-                                    "id": "issue-406-3a69",
-                                    "question": "Why does my washer report an unrecognised empty string `''` for the spin speed option?",
-                                    "answer": "The Home Connect API sometimes returns an empty string `''` for the `LaundryCare.Washer.Option.SpinSpeed` program option, which has been observed with certain Bosch washing machine models. This value is not defined in the official Home Connect API documentation, which only specifies a discrete set of RPM values such as `RPM400` or `RPM1400`.\n\nThis behaviour is typically caused by one of the following:\n- A bug in the Home Connect API server implementation.\n- A firmware anomaly in the specific appliance model.\n\nThe plugin identifies these unexpected values and logs them as unrecognised to highlight the discrepancy. While this does not usually prevent the appliance from being controlled, it indicates that the appliance is providing data that contradicts the manufacturer's own API specification. The plugin may be updated to silently ignore these empty values if they are confirmed as a permanent quirk of the API or firmware."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
