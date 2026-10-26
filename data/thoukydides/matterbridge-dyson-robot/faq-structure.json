@@ -14,8 +14,7 @@
                             "answer": "The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest` or device capabilities) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.\n\nThis validation serves two main purposes:\n- **Feature enablement**: Manifest capabilities indicate supported device features and are used to determine which Matter clusters and endpoints are dynamically exposed.\n- **Coverage across hardware variants**: Strict validation ensures that when Dyson introduces new capabilities in firmware updates or regional variants (for example, `AZ` for certain variants in Australia), users report the unrecognised values rather than having new hardware features fail silently or remain unsupported.\n\nBecause the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter. To resolve this:\n1. Ensure you are running the latest version of the plugin, as support for new models and regional settings is added incrementally.\n2. Identify the unrecognised value in the log output (for example, `response[0]...capabilities[X] is not a valid enum value`).\n3. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.\n4. Provide the logs and specific unrecognised values in a GitHub issue so the missing structures or codes can be correctly mapped.",
                             "included_ids": [
                                 "issue-17-fe91",
-                                "issue-52-fe7d",
-                                "issue-50-13e9"
+                                "issue-52-fe7d"
                             ]
                         },
                         {
@@ -47,7 +46,14 @@
                             ]
                         }
                     ],
-                    "candidates": [],
+                    "candidates": [
+                        {
+                            "issue_number": 50,
+                            "id": "issue-50-11d5",
+                            "question": "Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error related to `DysonManifestCapability`?",
+                            "answer": "This error typically occurs after a device firmware update introduces new hardware capabilities (such as `SelfCleanOptionsV2` or `SelfCleanV2`) that the plugin does not yet recognise. The plugin employs strict validation for these values in the `/v3/manifest` cloud response to ensure that new features are reported by users and can be correctly integrated or mapped to Matter. If you encounter this error, please open a GitHub issue providing the log output so the new capabilities can be added to the plugin's allowed list."
+                        }
+                    ],
                     "partition": "Unsupported Dyson Devices and Features"
                 }
             ],
@@ -83,7 +89,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 50,
+                                    "id": "issue-50-3ad7",
+                                    "question": "Why does the log show `404 Not Found` errors for `live-maps/cleaning`?",
+                                    "answer": "These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour, as the Dyson API only serves the live map resource during active operation. The plugin handles these 404 responses by continuing to poll until the resource becomes available or the robot operation state changes."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -152,8 +165,7 @@
                             "question": "Why are there no individual switches for rooms or granular cleaning settings?",
                             "answer": "The plugin does not provide dedicated virtual switch accessories for individual rooms, nor does it expose granular settings such as hydration water levels or mop passes. This is due to architectural constraints in the Matter specification and controller implementations:\n\n* **Service Area Cluster**: Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) `Service Area` cluster. Creating artificial switches would conflict with this data model and add unnecessary complexity.\n* **Matter specification limitations**: The current Matter RVC specification does not provide standard attributes for appliance-specific mechanics like water pump rates or mop repetition counts. It also lacks a mechanism to pass zone-specific operational settings (such as differing suction or hydration levels per room) within a single cleaning command.\n* **Combinatorial explosion of Clean Modes**: Grouping every combination of suction mode, water level, and repeat pass into discrete Matter Clean Modes would create an excessively large list. Furthermore, Apple Home does not display custom mode labels, making such a list effectively unusable.\n\nTo automate or voice-control specific rooms in Apple Home, use **Scenes**:\n\n1. Create a new Scene in the Apple Home app.\n2. Add the Dyson robot to the Scene.\n3. Configure the robot's state to be **Cleaning** and select the specific rooms under **Service Areas**.\n4. Trigger this Scene via Siri (e.g. 'Siri, clean the kitchen') or through automations.\n\nThe robot will apply the per-room cleaning rules (suction intensity, water flow, etc.) already configured within the MyDyson app for those areas.",
                             "included_ids": [
-                                "issue-46-2646",
-                                "issue-50-0706"
+                                "issue-46-2646"
                             ]
                         },
                         {
@@ -173,12 +185,23 @@
                         {
                             "question": "Why do Matter Service Area IDs change after renaming a room?",
                             "answer": "Service Area identifiers (`AreaID`) exposed over Matter may change if rooms are renamed or maps are modified. This occurs due to how the plugin must derive stable identifiers from the Dyson API:\n\n* **Unstable Dyson zone identifiers**: Dyson cloud APIs do not provide stable, permanent identifiers for rooms or zones; internal Dyson zone IDs are regularly re-used across edits and can point to different physical spaces.\n* **Derived zone identification**: To provide persistence, the plugin generates identifiers by concatenating the persistent map ID and the room name. Renaming a room in the MyDyson app alters this generated identifier, prompting the plugin to register it as a new zone with a new `AreaID`.\n* **Matter specification boundaries**: The Matter specification only requires that an `AreaID` remains stable during an active cleaning session. It does not mandate that IDs remain persistent across restarts or configuration changes.\n\nTo maintain stable area associations in your Matter controller (such as Home Assistant), avoid renaming rooms in the MyDyson app once they have been used in automations.",
-                            "included_ids": [
-                                "issue-50-2780"
-                            ]
+                            "included_ids": []
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 50,
+                            "id": "issue-50-788a",
+                            "question": "Why are advanced Dyson settings like water level, hydration level, or cleaning repetitions not supported?",
+                            "answer": "The Matter protocol currently lacks standard clusters or attributes to represent specific vacuum settings such as mop hydration levels, vacuum suction modes beyond standard tags, or per-zone cleaning repetitions. Furthermore, Matter does not support per-zone configuration beyond selecting which areas to clean. Since the plugin is designed to map Dyson functionality into the standard Matter data model, these proprietary or highly specific settings cannot be exposed. Users requiring full control over these features may need to use a native integration for their specific platform."
+                        },
+                        {
+                            "issue_number": 50,
+                            "id": "issue-50-5d0d",
+                            "question": "Why do Service Area identifiers change or shift in my smart home controller?",
+                            "answer": "Dyson APIs do not provide stable, unique identifiers for cleaning zones that persist reliably. The plugin generates Matter `AreaID` values based on a combination of the Dyson persistent map ID and the room name. This mapping is generated at runtime and is not persisted across plugin restarts. Consequently, renaming a room in the MyDyson app or restarting the plugin may cause the `AreaID` values to be reallocated. While some controllers like Home Assistant may assume stable IDs, the Matter specification does not mandate that these identifiers remain constant across sessions."
+                        }
+                    ]
                 }
             ],
             "subcategories": []

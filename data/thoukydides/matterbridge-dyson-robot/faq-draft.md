@@ -33,7 +33,7 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-13e9 issue-52-fe7d -->
+<!-- INCLUDES: issue-17-fe91 issue-52-fe7d -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest` or device capabilities) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
 
 This validation serves two main purposes:
@@ -81,6 +81,11 @@ The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting produc
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
 
+#### 🚧 Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error related to `DysonManifestCapability`? 🚧
+
+<!-- INCLUDES: issue-50-11d5 -->
+This error typically occurs after a device firmware update introduces new hardware capabilities (such as `SelfCleanOptionsV2` or `SelfCleanV2`) that the plugin does not yet recognise. The plugin employs strict validation for these values in the `/v3/manifest` cloud response to ensure that new features are reported by users and can be correctly integrated or mapped to Matter. If you encounter this error, please open a GitHub issue providing the log output so the new capabilities can be added to the plugin's allowed list.
+
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
 #### Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?
@@ -113,6 +118,11 @@ Unlike earlier Dyson robotic vacuum models that support local network discovery 
 * **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.
 
 Consequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture.
+
+#### 🚧 Why does the log show `404 Not Found` errors for `live-maps/cleaning`? 🚧
+
+<!-- INCLUDES: issue-50-3ad7 -->
+These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour, as the Dyson API only serves the live map resource during active operation. The plugin handles these 404 responses by continuing to poll until the resource becomes available or the robot operation state changes.
 
 ## Matterbridge
 
@@ -162,7 +172,7 @@ If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `
 
 #### Why are there no individual switches for rooms or granular cleaning settings?
 
-<!-- INCLUDES: issue-46-2646 issue-50-0706 -->
+<!-- INCLUDES: issue-46-2646 -->
 The plugin does not provide dedicated virtual switch accessories for individual rooms, nor does it expose granular settings such as hydration water levels or mop passes. This is due to architectural constraints in the Matter specification and controller implementations:
 
 * **Service Area Cluster**: Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) `Service Area` cluster. Creating artificial switches would conflict with this data model and add unnecessary complexity.
@@ -203,7 +213,6 @@ In Apple Home, cleaning modes are mapped as follows:
 
 #### Why do Matter Service Area IDs change after renaming a room?
 
-<!-- INCLUDES: issue-50-2780 -->
 Service Area identifiers (`AreaID`) exposed over Matter may change if rooms are renamed or maps are modified. This occurs due to how the plugin must derive stable identifiers from the Dyson API:
 
 * **Unstable Dyson zone identifiers**: Dyson cloud APIs do not provide stable, permanent identifiers for rooms or zones; internal Dyson zone IDs are regularly re-used across edits and can point to different physical spaces.
@@ -211,6 +220,16 @@ Service Area identifiers (`AreaID`) exposed over Matter may change if rooms are 
 * **Matter specification boundaries**: The Matter specification only requires that an `AreaID` remains stable during an active cleaning session. It does not mandate that IDs remain persistent across restarts or configuration changes.
 
 To maintain stable area associations in your Matter controller (such as Home Assistant), avoid renaming rooms in the MyDyson app once they have been used in automations.
+
+#### 🚧 Why are advanced Dyson settings like water level, hydration level, or cleaning repetitions not supported? 🚧
+
+<!-- INCLUDES: issue-50-788a -->
+The Matter protocol currently lacks standard clusters or attributes to represent specific vacuum settings such as mop hydration levels, vacuum suction modes beyond standard tags, or per-zone cleaning repetitions. Furthermore, Matter does not support per-zone configuration beyond selecting which areas to clean. Since the plugin is designed to map Dyson functionality into the standard Matter data model, these proprietary or highly specific settings cannot be exposed. Users requiring full control over these features may need to use a native integration for their specific platform.
+
+#### 🚧 Why do Service Area identifiers change or shift in my smart home controller? 🚧
+
+<!-- INCLUDES: issue-50-5d0d -->
+Dyson APIs do not provide stable, unique identifiers for cleaning zones that persist reliably. The plugin generates Matter `AreaID` values based on a combination of the Dyson persistent map ID and the room name. This mapping is generated at runtime and is not persisted across plugin restarts. Consequently, renaming a room in the MyDyson app or restarting the plugin may cause the `AreaID` values to be reallocated. While some controllers like Home Assistant may assume stable IDs, the Matter specification does not mandate that these identifiers remain constant across sessions.
 
 ## Diagnostic Logging
 
