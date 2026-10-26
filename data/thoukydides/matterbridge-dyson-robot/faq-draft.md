@@ -33,12 +33,12 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-52-fe7d -->
-The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest` or device capabilities) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API are identified and correctly implemented rather than silently ignored.
+<!-- INCLUDES: issue-17-fe91 issue-50-11d5 issue-52-fe7d -->
+The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest` or device capabilities) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API or new hardware capabilities are identified and correctly implemented rather than silently ignored.
 
 This validation serves two main purposes:
-- **Feature enablement**: Manifest capabilities indicate supported device features and are used to determine which Matter clusters and endpoints are dynamically exposed.
-- **Coverage across hardware variants**: Strict validation ensures that when Dyson introduces new capabilities in firmware updates or regional variants (for example, `AZ` for certain variants in Australia), users report the unrecognised values rather than having new hardware features fail silently or remain unsupported.
+- **Feature enablement**: Manifest capabilities indicate supported device features and are used to determine which Matter clusters and endpoints are dynamically exposed. New capabilities introduced via firmware updates (for example, `SelfCleanOptionsV2` or `SelfCleanV2`) must be added to the plugin's internal mapping before they can be processed.
+- **Coverage across hardware variants**: Strict validation ensures that when Dyson introduces new capabilities or regional variants (for example, `AZ` for certain variants in Australia), users report the unrecognised values rather than having new hardware features fail silently or remain unsupported.
 
 Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter. To resolve this:
 1. Ensure you are running the latest version of the plugin, as support for new models and regional settings is added incrementally.
@@ -80,11 +80,6 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
-
-#### 🚧 Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error related to `DysonManifestCapability`? 🚧
-
-<!-- INCLUDES: issue-50-11d5 -->
-This error typically occurs after a device firmware update introduces new hardware capabilities (such as `SelfCleanOptionsV2` or `SelfCleanV2`) that the plugin does not yet recognise. The plugin employs strict validation for these values in the `/v3/manifest` cloud response to ensure that new features are reported by users and can be correctly integrated or mapped to Matter. If you encounter this error, please open a GitHub issue providing the log output so the new capabilities can be added to the plugin's allowed list.
 
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
