@@ -81,16 +81,16 @@
                                     "included_ids": [
                                         "issue-46-b661"
                                     ]
+                                },
+                                {
+                                    "question": "Why does the log show `404 Not Found` errors for `live-maps/cleaning`?",
+                                    "answer": "These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour for robots supporting live mapping, such as the Dyson Spot+Scrub Ai (RB05). The Dyson cloud API only serves the live map resource during active operation, and there is often a short delay before it becomes available. The plugin handles these `404 Not Found` responses by continuing to poll until the resource becomes available or the robot operation state changes.",
+                                    "included_ids": [
+                                        "issue-50-3ad7"
+                                    ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 50,
-                                    "id": "issue-50-3ad7",
-                                    "question": "Why does the log show `404 Not Found` errors for `live-maps/cleaning`?",
-                                    "answer": "These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour, as the Dyson API only serves the live map resource during active operation. The plugin handles these 404 responses by continuing to poll until the resource becomes available or the robot operation state changes."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []

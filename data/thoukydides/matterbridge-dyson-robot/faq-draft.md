@@ -12,6 +12,7 @@
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
     - [Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?](#why-does-selecting-mop-or-vacuum-and-mop-fail-when-starting-a-whole-home-clean)
     - [Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?](#can-the-dyson-spotscrub-ai-rb05-be-controlled-locally-over-lan-without-cloud-connectivity)
+    - [Why does the log show `404 Not Found` errors for `live-maps/cleaning`?](#why-does-the-log-show-404-not-found-errors-for-live-mapscleaning)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -114,10 +115,10 @@ Unlike earlier Dyson robotic vacuum models that support local network discovery 
 
 Consequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture.
 
-#### 🚧 Why does the log show `404 Not Found` errors for `live-maps/cleaning`? 🚧
+#### Why does the log show `404 Not Found` errors for `live-maps/cleaning`?
 
 <!-- INCLUDES: issue-50-3ad7 -->
-These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour, as the Dyson API only serves the live map resource during active operation. The plugin handles these 404 responses by continuing to poll until the resource becomes available or the robot operation state changes.
+These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour for robots supporting live mapping, such as the Dyson Spot+Scrub Ai (RB05). The Dyson cloud API only serves the live map resource during active operation, and there is often a short delay before it becomes available. The plugin handles these `404 Not Found` responses by continuing to poll until the resource becomes available or the robot operation state changes.
 
 ## Matterbridge
 
