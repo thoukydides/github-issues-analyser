@@ -11,8 +11,6 @@
     - [Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?](#why-does-the-dyson-spotscrub-ai-or-r1r2r3-nurovi-status-take-time-to-update)
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
     - [Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?](#why-does-selecting-mop-or-vacuum-and-mop-fail-when-starting-a-whole-home-clean)
-    - [Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?](#can-the-dyson-spotscrub-ai-rb05-be-controlled-locally-over-lan-without-cloud-connectivity)
-    - [Why does the log show `404 Not Found` errors for `live-maps/cleaning`?](#why-does-the-log-show-404-not-found-errors-for-live-mapscleaning)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -22,30 +20,24 @@
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
   - [Why are there no individual switches for rooms or granular cleaning settings?](#why-are-there-no-individual-switches-for-rooms-or-granular-cleaning-settings)
   - [Why does selecting rooms in Apple Home immediately start cleaning?](#why-does-selecting-rooms-in-apple-home-immediately-start-cleaning)
-  - [Why is there no dedicated vacuum-only mode in Apple Home?](#why-is-there-no-dedicated-vacuum-only-mode-in-apple-home)
-  - [Why do Matter Service Area IDs change or shift?](#why-do-matter-service-area-ids-change-or-shift)
 - **[Diagnostic Logging](#diagnostic-logging)**
   - [How can I capture comprehensive diagnostic logs for troubleshooting?](#how-can-i-capture-comprehensive-diagnostic-logs-for-troubleshooting)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
 
-<!-- PARTITION: Unsupported Dyson Devices and Features -->
-
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
 <!-- INCLUDES: issue-17-fe91 issue-50-11d5 issue-52-fe7d -->
-The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest` or device capabilities) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API or new hardware capabilities are identified and correctly implemented rather than silently ignored.
+The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API or new hardware capabilities are identified and correctly implemented rather than silently ignored.
 
-This validation serves two main purposes:
-- **Feature enablement**: Manifest capabilities indicate supported device features and are used to determine which Matter clusters and endpoints are dynamically exposed. New capabilities introduced via firmware updates (for example, `SelfCleanOptionsV2` or `SelfCleanV2`) must be added to the plugin's internal mapping before they can be processed.
-- **Coverage across hardware variants**: Strict validation ensures that when Dyson introduces new capabilities or regional variants (for example, `AZ` for certain variants in Australia), users report the unrecognised values rather than having new hardware features fail silently or remain unsupported.
+This error frequently occurs with newer models, regional variants, or firmware updates are released. Support for these models is often developed without direct access to physical devices.
 
 Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter. To resolve this:
-1. Ensure you are running the latest version of the plugin, as support for new models and regional settings is added incrementally.
-2. Identify the unrecognised value in the log output (for example, `response[0]...capabilities[X] is not a valid enum value`).
-3. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
-4. Provide the logs and specific unrecognised values in a GitHub issue so the missing structures or codes can be correctly mapped.
+1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
+2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
+3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
+4. Provide the logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
@@ -97,28 +89,7 @@ The `opendyson` tool by default subscribes to MQTT topics used by air treatment 
 <!-- INCLUDES: issue-51-dfab -->
 Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean results in an `Error: Global clean mopping is not implemented` message in the plugin logs.
 
-This limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active are undocumented and have not yet been reverse-engineered.
-
-To work around this limitation:
-
-* Start mopping cycles by selecting specific rooms (zone clean) rather than initiating a whole-home clean.
-* Initiate full-home mopping sessions directly within the MyDyson mobile app.
-
-#### Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?
-
-<!-- INCLUDES: issue-46-423c -->
-Unlike earlier Dyson robotic vacuum models (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) that support local network discovery and control via an exposed MQTT broker on port 1883, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.
-
-* **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker or an HTTP management interface).
-* **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.
-* **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.
-
-Consequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture.
-
-#### Why does the log show `404 Not Found` errors for `live-maps/cleaning`?
-
-<!-- INCLUDES: issue-50-3ad7 -->
-These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour for robots supporting live mapping, such as the Dyson Spot+Scrub Ai (RB05). The Dyson cloud API only serves the live map resource during active operation, and there is often a short delay before it becomes available. The plugin handles these `404 Not Found` responses by continuing to poll until the resource becomes available or the robot operation state changes.
+This limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active have not yet been reverse-engineered. If you would like this feature implemented then please create a feature request, attaching an MQTT log showing the MyDyson app initiating a global clean using each available mopping option.
 
 ## Matterbridge
 
@@ -168,7 +139,7 @@ If Apple Home is your primary Matter ecosystem, it is recommended to avoid the `
 
 #### Why are there no individual switches for rooms or granular cleaning settings?
 
-<!-- INCLUDES: issue-50-788a -->
+<!-- INCLUDES: issue-46-9197 issue-50-788a -->
 The plugin does not provide dedicated virtual switch accessories for individual rooms, nor does it expose granular settings such as mop hydration levels, water flow, or cleaning repetitions. This is due to architectural constraints in the Matter specification and controller implementations:
 
 * **Service Area Cluster**: Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) `Service Area` cluster. Creating artificial switches would conflict with this data model and add unnecessary complexity.
@@ -187,50 +158,20 @@ The robot will apply the per-room cleaning rules (suction intensity, water flow,
 #### Why does selecting rooms in Apple Home immediately start cleaning?
 
 <!-- INCLUDES: issue-51-aa8d -->
-Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command. This behaviour is intentional for several reasons:
+Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command.
 
-* **Matter specification compliance**: Section 1.17.7.1 (`SelectAreas` Command) of the Matter Application Cluster Specification specifies that a device may begin operating immediately or wait for a command, defining this behaviour as manufacturer-specific.
-* **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin defaults to these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.
-* **Safety and precedence**: Because room-level settings defined in the MyDyson app take precedence to prevent floor damage, any global vacuum or mopping mode selected in Apple Home is intentionally ignored during zone cleaning. Since room selection and cleaning mode cannot be configured independently without overriding room-specific floor safety profiles, cleaning commences as soon as the room selection is confirmed.
+This behaviour is intentional for several reasons:
 
-#### Why is there no dedicated vacuum-only mode in Apple Home?
+- **Matter specification compliance**: Section 1.17.7.1 (`SelectAreas` Command) of the Matter Application Cluster Specification specifies that a device may begin operating immediately or wait for a command, defining this behaviour as manufacturer-specific.
+- **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin defaults to these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.
 
-<!-- INCLUDES: issue-51-0b2f -->
-Vacuum-only cleaning is supported, but its presentation in Apple Home differs from the MyDyson app due to constraints in the Matter specification and Apple's user interface:
-
-* **Matter specification limitations**: Matter provides a single unified `RvcCleanMode` cluster list rather than distinct selectors for vacuum power and wet mopping. To prevent overly cluttered menus, vacuum-only operation is represented via suction power levels alongside combined or mop-only modes.
-* **Apple Home presentation limitations**: Apple Home does not render the custom mode description strings supplied by Matter devices; it displays only the standard Mode Tags associated with them.
-
-In Apple Home, cleaning modes are mapped as follows:
-
-* **Quiet**, **Quick**, **Max**, and **Automatic**: Vacuum-only cleaning at the specified power level.
-* **Mop**: Mopping-only cleaning.
-* **VacuumAndMop**: Simultaneous vacuuming and mopping.
-
-#### Why do Matter Service Area IDs change or shift?
-
-<!-- INCLUDES: issue-50-5d0d -->
-Service Area identifiers (`AreaID`) exposed over Matter may change if rooms are renamed, maps are modified, or the plugin is restarted. This occurs due to how the plugin must derive stable identifiers from the Dyson API:
-
-* **Unstable Dyson zone identifiers**: Dyson cloud APIs do not provide stable, permanent identifiers for rooms or zones; internal Dyson zone IDs are regularly re-used across edits and can point to different physical spaces.
-* **Derived zone identification**: To provide persistence while running, the plugin generates identifiers by concatenating the persistent map ID and the room name. However, this mapping is generated at runtime and is not persisted across plugin restarts; renaming a room in the MyDyson app or restarting the plugin may cause these `AreaID` values to be reallocated.
-* **Matter specification boundaries**: The Matter specification only requires that an `AreaID` remains stable during an active cleaning session. It does not mandate that IDs remain persistent across restarts or configuration changes.
-
-To maintain stable area associations in your Matter controller (such as Home Assistant), avoid renaming rooms in the MyDyson app once they have been used in automations, and be aware that IDs may shift following a restart.
-
-#### 🚧 How can specific rooms be cleaned using Apple Home or Siri? 🚧
-
-<!-- INCLUDES: issue-46-9197 -->
-Apple Home natively supports Matter Service Areas for robot vacuum cleaners, avoiding the need for dedicated virtual switch accessories for each room:
-
-- **Configuring Apple Home scenes**: Create an Apple Home scene (for example, named "Clean the Kitchen" or "Mop the Kitchen") with the robot set to Cleaning mode and only the target room or rooms selected under Service Areas. Triggering this scene manually or via voice ("Hey Siri, mop the kitchen") directs the robot to clean the specified rooms.
-- **Room-specific cleaning preferences**: Matter's Robot Vacuum Cleaner (RVC) Clean Mode cluster is a global device-level attribute rather than a per-area parameter. In addition, Apple Home displays raw mode tags instead of descriptive labels. To ensure room-appropriate behaviour, the plugin directs the robot to clean selected rooms using the preconfigured rules (such as vacuuming, mopping, or suction level) saved within the MyDyson mobile application.
+Because any global mode selected in Apple Home during room selection is deliberately ignored in favour of pre-configured zone settings, the clean begins as soon as the area selection is confirmed.
 
 ## Diagnostic Logging
 
 #### How can I capture comprehensive diagnostic logs for troubleshooting?
 
-The plugin provides several debug flags to record detailed Dyson cloud REST API transactions and MQTT message payloads. This information is essential for diagnosing unexpected behaviour, API errors, or gathering telemetry for unsupported robot models.
+The plugin provides several debug flags to record detailed Dyson cloud REST API transactions and MQTT message payloads. This information is essential for diagnosing unexpected behaviour, API errors, or gathering telemetry for unsupported devices.
 
 To enable comprehensive diagnostic logging, add the following to the plugin configuration:
 
@@ -248,13 +189,13 @@ To enable comprehensive diagnostic logging, add the following to the plugin conf
 
 Key configuration options:
 - `debug`: Enables debug logging within the plugin.
-- `wildcardTopic`: Monitors all appliance MQTT topics to ensure no telemetry is missed.
+- `wildcardTopic`: Monitors all appliance MQTT topics, including commands issued by the MyDyson app, to ensure no telemetry is missed.
 - `Log API Bodies`: Captures HTTP request and response payloads for cloud REST API interactions, including map data and room definitions.
-- `Log MQTT Payloads as JSON`: Formats and outputs raw MQTT event payloads as structured JSON.
+- `Log MQTT Payloads as JSON`: Formats and outputs raw MQTT event payloads in-full, instead of truncating long messages.
 - `Log Debug as Info`: Elevates debug log statements to informational level. This ensures messages are recorded even if the Matterbridge environment or container host filters out standard debug-level logging.
 
 When collecting logs for an issue report:
 1. Record a complete cycle from start to finish. This should include initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).
 2. The plugin automatically masks sensitive values like appliance serial numbers and cloud authentication tokens. However, Matterbridge core logs (including Matter pairing passcodes) are outside the plugin control and must be redacted manually before sharing logs publicly.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-423c issue-50-3ad7 issue-50-5d0d issue-51-0b2f -->
