@@ -106,9 +106,10 @@ To work around this limitation:
 
 #### Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?
 
-Unlike earlier Dyson robotic vacuum models that support local network discovery and control, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.
+<!-- INCLUDES: issue-46-423c -->
+Unlike earlier Dyson robotic vacuum models (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) that support local network discovery and control via an exposed MQTT broker on port 1883, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.
 
-* **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker on port 1883 or an HTTP management interface).
+* **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker or an HTTP management interface).
 * **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.
 * **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.
 
@@ -118,15 +119,6 @@ Consequently, any integration with the Spot+Scrub Ai requires continuous interne
 
 <!-- INCLUDES: issue-50-3ad7 -->
 These errors occur when the plugin attempts to poll the Dyson cloud for a live cleaning map before the robot has fully initialised the map data at the start of a clean, or immediately after a cleaning session has concluded. This is expected behaviour for robots supporting live mapping, such as the Dyson Spot+Scrub Ai (RB05). The Dyson cloud API only serves the live map resource during active operation, and there is often a short delay before it becomes available. The plugin handles these `404 Not Found` responses by continuing to poll until the resource becomes available or the robot operation state changes.
-
-#### 🚧 Does the Dyson Spot+Scrub Ai (RB05) support direct local network control? 🚧
-
-<!-- INCLUDES: issue-46-423c -->
-Unlike earlier Dyson robotic vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) that expose a local MQTT broker on port 1883, the Dyson Spot+Scrub Ai (RB05) cannot be controlled directly over the local network:
-
-- **Cloud-only connectivity**: The robot establishes outbound TLS MQTT connections exclusively to Dyson cloud infrastructure (AWS IoT).
-- **Closed local ports**: Network scans confirm that the device has no open local listening ports. Any local network discovery or local-only communication methods used for previous Dyson models will not connect to this model.
-- **Account-based integration**: The plugin communicates with the RB05 via Dyson cloud MQTT services using valid account credentials rather than a local IP address.
 
 ## Matterbridge
 

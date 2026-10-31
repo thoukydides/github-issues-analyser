@@ -77,8 +77,10 @@
                                 },
                                 {
                                     "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?",
-                                    "answer": "Unlike earlier Dyson robotic vacuum models that support local network discovery and control, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.\n\n* **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker on port 1883 or an HTTP management interface).\n* **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.\n* **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.\n\nConsequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture.",
-                                    "included_ids": []
+                                    "answer": "Unlike earlier Dyson robotic vacuum models (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) that support local network discovery and control via an exposed MQTT broker on port 1883, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.\n\n* **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker or an HTTP management interface).\n* **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.\n* **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.\n\nConsequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture.",
+                                    "included_ids": [
+                                        "issue-46-423c"
+                                    ]
                                 },
                                 {
                                     "question": "Why does the log show `404 Not Found` errors for `live-maps/cleaning`?",
@@ -88,14 +90,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 46,
-                                    "id": "issue-46-423c",
-                                    "question": "Does the Dyson Spot+Scrub Ai (RB05) support direct local network control?",
-                                    "answer": "Unlike earlier Dyson robotic vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) that expose a local MQTT broker on port 1883, the Dyson Spot+Scrub Ai (RB05) cannot be controlled directly over the local network:\n\n- **Cloud-only connectivity**: The robot establishes outbound TLS MQTT connections exclusively to Dyson cloud infrastructure (AWS IoT).\n- **Closed local ports**: Network scans confirm that the device has no open local listening ports. Any local network discovery or local-only communication methods used for previous Dyson models will not connect to this model.\n- **Account-based integration**: The plugin communicates with the RB05 via Dyson cloud MQTT services using valid account credentials rather than a local IP address."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
