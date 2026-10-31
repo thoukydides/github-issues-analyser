@@ -78,9 +78,7 @@
                                 {
                                     "question": "Can the Dyson Spot+Scrub Ai (RB05) be controlled locally over LAN without cloud connectivity?",
                                     "answer": "Unlike earlier Dyson robotic vacuum models that support local network discovery and control, the Dyson Spot+Scrub Ai (RB05) does not support local LAN control.\n\n* **No local listeners**: Network port scans confirm that the robot does not open any local listening ports (such as a local MQTT broker on port 1883 or an HTTP management interface).\n* **Outbound cloud communication only**: Telemetry and control are handled exclusively through persistent outbound TLS connections from the robot to Dyson's AWS IoT MQTT cloud infrastructure.\n* **Null local address**: The MyDyson cloud API returns an empty `address` attribute during device discovery, indicating no local network endpoint is provisioned.\n\nConsequently, any integration with the Spot+Scrub Ai requires continuous internet connectivity and active credentials for the Dyson cloud service; local-only network operation is impossible due to device hardware and firmware architecture.",
-                                    "included_ids": [
-                                        "issue-46-b661"
-                                    ]
+                                    "included_ids": []
                                 },
                                 {
                                     "question": "Why does the log show `404 Not Found` errors for `live-maps/cleaning`?",
@@ -90,7 +88,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 46,
+                                    "id": "issue-46-423c",
+                                    "question": "Does the Dyson Spot+Scrub Ai (RB05) support direct local network control?",
+                                    "answer": "Unlike earlier Dyson robotic vacuums (such as the 360 Eye, 360 Heurist, and 360 Vis Nav) that expose a local MQTT broker on port 1883, the Dyson Spot+Scrub Ai (RB05) cannot be controlled directly over the local network:\n\n- **Cloud-only connectivity**: The robot establishes outbound TLS MQTT connections exclusively to Dyson cloud infrastructure (AWS IoT).\n- **Closed local ports**: Network scans confirm that the device has no open local listening ports. Any local network discovery or local-only communication methods used for previous Dyson models will not connect to this model.\n- **Account-based integration**: The plugin communicates with the RB05 via Dyson cloud MQTT services using valid account credentials rather than a local IP address."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []
@@ -159,7 +164,6 @@
                             "question": "Why are there no individual switches for rooms or granular cleaning settings?",
                             "answer": "The plugin does not provide dedicated virtual switch accessories for individual rooms, nor does it expose granular settings such as mop hydration levels, water flow, or cleaning repetitions. This is due to architectural constraints in the Matter specification and controller implementations:\n\n* **Service Area Cluster**: Matter natively supports area selection through the Robotic Vacuum Cleaner (RVC) `Service Area` cluster. Creating artificial switches would conflict with this data model and add unnecessary complexity.\n* **Matter specification limitations**: The current Matter RVC specification does not provide standard attributes for appliance-specific mechanics like water pump rates, mop hydration levels, or repetition counts. It also lacks a mechanism to pass zone-specific operational settings (such as differing suction or hydration levels per room) within a single cleaning command.\n* **Combinatorial explosion of Clean Modes**: Grouping every combination of suction mode, water level, and repeat pass into discrete Matter Clean Modes would create an excessively large list. Furthermore, Apple Home does not display custom mode labels, making such a list effectively unusable.\n\nTo automate or voice-control specific rooms in Apple Home, use **Scenes**:\n\n1. Create a new Scene in the Apple Home app.\n2. Add the Dyson robot to the Scene.\n3. Configure the robot's state to be **Cleaning** and select the specific rooms under **Service Areas**.\n4. Trigger this Scene via Siri (e.g. 'Siri, clean the kitchen') or through automations.\n\nThe robot will apply the per-room cleaning rules (suction intensity, water flow, etc.) already configured within the MyDyson app for those areas.",
                             "included_ids": [
-                                "issue-46-2646",
                                 "issue-50-788a"
                             ]
                         },
@@ -185,7 +189,14 @@
                             ]
                         }
                     ],
-                    "candidates": []
+                    "candidates": [
+                        {
+                            "issue_number": 46,
+                            "id": "issue-46-9197",
+                            "question": "How can specific rooms be cleaned using Apple Home or Siri?",
+                            "answer": "Apple Home natively supports Matter Service Areas for robot vacuum cleaners, avoiding the need for dedicated virtual switch accessories for each room:\n\n- **Configuring Apple Home scenes**: Create an Apple Home scene (for example, named \"Clean the Kitchen\" or \"Mop the Kitchen\") with the robot set to Cleaning mode and only the target room or rooms selected under Service Areas. Triggering this scene manually or via voice (\"Hey Siri, mop the kitchen\") directs the robot to clean the specified rooms.\n- **Room-specific cleaning preferences**: Matter's Robot Vacuum Cleaner (RVC) Clean Mode cluster is a global device-level attribute rather than a per-area parameter. In addition, Apple Home displays raw mode tags instead of descriptive labels. To ensure room-appropriate behaviour, the plugin directs the robot to clean selected rooms using the preconfigured rules (such as vacuuming, mopping, or suction level) saved within the MyDyson mobile application."
+                        }
+                    ]
                 }
             ],
             "subcategories": []
@@ -199,9 +210,7 @@
                         {
                             "question": "How can I capture comprehensive diagnostic logs for troubleshooting?",
                             "answer": "The plugin provides several debug flags to record detailed Dyson cloud REST API transactions and MQTT message payloads. This information is essential for diagnosing unexpected behaviour, API errors, or gathering telemetry for unsupported robot models.\n\nTo enable comprehensive diagnostic logging, add the following to the plugin configuration:\n\n```json\n{\n  \"debug\": true,\n  \"wildcardTopic\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\nKey configuration options:\n- `debug`: Enables debug logging within the plugin.\n- `wildcardTopic`: Monitors all appliance MQTT topics to ensure no telemetry is missed.\n- `Log API Bodies`: Captures HTTP request and response payloads for cloud REST API interactions, including map data and room definitions.\n- `Log MQTT Payloads as JSON`: Formats and outputs raw MQTT event payloads as structured JSON.\n- `Log Debug as Info`: Elevates debug log statements to informational level. This ensures messages are recorded even if the Matterbridge environment or container host filters out standard debug-level logging.\n\nWhen collecting logs for an issue report:\n1. Record a complete cycle from start to finish. This should include initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).\n2. The plugin automatically masks sensitive values like appliance serial numbers and cloud authentication tokens. However, Matterbridge core logs (including Matter pairing passcodes) are outside the plugin control and must be redacted manually before sharing logs publicly.",
-                            "included_ids": [
-                                "issue-46-24ab"
-                            ]
+                            "included_ids": []
                         }
                     ],
                     "candidates": []
