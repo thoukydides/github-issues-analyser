@@ -20,6 +20,7 @@
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
   - [Why are there no individual switches for rooms or granular cleaning settings?](#why-are-there-no-individual-switches-for-rooms-or-granular-cleaning-settings)
   - [Why does selecting rooms in Apple Home immediately start cleaning?](#why-does-selecting-rooms-in-apple-home-immediately-start-cleaning)
+  - [Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?](#why-does-the-apple-home-app-group-some-dyson-robot-vacuum-modes-with-suction-power-levels)
 - **[Diagnostic Logging](#diagnostic-logging)**
   - [How can I capture comprehensive diagnostic logs for troubleshooting?](#how-can-i-capture-comprehensive-diagnostic-logs-for-troubleshooting)
 <!-- TOC-END -->
@@ -167,7 +168,7 @@ This behaviour is intentional for several reasons:
 
 Because any global mode selected in Apple Home during room selection is deliberately ignored in favour of pre-configured zone settings, the clean begins as soon as the area selection is confirmed.
 
-#### 🚧 Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels? 🚧
+#### Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?
 
 <!-- INCLUDES: issue-53-99e8 -->
 The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
