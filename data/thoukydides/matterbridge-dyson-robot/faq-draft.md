@@ -167,6 +167,16 @@ This behaviour is intentional for several reasons:
 
 Because any global mode selected in Apple Home during room selection is deliberately ignored in favour of pre-configured zone settings, the clean begins as soon as the area selection is confirmed.
 
+#### 🚧 Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels? 🚧
+
+<!-- INCLUDES: issue-53-99e8 -->
+The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
+
+* **Suction Power Group**: Modes containing tags such as `Quiet`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider.
+* **Operation Group**: Modes with functional tags like `Mop`, `DeepClean`, or `Vacuum` often appear in a list under the Play or Start button.
+
+In some cases, such as with the Dyson R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.
+
 ## Diagnostic Logging
 
 #### How can I capture comprehensive diagnostic logs for troubleshooting?
