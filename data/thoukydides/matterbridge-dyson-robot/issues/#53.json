@@ -1,0 +1,12 @@
+{
+    "issue_number": 53,
+    "updated_at": "2026-11-02T22:28:55.307Z",
+    "faq": [
+        {
+            "question": "Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?",
+            "answer": "The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:\n\n* **Suction Power Group**: Modes containing tags such as `Quiet`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider.\n* **Operation Group**: Modes with functional tags like `Mop`, `DeepClean`, or `Vacuum` often appear in a list under the Play or Start button.\n\nIn some cases, such as with the Dyson R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.",
+            "semantic_abstract": "Apple Home UI grouping and labelling for Dyson robot vacuums is driven by Matter `ModeTag` values within the `RvcCleanMode` cluster. Specific tag combinations cause the Home app to categorise modes as either suction power levels (displayed in the primary pill UI) or cleaning operations (displayed under the Play button). This mapping causes the app to ignore custom Dyson labels in favour of standard Matter tag names, representing a platform-specific interpretation of the Matter specification.",
+            "hash": "99e88005480dfcb1a6a495e737a344f7c756d65230e7cb37ea60b54ff119e560"
+        }
+    ]
+}
