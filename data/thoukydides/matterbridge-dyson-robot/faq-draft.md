@@ -92,6 +92,14 @@ Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean 
 
 This limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active have not yet been reverse-engineered. If you would like this feature implemented then please create a feature request, attaching an MQTT log showing the MyDyson app initiating a global clean using each available mopping option.
 
+#### 🚧 Why does selecting a mopping mode for a zone clean have no effect or result in errors? 🚧
+
+<!-- INCLUDES: issue-53-2e96 -->
+There are two primary reasons why mopping modes may not behave as expected:
+
+1. **Zone Clean Mapping**: When performing a room-specific (zone) clean, the plugin intentionally ignores the Matter `CleanMode` setting. This is because Matter lacks a mechanism to handle granular per-zone options available in the MyDyson app, such as water levels, UV enablement, and specific pass counts. To prevent overriding important safety settings (such as avoiding mopping on carpets), the plugin defaults to the configuration defined in the MyDyson app map for that specific area.
+2. **Global Mopping Implementation**: Starting a global clean with a mopping mode (such as `Mop` or `Vacuum then Mop`) requires specific MQTT command sequences that differ from vacuum-only models. If these sequences have not yet been identified for a particular model, the plugin will return a `Global clean mopping is not implemented` error. Currently, only vacuum-only global cleans are fully supported via the Matter interface for certain newer models.
+
 ## Matterbridge
 
 #### Why does `matterbridge-dyson-robot` report an older version in logs after an update?
@@ -170,13 +178,17 @@ Because any global mode selected in Apple Home during room selection is delibera
 
 #### Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?
 
-<!-- INCLUDES: issue-53-99e8 -->
 The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
 
 * **Suction Power Group**: Modes containing tags such as `Quiet`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider.
 * **Operation Group**: Modes with functional tags like `Mop`, `DeepClean`, or `Vacuum` often appear in a list under the Play or Start button.
 
 In some cases, such as with the Dyson R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.
+
+#### 🚧 Why is the Vacuum then mop mode grouped with suction levels in Apple Home? 🚧
+
+<!-- INCLUDES: issue-53-c664 -->
+The Apple Home app determines the UI placement of cleaning modes based on the `Matter ModeTag` values assigned to each mode. Depending on the combination of tags used (such as `Vacuum`, `Mop`, or `DeepClean`), the app may group a mode under the primary **Play** button or alongside suction power levels (Quiet, Quick, Max, etc.). The plugin's current tag assignments for models like the Dyson Wash+Dry (RB07) may result in "Vacuum then mop" appearing in the power level list due to how Apple interprets these specific tag combinations.
 
 ## Diagnostic Logging
 
