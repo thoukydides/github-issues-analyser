@@ -68,21 +68,15 @@
                                     "included_ids": []
                                 },
                                 {
-                                    "question": "Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?",
-                                    "answer": "Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean results in an `Error: Global clean mopping is not implemented` message in the plugin logs.\n\nThis limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active have not yet been reverse-engineered. If you would like this feature implemented then please create a feature request, attaching an MQTT log showing the MyDyson app initiating a global clean using each available mopping option.",
+                                    "question": "Why does selecting a mopping mode fail or have no effect?",
+                                    "answer": "There are two distinct behaviours regarding mopping modes depending on the type of cleaning being performed:\n\n1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean currently results in a `Global clean mopping is not implemented` error. The specific MQTT command payloads required to initiate global cleaning with mopping have not yet been reverse-engineered. If you require this feature, please create a feature request and provide MQTT logs from the MyDyson app initiating these actions.\n2. **Zone (Room) Clean**: For room-specific cleans, the plugin intentionally ignores the Matter `CleanMode` setting and defaults to the configuration defined in the MyDyson app map for that area. Matter does not currently provide a way to manage granular per-zone options (such as water levels, UV sterilisation, or pass counts). By deferring to the app settings, the plugin ensures safety constraints (such as avoiding mopping on carpets) are respected.",
                                     "included_ids": [
-                                        "issue-51-dfab"
+                                        "issue-51-dfab",
+                                        "issue-53-2e96"
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 53,
-                                    "id": "issue-53-2e96",
-                                    "question": "Why does selecting a mopping mode for a zone clean have no effect or result in errors?",
-                                    "answer": "There are two primary reasons why mopping modes may not behave as expected:\n\n1. **Zone Clean Mapping**: When performing a room-specific (zone) clean, the plugin intentionally ignores the Matter `CleanMode` setting. This is because Matter lacks a mechanism to handle granular per-zone options available in the MyDyson app, such as water levels, UV enablement, and specific pass counts. To prevent overriding important safety settings (such as avoiding mopping on carpets), the plugin defaults to the configuration defined in the MyDyson app map for that specific area.\n2. **Global Mopping Implementation**: Starting a global clean with a mopping mode (such as `Mop` or `Vacuum then Mop`) requires specific MQTT command sequences that differ from vacuum-only models. If these sequences have not yet been identified for a particular model, the plugin will return a `Global clean mopping is not implemented` error. Currently, only vacuum-only global cleans are fully supported via the Matter interface for certain newer models."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
