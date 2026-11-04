@@ -87,11 +87,23 @@ The `opendyson` tool by default subscribes to MQTT topics used by air treatment 
 
 #### Why does selecting a mopping mode fail or have no effect?
 
-<!-- INCLUDES: issue-51-dfab issue-53-2e96 -->
+<!-- INCLUDES: issue-51-dfab -->
 There are two distinct behaviours regarding mopping modes depending on the type of cleaning being performed:
 
 1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean currently results in a `Global clean mopping is not implemented` error. The specific MQTT command payloads required to initiate global cleaning with mopping have not yet been reverse-engineered. If you require this feature, please create a feature request and provide MQTT logs from the MyDyson app initiating these actions.
 2. **Zone (Room) Clean**: For room-specific cleans, the plugin intentionally ignores the Matter `CleanMode` setting and defaults to the configuration defined in the MyDyson app map for that area. Matter does not currently provide a way to manage granular per-zone options (such as water levels, UV sterilisation, or pass counts). By deferring to the app settings, the plugin ensures safety constraints (such as avoiding mopping on carpets) are respected.
+
+#### 🚧 Why does the plugin ignore Matter Clean Mode settings during room or zone cleaning? 🚧
+
+<!-- INCLUDES: issue-53-e42b -->
+When cleaning selected rooms or zones, the plugin deliberately ignores the Matter `CleanMode` setting and instead applies the cleaning options configured for each zone within the MyDyson app map.
+
+This design decision is driven by two main factors:
+
+- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone cleaning options. Dyson appliances support numerous granular room-specific parameters—such as suction level, water flow rate, vacuum passes, mop passes, and UV sanitisation—that have no equivalent in the Matter Robotic Vacuum Cleaner (RVC) cluster.
+- **Surface protection**: Overriding saved map settings with a global Matter clean mode risks running inappropriate cleaning routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.
+
+To alter cleaning behaviour for individual rooms or zones, configure the desired settings directly within the MyDyson app map rather than through Matter controller clean modes.
 
 ## Matterbridge
 
@@ -171,7 +183,6 @@ Because any global mode selected in Apple Home during room selection is delibera
 
 #### Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?
 
-<!-- INCLUDES: issue-53-c664 -->
 The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
 
 * **Suction Power Group**: Modes containing tags such as `Quiet`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider.
