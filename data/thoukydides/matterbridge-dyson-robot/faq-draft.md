@@ -16,7 +16,7 @@
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
   - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
   - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
-- **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
+- **[Apple Home and HomeKi Mapping](#apple-home-and-homeki-mapping)**
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
   - [Why are there no individual switches for rooms or granular cleaning settings?](#why-are-there-no-individual-switches-for-rooms-or-granular-cleaning-settings)
   - [Why does selecting rooms in Apple Home immediately start cleaning?](#why-does-selecting-rooms-in-apple-home-immediately-start-cleaning)
@@ -127,7 +127,7 @@ To address this behaviour:
 2. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
 3. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer.
 
-## Apple Home and HomeKit Mapping
+## Apple Home and HomeKi Mapping
 
 #### Why does the `Composed Air Purifier` option cause issues in Apple Home?
 
@@ -171,17 +171,13 @@ Because any global mode selected in Apple Home during room selection is delibera
 
 #### Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?
 
+<!-- INCLUDES: issue-53-c664 -->
 The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
 
 * **Suction Power Group**: Modes containing tags such as `Quiet`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider.
 * **Operation Group**: Modes with functional tags like `Mop`, `DeepClean`, or `Vacuum` often appear in a list under the Play or Start button.
 
-In some cases, such as with the Dyson R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.
-
-#### 🚧 Why is the Vacuum then mop mode grouped with suction levels in Apple Home? 🚧
-
-<!-- INCLUDES: issue-53-c664 -->
-The Apple Home app determines the UI placement of cleaning modes based on the `Matter ModeTag` values assigned to each mode. Depending on the combination of tags used (such as `Vacuum`, `Mop`, or `DeepClean`), the app may group a mode under the primary **Play** button or alongside suction power levels (Quiet, Quick, Max, etc.). The plugin's current tag assignments for models like the Dyson Wash+Dry (RB07) may result in "Vacuum then mop" appearing in the power level list due to how Apple interprets these specific tag combinations.
+In some cases, such as with the Dyson Wash+Dry / R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.
 
 ## Diagnostic Logging
 
