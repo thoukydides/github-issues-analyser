@@ -10,7 +10,7 @@
   - **[Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support](#dyson-spotscrub-ai-and-r1r2r3-nurovi-support)**
     - [Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?](#why-does-the-dyson-spotscrub-ai-or-r1r2r3-nurovi-status-take-time-to-update)
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
-    - [Why does selecting a mopping mode fail or have no effect?](#why-does-selecting-a-mopping-mode-fail-or-have-no-effect)
+    - [Why does selecting a mopping mode or clean mode fail or have no effect?](#why-does-selecting-a-mopping-mode-or-clean-mode-fail-or-have-no-effect)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -85,25 +85,16 @@ Unlike most other Dyson appliances, the RB05 and RB07 robot vacuums do not autom
 
 The `opendyson` tool by default subscribes to MQTT topics used by air treatment devices such as `<model>/<serial>/status/current` and `<model>/<serial>/status/fault`. However, robot vacuums instead publish their status to the more general `<model>/<serial>/status` topic, with RB05 and later models additionally using `<model>/<serial>/status/jdm`. This mismatch in expected MQTT topics means `opendyson` will not receive any status messages, making it appear as if the device is not publishing.
 
-#### Why does selecting a mopping mode fail or have no effect?
+#### Why does selecting a mopping mode or clean mode fail or have no effect?
 
-<!-- INCLUDES: issue-51-dfab -->
-There are two distinct behaviours regarding mopping modes depending on the type of cleaning being performed:
+<!-- INCLUDES: issue-51-dfab issue-53-e42b -->
+There are two distinct behaviours regarding mopping and clean modes depending on the type of cleaning being performed:
 
-1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean currently results in a `Global clean mopping is not implemented` error. The specific MQTT command payloads required to initiate global cleaning with mopping have not yet been reverse-engineered. If you require this feature, please create a feature request and provide MQTT logs from the MyDyson app initiating these actions.
-2. **Zone (Room) Clean**: For room-specific cleans, the plugin intentionally ignores the Matter `CleanMode` setting and defaults to the configuration defined in the MyDyson app map for that area. Matter does not currently provide a way to manage granular per-zone options (such as water levels, UV sterilisation, or pass counts). By deferring to the app settings, the plugin ensures safety constraints (such as avoiding mopping on carpets) are respected.
+1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean currently results in a `Global clean mopping is not implemented` error. The specific MQTT command payloads required to initiate global cleaning with mopping have not yet been reverse-engineered. To support this, please provide MQTT logs from the MyDyson app initiating these actions in a feature request.
+2. **Zone (Room) Clean**: For room-specific cleans, the plugin intentionally ignores the Matter `CleanMode` setting and defaults to the configuration defined in the MyDyson app map for that area. This design decision is driven by two factors:
 
-#### 🚧 Why does the plugin ignore Matter Clean Mode settings during room or zone cleaning? 🚧
-
-<!-- INCLUDES: issue-53-e42b -->
-When cleaning selected rooms or zones, the plugin deliberately ignores the Matter `CleanMode` setting and instead applies the cleaning options configured for each zone within the MyDyson app map.
-
-This design decision is driven by two main factors:
-
-- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone cleaning options. Dyson appliances support numerous granular room-specific parameters—such as suction level, water flow rate, vacuum passes, mop passes, and UV sanitisation—that have no equivalent in the Matter Robotic Vacuum Cleaner (RVC) cluster.
-- **Surface protection**: Overriding saved map settings with a global Matter clean mode risks running inappropriate cleaning routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.
-
-To alter cleaning behaviour for individual rooms or zones, configure the desired settings directly within the MyDyson app map rather than through Matter controller clean modes.
+- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone options. Dyson appliances support numerous granular parameters—such as suction level, water flow rate, vacuum or mop passes, and UV sanitisation—that have no equivalent in the Matter Robotic Vacuum Cleaner (RVC) cluster.
+- **Surface protection**: Overriding saved map settings with a global Matter clean mode risks running inappropriate routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.
 
 ## Matterbridge
 
