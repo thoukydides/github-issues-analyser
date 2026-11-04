@@ -1,18 +1,24 @@
 {
     "issue_number": 53,
-    "updated_at": "2026-11-03T12:46:57.995Z",
+    "updated_at": "2026-11-04T12:58:58.519Z",
     "faq": [
         {
-            "question": "Why is the Vacuum then mop mode grouped with suction levels in Apple Home?",
-            "answer": "The Apple Home app determines the UI placement of cleaning modes based on the `Matter ModeTag` values assigned to each mode. Depending on the combination of tags used (such as `Vacuum`, `Mop`, or `DeepClean`), the app may group a mode under the primary **Play** button or alongside suction power levels (Quiet, Quick, Max, etc.). The plugin's current tag assignments for models like the Dyson Wash+Dry (RB07) may result in \"Vacuum then mop\" appearing in the power level list due to how Apple interprets these specific tag combinations.",
-            "semantic_abstract": "Apple Home UI categorisation of robot vacuum modes is determined by `Matter ModeTag` attribute values, which can lead to mopping modes being grouped with suction levels if specific tag combinations are not utilised.",
-            "hash": "c664e5572d93a896ae42bf7264e5330a630ec9a7dbca0abd93cf3846d54e6c08"
+            "question": "Why does the robot ignore the Clean Mode selected in HomeKit when cleaning specific rooms?",
+            "answer": "When performing a zone or room clean, the plugin intentionally ignores the global Matter `Clean Mode` setting configured in HomeKit. This is because the Matter specification lacks the granularity required to represent Dyson's per-zone cleaning options, such as water levels, vacuum passes, mop passes, and UV light activation.\n\nTo ensure consistent behaviour and protect surfaces, the plugin defaults to the per-zone cleaning configurations defined within the MyDyson app map. This prevents scenarios where selecting a global mopping mode in HomeKit might inadvertently override a vacuum-only zone configuration and cause the robot to mop over carpeted areas.",
+            "semantic_abstract": "Matter specification limitations regarding granular per-zone cleaning parameters (water volume, UV light, pass counts) necessitate the prioritisation of MyDyson app map configurations over HomeKit mode settings during room-specific cleaning tasks to prevent accidental surface damage.",
+            "hash": "6f4a63b09250d7ffa25c97edbd5dbc99eba59bf836d1bb01409de5009d2e033a"
         },
         {
-            "question": "Why does selecting a mopping mode for a zone clean have no effect or result in errors?",
-            "answer": "There are two primary reasons why mopping modes may not behave as expected:\n\n1. **Zone Clean Mapping**: When performing a room-specific (zone) clean, the plugin intentionally ignores the Matter `CleanMode` setting. This is because Matter lacks a mechanism to handle granular per-zone options available in the MyDyson app, such as water levels, UV enablement, and specific pass counts. To prevent overriding important safety settings (such as avoiding mopping on carpets), the plugin defaults to the configuration defined in the MyDyson app map for that specific area.\n2. **Global Mopping Implementation**: Starting a global clean with a mopping mode (such as `Mop` or `Vacuum then Mop`) requires specific MQTT command sequences that differ from vacuum-only models. If these sequences have not yet been identified for a particular model, the plugin will return a `Global clean mopping is not implemented` error. Currently, only vacuum-only global cleans are fully supported via the Matter interface for certain newer models.",
-            "semantic_abstract": "Matter RVC cluster constraints regarding granular per-zone configuration like water levels and UV control cause the plugin to prioritise MyDyson app map settings over Matter `CleanMode` attributes during zone-specific cleaning operations.",
-            "hash": "2e965e8f91baae3a88ce7ffc9850b55b74036bf68fe1a3181559a54fa5919de2"
+            "question": "Why does starting a global clean in a mopping mode result in a `Global clean mopping is not implemented` error?",
+            "answer": "The plugin currently lacks the specific MQTT command sequences required to initiate a global mopping clean for newer models like the Dyson R2 Nurovi Wash+Dry (RB07). While vacuum-only global cleans are supported, the distinct logic for mopping, vacuum-and-mop, and vacuum-then-mop modes requires further technical investigation and MQTT log analysis from the physical hardware to implement correctly.",
+            "semantic_abstract": "Functional limitation in global cleaning operations for Dyson R2 Nurovi models caused by undocumented MQTT command sequences for mopping-specific modes, resulting in a runtime error when these modes are selected for non-zone cleaning.",
+            "hash": "8fd7e3d9a5f9088ae0aebf763e8b256b02deec889d6151031a7e11872f225f40"
+        },
+        {
+            "question": "Why are some cleaning modes grouped with suction power levels instead of mopping options in Apple Home?",
+            "answer": "The visual grouping of robot vacuum cleaner (RVC) modes within the Apple Home app is determined by the specific Matter `ModeTag` values assigned to each mode. If a mode like `Vacuum then mop` appears alongside suction levels (Quiet, Max, etc.) instead of with other mopping modes under the Play button, it is due to how the Home app interprets the combination of tags provided by the plugin.\n\nWhile the plugin maps Dyson modes to Matter standard tags, different versions of iOS may cluster these tags differently. Adjusting these tags is an area of active experimentation to improve the user interface layout for multi-function robots.",
+            "semantic_abstract": "Apple Home app UI clustering for Robot Vacuum Cleaner services is driven by Matter `ModeTag` value assignments, which can lead to mopping modes being categorised alongside power level characteristics depending on the specific tag combination defined by the plugin.",
+            "hash": "0e2c50c40399abf8043963d429476d0f17126ec6095221654a87bd2a59c2fa0e"
         }
     ]
 }
