@@ -27,18 +27,23 @@
 
 ## Unsupported Dyson Devices and Features
 
+<!-- PARTITION: Unsupported Dyson Devices and Features -->
+
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-11d5 -->
+<!-- INCLUDES: issue-17-fe91 issue-50-11d5 issue-52-8b41 -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API or new hardware capabilities are identified and correctly implemented rather than silently ignored.
 
-This error frequently occurs with newer models, regional variants, or firmware updates are released. Support for these models is often developed without direct access to physical devices.
+This error frequently occurs when newer models, regional variants, or firmware updates are released. Common causes for validation failure include:
+- **Non-standard identifiers**: Dyson occasionally uses proprietary codes for regions or models. For example, codes like `AZ` (Australia/New Zealand), `XC`, or `XD` may be used instead of standard ISO country codes.
+- **API Schema Changes**: Updates to Dyson's infrastructure may introduce new fields or modify data types.
+- **Unsupported Capabilities**: Newer devices may report capabilities that the plugin has not yet been configured to handle.
 
 Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter. To resolve this:
-1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
+1. Ensure you are running the latest version of the plugin.
 2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
 3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
-4. Provide the logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
+4. Provide the logs in a GitHub issue so the missing structures can be mapped.
 
 #### What information should I collect to enable support for a new Dyson model or missing features?
 
@@ -74,18 +79,6 @@ This is primarily due to limitations in the Matter specification, which does not
 The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting products are Bluetooth-only devices, indicated by the `connectionCategory: 'lecOnly'` field in the MyDyson API manifest. For an appliance to be bridged to Matter via this plugin, it must be reachable via Wi-Fi (`wifiOnly` or `lecAndWifi`).
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
-
-#### 🚧 Why does the plugin fail with `Unexpected structure of Dyson cloud API response`? 🚧
-
-<!-- INCLUDES: issue-52-8b41 -->
-The plugin performs strict validation on all data received from the Dyson cloud API (such as the `GET /v3/manifest` response) to ensure that device configurations are mapped accurately to Matter services. If any single device in an account returns data that does not conform to the expected schema, the entire plugin will fail to start to prevent inconsistent state.
-
-Common reasons for this validation error include:
-* **Non-standard identifiers**: Dyson sometimes uses proprietary codes for regions or models. For example, codes like `AZ` (used for some Australia/New Zealand variants), `XC`, or `XD` may be used instead of standard ISO country codes.
-* **API Schema Changes**: Updates to the Dyson cloud infrastructure may introduce new fields or change the data types of existing ones.
-* **Unsupported Device Capabilities**: Newer devices may report capabilities that the plugin has not yet been configured to handle.
-
-If you encounter this error, please enable debug logging and Log API Bodies in the plugin configuration. Capture the log output showing the `Unexpected structure` error and the JSON response following it, then report it as an issue so the internal validation schemas can be updated.
 
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
