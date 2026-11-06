@@ -16,11 +16,11 @@
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
   - [Why does the plugin still log details for appliances I have blacklisted?](#why-does-the-plugin-still-log-details-for-appliances-i-have-blacklisted)
   - [Why does Apple Home show `Updating` for my Dyson robot vacuum?](#why-does-apple-home-show-updating-for-my-dyson-robot-vacuum)
-- **[Apple Home and HomeKi Mapping](#apple-home-and-homeki-mapping)**
+- **[Apple Home and HomeKit Mapping](#apple-home-and-homekit-mapping)**
   - [Why does the `Composed Air Purifier` option cause issues in Apple Home?](#why-does-the-composed-air-purifier-option-cause-issues-in-apple-home)
   - [Why are there no individual switches for rooms or granular cleaning settings?](#why-are-there-no-individual-switches-for-rooms-or-granular-cleaning-settings)
   - [Why does selecting rooms in Apple Home immediately start cleaning?](#why-does-selecting-rooms-in-apple-home-immediately-start-cleaning)
-  - [Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?](#why-does-the-apple-home-app-group-some-dyson-robot-vacuum-modes-with-suction-power-levels)
+  - [How are robot vacuum cleaning modes and suction levels displayed in Apple Home?](#how-are-robot-vacuum-cleaning-modes-and-suction-levels-displayed-in-apple-home)
 - **[Diagnostic Logging](#diagnostic-logging)**
   - [How can I capture comprehensive diagnostic logs for troubleshooting?](#how-can-i-capture-comprehensive-diagnostic-logs-for-troubleshooting)
 <!-- TOC-END -->
@@ -135,7 +135,7 @@ To address this behaviour:
 2. Ensure that Matterbridge, Node.js, and your Apple Home hubs (Apple TV or HomePod) are updated to their latest software versions.
 3. If the issue persists, seek support via the [Matterbridge Discord](https://discord.gg/QX58CDe6hd) server, or open an issue on the [Matterbridge](https://github.com/Luligu/matterbridge/issues/new/choose) or [matter.js](https://github.com/matter-js/matter.js/issues) GitHub repositories, as the resolution lies within the Matter implementation layer.
 
-## Apple Home and HomeKi Mapping
+## Apple Home and HomeKit Mapping
 
 #### Why does the `Composed Air Purifier` option cause issues in Apple Home?
 
@@ -167,36 +167,25 @@ The robot will apply the per-room cleaning rules (suction intensity, water flow,
 
 #### Why does selecting rooms in Apple Home immediately start cleaning?
 
+<!-- INCLUDES: issue-51-7189 -->
 Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command.
 
 This behaviour is intentional for several reasons:
 
 - **Matter specification compliance**: Section 1.17.7.1 (`SelectAreas` Command) of the Matter Application Cluster Specification specifies that a device may begin operating immediately or wait for a command, defining this behaviour as manufacturer-specific.
-- **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin defaults to these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.
+- **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin prioritises these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.
 
 Because any global mode selected in Apple Home during room selection is deliberately ignored in favour of pre-configured zone settings, the clean begins as soon as the area selection is confirmed.
 
-#### Why does the Apple Home app group some Dyson robot vacuum modes with suction power levels?
-
-The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
-
-* **Suction Power Group**: Modes containing tags such as `Quiet`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider.
-* **Operation Group**: Modes with functional tags like `Mop`, `DeepClean`, or `Vacuum` often appear in a list under the Play or Start button.
-
-In some cases, such as with the Dyson Wash+Dry / R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.
-
-#### 🚧 Why is there no Vacuum Only mode for my Dyson robot in Apple Home? 🚧
+#### How are robot vacuum cleaning modes and suction levels displayed in Apple Home?
 
 <!-- INCLUDES: issue-51-ceb8 -->
-Vacuum-only operation is available but is presented differently due to limitations in the Matter specification and the Apple Home user interface. Matter uses a single list for all cleaning modes rather than separate selectors for vacuuming and mopping. To keep the interface manageable, the plugin maps vacuum-only modes to specific power levels. In Apple Home, you will see options such as `Quiet`, `Quick`, `Max`, and `Automatic` for vacuum-only cleaning, alongside dedicated tags for `Mop` or `VacuumAndMop`.
+The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
 
-#### 🚧 Why does my Dyson robot start cleaning immediately after I select rooms in Apple Home? 🚧
+* **Suction Power Group**: Modes containing tags such as `Quiet`, `Quick`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider. Vacuum-only operation is available through these power levels; there is no separate 'Vacuum Only' switch because these modes are defined as vacuuming by default.
+* **Operation Group**: Modes with functional tags like `Mop`, `DeepClean`, or `Vacuum and Mop` often appear in a list under the Play or Start button.
 
-<!-- INCLUDES: issue-51-7189 -->
-The robot is designed to start cleaning as soon as room selection is confirmed for two reasons:
-
-1. **Specification Compliance**: The Matter Application Cluster Specification allows for devices to start operating immediately upon room selection rather than waiting for a separate start command.
-2. **Safety and Presets**: When a zone clean is triggered, the plugin prioritises the per-zone cleaning configurations (such as suction power and water flow) already defined in the MyDyson app. This ensures that the robot correctly follows safety rules, such as not mopping on carpeted areas. Because these pre-defined settings override any global mode selected via Matter, the clean begins immediately to ensure the correct per-room logic is applied.
+In some cases, such as with the Dyson Wash+Dry / R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.
 
 ## Diagnostic Logging
 
