@@ -180,16 +180,16 @@
                             "question": "How can I capture comprehensive diagnostic logs for troubleshooting?",
                             "answer": "The plugin provides several debug flags to record detailed Dyson cloud REST API transactions and MQTT message payloads. This information is essential for diagnosing unexpected behaviour, API errors, or gathering telemetry for unsupported devices.\n\nTo enable comprehensive diagnostic logging, add the following to the plugin configuration:\n\n```json\n{\n  \"debug\": true,\n  \"wildcardTopic\": true,\n  \"debugFeatures\": [\n    \"Log API Bodies\",\n    \"Log MQTT Payloads as JSON\",\n    \"Log Debug as Info\"\n  ]\n}\n```\n\nKey configuration options:\n- `debug`: Enables debug logging within the plugin.\n- `wildcardTopic`: Monitors all appliance MQTT topics, including commands issued by the MyDyson app, to ensure no telemetry is missed.\n- `Log API Bodies`: Captures HTTP request and response payloads for cloud REST API interactions, including map data and room definitions.\n- `Log MQTT Payloads as JSON`: Formats and outputs raw MQTT event payloads in-full, instead of truncating long messages.\n- `Log Debug as Info`: Elevates debug log statements to informational level. This ensures messages are recorded even if the Matterbridge environment or container host filters out standard debug-level logging.\n\nWhen collecting logs for an issue report:\n1. Record a complete cycle from start to finish. This should include initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).\n2. The plugin automatically masks sensitive values like appliance serial numbers and cloud authentication tokens. However, Matterbridge core logs (including Matter pairing passcodes) are outside the plugin control and must be redacted manually before sharing logs publicly.",
                             "included_ids": []
+                        },
+                        {
+                            "question": "What do extraneous fields or unrecognised MQTT message warnings in the logs mean?",
+                            "answer": "These warnings generally represent technical noise and do not indicate a functional failure of the plugin:\n\n- **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g. `privacy.ai_recognize`). The plugin will continue to process all known fields, and these extra values are simply ignored.\n- **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance.",
+                            "included_ids": [
+                                "issue-51-051e"
+                            ]
                         }
                     ],
-                    "candidates": [
-                        {
-                            "issue_number": 51,
-                            "id": "issue-51-051e",
-                            "question": "What do extraneous fields or unrecognised MQTT message warnings in the logs mean?",
-                            "answer": "These warnings generally represent technical noise and do not indicate a functional failure of the plugin:\n\n- **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g., `privacy.ai_recognize`). The plugin will continue to process all known fields, and these extra values are simply ignored.\n- **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance."
-                        }
-                    ]
+                    "candidates": []
                 }
             ],
             "subcategories": []
