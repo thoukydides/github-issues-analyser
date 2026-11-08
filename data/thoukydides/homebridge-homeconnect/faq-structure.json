@@ -455,13 +455,14 @@
                                     ]
                                 },
                                 {
-                                    "question": "Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?",
-                                    "answer": "To identify an appliance's specific programs and valid option ranges, the plugin must perform a discovery routine. Many appliances only report this data via the API when they are powered on and the specific program is selected.\n\nThis discovery phase typically occurs upon the first successful authorisation of the plugin, after manually deleting persistent cache files, or when the **Identify** mechanism is triggered. During this process:\n\n1. **Power On**: The appliance switches on automatically. If it has an automatic rinsing cycle (common with coffee machines), the plugin will wait up to two minutes for it to finish.\n2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options.\n3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).\n\nThis typically happens only once during initial setup or after a cache deletion. Results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open. If no cache exists and the appliance is offline, startup will stall until a connection is established.",
+                                    "question": "Why does my appliance turn on automatically, switch off immediately, or fail with a `StateTransitionTimeout` error?",
+                                    "answer": "To generate the configuration schema in the Homebridge UI and identify supported option ranges, the plugin performs a discovery routine. Under the Home Connect API specification, a program must be actively selected on the appliance before its supported options can be read reliably; querying unselected programs often returns incomplete or incorrect metadata.\n\nThis discovery phase typically occurs upon the first successful authorisation, after deleting cache files, or when the **Identify** mechanism is triggered. During this process:\n\n1. **Power On**: The appliance switches on automatically. For coffee machines with automatic rinsing cycles, the plugin waits up to two minutes.\n2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options.\n3. **Restoration**: The plugin restores the appliance to its original state (usually Off or Standby).\n\nThis probing can fail with errors such as `409 Conflict`, `SDK.Error.WrongOperationState`, or `SDK.Error.HomeAppliance.StateTransitionTimeout`. Common causes include:\n- **Appliance State**: The appliance is busy, the door is open, or it is not currently in an idle state permitting remote operation.\n- **Favourite Programs**: Custom favourite programs configured on the appliance or within the official mobile app can cause state conflicts, as they are not supported by the documented Home Connect API.\n\nIf discovery fails, stalls, or results in missing options:\n- **Remove favourites**: Delete custom programs from the physical appliance or official app.\n- **Prepare the appliance**: Ensure it is switched on, idle, and remote control is enabled.\n- **Manual selection**: Manually select each program on the physical control panel for one minute to allow the plugin to read and cache the options.\n- **Trigger refresh**: Restart Homebridge or invoke the HomeKit **Identify** routine.",
                                     "included_ids": [
                                         "issue-19-c2a7",
                                         "issue-20-397f",
                                         "issue-32-acbc",
-                                        "issue-78-1a42"
+                                        "issue-78-1a42",
+                                        "issue-409-9747"
                                     ]
                                 },
                                 {
@@ -535,14 +536,7 @@
                                     ]
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 409,
-                                    "id": "issue-409-9747",
-                                    "question": "Why does the plugin temporarily select programs at startup, and why might it fail with `SDK.Error.HomeAppliance.StateTransitionTimeout`?",
-                                    "answer": "To generate the configuration schema in the Homebridge UI and validate program settings, the plugin must retrieve the options supported by each program. Under the Home Connect API specification, a program must be actively selected on the appliance before its supported options can be read reliably; querying unselected programs often returns incomplete or incorrect metadata. Until these options are cached, the plugin attempts to temporarily select each program in sequence during startup.\n\nThis probing can fail with a `409 Conflict` error and `SDK.Error.HomeAppliance.StateTransitionTimeout` under specific conditions:\n- **Appliance state:** The appliance is switched off, in standby, or not currently in an idle state permitting remote operation.\n- **Appliance favourites:** Having custom favourite programs configured on the appliance or within the official Home Connect mobile app can cause state conflicts, as favourite programs are not supported by the documented Home Connect API.\n\nA failure during program probing is non-fatal and does not prevent the plugin from running, but option validation for affected programs will be unavailable until details are cached. To resolve this error:\n1. Delete any custom favourite programs configured on the appliance or within the official Home Connect app.\n2. Ensure the appliance is switched on, idle, and has remote start or remote control permissions enabled.\n3. If necessary, manually select each program on the appliance control panel for a couple of minutes so the plugin can read and cache the options.\n4. Trigger a program cache refresh by restarting the Homebridge plugin instance or invoking the HomeKit **Identify** routine on the accessory."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
