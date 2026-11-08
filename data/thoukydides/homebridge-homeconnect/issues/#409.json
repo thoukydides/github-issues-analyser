@@ -1,0 +1,12 @@
+{
+    "issue_number": 409,
+    "updated_at": "2026-11-08T17:55:51.185Z",
+    "faq": [
+        {
+            "question": "Why does the plugin temporarily select programs at startup, and why might it fail with `SDK.Error.HomeAppliance.StateTransitionTimeout`?",
+            "answer": "To generate the configuration schema in the Homebridge UI and validate program settings, the plugin must retrieve the options supported by each program. Under the Home Connect API specification, a program must be actively selected on the appliance before its supported options can be read reliably; querying unselected programs often returns incomplete or incorrect metadata. Until these options are cached, the plugin attempts to temporarily select each program in sequence during startup.\n\nThis probing can fail with a `409 Conflict` error and `SDK.Error.HomeAppliance.StateTransitionTimeout` under specific conditions:\n- **Appliance state:** The appliance is switched off, in standby, or not currently in an idle state permitting remote operation.\n- **Appliance favourites:** Having custom favourite programs configured on the appliance or within the official Home Connect mobile app can cause state conflicts, as favourite programs are not supported by the documented Home Connect API.\n\nA failure during program probing is non-fatal and does not prevent the plugin from running, but option validation for affected programs will be unavailable until details are cached. To resolve this error:\n1. Delete any custom favourite programs configured on the appliance or within the official Home Connect app.\n2. Ensure the appliance is switched on, idle, and has remote start or remote control permissions enabled.\n3. If necessary, manually select each program on the appliance control panel for a couple of minutes so the plugin can read and cache the options.\n4. Trigger a program cache refresh by restarting the Homebridge plugin instance or invoking the HomeKit **Identify** routine on the accessory.",
+            "semantic_abstract": "Home Connect API constraints require an appliance program to be actively selected before its supported options can be queried, leading the plugin to probe programs sequentially at startup. Firmware state transition rejections (`SDK.Error.HomeAppliance.StateTransitionTimeout`) occur when the appliance is powered down or when undocumented custom favourite program states prevent remote program selection.",
+            "hash": "974797b502c924df1072cf5cf449f15d427409979e4cd5e00d371be478e57c46"
+        }
+    ]
+}
