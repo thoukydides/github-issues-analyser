@@ -11,6 +11,7 @@
     - [Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?](#why-does-the-dyson-spotscrub-ai-or-r1r2r3-nurovi-status-take-time-to-update)
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
     - [Why does selecting a mopping mode or clean mode fail or have no effect?](#why-does-selecting-a-mopping-mode-or-clean-mode-fail-or-have-no-effect)
+    - [Why is the `Vacuum then mop` clean mode not supported for Dyson robot mops?](#why-is-the-vacuum-then-mop-clean-mode-not-supported-for-dyson-robot-mops)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -93,33 +94,24 @@ The `opendyson` tool by default subscribes to MQTT topics used by air treatment 
 
 #### Why does selecting a mopping mode or clean mode fail or have no effect?
 
-<!-- INCLUDES: issue-51-8334 -->
+<!-- INCLUDES: issue-51-8334 issue-53-96fb -->
 There are two distinct behaviours regarding mopping and clean modes depending on the type of cleaning being performed:
 
 1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean on newer models like the RB05 currently results in a `Global clean mopping is not implemented` error. The specific MQTT command payloads required to initiate global cleaning with mopping have not yet been reverse-engineered. To support this, please provide MQTT logs from the MyDyson app initiating these actions in a feature request.
-2. **Zone (Room) Clean**: For room-specific cleans, the plugin intentionally ignores the Matter `CleanMode` setting and defaults to the configuration defined in the MyDyson app map for that area. This design decision is driven by two factors:
 
-- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone options. Dyson appliances support numerous granular parameters—such as suction level, water flow rate, vacuum or mop passes, and UV sanitisation—that have no equivalent in the Matter Robotic Vacuum Cleaner (RVC) cluster.
+2. **Zone (Room) Clean**: For room-specific cleans, the plugin deliberately preserves the per-zone cleaning options defined in the MyDyson app map rather than applying the global Matter `CleanMode` setting. This design decision is driven by three factors:
+
+- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone options. Dyson appliances store numerous granular parameters—such as suction level, water flow rate, vacuum or mop passes, and UV sanitisation—that have no equivalent in the Matter Robotic Vacuum Cleaner (RVC) cluster.
 - **Surface protection**: Overriding saved map settings with a global Matter clean mode risks running inappropriate routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.
+- **Complexity of modes**: Attempting to expose every permutation of suction, hydration, and repetition settings as proprietary Matter clean modes would create dozens of non-standard options that are difficult to navigate in controller platforms such as Apple Home.
 
-#### 🚧 Why does Matter clean mode not override per-zone cleaning preferences on Dyson robot vacuums? 🚧
-
-<!-- INCLUDES: issue-53-96fb -->
-When cleaning specific rooms or zones, the plugin deliberately preserves the per-zone cleaning options defined in the MyDyson app map rather than applying the global Matter Clean Mode setting:
-
-- **Lack of per-zone Matter configuration**: The Matter Robot Vacuum Cleaner (RVC) specification does not support per-zone cleaning parameters. Dyson appliances store numerous per-room settings—such as hydration levels, vacuum suction levels, cleaning passes, and UV sanitisation—that have no direct counterpart in Matter.
-- **Risk of carpet damage**: Overriding zone configurations with a global Matter Clean Mode could cause robot mops to attempt wet mopping on carpeted zones configured as vacuum-only in the MyDyson map.
-- **Combinatorial explosion of modes**: Attempting to expose every permutation of suction, hydration, and repetition settings as proprietary Matter Clean Modes would create dozens of non-standard options that are not supported by controller platforms such as Apple Home.
-
-To adjust cleaning behaviour (such as suction strength, water flow, or mop passes) for specific rooms, configure the zone preferences directly within the MyDyson app map.
-
-#### 🚧 Why is the `Vacuum then mop` clean mode not supported in Apple Home for Dyson robot mops? 🚧
+#### Why is the `Vacuum then mop` clean mode not supported for Dyson robot mops?
 
 <!-- INCLUDES: issue-53-f4c4 -->
-Although the MyDyson app offers both simultaneous "Vacuum and Wash" and sequential "Vacuum then Wash" modes for mop-equipped models (such as the Dyson R2 Nurovi), the plugin does not expose a distinct `Vacuum then mop` mode to Matter:
+Although the MyDyson app offers both simultaneous 'Vacuum and Wash' and sequential 'Vacuum then Wash' modes for mop-equipped models (such as the Dyson R2 Nurovi), the plugin does not expose a distinct `Vacuum then mop` mode to Matter:
 
 - **Identical device telemetry**: Dyson robot MQTT status messages (`CURRENT-STATE`) do not distinguish between simultaneous and sequential operations. Both cleaning styles report the identical state value of `VACUUMING_AND_MOPPING`.
-- **Telemetry-only mode representation**: For models that configure cleaning options strictly per room within map preferences, the plugin uses the Matter Clean Mode attribute to reflect the robot's current activity rather than to command cleaning configurations. Because the appliance firmware does not report a distinct status for sequential passes, the plugin cannot accurately report or track this state in Apple Home.
+- **Telemetry-only mode representation**: For models that configure cleaning options strictly per room within map preferences, the plugin uses the Matter Clean Mode attribute to reflect the robot's current activity rather than to command cleaning configurations. Because the appliance firmware does not report a distinct status for sequential passes, the plugin cannot accurately report or track this state.
 
 ## Matterbridge
 
