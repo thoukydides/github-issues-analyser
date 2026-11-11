@@ -190,23 +190,15 @@ Because any global mode selected in Apple Home during room selection is delibera
 
 #### How are robot vacuum cleaning modes and suction levels displayed in Apple Home?
 
-<!-- INCLUDES: issue-51-ceb8 -->
+<!-- INCLUDES: issue-51-ceb8 issue-53-a66d -->
 The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
 
 * **Suction Power Group**: Modes containing tags such as `Quiet`, `Quick`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider. Vacuum-only operation is available through these power levels; there is no separate 'Vacuum Only' switch because these modes are defined as vacuuming by default.
 * **Operation Group**: Modes with functional tags like `Mop`, `DeepClean`, or `Vacuum and Mop` often appear in a list under the Play or Start button.
 
-In some cases, such as with the Dyson Wash+Dry / R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** may be assigned tags that Apple Home associates with suction levels, causing it to appear in the pill section instead of the Play button menu. Additionally, Apple Home currently displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC (Robot Vacuum Cleaner) specification and cannot be directly overridden by the plugin.
+In some cases, such as with the Dyson Wash+Dry / R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** uses the standard `VacuumThenMop` tag. Apple Home currently associates this tag with suction levels, causing it to appear in the pill section instead of the Play button menu. Furthermore, Apple Home displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC specification.
 
-#### 🚧 Why does the `Vacuum then mop` mode appear in the suction power menu instead of under the Play button in Apple Home? 🚧
-
-<!-- INCLUDES: issue-53-a66d -->
-The grouping of cleaning modes in Apple Home is determined by the `ModeTag` values defined in the Matter specification. The plugin maps Dyson cleaning modes to these standard tags, but the Apple Home app interprets specific tags differently:
-
-* Primary modes like `Mop` and `Vacuum` are typically displayed under the main Play button.
-* Combination or modifier tags, such as `VacuumThenMop`, are often relegated to the secondary settings menu (the robot icon pill), where suction power levels are also found.
-
-The plugin follows standard Matter tagging to ensure broad compatibility. Adding proprietary or non-standard tags to force a specific UI layout in Apple Home is avoided, as these are often unsupported by other Matter controllers and can lead to inconsistent behaviour.
+The plugin follows standard Matter tagging to ensure broad compatibility across all ecosystems. Proprietary or non-standard tags are not used to force a specific UI layout in Apple Home, as these are often unsupported by other Matter controllers and can lead to inconsistent behaviour.
 
 ## Diagnostic Logging
 
