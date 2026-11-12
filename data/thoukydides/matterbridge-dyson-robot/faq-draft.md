@@ -33,7 +33,7 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-11d5 issue-52-8b41 -->
+<!-- INCLUDES: issue-17-fe91 issue-50-11d5 -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API or new hardware capabilities are identified and correctly implemented rather than silently ignored.
 
 This error frequently occurs when newer models, regional variants, or firmware updates are released. Common causes for validation failure include:
@@ -82,6 +82,21 @@ The Dyson Solarcycle Morph desk light (model `CD06`) and similar lighting produc
 
 While the MyDyson API includes MQTT configuration for these models, testing has confirmed that no control traffic or state updates are actually transmitted via Dyson's cloud gateway for BLE-only devices. Without a local network interface or a functional cloud MQTT proxy, there is no technical pathway for the plugin to control the device. The plugin identifies these devices and gracefully ignores them to ensure they do not interfere with the operation of supported Wi-Fi-enabled appliances.
 
+#### 🚧 Why does the plugin fail with `Unexpected structure of Dyson cloud API response`? 🚧
+
+<!-- INCLUDES: issue-52-3d3f -->
+The plugin performs strict validation on all data received from the Dyson Cloud API to ensure that device features and configurations are correctly mapped to Matter services. This error typically occurs when the API returns an undocumented or non-standard value that does not match the plugin's internal schema.
+
+A common cause is the use of unrecognised regional identifiers. For example, some models like the Dyson Spot+Scrub Ai (`RB05`) may report a `countryCode` of `AZ` (likely representing a combined Australia/New Zealand market) which is not present in Dyson's own official list of supported markets or product definitions.
+
+When the plugin encounters an unmapped value:
+1. It stops the entire initialisation process to prevent the exposure of devices with potentially incorrect or unstable configurations.
+2. An error message is logged identifying the specific field that failed validation (e.g. `response[0].countryCode is not a DysonProductCountryCode`).
+
+If you encounter this error:
+- Ensure you are running the latest version of the plugin, as support for new models and regional codes is added regularly.
+- If the issue persists, capture the debug logs showing the `Unexpected structure` error and the unrecognised value, then report it so the schema can be updated.
+
 ### Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support
 
 #### Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?
@@ -94,7 +109,7 @@ The `opendyson` tool by default subscribes to MQTT topics used by air treatment 
 
 #### Why does selecting a mopping mode or clean mode fail or have no effect?
 
-<!-- INCLUDES: issue-51-8334 issue-53-4473 issue-53-e6e0 -->
+<!-- INCLUDES: issue-53-4473 issue-53-e6e0 -->
 There are two distinct behaviours regarding mopping and clean modes depending on the type of cleaning being performed:
 
 1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean on models like the RB05 or R2 Nurovi currently results in a `Global clean mopping is not implemented` error. On these mopping-capable robots, the official app typically handles "all-room" cleans by sending a list of individual room preferences and map identifiers rather than a single global command. Until the precise MQTT sequencing for global mopping is reverse-engineered, the plugin treats these `RVC Clean Mode` settings primarily as status indicators. To use mopping functionality, users should initiate cleans via the MyDyson app or as zone-based cleans that use the settings pre-configured in the Dyson map.
@@ -111,6 +126,11 @@ Although the MyDyson app offers both simultaneous 'Vacuum and Wash' and sequenti
 
 - **Identical device telemetry**: Dyson robot MQTT status messages (`CURRENT-STATE`) do not distinguish between simultaneous and sequential operations. Both cleaning styles report the identical state value of `VACUUMING_AND_MOPPING`.
 - **Telemetry-only mode representation**: For models that configure cleaning options strictly per room within map preferences, the plugin uses the Matter Clean Mode attribute to reflect the robot's current activity rather than to command cleaning configurations. Because the appliance firmware does not report a distinct status for sequential passes, the plugin cannot accurately report or track this state.
+
+#### 🚧 Why do Mop or Vacuum and Mop modes fail when starting a global clean? 🚧
+
+<!-- INCLUDES: issue-51-b34b -->
+Global mopping is currently not implemented for certain models, such as the Spot+Scrub Ai (RB05). While the robot can mop when specific rooms are selected (using the room settings from the MyDyson app), the specific API commands required to initiate a whole-home (global) mopping session are currently unknown. Attempting to start a global clean in these modes will result in an `Error: Global clean mopping is not implemented` in the logs. To mop, you should use the room selection feature or the official MyDyson app.
 
 ## Matterbridge
 
@@ -178,7 +198,6 @@ The robot will apply the per-room cleaning rules (suction intensity, water flow,
 
 #### Why does selecting rooms in Apple Home immediately start cleaning?
 
-<!-- INCLUDES: issue-51-7189 -->
 Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command.
 
 This behaviour is intentional for several reasons:
@@ -190,7 +209,7 @@ Because any global mode selected in Apple Home during room selection is delibera
 
 #### How are robot vacuum cleaning modes and suction levels displayed in Apple Home?
 
-<!-- INCLUDES: issue-51-ceb8 issue-53-a66d -->
+<!-- INCLUDES: issue-53-a66d -->
 The Apple Home app determines where to display robot vacuum cleaning modes based on the Matter `ModeTags` assigned to them, rather than the custom labels provided by the plugin or the Dyson API. This results in two distinct UI areas:
 
 * **Suction Power Group**: Modes containing tags such as `Quiet`, `Quick`, `Normal`, `Max`, or `Auto` are typically grouped into a selection pill or slider. Vacuum-only operation is available through these power levels; there is no separate 'Vacuum Only' switch because these modes are defined as vacuuming by default.
@@ -199,6 +218,23 @@ The Apple Home app determines where to display robot vacuum cleaning modes based
 In some cases, such as with the Dyson Wash+Dry / R2 Nurovi (RB07), a hybrid mode like **Vacuum then mop** uses the standard `VacuumThenMop` tag. Apple Home currently associates this tag with suction levels, causing it to appear in the pill section instead of the Play button menu. Furthermore, Apple Home displays the generic Matter tag name (e.g. `Vacuum and Mop`) instead of the specific label used by the MyDyson app. These behaviours are controlled by the Apple Home app's implementation of the Matter RVC specification.
 
 The plugin follows standard Matter tagging to ensure broad compatibility across all ecosystems. Proprietary or non-standard tags are not used to force a specific UI layout in Apple Home, as these are often unsupported by other Matter controllers and can lead to inconsistent behaviour.
+
+#### 🚧 Why does the Dyson robot start cleaning immediately after selecting rooms in Apple Home? 🚧
+
+<!-- INCLUDES: issue-51-dee4 -->
+This is a deliberate design choice aligned with the Matter Application Cluster Specification, which allows devices to start operating immediately upon area selection. When triggering a zone clean, the plugin prioritises the per-room cleaning configurations defined within the MyDyson app rather than applying a global setting from Matter. This ensures safe operation across mixed flooring types, such as preventing the robot from mopping on carpeted areas. Starting the clean immediately ensures these per-zone safety configurations are respected.
+
+#### 🚧 Why is there no dedicated Vacuum Only mode for my Dyson robot in Apple Home? 🚧
+
+<!-- INCLUDES: issue-51-9780 -->
+Vacuum-only operation is present but is presented via vacuum power levels due to limitations in both the Matter specification and Apple Home UI. Matter utilizes a single list for `RVC Clean Mode` options instead of separate selectors for power and mopping. To keep the interface manageable, the plugin maps vacuum-only cleaning to the following standard modes in Apple Home:
+
+*   **Quiet**
+*   **Quick**
+*   **Max**
+*   **Automatic**
+
+Mopping-specific modes like **Mop** or **VacuumAndMop** are included in the same list but represent mopping activity.
 
 ## Diagnostic Logging
 
@@ -233,10 +269,16 @@ When collecting logs for an issue report:
 
 #### What do extraneous fields or unrecognised MQTT message warnings in the logs mean?
 
-<!-- INCLUDES: issue-51-051e -->
 These warnings generally represent technical noise and do not indicate a functional failure of the plugin:
 
 - **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g. `privacy.ai_recognize`). The plugin will continue to process all known fields, and these extra values are simply ignored.
 - **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance.
+
+#### 🚧 What should I do if I see `DysonCloudError` or unrecognised MQTT messages in the logs? 🚧
+
+<!-- INCLUDES: issue-51-bdc6 -->
+Messages such as `DysonCloudError: Unexpected Dyson Cloud API response structure` or `Unrecognised Dyson MQTT message: DysonMsg.msg = 'undefined'` are generally non-critical background noise. These often occur when the Dyson Cloud API returns unexpected data types or when the robot sends data fields that the plugin does not yet explicitly handle (e.g., `privacy.ai_recognize`). 
+
+Similarly, errors associated with `REQUEST-CURRENT-FAULTS` only impact the reporting of specific fault details to Matter. Unless you are experiencing a total loss of control or incorrect status in Apple Home, these log entries do not typically indicate a functional failure and can be safely ignored.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-423c issue-50-3ad7 issue-50-5d0d -->
