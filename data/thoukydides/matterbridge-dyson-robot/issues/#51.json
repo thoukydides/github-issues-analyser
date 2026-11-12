@@ -1,30 +1,30 @@
 {
     "issue_number": 51,
-    "updated_at": "2026-11-05T13:11:07.621Z",
+    "updated_at": "2026-11-12T13:45:40.279Z",
     "faq": [
         {
-            "question": "Why do I get an error when selecting Mop or Vacuum and Mop in Apple Home?",
-            "answer": "Global mopping (starting a clean session for the entire map with mopping enabled) is currently not implemented for newer robot models like the RB05. This is because the specific command structure required by the Dyson API to initiate a global mopping cycle is not yet known. When this is attempted, the logs will show `Error: Global clean mopping is not implemented`. Currently, mopping functionality is only supported through per-zone cleaning configurations defined within the MyDyson app.",
-            "semantic_abstract": "Global mopping commands for specific Dyson robot models are unimplemented due to unknown API command signatures, causing `Global clean mopping is not implemented` errors when mopping is triggered outside of zone-based cleaning cycles.",
-            "hash": "83343d6fe09b3cc50f78c4eb9e2a3079195b9b07e9a025410d16431102d772e2"
+            "question": "Why does the Dyson robot start cleaning immediately after selecting rooms in Apple Home?",
+            "answer": "This is a deliberate design choice aligned with the Matter Application Cluster Specification, which allows devices to start operating immediately upon area selection. When triggering a zone clean, the plugin prioritises the per-room cleaning configurations defined within the MyDyson app rather than applying a global setting from Matter. This ensures safe operation across mixed flooring types, such as preventing the robot from mopping on carpeted areas. Starting the clean immediately ensures these per-zone safety configurations are respected.",
+            "semantic_abstract": "The plugin initiates cleaning immediately upon Matter `SelectAreas` command execution to ensure the robot adheres to per-zone safety configurations defined in the MyDyson app, preventing unsafe global mode overrides on sensitive flooring.",
+            "hash": "dee4f2d821633822aa0f85cd1465cb16447ac135290a84526f432354bd330828"
         },
         {
-            "question": "Why is there no Vacuum Only mode for my Dyson robot in Apple Home?",
-            "answer": "Vacuum-only operation is available but is presented differently due to limitations in the Matter specification and the Apple Home user interface. Matter uses a single list for all cleaning modes rather than separate selectors for vacuuming and mopping. To keep the interface manageable, the plugin maps vacuum-only modes to specific power levels. In Apple Home, you will see options such as `Quiet`, `Quick`, `Max`, and `Automatic` for vacuum-only cleaning, alongside dedicated tags for `Mop` or `VacuumAndMop`.",
-            "semantic_abstract": "Matter and Apple Home UI constraints require vacuum-only operation to be exposed via power level tags (e.g., `Quiet`, `Max`) within a unified clean mode list, rather than as a standalone toggle.",
-            "hash": "ceb8981b178ed08eb08f594f447a971b017af5b8375d352df04f3896b236efe2"
+            "question": "Why is there no dedicated Vacuum Only mode for my Dyson robot in Apple Home?",
+            "answer": "Vacuum-only operation is present but is presented via vacuum power levels due to limitations in both the Matter specification and Apple Home UI. Matter utilizes a single list for `RVC Clean Mode` options instead of separate selectors for power and mopping. To keep the interface manageable, the plugin maps vacuum-only cleaning to the following standard modes in Apple Home:\n\n*   **Quiet**\n*   **Quick**\n*   **Max**\n*   **Automatic**\n\nMopping-specific modes like **Mop** or **VacuumAndMop** are included in the same list but represent mopping activity.",
+            "semantic_abstract": "Matter and Apple Home UI constraints require mapping vacuum-only functionality to power level descriptors within a single cleaning mode list, rather than providing a standalone vacuum toggle.",
+            "hash": "9780957d6e28c1b11018559c44893a62c97cdb87484414c0378128e2b3f84f13"
         },
         {
-            "question": "Why does my Dyson robot start cleaning immediately after I select rooms in Apple Home?",
-            "answer": "The robot is designed to start cleaning as soon as room selection is confirmed for two reasons:\n\n1. **Specification Compliance**: The Matter Application Cluster Specification allows for devices to start operating immediately upon room selection rather than waiting for a separate start command.\n2. **Safety and Presets**: When a zone clean is triggered, the plugin prioritises the per-zone cleaning configurations (such as suction power and water flow) already defined in the MyDyson app. This ensures that the robot correctly follows safety rules, such as not mopping on carpeted areas. Because these pre-defined settings override any global mode selected via Matter, the clean begins immediately to ensure the correct per-room logic is applied.",
-            "semantic_abstract": "Room-specific cleaning initiates immediately upon selection to comply with Matter specifications and enforce pre-defined MyDyson app configurations, ensuring safety parameters like flooring-type restrictions are respected over global Matter mode overrides.",
-            "hash": "7189b2094639d997c5fa3a0ceec50af425ac83707af58b3c08f557c02c657470"
+            "question": "Why do Mop or Vacuum and Mop modes fail when starting a global clean?",
+            "answer": "Global mopping is currently not implemented for certain models, such as the Spot+Scrub Ai (RB05). While the robot can mop when specific rooms are selected (using the room settings from the MyDyson app), the specific API commands required to initiate a whole-home (global) mopping session are currently unknown. Attempting to start a global clean in these modes will result in an `Error: Global clean mopping is not implemented` in the logs. To mop, you should use the room selection feature or the official MyDyson app.",
+            "semantic_abstract": "Global mopping sessions via Matter are unavailable for specific Dyson models because the required API command signatures for non-zone mopping remain unidentified.",
+            "hash": "b34bc587021f05ff32282b7f36f7fb41df34cc4d5c8c32dfe933182302e665bb"
         },
         {
-            "question": "What do extraneous fields or unrecognised MQTT message warnings in the logs mean?",
-            "answer": "These warnings generally represent technical noise and do not indicate a functional failure of the plugin:\n\n- **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g., `privacy.ai_recognize`). The plugin will continue to process all known fields, and these extra values are simply ignored.\n- **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance.",
-            "semantic_abstract": "MQTT and API validation warnings regarding extraneous fields or unrecognised message tags typically represent undocumented telemetry data or diagnostic routines that do not impact core plugin functionality or appliance control.",
-            "hash": "051e243b79840d4756f3ca11a963c609288715e1c2a6e261248a33b926d130cc"
+            "question": "What should I do if I see `DysonCloudError` or unrecognised MQTT messages in the logs?",
+            "answer": "Messages such as `DysonCloudError: Unexpected Dyson Cloud API response structure` or `Unrecognised Dyson MQTT message: DysonMsg.msg = 'undefined'` are generally non-critical background noise. These often occur when the Dyson Cloud API returns unexpected data types or when the robot sends data fields that the plugin does not yet explicitly handle (e.g., `privacy.ai_recognize`). \n\nSimilarly, errors associated with `REQUEST-CURRENT-FAULTS` only impact the reporting of specific fault details to Matter. Unless you are experiencing a total loss of control or incorrect status in Apple Home, these log entries do not typically indicate a functional failure and can be safely ignored.",
+            "semantic_abstract": "Unexpected Dyson Cloud API response structures and unrecognised MQTT payloads are typically diagnostic background noise that does not interfere with primary device control or status synchronisation.",
+            "hash": "bdc62c76102a5bdab591b431ea714378beae675c45603a33cc06adc17bc27b65"
         }
     ]
 }
