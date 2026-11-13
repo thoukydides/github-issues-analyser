@@ -70,10 +70,11 @@
                                 },
                                 {
                                     "question": "Why does selecting a mopping mode or clean mode fail or have no effect?",
-                                    "answer": "There are two distinct behaviours regarding mopping and clean modes depending on the type of cleaning being performed:\n\n1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean on models like the RB05 or R2 Nurovi currently results in a `Global clean mopping is not implemented` error. On these mopping-capable robots, the official app typically handles \"all-room\" cleans by sending a list of individual room preferences and map identifiers rather than a single global command. Until the precise MQTT sequencing for global mopping is reverse-engineered, the plugin treats these `RVC Clean Mode` settings primarily as status indicators. To use mopping functionality, users should initiate cleans via the MyDyson app or as zone-based cleans that use the settings pre-configured in the Dyson map.\n\n2. **Zone (Room) Clean and Attribute Adjustability**: For room-specific cleans, the plugin deliberately preserves the per-zone cleaning options defined in the MyDyson app map rather than applying global Matter `CleanMode` settings. This design decision is driven by three factors:\n\n- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone options. Dyson appliances store granular parameters—such as suction level, water volume, number of cleaning passes, and UV light activation—that have no equivalent in the Matter Robotic Vacuum Cleaner (RVC) cluster.\n- **Surface protection**: Overriding saved map settings with a global Matter clean mode risks running inappropriate routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.\n- **Complexity of modes**: Attempting to expose every permutation of suction, hydration, and repetition settings as proprietary Matter clean modes would create a combinatorial explosion of non-standard options that are difficult to navigate in controller platforms such as Apple Home.",
+                                    "answer": "There are two distinct behaviours regarding mopping and clean modes depending on the type of cleaning being performed:\n\n1. **Whole-home (Global) Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean on models like the RB05 (Spot+Scrub Ai) or R2 Nurovi currently results in a `Global clean mopping is not implemented` error. On these mopping-capable robots, the official app typically handles \"all-room\" cleans by sending a list of individual room preferences and map identifiers rather than a single global command. Until the precise MQTT sequencing for global mopping is reverse-engineered, the plugin treats these `RVC Clean Mode` settings primarily as status indicators. To use mopping functionality, users should initiate cleans via the MyDyson app or as zone-based cleans that use the settings pre-configured in the Dyson map.\n\n2. **Zone (Room) Clean and Attribute Adjustability**: For room-specific cleans, the plugin deliberately preserves the per-zone cleaning options defined in the MyDyson app map rather than applying global Matter `CleanMode` settings. This design decision is driven by three factors:\n\n- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone options. Dyson appliances store granular parameters—such as suction level, water volume, number of cleaning passes, and UV light activation—that have no equivalent in the Matter Robotic Vacuum Cleaner (RVC) cluster.\n- **Surface protection**: Overriding saved map settings with a global Matter clean mode risks running inappropriate routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.\n- **Complexity of modes**: Attempting to expose every permutation of suction, hydration, and repetition settings as proprietary Matter clean modes would create a combinatorial explosion of non-standard options that are difficult to navigate in controller platforms such as Apple Home.",
                                     "included_ids": [
                                         "issue-53-4473",
-                                        "issue-53-e6e0"
+                                        "issue-53-e6e0",
+                                        "issue-51-b34b"
                                     ]
                                 },
                                 {
@@ -82,14 +83,7 @@
                                     "included_ids": []
                                 }
                             ],
-                            "candidates": [
-                                {
-                                    "issue_number": 51,
-                                    "id": "issue-51-b34b",
-                                    "question": "Why do Mop or Vacuum and Mop modes fail when starting a global clean?",
-                                    "answer": "Global mopping is currently not implemented for certain models, such as the Spot+Scrub Ai (RB05). While the robot can mop when specific rooms are selected (using the room settings from the MyDyson app), the specific API commands required to initiate a whole-home (global) mopping session are currently unknown. Attempting to start a global clean in these modes will result in an `Error: Global clean mopping is not implemented` in the logs. To mop, you should use the room selection feature or the official MyDyson app."
-                                }
-                            ]
+                            "candidates": []
                         }
                     ],
                     "subcategories": []
