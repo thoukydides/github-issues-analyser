@@ -24,7 +24,7 @@
   - [How are robot vacuum cleaning modes and suction levels displayed in Apple Home?](#how-are-robot-vacuum-cleaning-modes-and-suction-levels-displayed-in-apple-home)
 - **[Diagnostic Logging](#diagnostic-logging)**
   - [How can I capture comprehensive diagnostic logs for troubleshooting?](#how-can-i-capture-comprehensive-diagnostic-logs-for-troubleshooting)
-  - [What do extraneous fields or unrecognised MQTT message warnings in the logs mean?](#what-do-extraneous-fields-or-unrecognised-mqtt-message-warnings-in-the-logs-mean)
+  - [What do `DysonCloudError` or unrecognised MQTT message warnings in the logs mean?](#what-do-dysonclouderror-or-unrecognised-mqtt-message-warnings-in-the-logs-mean)
 <!-- TOC-END -->
 
 ## Unsupported Dyson Devices and Features
@@ -233,18 +233,13 @@ When collecting logs for an issue report:
 1. Record a complete cycle from start to finish. This should include initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).
 2. The plugin automatically masks sensitive values like appliance serial numbers and cloud authentication tokens. However, Matterbridge core logs (including Matter pairing passcodes) are outside the plugin control and must be redacted manually before sharing logs publicly.
 
-#### What do extraneous fields or unrecognised MQTT message warnings in the logs mean?
-
-These warnings generally represent technical noise and do not indicate a functional failure of the plugin:
-
-- **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g. `privacy.ai_recognize`). The plugin will continue to process all known fields, and these extra values are simply ignored.
-- **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance.
-
-#### 🚧 What should I do if I see `DysonCloudError` or unrecognised MQTT messages in the logs? 🚧
+#### What do `DysonCloudError` or unrecognised MQTT message warnings in the logs mean?
 
 <!-- INCLUDES: issue-51-bdc6 -->
-Messages such as `DysonCloudError: Unexpected Dyson Cloud API response structure` or `Unrecognised Dyson MQTT message: DysonMsg.msg = 'undefined'` are generally non-critical background noise. These often occur when the Dyson Cloud API returns unexpected data types or when the robot sends data fields that the plugin does not yet explicitly handle (e.g., `privacy.ai_recognize`). 
+These warnings generally represent technical noise and do not indicate a functional failure of the plugin. They typically occur when the Dyson Cloud API returns data in an unexpected format or when the appliance sends status fields that the plugin does not yet explicitly handle.
 
-Similarly, errors associated with `REQUEST-CURRENT-FAULTS` only impact the reporting of specific fault details to Matter. Unless you are experiencing a total loss of control or incorrect status in Apple Home, these log entries do not typically indicate a functional failure and can be safely ignored.
+- **Dyson Cloud Errors**: Messages such as `DysonCloudError: Unexpected Dyson Cloud API response structure` usually result from the cloud service returning additional metadata. Unless you are unable to log in or control your devices, these can be safely ignored.
+- **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g. `privacy.ai_recognize`). The plugin continues to process all known fields, and these extra values are simply ignored.
+- **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance or its status in HomeKit.
 
 <!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-423c issue-50-3ad7 issue-50-5d0d -->

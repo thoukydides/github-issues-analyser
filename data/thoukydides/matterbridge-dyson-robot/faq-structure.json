@@ -189,19 +189,14 @@
                             "included_ids": []
                         },
                         {
-                            "question": "What do extraneous fields or unrecognised MQTT message warnings in the logs mean?",
-                            "answer": "These warnings generally represent technical noise and do not indicate a functional failure of the plugin:\n\n- **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g. `privacy.ai_recognize`). The plugin will continue to process all known fields, and these extra values are simply ignored.\n- **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance.",
-                            "included_ids": []
+                            "question": "What do `DysonCloudError` or unrecognised MQTT message warnings in the logs mean?",
+                            "answer": "These warnings generally represent technical noise and do not indicate a functional failure of the plugin. They typically occur when the Dyson Cloud API returns data in an unexpected format or when the appliance sends status fields that the plugin does not yet explicitly handle.\n\n- **Dyson Cloud Errors**: Messages such as `DysonCloudError: Unexpected Dyson Cloud API response structure` usually result from the cloud service returning additional metadata. Unless you are unable to log in or control your devices, these can be safely ignored.\n- **Extraneous fields**: This warning appears when the Dyson API returns data that the plugin was not expecting (e.g. `privacy.ai_recognize`). The plugin continues to process all known fields, and these extra values are simply ignored.\n- **Unrecognised MQTT messages**: Messages like `DysonMsg.msg = 'undefined'` or errors associated with `REQUEST-CURRENT-FAULTS` usually involve background diagnostic routines. These routines retrieve fault details to report them to Matter but do not affect the ability to control the appliance or its status in HomeKit.",
+                            "included_ids": [
+                                "issue-51-bdc6"
+                            ]
                         }
                     ],
-                    "candidates": [
-                        {
-                            "issue_number": 51,
-                            "id": "issue-51-bdc6",
-                            "question": "What should I do if I see `DysonCloudError` or unrecognised MQTT messages in the logs?",
-                            "answer": "Messages such as `DysonCloudError: Unexpected Dyson Cloud API response structure` or `Unrecognised Dyson MQTT message: DysonMsg.msg = 'undefined'` are generally non-critical background noise. These often occur when the Dyson Cloud API returns unexpected data types or when the robot sends data fields that the plugin does not yet explicitly handle (e.g., `privacy.ai_recognize`). \n\nSimilarly, errors associated with `REQUEST-CURRENT-FAULTS` only impact the reporting of specific fault details to Matter. Unless you are experiencing a total loss of control or incorrect status in Apple Home, these log entries do not typically indicate a functional failure and can be safely ignored."
-                        }
-                    ]
+                    "candidates": []
                 }
             ],
             "subcategories": []
