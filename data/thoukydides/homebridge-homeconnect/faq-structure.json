@@ -536,7 +536,14 @@
                                     ]
                                 }
                             ],
-                            "candidates": []
+                            "candidates": [
+                                {
+                                    "issue_number": 412,
+                                    "id": "issue-412-9117",
+                                    "question": "How can I reduce the frequency of `Waiting for ... features to finish initialising` log messages when an appliance is switched off?",
+                                    "answer": "Many Home Connect appliances (such as washing machines and tumble dryers) turn off their Wi-Fi interfaces completely when powered off or placed in standby. If Homebridge starts while the appliance is offline, the plugin cannot retrieve the current state of its capabilities and will periodically log messages such as:\n\n`Waiting for 4 features to finish initialising: Power, Door, Programs, and Child Lock`\n\nBy default, the plugin logs this reminder every 5 minutes until the appliance is powered back on and initialisation completes.\n\nTo make these notifications less frequent:\n- Enable the `Quieter Delayed Initialisation` configuration option, which increases the logging interval from 5 minutes to 1 hour.\n\nNote that the `Disconnected as Off` setting does not affect these messages; it only alters how an offline appliance is displayed in HomeKit after initialisation has already finished."
+                                }
+                            ]
                         }
                     ],
                     "subcategories": []

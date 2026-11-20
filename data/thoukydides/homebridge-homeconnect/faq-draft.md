@@ -604,6 +604,20 @@ Users should be aware of several technical consequences:
 2. **Reduced status feedback**: HomeKit has fewer data points to trigger status updates. If a transient error occurs (such as a duplicate start command), the accessory may show a `No Response` status that persists until the program completes, as there are fewer characteristic updates to clear the error state.
 3. **HomeKit UI glitches**: Removing a service from an existing accessory can confuse the Home app cache. If labels disappear or tiles merge incorrectly after disabling the Power switch, remove the accessory or child bridge from Homebridge and re-add it to flush the HomeKit cache.
 
+#### 🚧 How can I reduce the frequency of `Waiting for ... features to finish initialising` log messages when an appliance is switched off? 🚧
+
+<!-- INCLUDES: issue-412-9117 -->
+Many Home Connect appliances (such as washing machines and tumble dryers) turn off their Wi-Fi interfaces completely when powered off or placed in standby. If Homebridge starts while the appliance is offline, the plugin cannot retrieve the current state of its capabilities and will periodically log messages such as:
+
+`Waiting for 4 features to finish initialising: Power, Door, Programs, and Child Lock`
+
+By default, the plugin logs this reminder every 5 minutes until the appliance is powered back on and initialisation completes.
+
+To make these notifications less frequent:
+- Enable the `Quieter Delayed Initialisation` configuration option, which increases the logging interval from 5 minutes to 1 hour.
+
+Note that the `Disconnected as Off` setting does not affect these messages; it only alters how an offline appliance is displayed in HomeKit after initialisation has already finished.
+
 ### Appliance Status and Connectivity
 
 #### Why does my appliance status appear stuck or show as offline in HomeKit?
