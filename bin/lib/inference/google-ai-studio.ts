@@ -9,7 +9,7 @@ import z, { ZodType } from 'zod';
 import { JSONSchema } from 'zod/v4/core';
 
 // Default model
-const DEFAULT_MODEL = 'gemini-3-flash-preview';
+const DEFAULT_MODEL = 'gemini-4-hydrogen';
 
 // Base URL for routing requests via a Cloudflare AI Gateway proxy
 const BASE_URL = 'https://www.thouky.co.uk/api/github-actions/ai/google-ai-studio';

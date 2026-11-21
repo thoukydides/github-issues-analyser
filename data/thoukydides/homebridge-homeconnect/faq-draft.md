@@ -41,7 +41,7 @@
     - [Why is the `Active Program` switch failing or unavailable in HomeKit?](#why-is-the-active-program-switch-failing-or-unavailable-in-homekit)
     - [How can I trigger the Identify function in the Eve app?](#how-can-i-trigger-the-identify-function-in-the-eve-app)
     - [How can I enable dishwasher options like Half Load, Extra Dry, or Efficient Dry in HomeKit?](#how-can-i-enable-dishwasher-options-like-half-load-extra-dry-or-efficient-dry-in-homekit)
-    - [Why does my appliance turn on automatically, switch off immediately, or fail with a `StateTransitionTimeout` error?](#why-does-my-appliance-turn-on-automatically-switch-off-immediately-or-fail-with-a-statetransitiontimeout-error)
+    - [Why does my appliance turn on automatically, switch off immediately, or cause Homebridge startup to stall?](#why-does-my-appliance-turn-on-automatically-switch-off-immediately-or-cause-homebridge-startup-to-stall)
     - [Which settings are used for programs started without specific options?](#which-settings-are-used-for-programs-started-without-specific-options)
     - [How can I change the default duration or temperature for oven programs?](#how-can-i-change-the-default-duration-or-temperature-for-oven-programs)
     - [Why is the scheduled start time for my appliance program not being honoured?](#why-is-the-scheduled-start-time-for-my-appliance-program-not-being-honoured)
@@ -513,26 +513,23 @@ Home Connect distinguishes between global [settings](https://api-docs.home-conne
 
 Because these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.
 
-#### Why does my appliance turn on automatically, switch off immediately, or fail with a `StateTransitionTimeout` error?
+#### Why does my appliance turn on automatically, switch off immediately, or cause Homebridge startup to stall?
 
 <!-- INCLUDES: issue-19-c2a7 issue-20-397f issue-32-acbc issue-78-1a42 issue-409-9747 -->
-To generate the configuration schema in the Homebridge UI and identify supported option ranges, the plugin performs a discovery routine. Under the Home Connect API specification, a program must be actively selected on the appliance before its supported options can be read reliably; querying unselected programs often returns incomplete or incorrect metadata.
+To identify an appliance's specific programs and valid option ranges, the plugin must perform a discovery routine. Under the Home Connect API specification, a program must be actively selected on the appliance before its supported options can be read reliably; querying unselected programs often returns incomplete or incorrect metadata.
 
-This discovery phase typically occurs upon the first successful authorisation, after deleting cache files, or when the **Identify** mechanism is triggered. During this process:
+This discovery phase typically occurs upon the first successful authorisation of the plugin, after manually deleting persistent cache files, or when the **Identify** mechanism is triggered. During this process:
 
-1. **Power On**: The appliance switches on automatically. For coffee machines with automatic rinsing cycles, the plugin waits up to two minutes.
+1. **Power On**: The appliance switches on automatically. If it has an automatic rinsing cycle (common with coffee machines), the plugin will wait up to two minutes for it to finish.
 2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options.
-3. **Restoration**: The plugin restores the appliance to its original state (usually Off or Standby).
+3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).
 
-This probing can fail with errors such as `409 Conflict`, `SDK.Error.WrongOperationState`, or `SDK.Error.HomeAppliance.StateTransitionTimeout`. Common causes include:
-- **Appliance State**: The appliance is busy, the door is open, or it is not currently in an idle state permitting remote operation.
-- **Favourite Programs**: Custom favourite programs configured on the appliance or within the official mobile app can cause state conflicts, as they are not supported by the documented Home Connect API.
+This process can fail with a `409 Conflict` error and messages like `SDK.Error.WrongOperationState` or `SDK.Error.HomeAppliance.StateTransitionTimeout`. Common causes include:
 
-If discovery fails, stalls, or results in missing options:
-- **Remove favourites**: Delete custom programs from the physical appliance or official app.
-- **Prepare the appliance**: Ensure it is switched on, idle, and remote control is enabled.
-- **Manual selection**: Manually select each program on the physical control panel for one minute to allow the plugin to read and cache the options.
-- **Trigger refresh**: Restart Homebridge or invoke the HomeKit **Identify** routine.
+- **Appliance State**: The appliance is busy, in a non-idle state (such as running a manual cycle), or the door is open.
+- **Favourite Programs**: Custom favourite programs configured on the appliance or within the official mobile app can cause state conflicts, as these are not supported by the public API.
+
+If discovery fails, Homebridge startup may stall or affected programs will lack option validation. To resolve this: ensure the appliance is switched on and idle; delete any custom favourite programs; or manually select each program on the physical control panel for one minute to allow the plugin to read and cache the options. Triggering a refresh using the **Identify** routine will then update the cached details.
 
 #### Which settings are used for programs started without specific options?
 

@@ -11,6 +11,7 @@
     - [Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?](#why-does-the-dyson-spotscrub-ai-or-r1r2r3-nurovi-status-take-time-to-update)
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
     - [Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?](#why-does-selecting-mop-or-vacuum-and-mop-fail-when-starting-a-whole-home-clean)
+    - [Why is the `Vacuum then mop` clean mode not supported for Dyson robot mops?](#why-is-the-vacuum-then-mop-clean-mode-not-supported-for-dyson-robot-mops)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
 - **[Appliance Discovery and Filtering](#appliance-discovery-and-filtering)**
@@ -28,13 +29,13 @@
 
 #### Why does the plugin fail to start with an `Unexpected structure of Dyson cloud API response` error?
 
-<!-- INCLUDES: issue-17-fe91 issue-50-11d5 issue-52-fe7d -->
+<!-- INCLUDES: issue-17-fe91 issue-50-11d5 issue-52-3d3f -->
 The `Unexpected structure of Dyson cloud API response` error occurs because the plugin performs strict schema validation on all data received from the MyDyson cloud API (such as the `/v3/manifest`) and MQTT payloads. This is a deliberate design choice to ensure that any changes to the API or new hardware capabilities are identified and correctly implemented rather than silently ignored.
 
 This error frequently occurs with newer models, regional variants, or firmware updates are released. Support for these models is often developed without direct access to physical devices.
 
 Because the plugin validates the structure of the entire device manifest during startup, an unrecognised value for even a single device will prevent the plugin from loading and exposing any appliances to Matter. To resolve this:
-1. Ensure you are running the latest version of the plugin, as new capabilities are added incrementally.
+1. Ensure you are running the latest version of the plugin.
 2. Enable detailed diagnostic logging in your configuration, ensuring `wildcardTopic` and `debug` are set to `true`, and adding `Log API Bodies`, `Log MQTT Payloads as JSON`, and `Log Debug as Info` to the `debugFeatures` array.
 3. Record an entire operational cycle: for a robot vacuum confirm the plugin establishes an MQTT connection, start a full clean, allow the robot to return to its dock autonomously, and allow all dock maintenance routines (such as self-cleaning or drying) to finish completely.
 4. Provide the logs in a GitHub issue so the missing capabilities and MQTT structures can be correctly mapped.
@@ -86,10 +87,25 @@ The `opendyson` tool by default subscribes to MQTT topics used by air treatment 
 
 #### Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?
 
-<!-- INCLUDES: issue-51-dfab -->
-Selecting `Mop` or `Vacuum and Mop` when starting a whole-home (non-zone) clean results in an `Error: Global clean mopping is not implemented` message in the plugin logs.
+<!-- INCLUDES: issue-51-b34b issue-53-4473 issue-53-e6e0 -->
+There are two distinct behaviours regarding mopping and RVC Clean Mode depending on the type of cleaning being performed:
 
-This limitation occurs because the specific MQTT command payloads required by Dyson appliances to initiate whole-home cleaning with mopping active have not yet been reverse-engineered. If you would like this feature implemented then please create a feature request, attaching an MQTT log showing the MyDyson app initiating a global clean using each available mopping option.
+1. **Global Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean on models like the Spot+Scrub Ai or R2/R3 Nurovi currently results in a `Global clean mopping is not implemented` error. Unlike previous generation devices, the MyDyson app does not appear to use global cleans with mopping-capable robots. Instead, it initiates a zone-clean of all zones in the map. It is unknown whether the robots themselves support a global clean, so this functionality cannot be implemented until the precise MQTT commands used to initiate such a clean have been captured and reverse-engineered.
+
+2. **Zone Clean**: When cleaning specific rooms the plugin deliberately preserves the per-zone cleaning options defined in the MyDyson app rather than applying the global Matter RVC Clean Mode setting to all zones. This design decision is driven by three factors:
+
+- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone options (beyond which zones to clean). Dyson appliances store granular parameters (such as suction level, water volume, number of cleaning passes, and UV light activation) that have no equivalent in the Matter RVC cluster, and support different settings per room.
+- **Surface protection**: Overriding saved map settings with a global Matter RVC Clean Mode risks running inappropriate routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.
+- **Complexity of modes**: Attempting to expose even a few of the mop-related settings as RVC Clean Mode values would result in a combinatorial explosion of options that would not provide a usable UI. It would also be unusable in Apple Home, which only supports standard Mode Tags and flattens the list rather than showing the defined Clean Modes.
+
+#### Why is the `Vacuum then mop` clean mode not supported for Dyson robot mops?
+
+<!-- INCLUDES: issue-51-9780 issue-53-a66d -->
+Although the MyDyson app offers both simultaneous 'Vacuum and Wash' and sequential 'Vacuum then Wash' modes for mop-equipped models (such as the Dyson R2 Nurovi), the plugin does not utilise the Matter `Vacuum then Mop` RVC Clean Mode Tag:
+
+- **Status indication only**: The `Mop` RVC Clean Mode Tag is not used to initiate a clean using the mop, but only to indicate the robot's current activity.
+- **Identical device telemetry**: Dyson robot `CURRENT-STATE` MQTT messages do not distinguish between simultaneous and sequential operations. Both cleaning styles report the identical state value of `VACUUMING_AND_MOPPING`.
+- **Apple Home interpretation**: The Apple Home app only treats `Vacuum` and `Mop` Mode Tags (and the `Vacuum` plus `Mop` combination) as primary RVC Clean Modes that are displayed prominently under the Play button used to initiate a clean. The `Vacuum then Mop` Mode Tag is treated like intensity settings (such as `Quick`, `Min`, and `Max`) as a secondary mode that is displayed on the menu accessed via the icon in the bottom-left corner of the tile. The Home app flattens the list of all Mode Tags, only allowing one to be selected at a time, so this conflicts with vacuum power mode selection.
 
 ## Matterbridge
 
@@ -157,13 +173,13 @@ The robot will apply the per-room cleaning rules (suction intensity, water flow,
 
 #### Why does selecting rooms in Apple Home immediately start cleaning?
 
-<!-- INCLUDES: issue-51-aa8d -->
+<!-- INCLUDES: issue-51-dee4 -->
 Selecting rooms or zones and confirming the selection in Apple Home starts cleaning immediately by design, rather than waiting for an explicit start or play command.
 
 This behaviour is intentional for several reasons:
 
 - **Matter specification compliance**: Section 1.17.7.1 (`SelectAreas` Command) of the Matter Application Cluster Specification specifies that a device may begin operating immediately or wait for a command, defining this behaviour as manufacturer-specific.
-- **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin defaults to these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.
+- **Protection of per-room settings**: Dyson robots store individual cleaning preferences per room or zone configured within the MyDyson app (such as preventing mopping on carpeted areas). When initiating a room clean, the plugin prioritises these saved per-zone configurations rather than allowing a single global Matter clean mode to override them, which could risk damage to flooring.
 
 Because any global mode selected in Apple Home during room selection is deliberately ignored in favour of pre-configured zone settings, the clean begins as soon as the area selection is confirmed.
 
@@ -198,4 +214,4 @@ When collecting logs for an issue report:
 1. Record a complete cycle from start to finish. This should include initiating the clean, the full run, and any subsequent docking or maintenance operations (such as dust bin emptying, mop washing, and mop drying).
 2. The plugin automatically masks sensitive values like appliance serial numbers and cloud authentication tokens. However, Matterbridge core logs (including Matter pairing passcodes) are outside the plugin control and must be redacted manually before sharing logs publicly.
 
-<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-423c issue-50-3ad7 issue-50-5d0d issue-51-0b2f -->
+<!-- EXCLUDED: issue-1-59e4 issue-13-4541 issue-16-b5e2 issue-17-01c1 issue-26-2ae8 issue-31-833f issue-33-3d80 issue-46-423c issue-50-3ad7 issue-50-5d0d issue-51-bdc6 -->

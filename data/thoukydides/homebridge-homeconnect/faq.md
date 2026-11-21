@@ -33,7 +33,8 @@
     - [Why does the log show `Unexpected fields`, `(unrecognised)` values, or TypeScript-like code blocks?](#why-does-the-log-show-unexpected-fields-unrecognised-values-or-typescript-like-code-blocks)
     - [Why are some appliance features, programs, or options missing, unavailable, or absent from the configuration UI?](#why-are-some-appliance-features-programs-or-options-missing-unavailable-or-absent-from-the-configuration-ui)
     - [Why does the log say a selected program is not supported by the Home Connect API?](#why-does-the-log-say-a-selected-program-is-not-supported-by-the-home-connect-api)
-    - [Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?](#why-is-my-appliance-stuck-at-waiting-for-features-to-finish-initialising-showing-as-not-responding-or-displaying-unresponsive-tiles)
+    - [Why is my appliance stuck at `Waiting for features to finish initialising` or showing as `Not Responding`?](#why-is-my-appliance-stuck-at-waiting-for-features-to-finish-initialising-or-showing-as-not-responding)
+    - [How do I troubleshoot Home Connect appliance connectivity and discovery failures?](#how-do-i-troubleshoot-home-connect-appliance-connectivity-and-discovery-failures)
     - [Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?](#why-do-i-see-an-invalidstepsize-or-sdkerrorinvalidoptionvalue-error)
     - [Why are Pause and Resume features missing or inconsistent?](#why-are-pause-and-resume-features-missing-or-inconsistent)
     - [Why doesn't the plugin automatically turn on my coffee machine when I start a beverage program?](#why-doesnt-the-plugin-automatically-turn-on-my-coffee-machine-when-i-start-a-beverage-program)
@@ -427,23 +428,30 @@ This warning typically occurs in two different contexts:
 
 This is often a known inconsistency in the Home Connect API's behaviour. When the plugin identifies this discrepancy, it deliberately avoids querying the API for further details to prevent invalid requests that would unnecessarily consume your daily API rate limit quota. In these cases, the messages are often cosmetic and the plugin will automatically refresh necessary details once initialisation is complete.
 
-#### Why is my appliance stuck at `Waiting for features to finish initialising`, showing as `Not Responding`, or displaying unresponsive tiles?
+#### Why is my appliance stuck at `Waiting for features to finish initialising` or showing as `Not Responding`?
 
-<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 -->
-The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability, missing consumables, or transient server errors can also cause discovery to fail. When initialisation stalls, the log typically includes messages like `Waiting for ... features to finish initialising` or `Appliance initialisation is taking longer than expected`.
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 issue-412-9117 -->
+The plugin discovers appliance capabilities during startup and caches them. This process can fail if the appliance is offline, busy, or has an open door. Technical issues such as API instability or transient server errors can also cause discovery to stall. When this happens, the log typically includes messages like `Waiting for ... features to finish initialising`.
 
 Several factors can contribute to this state:
-- **Cloud versus Local Connectivity**: The official Home Connect app can communicate using the local network. However, this plugin relies entirely on the cloud-based public API. An appliance may appear functional in the official app via a local connection while being disconnected from the cloud servers. If the public API reports the device as disconnected, the plugin will wait for a valid response before configuring HomeKit services.
-- **Stale HomeKit Accessories**: HomeKit caches accessory definitions from previous successful sessions. If the plugin fails to complete initialisation, it cannot update these definitions. This results in the Home app displaying numerous unresponsive tiles that do not reflect your current configuration.
+- **Cloud versus Local Connectivity**: This plugin relies entirely on the cloud-based public API. An appliance may appear functional in the official app via a local connection while being disconnected from the cloud servers. If the public API reports the device as disconnected, the plugin will wait for a valid response before configuring HomeKit services.
+- **Hardware Power-Down**: Many appliances, particularly washing machines and tumble dryers, completely disable their Wi-Fi modules when powered off or in standby. If Homebridge starts while the appliance is in this state, the plugin cannot complete discovery until the appliance is physically turned back on.
+- **Stale HomeKit Accessories**: HomeKit caches accessory definitions from previous successful sessions. If the plugin fails to complete initialisation, it cannot update these definitions, resulting in unresponsive tiles that do not reflect your current configuration.
 
-To resolve this, perform the following diagnostic steps:
+To reduce the frequency of log messages when an appliance is intentionally offline, you can enable the **Quieter Delayed Initialisation** configuration option. This increases the logging interval from 5 minutes to 1 hour. Note that the **Disconnected as Off** setting only affects how an appliance is displayed in HomeKit *after* discovery has already finished.
+
+#### How do I troubleshoot Home Connect appliance connectivity and discovery failures?
+
+<!-- INCLUDES: issue-27-a038 issue-42-d406 issue-290-96f5 issue-292-3212 issue-315-b7f2 issue-323-0be1 issue-329-638e issue-333-8d17 issue-390-64e2 -->
+If an appliance fails to initialise or shows as `Not Responding` in HomeKit, perform the following diagnostic steps to identify the root cause:
+
 1. **Check the Home Connect Server Status**: Visit the [unofficial status page](https://homeconnect.thouky.co.uk/) to rule out platform-wide outages.
 2. **Perform the Mobile Data Test**: Disable Wi-Fi on your mobile device and attempt to control the appliance via the official Home Connect app using cellular data. If this fails, the appliance is not correctly connected to the cloud servers.
 3. **Verify App Connectivity Status**: Within the official Home Connect app, check the appliance's network settings. A fully functional connection is typically indicated by **three green lines**.
 4. **Confirm Consumables and Maintenance**: Verify that all maintenance requirements (cleaning, descaling, refills) are met and the door is closed.
 5. **Power Cycle**: Disconnect the appliance from the mains power for at least 30 seconds to force its internal firmware to re-register with the cloud servers.
 6. **Restart Homebridge**: Once the appliance has reconnected, restart Homebridge to trigger a fresh initialisation sequence.
-7. **Delete Cache Files**: If the issue persists, stop Homebridge and delete the appliance's cache files in the `persist` directory (usually `~/.homebridge/homebridge-homeconnect/persist/` or `/var/lib/homebridge/homebridge-homeconnect/persist/`). These files are named with an MD5 hash of your appliance's Home Connect ID (HaID) followed by ` cache`. **Do not delete or share** the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`, as it contains private OAuth authentication tokens.
+7. **Delete Cache Files**: Stop Homebridge and delete the appliance's cache files in the `persist` directory (usually `~/.homebridge/homebridge-homeconnect/persist/` or `/var/lib/homebridge/homebridge-homeconnect/persist/`). These files are named with an MD5 hash of your appliance's Home Connect ID (HaID) followed by ` cache`. **Do not delete or share** the authorisation file `94a08da1fecbb6e8b46990538c7b50b2`.
 8. **Refresh Connection**: As a last resort, remove the appliance from the Home Connect app and re-add it to your home network.
 
 #### Why do I see an `InvalidStepSize` or `SDK.Error.InvalidOptionValue` error?
@@ -505,18 +513,6 @@ Home Connect distinguishes between global [settings](https://api-docs.home-conne
 
 Because these are program options rather than independent settings, they must be configured as part of a specific program's execution and are not exposed as standalone HomeKit switches. By default, the plugin creates a HomeKit `Switch` for each program using its default settings. To use specific options, you must configure a **Custom list of programs and options** in the plugin settings and explicitly define the desired options for each switch.
 
-#### Why does my appliance turn on automatically, switch off immediately, or Homebridge startup stall?
-
-<!-- INCLUDES: issue-19-c2a7 issue-20-397f issue-32-acbc issue-78-1a42 -->
-To identify an appliance's specific programs and valid option ranges, the plugin must perform a discovery routine. Many appliances only report this data via the API when they are powered on and the specific program is selected.
-
-This discovery phase typically occurs upon the first successful authorisation of the plugin, after manually deleting persistent cache files, or when the **Identify** mechanism is triggered. During this process:
-
-1. **Power On**: The appliance switches on automatically. If it has an automatic rinsing cycle (common with coffee machines), the plugin will wait up to two minutes for it to finish.
-2. **Iteration**: The plugin briefly selects each available program in sequence to fetch supported options.
-3. **Restoration**: Once complete, the plugin restores the appliance to its original state (usually Off or Standby).
-
-This typically happens only once during initial setup or after a cache deletion. Results are cached in the plugin's `persist` directory. If this happens every time Homebridge restarts, check the logs for errors like `409 Conflict` or `SDK.Error.WrongOperationState`, which suggest discovery failed because the appliance was busy or the door was open. If no cache exists and the appliance is offline, startup will stall until a connection is established.
 
 #### Which settings are used for programs started without specific options?
 
