@@ -610,7 +610,6 @@ Avoid manually operating the appliance during this brief window to prevent state
 
 #### Why does program discovery fail with `SDK.Error.HomeAppliance.StateTransitionTimeout`?
 
-<!-- INCLUDES: issue-409-9747 -->
 During startup or a cache refresh, the plugin temporarily selects each supported program in sequence to read and cache its valid options for the Homebridge UI and setting validation. This probing can fail with a `409 Conflict` error and `SDK.Error.HomeAppliance.StateTransitionTimeout` under two common conditions:
 
 - **Appliance unavailable**: The appliance is switched off, in standby, busy, or does not have remote control or remote start enabled.
@@ -633,6 +632,31 @@ This behaviour typically occurs when the plugin needs to read and cache supporte
 This mismatch usually happens because the Home Connect API may fail to send a `PowerState` update event when an appliance is manually activated or while it is performing an initial self-cleaning cycle. The plugin relies on these events to track the current state of the hardware.
 
 To address this, the plugin includes logic to infer the power status from other events. For example, if the appliance reports an `OperationState` of `Ready`, the plugin now automatically treats the appliance as being `On`. Ensure you are using the latest version of the plugin to benefit from these state inference improvements.
+
+#### 🚧 Why does the plugin temporarily select programs on my appliance at startup? 🚧
+
+<!-- INCLUDES: issue-409-3824 -->
+To generate the configuration schema for the Homebridge UI (such as setting up custom programs and their options), the plugin needs to know which options each supported program provides. The Home Connect API documentation states that a program must be selected in order to read its supported options, and multiple appliances have been confirmed to return incorrect program details if queried without first being selected.
+
+Until those program details are cached, the plugin temporarily selects each advertised program in turn during startup to inspect its available options. If the appliance rejects a temporary selection, the failure is handled gracefully and logged without blocking normal plugin operation, although custom programs may not be configurable until the options are cached.
+
+If you need the plugin to cache program options that failed to read at startup:
+
+1. Ensure the appliance has power, no active program, no low consumables or pending maintenance, and is left idle for a few minutes so it can accept remote control.
+2. Manually select (without starting) each affected program on the appliance itself, leaving it idle for a couple of minutes after each selection.
+3. Trigger the plugin to re-read the program details by restarting the Homebridge instance (or child bridge) or invoking the HomeKit **Identify** routine for the appliance.
+
+#### 🚧 Why does program selection fail with `409 Conflict` and `SDK.Error.HomeAppliance.StateTransitionTimeout`? 🚧
+
+<!-- INCLUDES: issue-409-e819 -->
+A `409 Conflict` response with `SDK.Error.HomeAppliance.StateTransitionTimeout` indicates that the appliance failed to transition to the requested program within the expected time.
+
+On some appliances (such as the Neff `C24MT73G0B/K8` oven), this error can be triggered by an appliance firmware bug when a custom favourite program (`BSH.Common.Program.Favorite.*`, for example `BSH.Common.Program.Favorite.002`) is configured or selected. Favourite programs are not part of the documented Home Connect API, and their presence can prevent the appliance from accepting standard program selection commands over the API.
+
+To work around this behaviour:
+
+- Delete the custom favourite program(s) on the appliance or in the Home Connect app, then restart the plugin or invoke the HomeKit **Identify** routine so the plugin can re-read program details.
+- Ensure the appliance is switched on, idle, and ready for remote control before restarting the plugin, or manually select each required program directly on the appliance.
 
 ### Appliance Status and Connectivity
 
