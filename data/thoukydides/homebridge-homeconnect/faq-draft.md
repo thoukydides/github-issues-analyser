@@ -610,7 +610,6 @@ Avoid manually operating the appliance during this brief window to prevent state
 
 #### Why does program discovery fail with `SDK.Error.HomeAppliance.StateTransitionTimeout`?
 
-<!-- INCLUDES: issue-409-3824 issue-409-e819 -->
 During startup or a cache refresh, the plugin temporarily selects each supported program in sequence to read and cache its valid options for the Homebridge UI and setting validation. This probing can fail with a `409 Conflict` error and `SDK.Error.HomeAppliance.StateTransitionTimeout` under two common conditions:
 
 - **Appliance unavailable**: The appliance is switched off, in standby, busy, or does not have remote control or remote start enabled.
@@ -633,6 +632,25 @@ This behaviour typically occurs when the plugin needs to read and cache supporte
 This mismatch usually happens because the Home Connect API may fail to send a `PowerState` update event when an appliance is manually activated or while it is performing an initial self-cleaning cycle. The plugin relies on these events to track the current state of the hardware.
 
 To address this, the plugin includes logic to infer the power status from other events. For example, if the appliance reports an `OperationState` of `Ready`, the plugin now automatically treats the appliance as being `On`. Ensure you are using the latest version of the plugin to benefit from these state inference improvements.
+
+#### 🚧 Why does the plugin temporarily select programs on startup, and what causes `SDK.Error.HomeAppliance.StateTransitionTimeout`? 🚧
+
+<!-- INCLUDES: issue-409-5f2b -->
+To generate the dynamic configuration schema for the Homebridge UI and allow custom program configurations, the plugin needs to discover each program's supported options (such as duration or temperature).
+
+The Home Connect API requires an appliance to have a program selected before it will return accurate details about that program's supported options. If queried while not selected, many appliances return incomplete or incorrect metadata. Consequently, until program details have been cached, the plugin attempts to temporarily select each advertised program in turn during startup.
+
+If the appliance fails to select a program, it may return `409 Conflict` with the error `SDK.Error.HomeAppliance.StateTransitionTimeout`. While this failure is handled gracefully and does not prevent normal operation, it prevents custom programs from being configured for those unprobed programs. This error is typically caused by one of the following:
+
+* **Appliance not ready**: The appliance must be powered on, connected, and idle. If the appliance is switched off or in use, remote program selection requests will be rejected.
+* **Appliance favourites**: Configuring custom "favourite" programs in the official Home Connect app or directly on the appliance can cause firmware conflicts on certain appliances (such as Neff ovens). Custom favourites are undocumented in the public Home Connect API and can prevent the appliance from accepting API program selections. Deleting these favourites from the appliance or app resolves the conflict.
+
+If programs continue to fail during startup probing, try the following steps:
+
+1. Ensure the appliance has power, has remote start enabled (if required), and is left idle for a few minutes.
+2. Delete any custom favourite programs configured on the appliance or via the mobile app.
+3. Manually select (but do not start) each program on the appliance control panel, leaving it idle for a couple of minutes after each selection.
+4. Trigger the plugin to re-cache program details by restarting Homebridge or triggering the appliance's **Identify** routine in your HomeKit app.
 
 ### Appliance Status and Connectivity
 
