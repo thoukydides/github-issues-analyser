@@ -10,7 +10,7 @@
   - **[Dyson Spot+Scrub Ai and R1/R2/R3 Nurovi Support](#dyson-spotscrub-ai-and-r1r2r3-nurovi-support)**
     - [Why does the Dyson Spot+Scrub Ai or R1/R2/R3 Nurovi status take time to update?](#why-does-the-dyson-spotscrub-ai-or-r1r2r3-nurovi-status-take-time-to-update)
     - [Why does `opendyson listen` fail to show status messages for robot vacuums?](#why-does-opendyson-listen-fail-to-show-status-messages-for-robot-vacuums)
-    - [Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?](#why-does-selecting-mop-or-vacuum-and-mop-fail-when-starting-a-whole-home-clean)
+    - [Why does selecting `Mop` or `Vacuum and Mop` fail for whole-home cleans or ignore per-zone settings?](#why-does-selecting-mop-or-vacuum-and-mop-fail-for-whole-home-cleans-or-ignore-per-zone-settings)
     - [Why is the `Vacuum then mop` clean mode not supported for Dyson robot mops?](#why-is-the-vacuum-then-mop-clean-mode-not-supported-for-dyson-robot-mops)
 - **[Matterbridge](#matterbridge)**
   - [Why does `matterbridge-dyson-robot` report an older version in logs after an update?](#why-does-matterbridge-dyson-robot-report-an-older-version-in-logs-after-an-update)
@@ -85,48 +85,29 @@ Unlike most other Dyson appliances, the RB05 and RB07 robot vacuums do not autom
 
 The `opendyson` tool by default subscribes to MQTT topics used by air treatment devices such as `<model>/<serial>/status/current` and `<model>/<serial>/status/fault`. However, robot vacuums instead publish their status to the more general `<model>/<serial>/status` topic, with RB05 and later models additionally using `<model>/<serial>/status/jdm`. This mismatch in expected MQTT topics means `opendyson` will not receive any status messages, making it appear as if the device is not publishing.
 
-#### Why does selecting Mop or Vacuum and Mop fail when starting a whole-home clean?
+#### Why does selecting `Mop` or `Vacuum and Mop` fail for whole-home cleans or ignore per-zone settings?
 
-<!-- INCLUDES: issue-51-b34b -->
+<!-- INCLUDES: issue-51-b34b issue-53-140a -->
 There are two distinct behaviours regarding mopping and RVC Clean Mode depending on the type of cleaning being performed:
 
-1. **Global Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean on models like the Spot+Scrub Ai or R2/R3 Nurovi currently results in a `Global clean mopping is not implemented` error. Unlike previous generation devices, the MyDyson app does not appear to use global cleans with mopping-capable robots. Instead, it initiates a zone-clean of all zones in the map. It is unknown whether the robots themselves support a global clean, so this functionality cannot be implemented until the precise MQTT commands used to initiate such a clean have been captured and reverse-engineered.
+1. **Global Clean**: Selecting `Mop` or `Vacuum and Mop` for a global clean on models such as the Spot+Scrub Ai or R2/R3 Nurovi currently results in a `Global clean mopping is not implemented` error. Unlike previous generation devices, the MyDyson app does not appear to use global cleans with mopping-capable robots, instead initiating a zone clean of all mapped zones. It is unknown whether the robots support a global clean, so this cannot be implemented until the MQTT commands are captured and reverse-engineered.
 
-2. **Zone Clean**: When cleaning specific rooms the plugin deliberately preserves the per-zone cleaning options defined in the MyDyson app rather than applying the global Matter RVC Clean Mode setting to all zones. This design decision is driven by three factors:
+2. **Zone Clean**: For room-selected cleans, the plugin deliberately preserves the per-zone options saved in the MyDyson app rather than applying the global Matter RVC Clean Mode. This design decision reflects three constraints:
 
-- **Matter specification limitations**: Matter does not provide a mechanism for configuring per-zone options (beyond which zones to clean). Dyson appliances store granular parameters (such as suction level, water volume, number of cleaning passes, and UV light activation) that have no equivalent in the Matter RVC cluster, and support different settings per room.
-- **Surface protection**: Overriding saved map settings with a global Matter RVC Clean Mode risks running inappropriate routines on sensitive surfaces, such as wet mopping across carpeted areas where vacuum-only cleaning was configured.
-- **Complexity of modes**: Attempting to expose even a few of the mop-related settings as RVC Clean Mode values would result in a combinatorial explosion of options that would not provide a usable UI. It would also be unusable in Apple Home, which only supports standard Mode Tags and flattens the list rather than showing the defined Clean Modes.
+- **Matter specification limitations**: Matter has no mechanism for configuring per-zone options beyond selecting zones. Dyson appliances store granular per-room settings (clean type, suction level, water hydration level, `1x` or `2x` vacuum/mop repetitions, and UV light activation) that have no Matter equivalent, and Matter defines no standard RVC Clean Mode tags for water levels or repetitions.
+- **Surface protection**: Overriding saved map settings with a global Matter RVC Clean Mode risks running inappropriate routines on sensitive surfaces, such as wet mopping carpeted areas configured as vacuum-only, or overwriting per-room suction levels.
+- **Complexity of modes**: Exposing mop settings as RVC Clean Mode values would require proprietary tags unsupported by Apple Home and cause a combinatorial explosion of options. Apple Home only supports standard Mode Tags and flattens the list rather than showing defined Clean Modes.
+
+Configure each room's clean type, suction power, water level, and repetitions in the MyDyson app; Matter-initiated zone cleans will use those saved preferences.
 
 #### Why is the `Vacuum then mop` clean mode not supported for Dyson robot mops?
 
-<!-- INCLUDES: issue-51-9780 -->
-Although the MyDyson app offers both simultaneous 'Vacuum and Wash' and sequential 'Vacuum then Wash' modes for mop-equipped models (such as the Dyson R2 Nurovi), the plugin does not utilise the Matter `Vacuum then Mop` RVC Clean Mode Tag:
+<!-- INCLUDES: issue-51-9780 issue-53-56c7 -->
+Although the MyDyson app offers both simultaneous **Vacuum and Wash** and sequential **Vacuum then Wash** modes for mop-equipped models (such as the Dyson R2 Nurovi), the plugin does not utilise the Matter `Vacuum then Mop` RVC Clean Mode Tag:
 
 - **Status indication only**: The `Mop` RVC Clean Mode Tag is not used to initiate a clean using the mop, but only to indicate the robot's current activity.
-- **Identical device telemetry**: Dyson robot `CURRENT-STATE` MQTT messages do not distinguish between simultaneous and sequential operations. Both cleaning styles report the identical state value of `VACUUMING_AND_MOPPING`.
-- **Apple Home interpretation**: The Apple Home app only treats `Vacuum` and `Mop` Mode Tags (and the `Vacuum` plus `Mop` combination) as primary RVC Clean Modes that are displayed prominently under the Play button used to initiate a clean. The `Vacuum then Mop` Mode Tag is treated like intensity settings (such as `Quick`, `Min`, and `Max`) as a secondary mode that is displayed on the menu accessed via the icon in the bottom-left corner of the tile. The Home app flattens the list of all Mode Tags, only allowing one to be selected at a time, so this conflicts with vacuum power mode selection.
-
-#### 🚧 Why doesn't RVC Clean Mode control per-zone mopping, water levels, or repetitions? 🚧
-
-<!-- INCLUDES: issue-53-140a -->
-By design, the plugin deliberately ignores the Matter RVC Clean Mode setting when starting zone (room-selected) cleans and instead uses the per-zone cleaning options saved on the map in the MyDyson app. On mopping robots that have no global clean mode (such as the Dyson R2 Nurovi), the mopping Clean Mode options only indicate the robot's current activity during a clean and do not influence how a clean is started. On models that support global cleans, selecting a mopping Clean Mode for a global clean currently returns `Global clean mopping is not implemented`.
-
-This behaviour exists for several reasons:
-
-- **No Matter per-zone configuration**: Matter provides no mechanism for configuring per-zone cleaning options, whereas the MyDyson app stores numerous settings per room—including clean type, suction level, water level, vacuum repetitions, mop repetitions, and UV enablement—that have no Matter equivalent.
-- **Protecting room-specific settings**: Overriding per-zone configurations with a global Matter Clean Mode would risk applying unintended settings across rooms, such as enabling mopping on carpeted rooms configured as vacuum-only or overwriting per-room suction power levels.
-- **No Matter tags for water levels or repetitions**: Matter does not define suitable RVC Clean Mode tags for water hydration levels or cleaning repetitions (`1x` or `2x`). Implementing them as extra Clean Mode values would require proprietary tags that Apple Home does not support and would cause a combinatorial explosion of options, so these settings will not be added.
-
-Configure each room's clean type, suction power, water level, and repetitions in the MyDyson app; Matter-initiated zone cleans will use those saved room preferences.
-
-#### 🚧 Why is `Vacuum then mop` not available as an RVC Clean Mode in Apple Home? 🚧
-
-<!-- INCLUDES: issue-53-56c7 -->
-The `Vacuum then mop` cleaning strategy (shown as **Vacuum then Wash** in the MyDyson app on robots such as the Dyson R2 Nurovi) is deliberately omitted from the plugin's RVC Clean Mode list.
-
-- **Robot status reporting limitation**: The plugin uses the mopping RVC Clean Mode options solely to report the robot's current activity during a clean. Dyson's `CURRENT-STATE` MQTT message only reports `NONE`, `MOPPING`, `VACUUMING`, and `VACUUMING_AND_MOPPING`—using `VACUUMING_AND_MOPPING` for both simultaneous and sequential (`Vacuum then mop`) cleaning—and `/status/jdm` messages do not appear to distinguish between them either. Because the plugin does not modify per-zone cleaning configurations and cannot detect this mode from status updates, it would never report `Vacuum then mop` as the active state.
-- **Apple Home ModeTag presentation**: Apple Home treats the Matter `VacuumThenMop` RVC Clean Mode tag as a modifier in the bottom-left tile menu (alongside vacuum power levels) rather than as a primary mode under the central Play button. Because Apple Home displays individual ModeTags rather than combined mode labels, exposing `VacuumThenMop` would conflict with selecting a vacuum power level.
+- **Identical device telemetry**: Dyson robot `CURRENT-STATE` MQTT messages only report `NONE`, `MOPPING`, `VACUUMING`, and `VACUUMING_AND_MOPPING`—using `VACUUMING_AND_MOPPING` for both simultaneous and sequential operations—and `/status/jdm` messages do not appear to distinguish between them either. Because the plugin cannot detect sequential mode from status updates, it could never report `Vacuum then mop` as the active state.
+- **Apple Home interpretation**: The Apple Home app only treats `Vacuum` and `Mop` Mode Tags (and the `Vacuum` plus `Mop` combination) as primary RVC Clean Modes displayed prominently under the Play button used to initiate a clean. The `Vacuum then Mop` Mode Tag is treated like intensity settings (such as `Quick`, `Min`, and `Max`) as a secondary mode in the menu accessed via the icon in the bottom-left corner of the tile. The Home app flattens the list of all Mode Tags, allowing only one to be selected at a time, which conflicts with vacuum power mode selection.
 
 To use sequential vacuuming and mopping, select **Vacuum then Wash** per room in the MyDyson app; during operation, the plugin reports the active state as Vacuum and Mop.
 
